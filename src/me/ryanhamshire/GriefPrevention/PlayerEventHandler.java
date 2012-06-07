@@ -434,14 +434,18 @@ class PlayerEventHandler implements Listener
 		long elapsed = Calendar.getInstance().getTimeInMillis() - playerData.lastLogout;
 		
 		//remember message, then silence it.  may broadcast it later
-		String message = event.getJoinMessage();
-		event.setJoinMessage(null);
 		
-		if(message != null && elapsed >= GriefPrevention.NOTIFICATION_SECONDS * 1000)
-		{
-			//start a timer for a delayed join notification message (will only show if player is still online in 30 seconds)
-			JoinLeaveAnnouncementTask task = new JoinLeaveAnnouncementTask(event.getPlayer(), message, true);		
-			GriefPrevention.instance.getServer().getScheduler().scheduleSyncDelayedTask(GriefPrevention.instance, task, 20L * GriefPrevention.NOTIFICATION_SECONDS);
+		//only do this if notification_seconds is bigger than 0
+		if(GriefPrevention.NOTIFICATION_SECONDS > 0) {
+			String message = event.getJoinMessage();
+			event.setJoinMessage(null);
+			
+			if(message != null && elapsed >= GriefPrevention.NOTIFICATION_SECONDS * 1000)
+			{
+				//start a timer for a delayed join notification message (will only show if player is still online in 30 seconds)
+				JoinLeaveAnnouncementTask task = new JoinLeaveAnnouncementTask(event.getPlayer(), message, true);		
+				GriefPrevention.instance.getServer().getScheduler().scheduleSyncDelayedTask(GriefPrevention.instance, task, 20L * GriefPrevention.NOTIFICATION_SECONDS);
+			}
 		}
 	}
 	
@@ -465,7 +469,11 @@ class PlayerEventHandler implements Listener
 		this.onPlayerDisconnect(event.getPlayer(), event.getQuitMessage());
 		
 		//silence the leave message (may be broadcast later, if the player stays offline)
-		event.setQuitMessage(null);
+		
+		//only do this if notification_seconds is bigger than 0
+		if(GriefPrevention.NOTIFICATION_SECONDS > 0) {
+			event.setQuitMessage(null);			
+		}
 	}
 	
 	//helper for above
@@ -496,11 +504,15 @@ class PlayerEventHandler implements Listener
 		playerData.lastLogout = Calendar.getInstance().getTimeInMillis();
 		
 		//if notification message isn't null and the player has been online for at least 30 seconds...
-		if(notificationMessage != null && elapsed >= 1000 * GriefPrevention.NOTIFICATION_SECONDS)
-		{
-			//start a timer for a delayed leave notification message (will only show if player is still offline in 30 seconds)
-			JoinLeaveAnnouncementTask task = new JoinLeaveAnnouncementTask(player, notificationMessage, false);		
-			GriefPrevention.instance.getServer().getScheduler().scheduleSyncDelayedTask(GriefPrevention.instance, task, 20L * GriefPrevention.NOTIFICATION_SECONDS);		
+		
+		//only do this if notification_seconds is bigger than 0
+		if(GriefPrevention.NOTIFICATION_SECONDS > 0) {
+			if(notificationMessage != null && elapsed >= 1000 * GriefPrevention.NOTIFICATION_SECONDS)
+			{
+				//start a timer for a delayed leave notification message (will only show if player is still offline in 30 seconds)
+				JoinLeaveAnnouncementTask task = new JoinLeaveAnnouncementTask(player, notificationMessage, false);		
+				GriefPrevention.instance.getServer().getScheduler().scheduleSyncDelayedTask(GriefPrevention.instance, task, 20L * GriefPrevention.NOTIFICATION_SECONDS);		
+			}
 		}
 	}
 

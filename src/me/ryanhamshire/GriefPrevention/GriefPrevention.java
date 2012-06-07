@@ -117,7 +117,7 @@ public class GriefPrevention extends JavaPlugin
 	public static final int TREE_RADIUS = 5;
 	
 	//how long to wait before deciding a player is staying online or staying offline, for notication messages
-	public static final int NOTIFICATION_SECONDS = 20;
+	public static int NOTIFICATION_SECONDS = 20;
 	
 	//adds a server log entry
 	public static void AddLogEntry(String entry)
@@ -222,6 +222,7 @@ public class GriefPrevention extends JavaPlugin
 		this.config_spam_allowedIpAddresses = config.getString("GriefPrevention.Spam.AllowedIpAddresses", "1.2.3.4; 5.6.7.8");
 		this.config_spam_banOffenders = config.getBoolean("GriefPrevention.Spam.BanOffenders", true);		
 		this.config_spam_banMessage = config.getString("GriefPrevention.Spam.BanMessage", "Banned for spam.");
+		this.NOTIFICATION_SECONDS = config.getInt("GriefPrevention.Spam.JoinLeaveDelay", 20);
 		String slashCommandsToMonitor = config.getString("GriefPrevention.Spam.MonitorSlashCommands", "/me;/tell;/global;/local");
 		
 		this.config_pvp_protectFreshSpawns = config.getBoolean("GriefPrevention.PvP.ProtectFreshSpawns", true);
@@ -338,6 +339,7 @@ public class GriefPrevention extends JavaPlugin
 		config.set("GriefPrevention.Spam.WarningMessage", this.config_spam_warningMessage);
 		config.set("GriefPrevention.Spam.BanOffenders", this.config_spam_banOffenders);		
 		config.set("GriefPrevention.Spam.BanMessage", this.config_spam_banMessage);
+		config.set("GriefPrevention.Spam.JoinLeaveDelay", this.NOTIFICATION_SECONDS);
 		config.set("GriefPrevention.Spam.AllowedIpAddresses", this.config_spam_allowedIpAddresses);
 		
 		config.set("GriefPrevention.PvP.ProtectFreshSpawns", this.config_pvp_protectFreshSpawns);
