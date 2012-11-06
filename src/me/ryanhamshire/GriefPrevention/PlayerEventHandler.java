@@ -639,6 +639,8 @@ class PlayerEventHandler implements Listener
 		
 		//these rules only apply to non-ender-pearl teleportation
 		if(event.getCause() == TeleportCause.ENDER_PEARL) return;
+		//prevent blocking other plugins like survival games
+		if(event.getCause() == TeleportCause.PLUGIN) return;
 		
 		Player player = event.getPlayer();
 		
