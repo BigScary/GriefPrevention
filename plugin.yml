@@ -161,6 +161,9 @@ permissions:
     griefprevention.spam:
         description: Grants permission to log in, send messages, and send commands rapidly.
         default: op
+    griefprevention.spam.capslock:
+        description: Grants permission to send messages with excessive use of caps lock.
+        default: op
     griefprevention.lava:
         description: Grants permission to place lava near the surface and outside of claims.
         default: op

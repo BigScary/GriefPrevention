@@ -126,12 +126,15 @@ class PlayerEventHandler implements Listener
 		if(player.hasPermission("griefprevention.spam")) return false;
 		
 		//remedy any CAPS SPAM without bothering to fault the player for it
-		if(message.length() > 4 && this.stringsAreSimilar(message.toUpperCase(), message))
-		{
-			if(event instanceof AsyncPlayerChatEvent)
-			{
-				((AsyncPlayerChatEvent)event).setMessage(message.toLowerCase());
-			}
+    if(!player.hasPermission("griefprevention.spam.capslock"))
+    {
+      if(message.length() > 4 && this.stringsAreSimilar(message.toUpperCase(), message))
+      {
+        if(event instanceof AsyncPlayerChatEvent)
+        {
+          ((AsyncPlayerChatEvent)event).setMessage(message.toLowerCase());
+        }
+      }
 		}
 		
 		//where other types of spam are concerned, casing isn't significant
