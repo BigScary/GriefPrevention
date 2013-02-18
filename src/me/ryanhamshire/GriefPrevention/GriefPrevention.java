@@ -312,8 +312,9 @@ public class GriefPrevention extends JavaPlugin
 		this.config_claims_warnOnBuildOutside = config.getBoolean("GriefPrevention.Claims.WarnWhenBuildingOutsideClaims", true);
 		this.config_claims_allowUnclaimInCreative = config.getBoolean("GriefPrevention.Claims.AllowUnclaimingCreativeModeLand", true);
 		this.config_claims_autoRestoreUnclaimedCreativeLand = config.getBoolean("GriefPrevention.Claims.AutoRestoreUnclaimedCreativeLand", true);
+
                 this.config_claims_drainLiquidsOnAbandon = config.getBoolean("GriefPrevention.Claims.DrainLiquidsOnAbandon", true);
-                this.config_trackSignChanges = config.getBoolean("GriefPrevention.Claims.TrackSignChanges", true);
+                this.config_trackSignChanges = config.getBoolean("GriefPrevention.TrackSignChanges", true);
 
 		this.config_claims_chestClaimExpirationDays = config.getInt("GriefPrevention.Claims.Expiration.ChestClaimDays", 7);
 		outConfig.set("GriefPrevention.Claims.Expiration.ChestClaimDays", this.config_claims_chestClaimExpirationDays);
@@ -572,6 +573,7 @@ public class GriefPrevention extends JavaPlugin
 		outConfig.set("GriefPrevention.Claims.WarnWhenBuildingOutsideClaims", this.config_claims_warnOnBuildOutside);
 		outConfig.set("GriefPrevention.Claims.AllowUnclaimingCreativeModeLand", this.config_claims_allowUnclaimInCreative);
 		outConfig.set("GriefPrevention.Claims.AutoRestoreUnclaimedCreativeLand", this.config_claims_autoRestoreUnclaimedCreativeLand);
+                outConfig.set("GriefPrevention.Claims.DrainLiquidsOnAbandon", this.config_claims_drainLiquidsOnAbandon);
 		
 		outConfig.set("GriefPrevention.Spam.Enabled", this.config_spam_enabled);
 		outConfig.set("GriefPrevention.Spam.LoginCooldownMinutes", this.config_spam_loginCooldownMinutes);
@@ -617,7 +619,8 @@ public class GriefPrevention extends JavaPlugin
 		outConfig.set("GriefPrevention.EndermenMoveBlocks", this.config_endermenMoveBlocks);
 		outConfig.set("GriefPrevention.SilverfishBreakBlocks", this.config_silverfishBreakBlocks);		
 		outConfig.set("GriefPrevention.CreaturesTrampleCrops", this.config_creaturesTrampleCrops);
-		outConfig.set("GriefPrevention.HardModeZombiesBreakDoors", this.config_zombiesBreakDoors);		
+		outConfig.set("GriefPrevention.HardModeZombiesBreakDoors", this.config_zombiesBreakDoors);
+                outConfig.set("GriefPrevention.TrackSignChanges", this.config_trackSignChanges);
 		
 		outConfig.set("GriefPrevention.Database.URL", databaseUrl);
 		outConfig.set("GriefPrevention.Database.UserName", databaseUserName);
@@ -1569,8 +1572,8 @@ public class GriefPrevention extends JavaPlugin
 
 			GriefPrevention.sendMessage(player, TextMode.Success, Messages.SetBlockBankSuccess, otherPlayer.getName());
 			if(player != null)
-			{
-				GriefPrevention.AddLogEntry(player.getName() + " set the block bank belonging to " + otherPlayer.getName() + "to" + adjustment + ".");
+			{			
+				GriefPrevention.AddLogEntry(player.getName() + " set the block bank belonging to " + otherPlayer.getName() + " to " + adjustment + ".");
 			
 				//revert any current visualization
 				Visualization.Revert(player);
