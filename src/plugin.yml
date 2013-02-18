@@ -61,7 +61,7 @@ commands:
       usage: /DeleteAllClaims <player>
       permission: griefprevention.deleteclaims
    resetclaims:
-      description: Deletes all of another player's claims and sets that players accrued block balance to zero.
+      description: Deletes all of another player's claims and sets their claim block balance to the initial value from config.
       usage: /ResetClaims <player>
       permission: griefprevention.deleteclaims
    setblockbank:

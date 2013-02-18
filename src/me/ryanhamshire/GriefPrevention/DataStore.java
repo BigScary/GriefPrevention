@@ -841,7 +841,7 @@ public abstract class DataStore
 		this.addDefault(defaults, Messages.DeleteSuccess, "Claim deleted.", null);
 		this.addDefault(defaults, Messages.CantDeleteAdminClaim, "You don't have permission to delete administrative claims.", null);
 		this.addDefault(defaults, Messages.DeleteAllSuccess, "Deleted all of {0}'s claims.", "0: owner's name");
-		this.addDefault(defaults, Messages.ResetSuccess, "Reset {0}'s claims and block bank.", "0: owner's name");
+		this.addDefault(defaults, Messages.ResetSuccess, "Reset {0}'s status to initial settings.", "0: owner's name");
 		this.addDefault(defaults, Messages.SetBlockBankSuccess, "Set {0}'s block bank to new amount.", "0: owner's name");
 		this.addDefault(defaults, Messages.NoDeletePermission, "You don't have permission to delete claims.", null);
 		this.addDefault(defaults, Messages.AllAdminDeleted, "Deleted all administrative claims.", null);

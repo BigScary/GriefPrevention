@@ -1528,12 +1528,12 @@ public class GriefPrevention extends JavaPlugin
 			this.dataStore.deleteClaimsForPlayer(otherPlayer.getName(), true);
                         //set claim blocks bank to zero
 			PlayerData playerData = this.dataStore.getPlayerData(otherPlayer.getName());
-			playerData.accruedClaimBlocks = 0;                        
+			playerData.accruedClaimBlocks = GriefPrevention.instance.config_claims_initialBlocks;                        
 
 			GriefPrevention.sendMessage(player, TextMode.Success, Messages.ResetSuccess, otherPlayer.getName());
 			if(player != null)
 			{
-				GriefPrevention.AddLogEntry(player.getName() + " reset all claims and the block bank belonging to " + otherPlayer.getName() + ".");
+				GriefPrevention.AddLogEntry(player.getName() + " reset " + otherPlayer.getName() + " to initial settings.");
 			
 				//revert any current visualization
 				Visualization.Revert(player);
