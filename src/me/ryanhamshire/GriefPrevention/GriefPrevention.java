@@ -1419,7 +1419,8 @@ public class GriefPrevention extends JavaPlugin
 					}
 					else
 					{
-						claim.removeSurfaceFluids(null);
+                                                if (GriefPrevention.instance.config_claims_drainLiquidsOnAbandon)
+                                                        claim.removeSurfaceFluids(null);
 						this.dataStore.deleteClaim(claim);
 						
 						//if in a creative mode world, /restorenature the claim
@@ -1991,7 +1992,9 @@ public class GriefPrevention extends JavaPlugin
 		else
 		{
 			//delete it
-			claim.removeSurfaceFluids(null);
+                        if (GriefPrevention.instance.config_claims_drainLiquidsOnAbandon)
+                                claim.removeSurfaceFluids(null);
+                        
 			this.dataStore.deleteClaim(claim);
 			
 			//if in a creative mode world, restore the claim area
