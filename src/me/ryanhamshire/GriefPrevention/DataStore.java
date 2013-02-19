@@ -728,7 +728,8 @@ public abstract class DataStore
 		for(int i = 0; i < claimsToDelete.size(); i++)
 		{
                         Claim claim = claimsToDelete.get(i); 
-                        claim.removeSurfaceFluids(null);
+                        if (GriefPrevention.instance.config_claims_drainLiquidsOnAbandon)
+                                claim.removeSurfaceFluids(null);
 			
 			this.deleteClaim(claim);
 			
