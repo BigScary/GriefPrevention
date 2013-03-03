@@ -62,97 +62,100 @@ public class GriefPrevention extends JavaPlugin
 	
 	//configuration variables, loaded/saved from a config.yml
 	public ArrayList<World> config_claims_enabledWorlds;			//list of worlds where players can create GriefPrevention claims
-	public ArrayList<World> config_claims_enabledCreativeWorlds;	//list of worlds where additional creative mode anti-grief rules apply
+	public ArrayList<World> config_claims_enabledCreativeWorlds;            //list of worlds where additional creative mode anti-grief rules apply
 	
-	public boolean config_claims_preventTheft;						//whether containers and crafting blocks are protectable
-	public boolean config_claims_protectCreatures;					//whether claimed animals may be injured by players without permission
+	public boolean config_claims_preventTheft;				//whether containers and crafting blocks are protectable
+	public boolean config_claims_protectCreatures;				//whether claimed animals may be injured by players without permission
 	public boolean config_claims_preventButtonsSwitches;			//whether buttons and switches are protectable
-	public boolean config_claims_lockWoodenDoors;					//whether wooden doors should be locked by default (require /accesstrust)
-	public boolean config_claims_lockTrapDoors;						//whether trap doors should be locked by default (require /accesstrust)
-	public boolean config_claims_lockFenceGates;					//whether fence gates should be locked by default (require /accesstrust)
+	public boolean config_claims_lockWoodenDoors;				//whether wooden doors should be locked by default (require /accesstrust)
+	public boolean config_claims_lockTrapDoors;				//whether trap doors should be locked by default (require /accesstrust)
+	public boolean config_claims_lockFenceGates;				//whether fence gates should be locked by default (require /accesstrust)
 	public boolean config_claims_enderPearlsRequireAccessTrust;		//whether teleporting into a claim with a pearl requires access trust
 	
-	public int config_claims_initialBlocks;							//the number of claim blocks a new player starts with
-	public int config_claims_blocksAccruedPerHour;					//how many additional blocks players get each hour of play (can be zero)
-	public int config_claims_maxAccruedBlocks;						//the limit on accrued blocks (over time).  doesn't limit purchased or admin-gifted blocks 
-	public int config_claims_maxDepth;								//limit on how deep claims can go
-	public int config_claims_expirationDays;						//how many days of inactivity before a player loses his claims
+	public int config_claims_initialBlocks;					//the number of claim blocks a new player starts with
+	public int config_claims_blocksAccruedPerHour;				//how many additional blocks players get each hour of play (can be zero)
+	public int config_claims_maxAccruedBlocks;				//the limit on accrued blocks (over time).  doesn't limit purchased or admin-gifted blocks 
+	public int config_claims_maxDepth;					//limit on how deep claims can go
+	public int config_claims_expirationDays;				//how many days of inactivity before a player loses his claims
 	
-	public int config_claims_automaticClaimsForNewPlayersRadius;	//how big automatic new player claims (when they place a chest) should be.  0 to disable
+	public int config_claims_automaticClaimsForNewPlayersRadius;            //how big automatic new player claims (when they place a chest) should be.  0 to disable
 	public boolean config_claims_creationRequiresPermission;		//whether creating claims with the shovel requires a permission
 	public int config_claims_claimsExtendIntoGroundDistance;		//how far below the shoveled block a new claim will reach
-	public int config_claims_minSize;								//minimum width and height for non-admin claims
+	public int config_claims_minSize;					//minimum width and height for non-admin claims
 	public boolean config_claims_allowUnclaimInCreative;			//whether players may unclaim land (resize or abandon) in creative mode
-	public boolean config_claims_autoRestoreUnclaimedCreativeLand; 	//whether unclaimed land in creative worlds is automatically /restorenature-d
+	public boolean config_claims_autoRestoreUnclaimedCreativeLand;          //whether unclaimed land in creative worlds is automatically /restorenature-d
 	
-	public boolean config_claims_noBuildOutsideClaims;				//whether players can build in survival worlds outside their claimed areas
+	public boolean config_claims_noBuildOutsideClaims;			//whether players can build in survival worlds outside their claimed areas
 	
-	public int config_claims_chestClaimExpirationDays;				//number of days of inactivity before an automatic chest claim will be deleted
-	public int config_claims_unusedClaimExpirationDays;				//number of days of inactivity before an unused (nothing build) claim will be deleted
+	public int config_claims_chestClaimExpirationDays;			//number of days of inactivity before an automatic chest claim will be deleted
+	public int config_claims_unusedClaimExpirationDays;			//number of days of inactivity before an unused (nothing build) claim will be deleted
 	public boolean config_claims_survivalAutoNatureRestoration;		//whether survival claims will be automatically restored to nature when auto-deleted
 	public boolean config_claims_creativeAutoNatureRestoration;		//whether creative claims will be automatically restored to nature when auto-deleted
 	
-	public int config_claims_trappedCooldownHours;					//number of hours between uses of the /trapped command
+	public int config_claims_trappedCooldownHours;				//number of hours between uses of the /trapped command
 	
-	public Material config_claims_investigationTool;				//which material will be used to investigate claims with a right click
-	public Material config_claims_modificationTool;	  				//which material will be used to create/resize claims with a right click
+	public Material config_claims_investigationTool;			//which material will be used to investigate claims with a right click
+	public Material config_claims_modificationTool;	  			//which material will be used to create/resize claims with a right click
 	
-	public ArrayList<World> config_siege_enabledWorlds;				//whether or not /siege is enabled on this server
-	public ArrayList<Material> config_siege_blocks;					//which blocks will be breakable in siege mode
+	public ArrayList<World> config_siege_enabledWorlds;			//whether or not /siege is enabled on this server
+	public ArrayList<Material> config_siege_blocks;				//which blocks will be breakable in siege mode
 		
-	public boolean config_spam_enabled;								//whether or not to monitor for spam
-	public int config_spam_loginCooldownMinutes;					//how long players must wait between logins.  combats login spam.
-	public ArrayList<String> config_spam_monitorSlashCommands;  	//the list of slash commands monitored for spam
-	public boolean config_spam_banOffenders;						//whether or not to ban spammers automatically
-	public String config_spam_banMessage;							//message to show an automatically banned player
-	public String config_spam_warningMessage;						//message to show a player who is close to spam level
-	public String config_spam_allowedIpAddresses;					//IP addresses which will not be censored
-	public int config_spam_deathMessageCooldownSeconds;				//cooldown period for death messages (per player) in seconds
+	public boolean config_spam_enabled;					//whether or not to monitor for spam
+	public int config_spam_loginCooldownMinutes;				//how long players must wait between logins.  combats login spam.
+	public ArrayList<String> config_spam_monitorSlashCommands;              //the list of slash commands monitored for spam
+	public boolean config_spam_banOffenders;				//whether or not to ban spammers automatically
+	public String config_spam_banMessage;					//message to show an automatically banned player
+	public String config_spam_warningMessage;				//message to show a player who is close to spam level
+	public String config_spam_allowedIpAddresses;				//IP addresses which will not be censored
+	public int config_spam_deathMessageCooldownSeconds;			//cooldown period for death messages (per player) in seconds
 	
-	public ArrayList<World> config_pvp_enabledWorlds;				//list of worlds where pvp anti-grief rules apply
-	public boolean config_pvp_protectFreshSpawns;					//whether to make newly spawned players immune until they pick up an item
-	public boolean config_pvp_punishLogout;						    //whether to kill players who log out during PvP combat
-	public int config_pvp_combatTimeoutSeconds;						//how long combat is considered to continue after the most recent damage
-	public boolean config_pvp_allowCombatItemDrop;					//whether a player can drop items during combat to hide them
+	public ArrayList<World> config_pvp_enabledWorlds;			//list of worlds where pvp anti-grief rules apply
+	public boolean config_pvp_protectFreshSpawns;				//whether to make newly spawned players immune until they pick up an item
+	public boolean config_pvp_punishLogout;					//whether to kill players who log out during PvP combat
+	public int config_pvp_combatTimeoutSeconds;				//how long combat is considered to continue after the most recent damage
+	public boolean config_pvp_allowCombatItemDrop;				//whether a player can drop items during combat to hide them
 	public ArrayList<String> config_pvp_blockedCommands;			//list of commands which may not be used during pvp combat
 	public boolean config_pvp_noCombatInPlayerLandClaims;			//whether players may fight in player-owned land claims
 	public boolean config_pvp_noCombatInAdminLandClaims;			//whether players may fight in admin-owned land claims
 	
-	public boolean config_trees_removeFloatingTreetops;				//whether to automatically remove partially cut trees
-	public boolean config_trees_regrowGriefedTrees;					//whether to automatically replant partially cut trees
+	public boolean config_trees_removeFloatingTreetops;			//whether to automatically remove partially cut trees
+	public boolean config_trees_regrowGriefedTrees;				//whether to automatically replant partially cut trees
 	
 	public double config_economy_claimBlocksPurchaseCost;			//cost to purchase a claim block.  set to zero to disable purchase.
-	public double config_economy_claimBlocksSellValue;				//return on a sold claim block.  set to zero to disable sale.
+	public double config_economy_claimBlocksSellValue;			//return on a sold claim block.  set to zero to disable sale.
 	
 	public boolean config_blockSurfaceCreeperExplosions;			//whether creeper explosions near or above the surface destroy blocks
-	public boolean config_blockSurfaceOtherExplosions;				//whether non-creeper explosions near or above the surface destroy blocks
-	public boolean config_blockWildernessWaterBuckets;				//whether players can dump water buckets outside their claims
-	public boolean config_blockSkyTrees;							//whether players can build trees on platforms in the sky
+	public boolean config_blockSurfaceOtherExplosions;			//whether non-creeper explosions near or above the surface destroy blocks
+	public boolean config_blockWildernessWaterBuckets;			//whether players can dump water buckets outside their claims
+	public boolean config_blockSkyTrees;					//whether players can build trees on platforms in the sky
 	
-	public boolean config_fireSpreads;								//whether fire spreads outside of claims
-	public boolean config_fireDestroys;								//whether fire destroys blocks outside of claims
+	public boolean config_fireSpreads;					//whether fire spreads outside of claims
+	public boolean config_fireDestroys;					//whether fire destroys blocks outside of claims
 	
-	public boolean config_addItemsToClaimedChests;					//whether players may add items to claimed chests by left-clicking them
+	public boolean config_addItemsToClaimedChests;				//whether players may add items to claimed chests by left-clicking them
 	public boolean config_eavesdrop; 								//whether whispered messages will be visible to administrators
 	public ArrayList<String> config_eavesdrop_whisperCommands;		//list of whisper commands to eavesdrop on
 	
-	public boolean config_smartBan;									//whether to ban accounts which very likely owned by a banned player
+	public boolean config_smartBan;						//whether to ban accounts which very likely owned by a banned player
 	
-	public boolean config_endermenMoveBlocks;						//whether or not endermen may move blocks around
-	public boolean config_silverfishBreakBlocks;					//whether silverfish may break blocks
-	public boolean config_creaturesTrampleCrops;					//whether or not non-player entities may trample crops
-	public boolean config_zombiesBreakDoors;						//whether or not hard-mode zombies may break down wooden doors
+	public boolean config_endermenMoveBlocks;				//whether or not endermen may move blocks around
+	public boolean config_silverfishBreakBlocks;				//whether silverfish may break blocks
+	public boolean config_creaturesTrampleCrops;				//whether or not non-player entities may trample crops
+	public boolean config_zombiesBreakDoors;				//whether or not hard-mode zombies may break down wooden doors
 	
 	public MaterialCollection config_mods_accessTrustIds;			//list of block IDs which should require /accesstrust for player interaction
 	public MaterialCollection config_mods_containerTrustIds;		//list of block IDs which should require /containertrust for player interaction
 	public List<String> config_mods_ignoreClaimsAccounts;			//list of player names which ALWAYS ignore claims
 	public MaterialCollection config_mods_explodableIds;			//list of block IDs which can be destroyed by explosions, even in claimed areas
 
-	public boolean config_claims_warnOnBuildOutside;				//whether players should be warned when they're building in an unclaimed area
+	public boolean config_claims_warnOnBuildOutside;			//whether players should be warned when they're building in an unclaimed area
 	
 	public HashMap<String, Integer> config_seaLevelOverride;		//override for sea level, because bukkit doesn't report the right value for all situations
 	
-	//reference to the economy plugin, if economy integration is enabled
+        public boolean config_claims_drainLiquidsOnAbandon;                     //set to false to prevent surface liquids being drained when claim is abandoned
+        public boolean config_trackSignChanges;                                 //set to false to prevent sign place/change alerts
+        
+        //reference to the economy plugin, if economy integration is enabled
 	public static Economy economy = null;					
 	
 	//how far away to search from a tree trunk for its branch blocks
@@ -308,7 +311,10 @@ public class GriefPrevention extends JavaPlugin
 		this.config_claims_noBuildOutsideClaims = config.getBoolean("GriefPrevention.Claims.NoSurvivalBuildingOutsideClaims", false);
 		this.config_claims_warnOnBuildOutside = config.getBoolean("GriefPrevention.Claims.WarnWhenBuildingOutsideClaims", true);
 		this.config_claims_allowUnclaimInCreative = config.getBoolean("GriefPrevention.Claims.AllowUnclaimingCreativeModeLand", true);
-		this.config_claims_autoRestoreUnclaimedCreativeLand = config.getBoolean("GriefPrevention.Claims.AutoRestoreUnclaimedCreativeLand", true);		
+		this.config_claims_autoRestoreUnclaimedCreativeLand = config.getBoolean("GriefPrevention.Claims.AutoRestoreUnclaimedCreativeLand", true);
+
+                this.config_claims_drainLiquidsOnAbandon = config.getBoolean("GriefPrevention.Claims.DrainLiquidsOnAbandon", true);
+                this.config_trackSignChanges = config.getBoolean("GriefPrevention.TrackSignChanges", true);
 
 		this.config_claims_chestClaimExpirationDays = config.getInt("GriefPrevention.Claims.Expiration.ChestClaimDays", 7);
 		outConfig.set("GriefPrevention.Claims.Expiration.ChestClaimDays", this.config_claims_chestClaimExpirationDays);
@@ -567,6 +573,7 @@ public class GriefPrevention extends JavaPlugin
 		outConfig.set("GriefPrevention.Claims.WarnWhenBuildingOutsideClaims", this.config_claims_warnOnBuildOutside);
 		outConfig.set("GriefPrevention.Claims.AllowUnclaimingCreativeModeLand", this.config_claims_allowUnclaimInCreative);
 		outConfig.set("GriefPrevention.Claims.AutoRestoreUnclaimedCreativeLand", this.config_claims_autoRestoreUnclaimedCreativeLand);
+                outConfig.set("GriefPrevention.Claims.DrainLiquidsOnAbandon", this.config_claims_drainLiquidsOnAbandon);
 		
 		outConfig.set("GriefPrevention.Spam.Enabled", this.config_spam_enabled);
 		outConfig.set("GriefPrevention.Spam.LoginCooldownMinutes", this.config_spam_loginCooldownMinutes);
@@ -612,7 +619,8 @@ public class GriefPrevention extends JavaPlugin
 		outConfig.set("GriefPrevention.EndermenMoveBlocks", this.config_endermenMoveBlocks);
 		outConfig.set("GriefPrevention.SilverfishBreakBlocks", this.config_silverfishBreakBlocks);		
 		outConfig.set("GriefPrevention.CreaturesTrampleCrops", this.config_creaturesTrampleCrops);
-		outConfig.set("GriefPrevention.HardModeZombiesBreakDoors", this.config_zombiesBreakDoors);		
+		outConfig.set("GriefPrevention.HardModeZombiesBreakDoors", this.config_zombiesBreakDoors);
+                outConfig.set("GriefPrevention.TrackSignChanges", this.config_trackSignChanges);
 		
 		outConfig.set("GriefPrevention.Database.URL", databaseUrl);
 		outConfig.set("GriefPrevention.Database.UserName", databaseUserName);
@@ -1411,7 +1419,8 @@ public class GriefPrevention extends JavaPlugin
 					}
 					else
 					{
-						claim.removeSurfaceFluids(null);
+                                                if (GriefPrevention.instance.config_claims_drainLiquidsOnAbandon)
+                                                        claim.removeSurfaceFluids(null);
 						this.dataStore.deleteClaim(claim);
 						
 						//if in a creative mode world, /restorenature the claim
@@ -1500,7 +1509,80 @@ public class GriefPrevention extends JavaPlugin
 			
 			return true;
 		}
-		
+
+		//resetclaims <player>
+		else if(cmd.getName().equalsIgnoreCase("resetclaims"))
+		{
+			//requires exactly one parameter, the other player's name
+			if(args.length != 1) return false;
+			
+			//try to find that player
+			OfflinePlayer otherPlayer = this.resolvePlayer(args[0]);
+			if(otherPlayer == null)
+			{
+				GriefPrevention.sendMessage(player, TextMode.Err, Messages.PlayerNotFound);
+				return true;
+			}
+			
+			//delete all that player's claims
+			this.dataStore.deleteClaimsForPlayer(otherPlayer.getName(), true);
+                        //set claim blocks bank to zero
+			PlayerData playerData = this.dataStore.getPlayerData(otherPlayer.getName());
+			playerData.accruedClaimBlocks = GriefPrevention.instance.config_claims_initialBlocks;                        
+
+			GriefPrevention.sendMessage(player, TextMode.Success, Messages.ResetSuccess, otherPlayer.getName());
+			if(player != null)
+			{
+				GriefPrevention.AddLogEntry(player.getName() + " reset " + otherPlayer.getName() + " to initial settings.");
+			
+				//revert any current visualization
+				Visualization.Revert(player);
+			}
+			
+			return true;
+		}
+
+		//setblockbank <player> <value>
+		else if(cmd.getName().equalsIgnoreCase("setblockbank"))
+		{
+			//requires exactly two parameter, the other player's name
+			if(args.length != 2) return false;
+			
+			//try to find that player
+			OfflinePlayer otherPlayer = this.resolvePlayer(args[0]);
+			if(otherPlayer == null)
+			{
+				GriefPrevention.sendMessage(player, TextMode.Err, Messages.PlayerNotFound);
+				return true;
+			}
+
+			//parse the amount to set the player's block bank to
+			int adjustment;			
+			try
+			{
+				adjustment = Integer.parseInt(args[1]);
+			}
+			catch(NumberFormatException numberFormatException)
+			{
+				return false;  //causes usage to be displayed
+			}
+                        
+                        //set claim blocks bank to indicated value
+			PlayerData playerData = this.dataStore.getPlayerData(otherPlayer.getName());
+			playerData.accruedClaimBlocks = adjustment;                        
+
+			GriefPrevention.sendMessage(player, TextMode.Success, Messages.SetBlockBankSuccess, otherPlayer.getName());
+			if(player != null)
+			{			
+				GriefPrevention.AddLogEntry(player.getName() + " set the block bank belonging to " + otherPlayer.getName() + " to " + adjustment + ".");
+			
+				//revert any current visualization
+				Visualization.Revert(player);
+			}
+			
+			return true;
+		}
+
 		//claimslist or claimslist <player>
 		else if(cmd.getName().equalsIgnoreCase("claimslist"))
 		{
@@ -1901,7 +1983,7 @@ public class GriefPrevention extends JavaPlugin
 		}
 		
 		//if the claim has lots of surface water or some surface lava, warn the player it will be cleaned up
-		else if(!playerData.warnedAboutMajorDeletion && claim.hasSurfaceFluids())
+		else if(!playerData.warnedAboutMajorDeletion && claim.hasSurfaceFluids() && GriefPrevention.instance.config_claims_drainLiquidsOnAbandon)
 		{			
 			GriefPrevention.sendMessage(player, TextMode.Warn, Messages.ConfirmFluidRemoval);
 			playerData.warnedAboutMajorDeletion = true;
@@ -1910,7 +1992,9 @@ public class GriefPrevention extends JavaPlugin
 		else
 		{
 			//delete it
-			claim.removeSurfaceFluids(null);
+                        if (GriefPrevention.instance.config_claims_drainLiquidsOnAbandon)
+                                claim.removeSurfaceFluids(null);
+                        
 			this.dataStore.deleteClaim(claim);
 			
 			//if in a creative mode world, restore the claim area
