@@ -434,8 +434,9 @@ class PlayerEventHandler implements Listener
 				if(cooldownRemaining > 0 && !player.hasPermission("griefprevention.loginspam"))
 				{
 					//DAS BOOT!
-					event.setResult(Result.KICK_OTHER);				
-					event.setKickMessage("You must wait " + cooldownRemaining + " more minutes before logging-in again.");
+					event.setResult(Result.KICK_OTHER);
+					String cooldown = GriefPrevention.instance.dataStore.getMessage(Messages.LoginSpamWait, Long.toString(cooldownRemaining));
+					event.setKickMessage(cooldown);
 					event.disallow(event.getResult(), event.getKickMessage());
 					return;
 				}
