@@ -81,7 +81,7 @@ public class DatabaseDataStore extends DataStore
 			
 			statement.execute("CREATE TABLE IF NOT EXISTS griefprevention_playerdata (name VARCHAR(50), lastlogin DATETIME, accruedblocks INT(15), bonusblocks INT(15));");
 			
-			ResultSet tempresult = statement.executeQuery("SHOW COLUMNS FROM griefprevention_claimdata LIKE neverdelete");
+			ResultSet tempresult = statement.executeQuery("SHOW COLUMNS FROM griefprevention_claimdata LIKE 'neverdelete';");
 			
 			if(!tempresult.next()) {
 				statement.execute("ALTER TABLE griefprevention_claimdata ADD neverdelete BOOLEAN NOT NULL DEFAULT 0;");
@@ -338,7 +338,8 @@ public class DatabaseDataStore extends DataStore
 					containersString + "', '" +
 					accessorsString + "', '" +
 					managersString + "', " +
-					parentId +		
+					parentId +	", " +
+					claim.neverdelete +
 					");");
 		}
 		catch(SQLException e)

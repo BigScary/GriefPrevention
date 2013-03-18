@@ -1527,7 +1527,7 @@ public class GriefPrevention extends JavaPlugin
 		else if(cmd.getName().equalsIgnoreCase("deleteallclaims"))
 		{
 			//requires one or two parameters, the other player's name and whether to delete locked claims.
-			if(args.length >= 1 && args.length < 3) return false;
+			if(args.length < 1 && args.length > 2) return false;
 			
 			//try to find that player
 			OfflinePlayer otherPlayer = this.resolvePlayer(args[0]);

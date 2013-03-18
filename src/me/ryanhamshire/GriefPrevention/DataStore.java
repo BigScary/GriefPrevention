@@ -1001,7 +1001,7 @@ public abstract class DataStore
 		this.addDefault(defaults, Messages.ClaimExplosivesAdvertisement, "To allow explosives to destroy blocks in this land claim, use /ClaimExplosions.", null);
 		this.addDefault(defaults, Messages.PlayerInPvPSafeZone, "That player is in a PvP safe zone.", null);		
 		this.addDefault(defaults, Messages.ClaimLocked, "This claim has been successfully locked against accidental/automatic deletion. Use /unlockclaim to unlock.", null);		
-		this.addDefault(defaults, Messages.PlayerInPvPSafeZone, "This claim has been successfully unlocked.", null);		
+		this.addDefault(defaults, Messages.ClaimUnlocked, "This claim has been successfully unlocked.", null);		
 		
 		//load the config file
 		FileConfiguration config = YamlConfiguration.loadConfiguration(new File(messagesFilePath));
@@ -1066,7 +1066,7 @@ public abstract class DataStore
 	}
 	
 	synchronized public Long[] getClaimIds() {
-		return (Long[]) claims.claimmap.keySet().toArray();
+		return claims.claimmap.keySet().toArray(new Long[claims.claimmap.size()]);
 	}
 	
 	abstract void close();
