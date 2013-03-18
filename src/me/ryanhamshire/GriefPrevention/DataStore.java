@@ -22,6 +22,10 @@ import java.io.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+
+import me.ryanhamshire.GriefPrevention.tasks.SecureClaimTask;
+import me.ryanhamshire.GriefPrevention.tasks.SiegeCheckupTask;
+
 import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -79,7 +83,7 @@ public abstract class DataStore
 	}
 	
 	//removes cached player data from memory
-	synchronized void clearCachedPlayerData(String playerName)
+	public synchronized void clearCachedPlayerData(String playerName)
 	{
 		this.playerNameToPlayerDataMap.remove(playerName);
 	}
@@ -389,6 +393,11 @@ public abstract class DataStore
 		return claims.getID(i);
 	}
 	
+	@Deprecated
+	synchronized public CreateClaimResult createClaim(World world, int x1, int x2, int y1, int y2, int z1, int z2, String ownerName, Claim parent, Long id) {
+		return createClaim(world, x1, x2, y1, y2, z1, z2, ownerName, parent, id, false);
+	}
+	
 	//creates a claim.
 	//if the new claim would overlap an existing claim, returns a failure along with a reference to the existing claim
 	//otherwise, returns a success along with a reference to the new claim
@@ -398,7 +407,7 @@ public abstract class DataStore
 	//does NOT check a player has permission to create a claim, or enough claim blocks.
 	//does NOT check minimum claim size constraints
 	//does NOT visualize the new claim for any players	
-	synchronized public CreateClaimResult createClaim(World world, int x1, int x2, int y1, int y2, int z1, int z2, String ownerName, Claim parent, Long id)
+	synchronized public CreateClaimResult createClaim(World world, int x1, int x2, int y1, int y2, int z1, int z2, String ownerName, Claim parent, Long id, boolean neverdelete)
 	{
 		CreateClaimResult result = new CreateClaimResult();
 		
@@ -453,7 +462,7 @@ public abstract class DataStore
 			new String [] {},
 			new String [] {},
 			new String [] {},
-			id);
+			id, false);
 		
 		newClaim.parent = parent;
 		
@@ -716,16 +725,31 @@ public abstract class DataStore
 		claim.siegeData = playerData.siegeData;
 	}		
 	
+	//deletes all claims owned by a player with the exception of locked claims
+	@Deprecated
+	synchronized public void deleteClaimsForPlayer(String playerName, boolean deleteCreativeClaims) {
+		deleteClaimsForPlayer(playerName, deleteCreativeClaims, false);
+	}
+	
 	//deletes all claims owned by a player
-	synchronized public void deleteClaimsForPlayer(String playerName, boolean deleteCreativeClaims)
+	/**
+	 * Deletes all claims owned by a player
+	 * @param playerName Case SeNsItIvE player name
+	 * @param deleteCreativeClaims Delete all the player's creative claims?
+	 * @param deleteLockedClaims Should we delete claims that have been locked to not delete?
+	 */
+	synchronized public void deleteClaimsForPlayer(String playerName, boolean deleteCreativeClaims, boolean deleteLockedClaims)
 	{
 		//make a list of the player's claims
 		ArrayList<Claim> claimsToDelete = new ArrayList<Claim>();
 		for(int i = 0; i < this.claims.size(); i++)
 		{
 			Claim claim = this.claims.get(i);
-			if(claim.ownerName.equals(playerName) && (deleteCreativeClaims || !GriefPrevention.instance.creativeRulesApply(claim.getLesserBoundaryCorner())))
+			if(claim.ownerName.equals(playerName) && 
+					(deleteCreativeClaims || !GriefPrevention.instance.creativeRulesApply(claim.getLesserBoundaryCorner())) &&
+					(!claim.neverdelete || deleteLockedClaims)) {
 				claimsToDelete.add(claim);
+			}
 		}
 		
 		//delete them one by one
@@ -810,7 +834,8 @@ public abstract class DataStore
 		this.addDefault(defaults, Messages.RespectingClaims, "Now respecting claims.", null);
 		this.addDefault(defaults, Messages.IgnoringClaims, "Now ignoring claims.", null);
 		this.addDefault(defaults, Messages.NoCreativeUnClaim, "You can't unclaim this land.  You can only make this claim larger or create additional claims.", null);
-		this.addDefault(defaults, Messages.SuccessfulAbandon, "Claims abandoned.  You now have {0} available claim blocks.", "0: remaining blocks");
+		this.addDefault(defaults, Messages.SuccessfulAbandonExcludingLocked, "All claims abandoned except for locked claims.  You now have {0} available claim blocks.", "0: remaining blocks");
+		this.addDefault(defaults, Messages.SuccessfulAbandonIncludingLocked, "All claims abandoned including locked claims.  You now have {0} available claim blocks.", "0: remaining blocks");
 		this.addDefault(defaults, Messages.RestoreNatureActivate, "Ready to restore some nature!  Right click to restore nature, and use /BasicClaims to stop.", null);
 		this.addDefault(defaults, Messages.RestoreNatureAggressiveActivate, "Aggressive mode activated.  Do NOT use this underneath anything you want to keep!  Right click to aggressively restore nature, and use /BasicClaims to stop.", null);
 		this.addDefault(defaults, Messages.FillModeActive, "Fill mode activated with radius {0}.  Right click an area to fill.", "0: fill radius");
@@ -844,7 +869,8 @@ public abstract class DataStore
 		this.addDefault(defaults, Messages.DeletionSubdivisionWarning, "This claim includes subdivisions.  If you're sure you want to delete it, use /DeleteClaim again.", null);
 		this.addDefault(defaults, Messages.DeleteSuccess, "Claim deleted.", null);
 		this.addDefault(defaults, Messages.CantDeleteAdminClaim, "You don't have permission to delete administrative claims.", null);
-		this.addDefault(defaults, Messages.DeleteAllSuccess, "Deleted all of {0}'s claims.", "0: owner's name");
+		this.addDefault(defaults, Messages.DeleteAllSuccessExcludingLocked, "Deleted all of {0}'s claims excluding locked claims.", "0: owner's name");
+		this.addDefault(defaults, Messages.DeleteAllSuccessIncludingLocked, "Deleted all of {0}'s claims including locked claims.", "0: owner's name");
 		this.addDefault(defaults, Messages.NoDeletePermission, "You don't have permission to delete claims.", null);
 		this.addDefault(defaults, Messages.AllAdminDeleted, "Deleted all administrative claims.", null);
 		this.addDefault(defaults, Messages.AdjustBlocksSuccess, "Adjusted {0}'s bonus claim blocks by {1}.  New total bonus blocks: {2}.", "0: player; 1: adjustment; 2: new total");
@@ -1035,5 +1061,13 @@ public abstract class DataStore
 		return message;		
 	}
 	
-	abstract void close();	
+	synchronized public Long[] getClaimIds() {
+		return (Long[]) claims.claimmap.keySet().toArray();
+	}
+	
+	abstract void close();
+
+	public int getClaimsSize() {
+		return claims.size();
+	}	
 }

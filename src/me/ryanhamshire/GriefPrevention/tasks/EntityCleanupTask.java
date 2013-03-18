@@ -16,10 +16,13 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package me.ryanhamshire.GriefPrevention;
+package me.ryanhamshire.GriefPrevention.tasks;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import me.ryanhamshire.GriefPrevention.Claim;
+import me.ryanhamshire.GriefPrevention.GriefPrevention;
 
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -32,7 +35,7 @@ import org.bukkit.entity.Vehicle;
 
 //this main thread task revisits the location of a partially chopped tree from several minutes ago
 //if any part of the tree is still there and nothing else has been built in its place, remove the remaining parts
-class EntityCleanupTask implements Runnable 
+public class EntityCleanupTask implements Runnable 
 {
 	//where to start cleaning in the list of entities
 	private double percentageStart;
@@ -114,12 +117,12 @@ class EntityCleanupTask implements Runnable
 		}
 		
 		//starting and stopping point.  each execution of the task scans 5% of the server's claims
-		List<Claim> claims = GriefPrevention.instance.dataStore.claims.claims;
-		int j = (int)(claims.size() * this.percentageStart);
-		int k = (int)(claims.size() * (this.percentageStart + .05));
-		for(; j < claims.size() && j < k; j++)
+		Long[] claims = GriefPrevention.instance.dataStore.getClaimIds();
+		int j = (int)(claims.length * this.percentageStart);
+		int k = (int)(claims.length * (this.percentageStart + .05));
+		for(; j < claims.length && j < k; j++)
 		{
-			Claim claim = claims.get(j);
+			Claim claim = GriefPrevention.instance.dataStore.getClaim(claims[j]);
 			
 			//if it's a creative mode claim
 			if(GriefPrevention.instance.creativeRulesApply(claim.getLesserBoundaryCorner()))

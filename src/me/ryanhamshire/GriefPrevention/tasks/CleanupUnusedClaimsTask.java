@@ -16,11 +16,15 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
  
- package me.ryanhamshire.GriefPrevention;
+ package me.ryanhamshire.GriefPrevention.tasks;
 
 import java.util.Calendar;
 import java.util.Random;
 import java.util.Vector;
+
+import me.ryanhamshire.GriefPrevention.Claim;
+import me.ryanhamshire.GriefPrevention.GriefPrevention;
+import me.ryanhamshire.GriefPrevention.PlayerData;
 
 import org.bukkit.Chunk;
 import org.bukkit.World;
@@ -31,21 +35,22 @@ import org.bukkit.World;
 //...because the player has been gone a REALLY long time, and that expiration has been configured in config.yml
 
 //runs every 1 minute in the main thread
-class CleanupUnusedClaimsTask implements Runnable 
+public class CleanupUnusedClaimsTask implements Runnable 
 {	
 	int nextClaimIndex;
 	
-	CleanupUnusedClaimsTask()
+	
+	public CleanupUnusedClaimsTask()
 	{
 		//start scanning in a random spot
-		if(GriefPrevention.instance.dataStore.claims.size() == 0)
+		if(GriefPrevention.instance.dataStore.getClaimsSize() == 0)
 		{
 			this.nextClaimIndex = 0;
 		}
 		else
 		{
 			Random randomNumberGenerator = new Random();
-			this.nextClaimIndex = randomNumberGenerator.nextInt(GriefPrevention.instance.dataStore.claims.size());
+			this.nextClaimIndex = randomNumberGenerator.nextInt(GriefPrevention.instance.dataStore.getClaimsSize());
 		}
 	}
 	
@@ -53,13 +58,13 @@ class CleanupUnusedClaimsTask implements Runnable
 	public void run()
 	{
 		//don't do anything when there are no claims
-		if(GriefPrevention.instance.dataStore.claims.size() == 0) return;
+		if(GriefPrevention.instance.dataStore.getClaimsSize() == 0) return;
 		
 		//wrap search around to beginning
-		if(this.nextClaimIndex >= GriefPrevention.instance.dataStore.claims.size()) this.nextClaimIndex = 0;
+		if(this.nextClaimIndex >= GriefPrevention.instance.dataStore.getClaimsSize()) this.nextClaimIndex = 0;
 		
 		//decide which claim to check next
-		Claim claim = GriefPrevention.instance.dataStore.claims.get(this.nextClaimIndex++);
+		Claim claim = GriefPrevention.instance.dataStore.getClaim(GriefPrevention.instance.dataStore.getClaimIds()[this.nextClaimIndex++]);
 		
 		//skip administrative claims
 		if(claim.isAdminClaim()) return;
@@ -118,8 +123,8 @@ class CleanupUnusedClaimsTask implements Runnable
 				}
 				
 				//delete them
-				GriefPrevention.instance.dataStore.deleteClaimsForPlayer(claim.getOwnerName(), true);
-				GriefPrevention.AddLogEntry(" All of " + claim.getOwnerName() + "'s claims have expired.");
+				GriefPrevention.instance.dataStore.deleteClaimsForPlayer(claim.getOwnerName(), true, false);
+				GriefPrevention.AddLogEntry(" All of " + claim.getOwnerName() + "'s claims have expired. Removing all but the locked claims.");
 				
 				for(int i = 0; i < claims.size(); i++)
 				{
@@ -140,8 +145,8 @@ class CleanupUnusedClaimsTask implements Runnable
 			earliestAllowedLoginDate.add(Calendar.DATE, -GriefPrevention.instance.config_claims_unusedClaimExpirationDays);
 			boolean needsInvestmentScan = earliestAllowedLoginDate.getTime().after(playerData.lastLogin);
 			
-			//avoid scanning large claims and administrative claims
-			if(claim.isAdminClaim() || claim.getWidth() > 25 || claim.getHeight() > 25) return;
+			//avoid scanning large claims, locked claims, and administrative claims
+			if(claim.isAdminClaim() || claim.neverdelete || claim.getWidth() > 25 || claim.getHeight() > 25) return;
 			
 			//if creative mode or the claim owner has been away a long enough time, scan the claim content
 			if(needsInvestmentScan || GriefPrevention.instance.creativeRulesApply(claim.getLesserBoundaryCorner()))

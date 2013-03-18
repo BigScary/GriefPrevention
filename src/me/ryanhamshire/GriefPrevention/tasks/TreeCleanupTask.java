@@ -16,9 +16,11 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package me.ryanhamshire.GriefPrevention;
+package me.ryanhamshire.GriefPrevention.tasks;
 
 import java.util.ArrayList;
+
+import me.ryanhamshire.GriefPrevention.GriefPrevention;
 
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -30,7 +32,7 @@ import org.bukkit.block.BlockFace;
 
 //this main thread task revisits the location of a partially chopped tree from several minutes ago
 //if any part of the tree is still there and nothing else has been built in its place, remove the remaining parts
-class TreeCleanupTask implements Runnable 
+public class TreeCleanupTask implements Runnable 
 {
 	private Block originalChoppedBlock;          //first block chopped in the tree
 	private Block originalRootBlock;             //where the root of the tree used to be

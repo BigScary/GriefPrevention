@@ -16,12 +16,19 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
  
- package me.ryanhamshire.GriefPrevention;
+ package me.ryanhamshire.GriefPrevention.tasks;
+
+
+import me.ryanhamshire.GriefPrevention.Claim;
+import me.ryanhamshire.GriefPrevention.GriefPrevention;
+import me.ryanhamshire.GriefPrevention.Messages;
+import me.ryanhamshire.GriefPrevention.SiegeData;
+import me.ryanhamshire.GriefPrevention.TextMode;
 
 import org.bukkit.entity.Player;
 
 //secures a claim after a siege looting window has closed
-class SecureClaimTask implements Runnable 
+public class SecureClaimTask implements Runnable 
 {
 	private SiegeData siegeData;
 	

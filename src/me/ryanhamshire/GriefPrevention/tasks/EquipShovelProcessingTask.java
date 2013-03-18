@@ -16,14 +16,20 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
  
-package me.ryanhamshire.GriefPrevention;
+package me.ryanhamshire.GriefPrevention.tasks;
+
+import me.ryanhamshire.GriefPrevention.GriefPrevention;
+import me.ryanhamshire.GriefPrevention.Messages;
+import me.ryanhamshire.GriefPrevention.PlayerData;
+import me.ryanhamshire.GriefPrevention.ShovelMode;
+import me.ryanhamshire.GriefPrevention.TextMode;
 
 import org.bukkit.entity.Player;
 
 //tells a player about how many claim blocks he has, etc
 //implemented as a task so that it can be delayed
 //otherwise, it's spammy when players mouse-wheel past the shovel in their hot bars
-class EquipShovelProcessingTask implements Runnable 
+public class EquipShovelProcessingTask implements Runnable 
 {
 	//player data
 	private Player player;

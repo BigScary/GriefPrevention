@@ -25,6 +25,11 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import me.ryanhamshire.GriefPrevention.tasks.EquipShovelProcessingTask;
+import me.ryanhamshire.GriefPrevention.tasks.PlayerKickBanTask;
+import me.ryanhamshire.GriefPrevention.visualization.Visualization;
+import me.ryanhamshire.GriefPrevention.visualization.VisualizationType;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -1534,7 +1539,7 @@ class PlayerEventHandler implements Listener
 					Claim newClaim = new Claim(
 							new Location(oldClaim.getLesserBoundaryCorner().getWorld(), newx1, newy1, newz1), 
 							new Location(oldClaim.getLesserBoundaryCorner().getWorld(), newx2, newy2, newz2),
-							"", new String[]{}, new String[]{}, new String[]{}, new String[]{}, null);
+							"", new String[]{}, new String[]{}, new String[]{}, new String[]{}, null, false);
 					
 					//if the new claim is smaller
 					if(!newClaim.contains(oldClaim.getLesserBoundaryCorner(), true, false) || !newClaim.contains(oldClaim.getGreaterBoundaryCorner(), true, false))
@@ -1652,7 +1657,7 @@ class PlayerEventHandler implements Listener
 									playerData.lastShovelLocation.getBlockZ(), clickedBlock.getZ(), 
 									"--subdivision--",  //owner name is not used for subdivisions
 									playerData.claimSubdividing,
-									null);
+									null, false);
 							
 							//if it didn't succeed, tell the player why
 							if(!result.succeeded)
@@ -1716,7 +1721,7 @@ class PlayerEventHandler implements Listener
 				GriefPrevention.sendMessage(player, TextMode.Instr, Messages.ClaimStart);
 				
 				//show him where he's working
-				Visualization visualization = Visualization.FromClaim(new Claim(clickedBlock.getLocation(), clickedBlock.getLocation(), "", new String[]{}, new String[]{}, new String[]{}, new String[]{}, null), clickedBlock.getY(), VisualizationType.RestoreNature, player.getLocation());
+				Visualization visualization = Visualization.FromClaim(new Claim(clickedBlock.getLocation(), clickedBlock.getLocation(), "", new String[]{}, new String[]{}, new String[]{}, new String[]{}, null, false), clickedBlock.getY(), VisualizationType.RestoreNature, player.getLocation());
 				Visualization.Apply(player, visualization);
 			}
 			
@@ -1765,7 +1770,7 @@ class PlayerEventHandler implements Listener
 						lastShovelLocation.getBlockY() - GriefPrevention.instance.config_claims_claimsExtendIntoGroundDistance, clickedBlock.getY() - GriefPrevention.instance.config_claims_claimsExtendIntoGroundDistance, 
 						lastShovelLocation.getBlockZ(), clickedBlock.getZ(), 
 						playerName,
-						null, null);
+						null, null, false);
 				
 				//if it didn't succeed, tell the player why
 				if(!result.succeeded)

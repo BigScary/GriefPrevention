@@ -21,6 +21,9 @@ package me.ryanhamshire.GriefPrevention;
 import java.util.ArrayList;
 import java.util.List;
 
+import me.ryanhamshire.GriefPrevention.visualization.Visualization;
+import me.ryanhamshire.GriefPrevention.visualization.VisualizationType;
+
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -317,7 +320,7 @@ public class BlockEventHandler implements Listener
 				//radius == 0 means protect ONLY the chest
 				if(GriefPrevention.instance.config_claims_automaticClaimsForNewPlayersRadius == 0)
 				{					
-					this.dataStore.createClaim(block.getWorld(), block.getX(), block.getX(), block.getY(), block.getY(), block.getZ(), block.getZ(), player.getName(), null, null);
+					this.dataStore.createClaim(block.getWorld(), block.getX(), block.getX(), block.getY(), block.getY(), block.getZ(), block.getZ(), player.getName(), null, null, false);
 					GriefPrevention.sendMessage(player, TextMode.Success, Messages.ChestClaimConfirmation);						
 				}
 				
@@ -331,7 +334,7 @@ public class BlockEventHandler implements Listener
 							block.getY() - GriefPrevention.instance.config_claims_claimsExtendIntoGroundDistance, block.getY(), 
 							block.getZ() - radius, block.getZ() + radius, 
 							player.getName(), 
-							null, null).succeeded)
+							null, null, false).succeeded)
 					{
 						radius--;
 					}

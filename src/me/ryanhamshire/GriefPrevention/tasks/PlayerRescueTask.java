@@ -16,9 +16,14 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
  
-package me.ryanhamshire.GriefPrevention;
+package me.ryanhamshire.GriefPrevention.tasks;
 
 import java.util.Calendar;
+
+import me.ryanhamshire.GriefPrevention.GriefPrevention;
+import me.ryanhamshire.GriefPrevention.Messages;
+import me.ryanhamshire.GriefPrevention.PlayerData;
+import me.ryanhamshire.GriefPrevention.TextMode;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -26,7 +31,7 @@ import org.bukkit.entity.Player;
 //tries to rescue a trapped player from a claim where he doesn't have permission to save himself
 //related to the /trapped slash command
 //this does run in the main thread, so it's okay to make non-thread-safe calls
-class PlayerRescueTask implements Runnable 
+public class PlayerRescueTask implements Runnable 
 {
 	//original location where /trapped was used
 	private Location location;

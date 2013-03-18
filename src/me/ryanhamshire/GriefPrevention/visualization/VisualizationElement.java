@@ -16,13 +16,21 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package me.ryanhamshire.GriefPrevention;
+package me.ryanhamshire.GriefPrevention.visualization;
+import org.bukkit.Location;
+import org.bukkit.Material;
 
-//just an enumeration of the visualization types, which determine what materials will be for the fake blocks
-public enum VisualizationType 
+//represents a "fake" block sent to a player as part of a visualization
+public class VisualizationElement 
 {
-	Claim,
-	Subdivision,
-	ErrorClaim,
-	RestoreNature
+	public Location location;
+	public Material visualizedMaterial;
+	public byte visualizedData; 
+	
+	public VisualizationElement(Location location, Material visualizedMaterial, byte visualizedData)
+	{
+		this.location = location;
+		this.visualizedMaterial= visualizedMaterial;
+		this.visualizedData = visualizedData;
+	}
 }

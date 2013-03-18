@@ -183,8 +183,15 @@ public class FlatFileDataStore extends DataStore
 						if(line == null) line = "";
 						String [] managerNames = line.split(";");
 						
-						//skip any remaining extra lines, until the "===" string, indicating the end of this claim or subdivision
+						//Eighth line either contains whether the claim can ever be deleted, or the divider for the subclaims
+						boolean neverdelete = false;
 						line = inStream.readLine();
+						if(line == null) line = "";
+						if(!line.contains("==========")) {
+							neverdelete = Boolean.parseBoolean(line);
+						}
+						
+						//Sub claims below this line
 						while(line != null && !line.contains("=========="))
 							line = inStream.readLine();
 						
@@ -193,7 +200,7 @@ public class FlatFileDataStore extends DataStore
 						if(topLevelClaim == null)
 						{
 							//instantiate
-							topLevelClaim = new Claim(lesserBoundaryCorner, greaterBoundaryCorner, ownerName, builderNames, containerNames, accessorNames, managerNames, claimID);
+							topLevelClaim = new Claim(lesserBoundaryCorner, greaterBoundaryCorner, ownerName, builderNames, containerNames, accessorNames, managerNames, claimID, neverdelete);
 							
 							//search for another claim overlapping this one
 							Claim conflictClaim = this.getClaimAt(topLevelClaim.lesserBoundaryCorner, true, null);
@@ -224,7 +231,7 @@ public class FlatFileDataStore extends DataStore
 						//otherwise there's already a top level claim, so this must be a subdivision of that top level claim
 						else
 						{
-							Claim subdivision = new Claim(lesserBoundaryCorner, greaterBoundaryCorner, "--subdivision--", builderNames, containerNames, accessorNames, managerNames, null);
+							Claim subdivision = new Claim(lesserBoundaryCorner, greaterBoundaryCorner, "--subdivision--", builderNames, containerNames, accessorNames, managerNames, null, neverdelete);
 							
 							subdivision.modifiedDate = new Date(files[i].lastModified());
 							subdivision.parent = topLevelClaim;
@@ -343,6 +350,10 @@ public class FlatFileDataStore extends DataStore
 		{
 			outStream.write(managers.get(i) + ";");
 		}
+		outStream.newLine();
+		
+		//eighth line has the never delete variable
+		outStream.write(Boolean.toString(claim.neverdelete));
 		outStream.newLine();
 		
 		//cap each claim with "=========="

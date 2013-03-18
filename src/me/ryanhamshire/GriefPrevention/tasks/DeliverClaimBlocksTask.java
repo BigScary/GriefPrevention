@@ -16,7 +16,11 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
  
- package me.ryanhamshire.GriefPrevention;
+ package me.ryanhamshire.GriefPrevention.tasks;
+
+import me.ryanhamshire.GriefPrevention.DataStore;
+import me.ryanhamshire.GriefPrevention.GriefPrevention;
+import me.ryanhamshire.GriefPrevention.PlayerData;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -24,7 +28,7 @@ import org.bukkit.entity.Player;
 //FEATURE: give players claim blocks for playing, as long as they're not away from their computer
 
 //runs every 5 minutes in the main thread, grants blocks per hour / 12 to each online player who appears to be actively playing
-class DeliverClaimBlocksTask implements Runnable 
+public class DeliverClaimBlocksTask implements Runnable 
 {	
 	@Override
 	public void run()

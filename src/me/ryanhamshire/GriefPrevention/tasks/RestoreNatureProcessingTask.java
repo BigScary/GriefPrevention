@@ -16,9 +16,12 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
  
-package me.ryanhamshire.GriefPrevention;
+package me.ryanhamshire.GriefPrevention.tasks;
 
 import java.util.ArrayList;
+
+import me.ryanhamshire.GriefPrevention.BlockSnapshot;
+import me.ryanhamshire.GriefPrevention.GriefPrevention;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -28,7 +31,7 @@ import org.bukkit.entity.Player;
 
 //non-main-thread task which processes world data to repair the unnatural
 //after processing is complete, creates a main thread task to make the necessary changes to the world
-class RestoreNatureProcessingTask implements Runnable 
+public class RestoreNatureProcessingTask implements Runnable 
 {
 	//world information captured from the main thread
 	//will be updated and sent back to main thread to be applied to the world
@@ -621,7 +624,7 @@ class RestoreNatureProcessingTask implements Runnable
 		return y;
 	}
 	
-	static ArrayList<Integer> getPlayerBlocks(Environment environment, Biome biome) 
+	public static ArrayList<Integer> getPlayerBlocks(Environment environment, Biome biome) 
 	{
 		//NOTE on this list.  why not make a list of natural blocks?
 		//answer: better to leave a few player blocks than to remove too many natural blocks.  remember we're "restoring nature"

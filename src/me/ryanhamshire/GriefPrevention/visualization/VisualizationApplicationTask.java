@@ -16,7 +16,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
  
- package me.ryanhamshire.GriefPrevention;
+ package me.ryanhamshire.GriefPrevention.visualization;
+
+import me.ryanhamshire.GriefPrevention.PlayerData;
 
 import org.bukkit.entity.Player;
 

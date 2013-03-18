@@ -26,6 +26,9 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+
+import me.ryanhamshire.GriefPrevention.tasks.RestoreNatureProcessingTask;
+
 import org.bukkit.*;
 import org.bukkit.World.Environment;
 import org.bukkit.block.Block;
@@ -79,6 +82,9 @@ public class Claim
 	
 	//following a siege, buttons/levers are unlocked temporarily.  this represents that state
 	public boolean doorsOpen = false;
+	
+	//This variable sets whether a claim gets deleted with the automatic cleanup.
+	public boolean neverdelete = false;
 	
 	//whether or not this is an administrative claim
 	//administrative claims are created and maintained by players with the griefprevention.adminclaims permission.
@@ -197,7 +203,7 @@ public class Claim
 	}
 	
 	//main constructor.  note that only creating a claim instance does nothing - a claim must be added to the data store to be effective
-	Claim(Location lesserBoundaryCorner, Location greaterBoundaryCorner, String ownerName, String [] builderNames, String [] containerNames, String [] accessorNames, String [] managerNames, Long id)
+	public Claim(Location lesserBoundaryCorner, Location greaterBoundaryCorner, String ownerName, String [] builderNames, String [] containerNames, String [] accessorNames, String [] managerNames, Long id, boolean neverdelete)
 	{
 		//modification date
 		this.modifiedDate = Calendar.getInstance().getTime();
@@ -248,6 +254,8 @@ public class Claim
 				this.managers.add(name);
 			}
 		}
+		
+		this.neverdelete = neverdelete;
 	}
 	
 	//measurements.  all measurements are in blocks
@@ -275,7 +283,7 @@ public class Claim
 		Claim claim = new Claim
 			(new Location(this.lesserBoundaryCorner.getWorld(), this.lesserBoundaryCorner.getBlockX() - howNear, this.lesserBoundaryCorner.getBlockY(), this.lesserBoundaryCorner.getBlockZ() - howNear),
 			 new Location(this.greaterBoundaryCorner.getWorld(), this.greaterBoundaryCorner.getBlockX() + howNear, this.greaterBoundaryCorner.getBlockY(), this.greaterBoundaryCorner.getBlockZ() + howNear),
-			 "", new String[] {}, new String[] {}, new String[] {}, new String[] {}, null);
+			 "", new String[] {}, new String[] {}, new String[] {}, new String[] {}, null, false);
 		
 		return claim.contains(location, false, true);
 	}
@@ -776,7 +784,7 @@ public class Claim
 		return thisCorner.getWorld().getName().compareTo(otherCorner.getWorld().getName()) < 0;
 	}
 	
-	long getPlayerInvestmentScore()
+	public long getPlayerInvestmentScore()
 	{
 		//decide which blocks will be considered player placed
 		Location lesserBoundaryCorner = this.getLesserBoundaryCorner();

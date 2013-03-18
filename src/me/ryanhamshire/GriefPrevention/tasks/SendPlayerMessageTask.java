@@ -15,22 +15,32 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+ 
+package me.ryanhamshire.GriefPrevention.tasks;
 
-package me.ryanhamshire.GriefPrevention;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import me.ryanhamshire.GriefPrevention.GriefPrevention;
 
-//represents a "fake" block sent to a player as part of a visualization
-public class VisualizationElement 
+import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
+
+//sends a message to a player
+//used to send delayed messages, for example help text triggered by a player's chat
+public class SendPlayerMessageTask implements Runnable 
 {
-	public Location location;
-	public Material visualizedMaterial;
-	public byte visualizedData; 
+	private Player player;
+	private ChatColor color;
+	private String message;
 	
-	public VisualizationElement(Location location, Material visualizedMaterial, byte visualizedData)
+	public SendPlayerMessageTask(Player player, ChatColor color, String message)
 	{
-		this.location = location;
-		this.visualizedMaterial= visualizedMaterial;
-		this.visualizedData = visualizedData;
+		this.player = player;
+		this.color = color;
+		this.message = message;
 	}
+
+	@Override
+	public void run()
+	{
+		GriefPrevention.sendMessage(this.player, this.color, this.message);
+	}	
 }
