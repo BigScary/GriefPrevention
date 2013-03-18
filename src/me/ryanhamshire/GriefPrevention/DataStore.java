@@ -169,6 +169,13 @@ public abstract class DataStore
 			return;
 		}
 		
+		//Get a unique identifier for the claim which will be used to name the file on disk
+		if(newClaim.id == null)
+		{
+			newClaim.id = this.nextClaimID;
+			this.incrementNextClaimID();
+		}
+		
 		//add it and mark it as added
 		int j = 0;
 		while(j < this.claims.size() && !this.claims.get(j).greaterThan(newClaim)) j++;
@@ -248,7 +255,7 @@ public abstract class DataStore
 			return;
 		}
 		
-		//otherwise get a unique identifier for the claim which will be used to name the file on disk
+		//Get a unique identifier for the claim which will be used to name the file on disk
 		if(claim.id == null)
 		{
 			claim.id = this.nextClaimID;
