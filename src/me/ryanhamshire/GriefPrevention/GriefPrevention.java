@@ -916,6 +916,38 @@ public class GriefPrevention extends JavaPlugin
 			return true;
 		}
 		
+		//lockclaim
+		else if(cmd.getName().equalsIgnoreCase("lockclaim") && player != null)
+		{
+			//requires exactly one parameter, the other player's name
+			if(args.length != 0) return false;
+			
+			Claim claim = dataStore.getClaimAt(player.getLocation(), true /*ignore height*/, null);
+			if((player.hasPermission("griefprevention.lock") && claim.ownerName.equalsIgnoreCase(player.getName())) || player.hasPermission("griefprevention.adminlock")) {
+				claim.neverdelete = true;
+				dataStore.saveClaim(claim);
+				GriefPrevention.sendMessage(player, TextMode.Success, Messages.ClaimLocked);
+			}
+			
+			return true;
+		}
+		
+		//unlockclaim
+		else if(cmd.getName().equalsIgnoreCase("unlockclaim") && player != null)
+		{
+			//requires exactly one parameter, the other player's name
+			if(args.length != 0) return false;
+			
+			Claim claim = dataStore.getClaimAt(player.getLocation(), true /*ignore height*/, null);
+			if((player.hasPermission("griefprevention.lock") && claim.ownerName.equalsIgnoreCase(player.getName())) || player.hasPermission("griefprevention.adminlock")) {
+				claim.neverdelete = false;
+				dataStore.saveClaim(claim);
+				GriefPrevention.sendMessage(player, TextMode.Success, Messages.ClaimUnlocked);
+			}
+			
+			return true;
+		}
+		
 		//transferclaim <player>
 		else if(cmd.getName().equalsIgnoreCase("transferclaim") && player != null)
 		{
@@ -944,7 +976,7 @@ public class GriefPrevention extends JavaPlugin
 				return true;
 			}
 			
-			//change ownerhsip
+			//change ownership
 			try
 			{
 				this.dataStore.changeClaimOwner(claim, targetPlayer.getName());
@@ -1423,6 +1455,9 @@ public class GriefPrevention extends JavaPlugin
 					if(claim.children.size() > 0 && !playerData.warnedAboutMajorDeletion)
 					{
 						GriefPrevention.sendMessage(player, TextMode.Warn, Messages.DeletionSubdivisionWarning);
+						playerData.warnedAboutMajorDeletion = true;
+					}else if(claim.neverdelete && !playerData.warnedAboutMajorDeletion) {
+						GriefPrevention.sendMessage(player, TextMode.Warn, Messages.DeleteLockedClaimWarning);
 						playerData.warnedAboutMajorDeletion = true;
 					}
 					else
@@ -1923,6 +1958,13 @@ public class GriefPrevention extends JavaPlugin
 		{
 			GriefPrevention.sendMessage(player, TextMode.Instr, Messages.DeleteTopLevelClaim);
 			return true;
+		}
+		
+		//if the claim is locked, let's warn the player and give them a chance to back out
+		else if(!playerData.warnedAboutMajorDeletion && claim.neverdelete)
+		{			
+			GriefPrevention.sendMessage(player, TextMode.Warn, Messages.ConfirmAbandonLockedClaim);
+			playerData.warnedAboutMajorDeletion = true;
 		}
 		
 		//if the claim has lots of surface water or some surface lava, warn the player it will be cleaned up

@@ -867,6 +867,7 @@ public abstract class DataStore
 		this.addDefault(defaults, Messages.SubdivisionDemo, "Land Claim Help:  http://tinyurl.com/7urdtue", null);
 		this.addDefault(defaults, Messages.DeleteClaimMissing, "There's no claim here.", null);
 		this.addDefault(defaults, Messages.DeletionSubdivisionWarning, "This claim includes subdivisions.  If you're sure you want to delete it, use /DeleteClaim again.", null);
+		this.addDefault(defaults, Messages.DeleteLockedClaimWarning, "This claim is locked.  If you're sure you want to delete it, use /DeleteClaim again.", null);
 		this.addDefault(defaults, Messages.DeleteSuccess, "Claim deleted.", null);
 		this.addDefault(defaults, Messages.CantDeleteAdminClaim, "You don't have permission to delete administrative claims.", null);
 		this.addDefault(defaults, Messages.DeleteAllSuccessExcludingLocked, "Deleted all of {0}'s claims excluding locked claims.", "0: owner's name");
@@ -976,6 +977,7 @@ public abstract class DataStore
 		this.addDefault(defaults, Messages.TooManyEntitiesInClaim, "This claim has too many entities already.  Try enlarging the claim or removing some animals, monsters, paintings, or minecarts.", null);
 		this.addDefault(defaults, Messages.YouHaveNoClaims, "You don't have any land claims.", null);
 		this.addDefault(defaults, Messages.ConfirmFluidRemoval, "Abandoning this claim will remove all your lava and water.  If you're sure, use /AbandonClaim again.", null);
+		this.addDefault(defaults, Messages.ConfirmAbandonLockedClaim, "This claim has been locked.  If you really want to abandon it, use /AbandonClaim again.", null);
 		this.addDefault(defaults, Messages.AutoBanNotify, "Auto-banned {0}({1}).  See logs for details.", null);
 		this.addDefault(defaults, Messages.AdjustGroupBlocksSuccess, "Adjusted bonus claim blocks for players with the {0} permission by {1}.  New total: {2}.", "0: permission; 1: adjustment amount; 2: new total bonus");
 		this.addDefault(defaults, Messages.InvalidPermissionID, "Please specify a player name, or a permission in [brackets].", null);
@@ -998,6 +1000,8 @@ public abstract class DataStore
 		this.addDefault(defaults, Messages.ExplosivesEnabled, "This claim is now vulnerable to explosions.  Use /ClaimExplosions again to re-enable protections.", null);
 		this.addDefault(defaults, Messages.ClaimExplosivesAdvertisement, "To allow explosives to destroy blocks in this land claim, use /ClaimExplosions.", null);
 		this.addDefault(defaults, Messages.PlayerInPvPSafeZone, "That player is in a PvP safe zone.", null);		
+		this.addDefault(defaults, Messages.ClaimLocked, "This claim has been successfully locked against accidental/automatic deletion. Use /unlockclaim to unlock.", null);		
+		this.addDefault(defaults, Messages.PlayerInPvPSafeZone, "This claim has been successfully unlocked.", null);		
 		
 		//load the config file
 		FileConfiguration config = YamlConfiguration.loadConfiguration(new File(messagesFilePath));

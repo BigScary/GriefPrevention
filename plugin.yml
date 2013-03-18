@@ -128,6 +128,12 @@ commands:
    claimexplosions:
       description: Toggles whether explosives may be used in a specific land claim.
       usage: /ClaimExplosions
+   lockclaim:
+      description: Locks the claim from accidental mass/automatic deletion.
+      usage: /LockClaim
+   unlockclaim:
+      description: Unlocks a previously locked claim.
+      usage: /UnlockClaim
 permissions:
     griefprevention.createclaims:
         description: Grants permission to create claims.
@@ -144,7 +150,10 @@ permissions:
             griefprevention.spam: true
             griefprevention.lava: true
             griefprevention.eavesdrop: true
+            griefprevention.admineavesdrop: true
             griefprevention.deathblow: true
+            griefprevention.adminlock: true
+            griefprevention.lock: true
     griefprevention.restorenature:
         description: Grants permission to use /RestoreNature.
         default: op
@@ -161,13 +170,19 @@ permissions:
         description: Grants permission to add or remove bonus blocks from a player's account.
         default: op
     griefprevention.spam:
-        description: Grants permission to log in, send messages, and send commands rapidly.
+        description: Grants permission to send messages commands rapidly.
+        default: op
+    griefprevention.loginspam:
+        description: Grants permission to log in rapidly.
         default: op
     griefprevention.lava:
         description: Grants permission to place lava near the surface and outside of claims.
         default: op
     griefprevention.eavesdrop:
         description: Allows a player to see whispered chat messages (/tell).
+        default: op
+    griefprevention.admineavesdrop:
+        description: Allows a player to see all whispered chat messages (/tell).
         default: op
     griefprevention.restorenatureaggressive:
         description: Grants access to /RestoreNatureAggressive and /RestoreNatureFill.
@@ -181,3 +196,9 @@ permissions:
     griefprevention.buysellclaimblocks:
         description: Grants access to claim block buy/sell commands.
         default: true
+    griefprevention.lock:
+        description: Grants permission to use the lock/unlock commands on your own claims.
+        default: op
+    griefprevention.adminlock:
+        description: Grants permission to use the lock/unlock commands on any claim.
+        default: op
