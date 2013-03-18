@@ -26,6 +26,8 @@ import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import me.ryanhamshire.GriefPrevention.exceptions.WorldNotFoundException;
+
 import org.bukkit.*;
 
 //manages data stored in the file system
@@ -137,7 +139,7 @@ public class DatabaseDataStore extends DataStore
 		while(results.next())
 		{
 			try
-			{			
+			{
 				//skip subdivisions
 				long parentId = results.getLong("parentid");
 				if(parentId != -1) continue;
@@ -228,6 +230,11 @@ public class DatabaseDataStore extends DataStore
 			{
 				GriefPrevention.AddLogEntry("Unable to load a claim.  Details: " + e.getMessage() + " ... " + results.toString());
 				e.printStackTrace();
+			}
+			catch(WorldNotFoundException e) {
+				//We don't need to worry about this exception.
+				//This is just here to catch it so that the plugin
+				//can load without erroring out.
 			}
 		}
 		

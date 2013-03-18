@@ -23,6 +23,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 
+import me.ryanhamshire.GriefPrevention.exceptions.WorldNotFoundException;
 import me.ryanhamshire.GriefPrevention.tasks.SecureClaimTask;
 import me.ryanhamshire.GriefPrevention.tasks.SiegeCheckupTask;
 
@@ -237,7 +238,7 @@ public abstract class DataStore
 		World world = GriefPrevention.instance.getServer().getWorld(worldName);
 		if(world == null)
 		{
-			throw new Exception("World not found: \"" + worldName + "\"");
+			throw new WorldNotFoundException("World not found: \"" + worldName + "\"");
 		}
 		
 		//convert those numerical strings to integer values

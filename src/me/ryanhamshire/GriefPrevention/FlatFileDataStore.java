@@ -24,6 +24,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import me.ryanhamshire.GriefPrevention.exceptions.WorldNotFoundException;
+
 import org.bukkit.*;
 
 //manages data stored in the file system
@@ -147,14 +149,14 @@ public class FlatFileDataStore extends DataStore
 				
 				BufferedReader inStream = null;
 				try
-				{					
+				{		
 					Claim topLevelClaim = null;
 					
 					inStream = new BufferedReader(new FileReader(files[i].getAbsolutePath()));
 					String line = inStream.readLine();
 					
 					while(line != null)
-					{					
+					{
 						//first line is lesser boundary corner location
 						Location lesserBoundaryCorner = this.locationFromString(line);
 						
@@ -244,6 +246,10 @@ public class FlatFileDataStore extends DataStore
 					}
 					
 					inStream.close();
+				}
+				//We don't need to log any additional error messages for this error.
+				catch(WorldNotFoundException e) {
+					//Nothing to do here.
 				}
 				
 				//if there's any problem with the file's content, log an error message and skip it
