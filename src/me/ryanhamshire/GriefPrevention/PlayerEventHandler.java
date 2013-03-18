@@ -37,10 +37,11 @@ import org.bukkit.entity.Animals;
 import org.bukkit.entity.Boat;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Hanging;
-import org.bukkit.entity.PoweredMinecart;
-import org.bukkit.entity.StorageMinecart;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
+import org.bukkit.entity.minecart.HopperMinecart;
+import org.bukkit.entity.minecart.PoweredMinecart;
+import org.bukkit.entity.minecart.StorageMinecart;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -341,7 +342,7 @@ class PlayerEventHandler implements Listener
 		
 		//if eavesdrop enabled, eavesdrop
 		String command = args[0].toLowerCase();
-		if(GriefPrevention.instance.config_eavesdrop && GriefPrevention.instance.config_eavesdrop_whisperCommands.contains(command) && !event.getPlayer().hasPermission("griefprevention.eavesdrop") && args.length > 1)
+		if(GriefPrevention.instance.config_eavesdrop && GriefPrevention.instance.config_eavesdrop_whisperCommands.contains(command) && args.length > 1)
 		{			
 			StringBuilder logMessageBuilder = new StringBuilder();
 			logMessageBuilder.append("[[").append(event.getPlayer().getName()).append("]] ");
@@ -354,12 +355,23 @@ class PlayerEventHandler implements Listener
 			String logMessage = logMessageBuilder.toString();
 			
 			Player [] players = GriefPrevention.instance.getServer().getOnlinePlayers();
-			for(int i = 0; i < players.length; i++)
-			{
-				Player player = players[i];
-				if(player.hasPermission("griefprevention.eavesdrop") && !player.getName().equalsIgnoreCase(args[1]))
+			if(!event.getPlayer().hasPermission("griefprevention.eavesdrop")) {
+				for(int i = 0; i < players.length; i++)
 				{
-					player.sendMessage(ChatColor.GRAY + logMessage);
+					Player player = players[i];
+					if(player.hasPermission("griefprevention.eavesdrop") && !player.getName().equalsIgnoreCase(args[1]))
+					{
+						player.sendMessage(ChatColor.GRAY + logMessage);
+					}
+				}
+			}else {
+				for(int i = 0; i < players.length; i++)
+				{
+					Player player = players[i];
+					if(player.hasPermission("griefprevention.admineavesdrop") && !player.getName().equalsIgnoreCase(args[1]))
+					{
+						player.sendMessage(ChatColor.GRAY + logMessage);
+					}
 				}
 			}
 		}
@@ -414,7 +426,7 @@ class PlayerEventHandler implements Listener
 				long cooldownRemaining = GriefPrevention.instance.config_spam_loginCooldownMinutes - minutesSinceLastLogin;
 				
 				//if cooldown remaining and player doesn't have permission to spam
-				if(cooldownRemaining > 0 && !player.hasPermission("griefprevention.spam"))
+				if(cooldownRemaining > 0 && !player.hasPermission("griefprevention.loginspam"))
 				{
 					//DAS BOOT!
 					event.setResult(Result.KICK_OTHER);				
@@ -736,7 +748,8 @@ class PlayerEventHandler implements Listener
 		}
 		
 		//don't allow container access during pvp combat
-		if((entity instanceof StorageMinecart || entity instanceof PoweredMinecart))
+		
+		if((entity instanceof StorageMinecart || entity instanceof PoweredMinecart || entity instanceof HopperMinecart))
 		{
 			if(playerData.siegeData != null)
 			{
@@ -760,8 +773,8 @@ class PlayerEventHandler implements Listener
 			Claim claim = this.dataStore.getClaimAt(entity.getLocation(), false, null);
 			if(claim != null)
 			{
-				//for storage and powered minecarts, apply container rules (this is a potential theft)
-				if(entity instanceof StorageMinecart || entity instanceof PoweredMinecart)
+				//for storage, hopper, and powered minecarts, apply container rules (this is a potential theft)
+				if(entity instanceof StorageMinecart || entity instanceof PoweredMinecart || entity instanceof HopperMinecart)
 				{					
 					String noContainersReason = claim.allowContainers(player);
 					if(noContainersReason != null)
@@ -1166,7 +1179,8 @@ class PlayerEventHandler implements Listener
 			}
 			
 			//if it's a spawn egg, minecart, or boat, and this is a creative world, apply special rules
-			else if((materialInHand == Material.MONSTER_EGG || materialInHand == Material.MINECART || materialInHand == Material.POWERED_MINECART || materialInHand == Material.STORAGE_MINECART || materialInHand == Material.BOAT) && GriefPrevention.instance.creativeRulesApply(clickedBlock.getLocation()))
+			else if((materialInHand == Material.MONSTER_EGG || materialInHand == Material.MINECART || materialInHand == Material.POWERED_MINECART || materialInHand == Material.STORAGE_MINECART
+					|| materialInHand == Material.HOPPER_MINECART || materialInHand == Material.EXPLOSIVE_MINECART || materialInHand == Material.BOAT) && GriefPrevention.instance.creativeRulesApply(clickedBlock.getLocation()))
 			{
 				//player needs build permission at this location
 				String noBuildReason = GriefPrevention.instance.allowBuild(player, clickedBlock.getLocation());

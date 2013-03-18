@@ -38,7 +38,7 @@ public abstract class DataStore
 	protected ConcurrentHashMap<String, Integer> permissionToBonusBlocksMap = new ConcurrentHashMap<String, Integer>();
 	
 	//in-memory cache for claim data
-	ArrayList<Claim> claims = new ArrayList<Claim>();
+	ClaimArray claims = new ClaimArray();
 	
 	//in-memory cache for messages
 	private String [] messages;
@@ -309,18 +309,11 @@ public abstract class DataStore
 		}
 		
 		//remove from memory
-		for(int i = 0; i < this.claims.size(); i++)
+		claims.removeID(claim.id);
+		claim.inDataStore = false;
+		for(int j = 0; j < claim.children.size(); j++)
 		{
-			if(claims.get(i).id.equals(claim.id))
-			{
-				this.claims.remove(i);
-				claim.inDataStore = false;
-				for(int j = 0; j < claim.children.size(); j++)
-				{
-					claim.children.get(j).inDataStore = false;
-				}
-				break;
-			}
+			claim.children.get(j).inDataStore = false;
 		}
 		
 		//remove from secondary storage
@@ -383,6 +376,10 @@ public abstract class DataStore
 		
 		//if no claim found, return null
 		return null;
+	}
+	
+	synchronized public Claim getClaim(long i) {
+		return claims.getID(i);
 	}
 	
 	//creates a claim.
@@ -461,7 +458,7 @@ public abstract class DataStore
 		}
 		else
 		{
-			claimsToCheck = this.claims;
+			claimsToCheck = this.claims.claims;
 		}
 
 		for(int i = 0; i < claimsToCheck.size(); i++)

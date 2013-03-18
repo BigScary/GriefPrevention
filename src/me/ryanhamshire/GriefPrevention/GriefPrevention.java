@@ -203,7 +203,7 @@ public class GriefPrevention extends JavaPlugin
 			World world = this.getServer().getWorld(worldName);
 			if(world == null)
 			{
-				AddLogEntry("Error: Claims Configuration: There's no world named \"" + worldName + "\".  Please update your config.yml.");
+				AddLogEntry("Warning: Claims Configuration: There's no world named \"" + worldName + "\".  Please update your config.yml.");
 			}
 			else
 			{
@@ -238,7 +238,7 @@ public class GriefPrevention extends JavaPlugin
 			World world = this.getServer().getWorld(worldName);
 			if(world == null)
 			{
-				AddLogEntry("Error: Claims Configuration: There's no world named \"" + worldName + "\".  Please update your config.yml.");
+				AddLogEntry("Warning: Claims Configuration: There's no world named \"" + worldName + "\".  Please update your config.yml.");
 			}
 			else
 			{
@@ -272,7 +272,7 @@ public class GriefPrevention extends JavaPlugin
 			World world = this.getServer().getWorld(worldName);
 			if(world == null)
 			{
-				AddLogEntry("Error: PvP Configuration: There's no world named \"" + worldName + "\".  Please update your config.yml.");
+				AddLogEntry("Warning: PvP Configuration: There's no world named \"" + worldName + "\".  Please update your config.yml.");
 			}
 			else
 			{
@@ -480,7 +480,7 @@ public class GriefPrevention extends JavaPlugin
 			World world = this.getServer().getWorld(worldName);
 			if(world == null)
 			{
-				AddLogEntry("Error: Siege Configuration: There's no world named \"" + worldName + "\".  Please update your config.yml.");
+				AddLogEntry("Warning: Siege Configuration: There's no world named \"" + worldName + "\".  Please update your config.yml.");
 			}
 			else
 			{
