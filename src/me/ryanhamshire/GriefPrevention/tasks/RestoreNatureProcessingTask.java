@@ -720,7 +720,19 @@ public class RestoreNatureProcessingTask implements Runnable
 		playerBlocks.add(Material.WOOD_BUTTON.getId());
 		playerBlocks.add(Material.SKULL.getId());
 		playerBlocks.add(Material.ANVIL.getId());
-		
+		playerBlocks.add(Material.ACTIVATOR_RAIL.getId());
+		playerBlocks.add(Material.QUARTZ_BLOCK.getId());
+		playerBlocks.add(Material.QUARTZ_STAIRS.getId());
+		playerBlocks.add(Material.DROPPER.getId());
+		playerBlocks.add(Material.DAYLIGHT_DETECTOR.getId());
+		playerBlocks.add(Material.REDSTONE_COMPARATOR.getId());
+		playerBlocks.add(Material.REDSTONE_COMPARATOR_OFF.getId());
+		playerBlocks.add(Material.REDSTONE_COMPARATOR_ON.getId());
+		playerBlocks.add(Material.IRON_PLATE.getId());
+		playerBlocks.add(Material.GOLD_PLATE.getId());
+		playerBlocks.add(Material.HOPPER.getId());
+		playerBlocks.add(Material.TRAPPED_CHEST.getId());
+		playerBlocks.add(Material.REDSTONE_BLOCK.getId());
 		
 		//these are unnatural in the standard world, but not in the nether
 		if(environment != Environment.NETHER)
@@ -731,6 +743,7 @@ public class RestoreNatureProcessingTask implements Runnable
 			playerBlocks.add(Material.NETHER_BRICK.getId());
 			playerBlocks.add(Material.NETHER_FENCE.getId());
 			playerBlocks.add(Material.NETHER_BRICK_STAIRS.getId());
+			playerBlocks.add(Material.QUARTZ_ORE.getId());
 		}
 		
 		//these are unnatural in the standard and nether worlds, but not in the end

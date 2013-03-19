@@ -1968,7 +1968,7 @@ public class GriefPrevention extends JavaPlugin
 		}
 		
 		//if the claim has lots of surface water or some surface lava, warn the player it will be cleaned up
-		else if(!playerData.warnedAboutMajorDeletion && claim.hasSurfaceFluids())
+		else if(!playerData.warnedAboutMajorDeletion && claim.hasSurfaceFluids() && claim.parent == null)
 		{			
 			GriefPrevention.sendMessage(player, TextMode.Warn, Messages.ConfirmFluidRemoval);
 			playerData.warnedAboutMajorDeletion = true;
@@ -1977,7 +1977,10 @@ public class GriefPrevention extends JavaPlugin
 		else
 		{
 			//delete it
-			claim.removeSurfaceFluids(null);
+			//Only do water/lava cleanup when it's a top level claim.
+			if(claim.parent == null) {
+				claim.removeSurfaceFluids(null);
+			}
 			this.dataStore.deleteClaim(claim);
 			
 			//if in a creative mode world, restore the claim area
