@@ -7,6 +7,8 @@ public class ClaimArray {
 	
 	ArrayList<Claim> claims = new ArrayList<Claim>();
 	ConcurrentHashMap<Long, Claim> claimmap = new ConcurrentHashMap<Long, Claim>();
+	
+	ConcurrentHashMap<String, ArrayList<Claim>> chunkmap = new ConcurrentHashMap<String, ArrayList<Claim>>();
 
 	public int size() {
 		return claims.size();

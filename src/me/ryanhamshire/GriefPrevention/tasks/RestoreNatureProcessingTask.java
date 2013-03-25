@@ -527,8 +527,13 @@ public class RestoreNatureProcessingTask implements Runnable
 		//fill water depressions
 		do
 		{
-			changed = false;		
-			for(int y = this.seaLevel - 10; y <= this.seaLevel; y++)			
+			changed = false;
+			//Fixes the negative values.
+			int y = this.seaLevel - 10;
+			if(y < 1) {
+				y = 1;
+			}
+			for(; y <= this.seaLevel; y++)			
 			{
 				for(int x = 1; x < snapshots.length - 1; x++)				
 				{
