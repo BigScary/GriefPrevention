@@ -64,7 +64,7 @@ public class CleanupUnusedClaimsTask implements Runnable
 		if(this.nextClaimIndex >= GriefPrevention.instance.dataStore.getClaimsSize()) this.nextClaimIndex = 0;
 		
 		//decide which claim to check next
-		Claim claim = GriefPrevention.instance.dataStore.getClaim(GriefPrevention.instance.dataStore.getClaimIds()[this.nextClaimIndex++]);
+		Claim claim = GriefPrevention.instance.dataStore.getClaimArray().get(this.nextClaimIndex++);
 		
 		//skip administrative claims
 		if(claim.isAdminClaim()) return;

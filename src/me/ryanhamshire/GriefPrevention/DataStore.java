@@ -362,10 +362,18 @@ public abstract class DataStore
 		Claim tempClaim = new Claim();
 		tempClaim.lesserBoundaryCorner = location;
 		
-		//otherwise, search all existing claims until we find the right claim
-		for(int i = 0; i < this.claims.size(); i++)
+		//Let's get all the claims in this block's chunk
+		ArrayList<Claim> aclaims = claims.chunkmap.get(getChunk(location));
+		
+		//If there are no claims here, let's return null.
+		if(aclaims == null) {
+			return null;
+		}
+		
+		//otherwise, search all existing claims in the chunk until we find the right claim
+		for(int i = 0; i < aclaims.size(); i++)
 		{
-			Claim claim = this.claims.get(i);
+			Claim claim = aclaims.get(i);
 			
 			//if we reach a claim which is greater than the temp claim created above, there's definitely no claim
 			//in the collection which includes our location
@@ -392,6 +400,15 @@ public abstract class DataStore
 	
 	synchronized public Claim getClaim(long i) {
 		return claims.getID(i);
+	}
+	
+	/**
+	 * Using the claim array to add or delete claims is NOT recommended
+	 * and it should only be used to read claim data.
+	 * @return The Claim Array.
+	 */
+	synchronized public ClaimArray getClaimArray() {
+		return claims;
 	}
 	
 	@Deprecated
@@ -1075,5 +1092,11 @@ public abstract class DataStore
 
 	public int getClaimsSize() {
 		return claims.size();
-	}	
+	}
+	
+	private String getChunk(Location loc) {
+		int chunkX = loc.getBlockX() >> 4;
+		int chunkZ = loc.getBlockZ() >> 4;
+		return loc.getWorld().getName() + ";" + chunkX + "," + chunkZ;
+	}
 }
