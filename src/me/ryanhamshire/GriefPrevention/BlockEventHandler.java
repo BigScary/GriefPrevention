@@ -329,12 +329,12 @@ public class BlockEventHandler implements Listener
 				{
 					//as long as the automatic claim overlaps another existing claim, shrink it
 					//note that since the player had permission to place the chest, at the very least, the automatic claim will include the chest
-					while(radius >= 0 && !this.dataStore.createClaim(block.getWorld(), 
+					while(radius >= 0 && (this.dataStore.createClaim(block.getWorld(), 
 							block.getX() - radius, block.getX() + radius, 
 							block.getY() - GriefPrevention.instance.config_claims_claimsExtendIntoGroundDistance, block.getY(), 
 							block.getZ() - radius, block.getZ() + radius, 
 							player.getName(), 
-							null, null, false).succeeded)
+							null, null, false).succeeded != CreateClaimResult.Result.Success))
 					{
 						radius--;
 					}

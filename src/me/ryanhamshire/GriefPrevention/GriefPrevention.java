@@ -1137,7 +1137,8 @@ public class GriefPrevention extends JavaPlugin
 					else
 					{
 						claim.dropPermission(args[0]);
-						claim.managers.remove(args[0]);
+						claim.removeManager(args[0]);
+						//claim.managers.remove(args[0]);
 					}
 					
 					//save changes
@@ -1181,7 +1182,8 @@ public class GriefPrevention extends JavaPlugin
 					claim.dropPermission(args[0]);
 					if(claim.allowEdit(player) == null)
 					{
-						claim.managers.remove(args[0]);
+						claim.removeManager(args[0]);
+						//claim.managers.remove(args[0]);
 						
 						//beautify for output
 						if(args[0].equals("public"))
@@ -2119,9 +2121,9 @@ public class GriefPrevention extends JavaPlugin
 			Claim currentClaim = targetClaims.get(i);
 			if(permissionLevel == null)
 			{
-				if(!currentClaim.managers.contains(recipientName))
+				if(!currentClaim.isManager(recipientName))
 				{
-					currentClaim.managers.add(recipientName);
+					currentClaim.addManager(recipientName);
 				}
 			}
 			else

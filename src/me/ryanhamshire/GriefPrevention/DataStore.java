@@ -461,9 +461,9 @@ public abstract class DataStore
 	/**
 	 * Creates a claim.
 	 * If the new claim would overlap an existing claim, returns a failure along with a reference to the existing claim
-	 * otherwise, returns a success along with a reference to the new claim.</br>
-	 * Use ownerName == "" for administrative claims.</br>
-	 * For top level claims, pass parent == NULL</br>
+	 * otherwise, returns a success along with a reference to the new claim.<br />
+	 * Use ownerName == "" for administrative claims.<br />
+	 * For top level claims, pass parent == NULL<br />
 	 * DOES adjust claim blocks available on success (players can go into negative quantity available)
 	 * Does NOT check a player has permission to create a claim, or enough claim blocks.
 	 * Does NOT check minimum claim size constraints
@@ -942,7 +942,8 @@ public abstract class DataStore
 			
 			for(int i = 0; i < managers.size(); i++)
 			{
-				result.claim.managers.add(managers.get(i));
+				result.claim.addManager(managers.get(i));
+				//result.claim.managers.add(managers.get(i));
 			}
 			
 			//copy subdivisions from old claim

@@ -6,6 +6,11 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
+/**
+ * Whenever a claim is resized this event is called.
+ * @author Tux2
+ *
+ */
 public class ClaimResizeEvent extends Event implements Cancellable {
 
 	// Custom Event Requirements
@@ -27,10 +32,18 @@ public class ClaimResizeEvent extends Event implements Cancellable {
     	this.newclaim = newclaim;
     }
     
+    /**
+     * Gets the existing claim.
+     * @return
+     */
     public Claim getOldClaim() {
     	return oldclaim;
     }
     
+    /**
+     * How the claim will look after the resize.
+     * @return
+     */
     public Claim getNewClaim() {
     	return newclaim;
     }

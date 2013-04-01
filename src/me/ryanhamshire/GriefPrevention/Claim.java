@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Set;
 
 
+import me.ryanhamshire.GriefPrevention.events.ClaimModifiedEvent;
 import me.ryanhamshire.GriefPrevention.tasks.RestoreNatureProcessingTask;
 
 import org.bukkit.*;
@@ -56,7 +57,7 @@ public class Claim
 	public String ownerName;
 	
 	//list of players who (beyond the claim owner) have permission to grant permissions in this claim
-	public ArrayList<String> managers = new ArrayList<String>();
+	private ArrayList<String> managers = new ArrayList<String>();
 	
 	//permissions for this claim, see ClaimPermission class
 	private HashMap<String, ClaimPermission> playerNameToClaimPermissionMap = new HashMap<String, ClaimPermission>();
@@ -88,6 +89,11 @@ public class Claim
 	
 	//whether or not this is an administrative claim
 	//administrative claims are created and maintained by players with the griefprevention.adminclaims permission.
+	/**
+	 * Whether or not this is an administrative claim.<br />
+	 * Administrative claims are created and maintained by players with the griefprevention.adminclaims permission.
+	 * @return
+	 */
 	public boolean isAdminClaim()
 	{
 		return (this.ownerName == null || this.ownerName.isEmpty());
@@ -106,8 +112,11 @@ public class Claim
 		this.modifiedDate = Calendar.getInstance().getTime();
 	}
 	
-	//players may only siege someone when he's not in an admin claim 
-	//and when he has some level of permission in the claim
+	/**
+	 * Players may only siege someone when he's not in an admin claim and when he has some level of permission in the claim.
+	 * @param defender
+	 * @return
+	 */
 	public boolean canSiege(Player defender)
 	{
 		if(this.isAdminClaim()) return false;
@@ -117,9 +126,10 @@ public class Claim
 		return true;
 	}
 	
-	//removes any fluids above sea level in a claim
-	//exclusionClaim is another claim indicating an sub-area to be excluded from this operation
-	//it may be null
+	/**
+	 * Removes any fluids above sea level in a claim.
+	 * @param exclusionClaim another claim indicating a sub-area to be excluded from this operation. Can be null.
+	 */
 	public void removeSurfaceFluids(Claim exclusionClaim)
 	{
 		//don't do this for administrative claims
@@ -202,7 +212,18 @@ public class Claim
 		return false;
 	}
 	
-	//main constructor.  note that only creating a claim instance does nothing - a claim must be added to the data store to be effective
+	/**
+	 * Main constructor.  Note that only creating a claim instance does nothing - a claim must be added to the data store to be effective.
+	 * @param lesserBoundaryCorner
+	 * @param greaterBoundaryCorner
+	 * @param ownerName
+	 * @param builderNames
+	 * @param containerNames
+	 * @param accessorNames
+	 * @param managerNames
+	 * @param id
+	 * @param neverdelete
+	 */
 	public Claim(Location lesserBoundaryCorner, Location greaterBoundaryCorner, String ownerName, String [] builderNames, String [] containerNames, String [] accessorNames, String [] managerNames, Long id, boolean neverdelete)
 	{
 		//modification date
@@ -258,7 +279,10 @@ public class Claim
 		this.neverdelete = neverdelete;
 	}
 	
-	//measurements.  all measurements are in blocks
+	/**
+	 * Measurements.  All measurements are in blocks
+	 * @return
+	 */
 	public int getArea()
 	{
 		int claimWidth = this.greaterBoundaryCorner.getBlockX() - this.lesserBoundaryCorner.getBlockX() + 1;
@@ -267,17 +291,30 @@ public class Claim
 		return claimWidth * claimHeight;		
 	}
 	
+	/**
+	 * Gets the width of the claim.
+	 * @return
+	 */
 	public int getWidth()
 	{
 		return this.greaterBoundaryCorner.getBlockX() - this.lesserBoundaryCorner.getBlockX() + 1;		
 	}
 	
+	/**
+	 * Gets the height of the claim.
+	 * @return
+	 */
 	public int getHeight()
 	{
 		return this.greaterBoundaryCorner.getBlockZ() - this.lesserBoundaryCorner.getBlockZ() + 1;		
 	}
 	
-	//distance check for claims, distance in this case is a band around the outside of the claim rather then euclidean distance
+	/**
+	 * Distance check for claims, distance in this case is a band around the outside of the claim rather then euclidean distance.
+	 * @param location
+	 * @param howNear
+	 * @return
+	 */
 	public boolean isNear(Location location, int howNear)
 	{
 		Claim claim = new Claim
@@ -288,8 +325,12 @@ public class Claim
 		return claim.contains(location, false, true);
 	}
 	
-	//permissions.  note administrative "public" claims have different rules than other claims
-	//all of these return NULL when a player has permission, or a String error message when the player doesn't have permission
+	/**
+	 * Permissions.  Note administrative "public" claims have different rules than other claims.<br />
+	 * All of these return NULL when a player has permission, or a String error message when the player doesn't have permission.
+	 * @param player
+	 * @return
+	 */
 	public String allowEdit(Player player)
 	{
 		//if we don't know who's asking, always say no (i've been told some mods can make this happen somehow)
@@ -329,7 +370,11 @@ public class Claim
 		return GriefPrevention.instance.dataStore.getMessage(Messages.OnlyOwnersModifyClaims, this.getOwnerName());
 	}
 	
-	//build permission check
+	/**
+	 * Build permission check
+	 * @param player
+	 * @return
+	 */
 	public String allowBuild(Player player)
 	{
 		//if we don't know who's asking, always say no (i've been told some mods can make this happen somehow)
@@ -404,7 +449,12 @@ public class Claim
 		return false;			
 	}
 	
-	//break permission check
+	/**
+	 * Break permission check
+	 * @param player
+	 * @param material
+	 * @return
+	 */
 	public String allowBreak(Player player, Material material)
 	{
 		//if under siege, some blocks will be breakable
@@ -442,7 +492,11 @@ public class Claim
 		return this.allowBuild(player);		
 	}
 	
-	//access permission check
+	/**
+	 * Access permission check
+	 * @param player
+	 * @return
+	 */
 	public String allowAccess(Player player)
 	{
 		//following a siege where the defender lost, the claim will allow everyone access for a time
@@ -477,7 +531,11 @@ public class Claim
 		return reason;
 	}
 	
-	//inventory permission check
+	/**
+	 * Inventory permission check
+	 * @param player
+	 * @return
+	 */
 	public String allowContainers(Player player)
 	{		
 		//if we don't know who's asking, always say no (i've been told some mods can make this happen somehow)
@@ -520,7 +578,11 @@ public class Claim
 		return reason;
 	}
 	
-	//grant permission check, relatively simple
+	/**
+	 * Grant permission check, relatively simple
+	 * @param player
+	 * @return
+	 */
 	public String allowGrantPermission(Player player)
 	{
 		//if we don't know who's asking, always say no (i've been told some mods can make this happen somehow)
@@ -554,26 +616,99 @@ public class Claim
 		return reason;
 	}
 	
-	//grants a permission for a player or the public
-	public void setPermission(String playerName, ClaimPermission permissionLevel)
+	/**
+	 * Grants a permission for a player or the public
+	 * @param playerName
+	 * @param permissionLevel
+	 * @return
+	 */
+	public boolean setPermission(String playerName, ClaimPermission permissionLevel)
 	{
+		//we only want to send events if the claim is in the data store
+		if(inDataStore) {
+			ClaimModifiedEvent.Type permtype;
+			switch(permissionLevel) {
+			case Access:
+				permtype = ClaimModifiedEvent.Type.AddedAccessTrust;
+				break;
+			case Build:
+				permtype = ClaimModifiedEvent.Type.AddedBuildTrust;
+				break;
+			case Inventory:
+				permtype = ClaimModifiedEvent.Type.AddedInventoryTrust;
+				break;
+			default:
+				permtype = null;
+			}
+			ClaimModifiedEvent claimevent = new ClaimModifiedEvent(this, null, permtype);
+			Bukkit.getServer().getPluginManager().callEvent(claimevent);
+			if(claimevent.isCancelled()) {
+				return false;
+			}
+		}
 		this.playerNameToClaimPermissionMap.put(playerName.toLowerCase(),  permissionLevel);
+		return true;
 	}
 	
-	//revokes a permission for a player or the public
-	public void dropPermission(String playerName)
+	/**
+	 * Revokes a permission for a player or the public
+	 * @param playerName
+	 */
+	public boolean dropPermission(String playerName)
 	{
+		//we only want to send events if the claim is in the data store
+		if(inDataStore) {
+			ClaimPermission perm = this.playerNameToClaimPermissionMap.get(playerName.toLowerCase());
+			ClaimModifiedEvent.Type permtype;
+			switch(perm) {
+			case Access:
+				permtype = ClaimModifiedEvent.Type.RemovedAccessTrust;
+				break;
+			case Build:
+				permtype = ClaimModifiedEvent.Type.RemovedBuildTrust;
+				break;
+			case Inventory:
+				permtype = ClaimModifiedEvent.Type.RemovedInventoryTrust;
+				break;
+			default:
+				permtype = null;
+			}
+			ClaimModifiedEvent claimevent = new ClaimModifiedEvent(this, null, permtype);
+			Bukkit.getServer().getPluginManager().callEvent(claimevent);
+			if(claimevent.isCancelled()) {
+				return false;
+			}
+		}
 		this.playerNameToClaimPermissionMap.remove(playerName.toLowerCase());
+		return true;
 	}
 	
-	//clears all permissions (except owner of course)
-	public void clearPermissions()
+	/**
+	 * Clears all permissions (except owner of course)
+	 * @return true if permissions were cleared successfully, false if a plugin prevented it from clearing them.
+	 */
+	public boolean clearPermissions()
 	{
+		//we only want to send events if the claim is in the data store
+		if(inDataStore) {
+			ClaimModifiedEvent claimevent = new ClaimModifiedEvent(this, null, ClaimModifiedEvent.Type.PermissionsCleared);
+			Bukkit.getServer().getPluginManager().callEvent(claimevent);
+			if(claimevent.isCancelled()) {
+				return false;
+			}
+		}
 		this.playerNameToClaimPermissionMap.clear();
+		return true;
 	}
-	
-	//gets ALL permissions
-	//useful for  making copies of permissions during a claim resize and listing all permissions in a claim
+
+	/**
+	 * Gets ALL permissions.<br />
+	 * Useful for  making copies of permissions during a claim resize and listing all permissions in a claim.
+	 * @param builders
+	 * @param containers
+	 * @param accessors
+	 * @param managers
+	 */
 	public void getPermissions(ArrayList<String> builders, ArrayList<String> containers, ArrayList<String> accessors, ArrayList<String> managers)
 	{
 		//loop through all the entries in the hash map
@@ -604,20 +739,29 @@ public class Claim
 		}
 	}
 	
-	//returns a copy of the location representing lower x, y, z limits
+	/**
+	 * Returns a copy of the location representing lower x, y, z limits
+	 * @return
+	 */
 	public Location getLesserBoundaryCorner()
 	{
 		return this.lesserBoundaryCorner.clone();
 	}
 	
-	//returns a copy of the location representing upper x, y, z limits
-	//NOTE: remember upper Y will always be ignored, all claims always extend to the sky
+	/**
+	 * Returns a copy of the location representing upper x, y, z limits.<br />
+	 * NOTE: remember upper Y will always be ignored, all claims always extend to the sky.
+	 * @return
+	 */
 	public Location getGreaterBoundaryCorner()
 	{
 		return this.greaterBoundaryCorner.clone();
 	}
 	
-	//returns a friendly owner name (for admin claims, returns "an administrator" as the owner)
+	/**
+	 * Returns a friendly owner name (for admin claims, returns "an administrator" as the owner)
+	 * @return
+	 */
 	public String getOwnerName()
 	{
 		if(this.parent != null)
@@ -627,11 +771,15 @@ public class Claim
 			return GriefPrevention.instance.dataStore.getMessage(Messages.OwnerNameForAdminClaims);
 		
 		return this.ownerName;
-	}	
+	}
 	
-	//whether or not a location is in a claim
-	//ignoreHeight = true means location UNDER the claim will return TRUE
-	//excludeSubdivisions = true means that locations inside subdivisions of the claim will return FALSE
+	/**
+	 * Whether or not a location is in the claim.
+	 * @param location
+	 * @param ignoreHeight true means location UNDER the claim will return TRUE
+	 * @param excludeSubdivisions true means that locations inside subdivisions of the claim will return FALSE
+	 * @return
+	 */
 	public boolean contains(Location location, boolean ignoreHeight, boolean excludeSubdivisions)
 	{
 		//not in the same world implies false
@@ -723,7 +871,10 @@ public class Claim
 		return false;
 	}
 	
-	//whether more entities may be added to a claim
+	/**
+	 * Whether more entities may be added to a claim
+	 * @return
+	 */
 	public String allowMoreEntities()
 	{
 		if(this.parent != null) return this.parent.allowMoreEntities();
@@ -837,7 +988,55 @@ public class Claim
 				}
 			}
 		}
-		
+
 		return (long)score;
+	}
+
+	/**
+	 * Checks to see if this player is a manager.
+	 * @param player
+	 * @return
+	 */
+	public boolean isManager(String player) {
+		//if we don't know who's asking, always say no (i've been told some mods can make this happen somehow)
+		if(player == null) return false;
+
+		return managers.contains(player);
+	}
+	
+	/**
+	 * Adds a manager to the claim.
+	 * @param player
+	 * @return
+	 */
+	public boolean addManager(String player) {
+		//we only want to send events if the claim is in the data store
+		if(inDataStore) {
+			ClaimModifiedEvent claimevent = new ClaimModifiedEvent(this, player, ClaimModifiedEvent.Type.AddedManager);
+			Bukkit.getServer().getPluginManager().callEvent(claimevent);
+			if(claimevent.isCancelled()) {
+				return false;
+			}
+		}
+		managers.add(player);
+		return true;
+	}
+
+	/**
+	 * Removes a manager from the claim.
+	 * @param player
+	 * @return
+	 */
+	public boolean removeManager(String player) {
+		//we only want to send events if the claim is in the data store
+		if(inDataStore) {
+			ClaimModifiedEvent claimevent = new ClaimModifiedEvent(this, player, ClaimModifiedEvent.Type.RemovedManager);
+			Bukkit.getServer().getPluginManager().callEvent(claimevent);
+			if(claimevent.isCancelled()) {
+				return false;
+			}
+		}
+		managers.remove(player);
+		return true;
 	}
 }

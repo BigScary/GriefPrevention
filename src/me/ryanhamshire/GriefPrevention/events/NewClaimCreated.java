@@ -6,6 +6,9 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
+/**
+ * Whenever a claim is created this event is called.
+ */
 public class NewClaimCreated extends Event implements Cancellable {
 
 	// Custom Event Requirements
