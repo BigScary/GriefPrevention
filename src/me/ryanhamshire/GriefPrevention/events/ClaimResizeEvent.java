@@ -6,7 +6,7 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-public class NewClaimCreated extends Event implements Cancellable {
+public class ClaimResizeEvent extends Event implements Cancellable {
 
 	// Custom Event Requirements
     private static final HandlerList handlers = new HandlerList();
@@ -19,14 +19,20 @@ public class NewClaimCreated extends Event implements Cancellable {
         return handlers;
     }
     
-    Claim claim;
+    Claim oldclaim;
+    Claim newclaim;
     
-    public NewClaimCreated(Claim claim) {
-    	this.claim = claim;
+    public ClaimResizeEvent(Claim oldclaim, Claim newclaim) {
+    	this.oldclaim = oldclaim;
+    	this.newclaim = newclaim;
     }
     
-    public Claim getClaim() {
-    	return claim;
+    public Claim getOldClaim() {
+    	return oldclaim;
+    }
+    
+    public Claim getNewClaim() {
+    	return newclaim;
     }
     
     boolean canceled = false;

@@ -982,7 +982,7 @@ class PlayerEventHandler implements Listener
 	{
 		Player player = event.getPlayer();
 		
-		//determine target block.  FEATURE: shovel and string can be used from a distance away
+		//determine target block.  FEATURE: shovel and stick can be used from a distance away
 		Block clickedBlock = null;
 		
 		try
@@ -1145,7 +1145,7 @@ class PlayerEventHandler implements Listener
 			}
 		}
 		
-		//otherwise handle right click (shovel, string, bonemeal)
+		//otherwise handle right click (shovel, stick, bonemeal)
 		else
 		{
 			//ignore all actions except right-click on a block or in the air
@@ -1535,7 +1535,7 @@ class PlayerEventHandler implements Listener
 				Claim oldClaim = playerData.claimResizing;
 				boolean smaller = false;
 				if(oldClaim.parent == null)
-				{				
+				{
 					//temporary claim instance, just for checking contains()
 					Claim newClaim = new Claim(
 							new Location(oldClaim.getLesserBoundaryCorner().getWorld(), newx1, newy1, newz1), 
@@ -1562,7 +1562,7 @@ class PlayerEventHandler implements Listener
 				//ask the datastore to try and resize the claim, this checks for conflicts with other claims
 				CreateClaimResult result = GriefPrevention.instance.dataStore.resizeClaim(playerData.claimResizing, newx1, newx2, newy1, newy2, newz1, newz2);
 				
-				if(result.succeeded)
+				if(result.succeeded == CreateClaimResult.Result.Success)
 				{
 					//inform and show the player
 					GriefPrevention.sendMessage(player, TextMode.Success, Messages.ClaimResizeSuccess, String.valueOf(playerData.getRemainingClaimBlocks()));
@@ -1586,8 +1586,7 @@ class PlayerEventHandler implements Listener
 					//clean up
 					playerData.claimResizing = null;
 					playerData.lastShovelLocation = null;
-				}
-				else
+				}else if(result.succeeded == CreateClaimResult.Result.ClaimOverlap)
 				{
 					//inform player
 					GriefPrevention.sendMessage(player, TextMode.Err, Messages.ResizeFailOverlap);
@@ -1661,13 +1660,17 @@ class PlayerEventHandler implements Listener
 									null, false);
 							
 							//if it didn't succeed, tell the player why
-							if(!result.succeeded)
+							if(result.succeeded == CreateClaimResult.Result.ClaimOverlap)
 							{
 								GriefPrevention.sendMessage(player, TextMode.Err, Messages.CreateSubdivisionOverlap);
 																				
 								Visualization visualization = Visualization.FromClaim(result.claim, clickedBlock.getY(), VisualizationType.ErrorClaim, player.getLocation());
 								Visualization.Apply(player, visualization);
 								
+								return;
+							}else if(result.succeeded == CreateClaimResult.Result.Canceled) {
+								//It was canceled by a plugin, just return, as the plugin should put out a 
+								//custom error message.
 								return;
 							}
 							
@@ -1774,13 +1777,16 @@ class PlayerEventHandler implements Listener
 						null, null, false);
 				
 				//if it didn't succeed, tell the player why
-				if(!result.succeeded)
+				if(result.succeeded == CreateClaimResult.Result.ClaimOverlap)
 				{
 					GriefPrevention.sendMessage(player, TextMode.Err, Messages.CreateClaimFailOverlapShort);
 					
 					Visualization visualization = Visualization.FromClaim(result.claim, clickedBlock.getY(), VisualizationType.ErrorClaim, player.getLocation());
 					Visualization.Apply(player, visualization);
 					
+					return;
+				}else if(result.succeeded == CreateClaimResult.Result.Canceled) {
+					//A plugin canceled the event.
 					return;
 				}
 				
