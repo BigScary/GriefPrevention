@@ -566,7 +566,19 @@ public abstract class DataStore
 		}
 		else
 		{
-			claimsToCheck = this.claims.claims;
+			ArrayList<String> claimchunks = ClaimArray.getChunks(newClaim);
+			claimsToCheck = new ArrayList<Claim>();
+			for(String chunk : claimchunks) {
+				ArrayList<Claim> chunkclaims = this.claims.chunkmap.get(chunk);
+				if(chunkclaims == null) {
+					continue;
+				}
+				for(Claim claim : chunkclaims) {
+					if(!claimsToCheck.contains(claim)) {
+						claimsToCheck.add(claim);
+					}
+				}
+			}
 		}
 
 		for(int i = 0; i < claimsToCheck.size(); i++)
@@ -649,7 +661,7 @@ public abstract class DataStore
 	 * @param attacker The attacker
 	 * @param defender The defending player
 	 * @param defenderClaim The claim being attacked
-	 * @see onCooldown()
+	 * @see #onCooldown()
 	 */
 	synchronized public void startSiege(Player attacker, Player defender, Claim defenderClaim)
 	{
