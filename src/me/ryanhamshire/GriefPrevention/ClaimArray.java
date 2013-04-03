@@ -38,7 +38,7 @@ public class ClaimArray {
 				if(k < aclaims.size())
 					aclaims.add(k, newClaim);
 				else
-					aclaims.add(this.claims.size(), newClaim);
+					aclaims.add(aclaims.size(), newClaim);
 			}
 		}
 	}
