@@ -659,6 +659,10 @@ public class Claim
 		//we only want to send events if the claim is in the data store
 		if(inDataStore) {
 			ClaimPermission perm = this.playerNameToClaimPermissionMap.get(playerName.toLowerCase());
+			//If they aren't in the map, let's just return
+			if(perm == null) {
+				return true;
+			}
 			ClaimModifiedEvent.Type permtype;
 			switch(perm) {
 			case Access:
