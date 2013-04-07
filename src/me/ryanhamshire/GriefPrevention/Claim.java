@@ -39,8 +39,8 @@ public class Claim
 {
 	//two locations, which together define the boundaries of the claim
 	//note that the upper Y value is always ignored, because claims ALWAYS extend up to the sky
-	Location lesserBoundaryCorner;
-	Location greaterBoundaryCorner;
+	public Location lesserBoundaryCorner;
+	public Location greaterBoundaryCorner;
 	
 	//modification date.  this comes from the file timestamp during load, and is updated with runtime changes
 	public Date modifiedDate;
