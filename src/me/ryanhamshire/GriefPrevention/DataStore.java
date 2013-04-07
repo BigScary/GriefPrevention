@@ -38,7 +38,7 @@ public abstract class DataStore
 	protected ConcurrentHashMap<String, Integer> permissionToBonusBlocksMap = new ConcurrentHashMap<String, Integer>();
 	
 	//in-memory cache for claim data
-	ArrayList<Claim> claims = new ArrayList<Claim>();
+	public ArrayList<Claim> claims = new ArrayList<Claim>();
 	
 	//in-memory cache for messages
 	private String [] messages;
