@@ -290,7 +290,11 @@ public class RestoreNatureProcessingTask implements Runnable
 		{
 			for(int z = 1; z < snapshots[0][0].length - 1; z++)
 			{
-				for(int y = this.seaLevel - 1; y < snapshots[0].length; y++)
+				int y = this.seaLevel - 1;
+				if(y < 0) {
+					y = 0;
+				}
+				for(; y < snapshots[0].length; y++)
 				{
 					BlockSnapshot block = snapshots[x][y][z];
 					
