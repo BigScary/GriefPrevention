@@ -181,6 +181,9 @@ public class RestoreNatureProcessingTask implements Runnable
 		{
 			for(int z = 1; z < snapshots[0][0].length - 1; z++)
 			{
+				if(this.seaLevel - 2 < 0) {
+					return;
+				}
 				//replace air, lava, or running water at sea level with stone
 				if(this.snapshots[x][this.seaLevel - 2][z].typeId == Material.AIR.getId() || this.snapshots[x][this.seaLevel - 2][z].typeId == Material.LAVA.getId() || (this.snapshots[x][this.seaLevel - 2][z].typeId == Material.WATER.getId() || this.snapshots[x][this.seaLevel - 2][z].data != 0))
 				{
