@@ -1043,4 +1043,12 @@ public class Claim
 		managers.remove(player);
 		return true;
 	}
+	
+	/**
+	 * This returns a copy of the managers list. Additions and removals in this list do not affect the claim.
+	 * @return The list of the managers.
+	 */
+	public ArrayList<String> getManagerList() {
+		return (ArrayList<String>) managers.clone();
+	}
 }
