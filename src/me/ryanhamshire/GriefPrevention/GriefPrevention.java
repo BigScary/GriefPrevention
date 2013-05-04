@@ -144,6 +144,7 @@ public class GriefPrevention extends JavaPlugin
 	public boolean config_fireDestroys;								//whether fire destroys blocks outside of claims
 	
 	public boolean config_addItemsToClaimedChests;					//whether players may add items to claimed chests by left-clicking them
+	public boolean config_sign_Eavesdrop;                           //whether to allow sign eavesdropping at all.
 	public boolean config_eavesdrop; 								//whether whispered messages will be visible to administrators
 	public ArrayList<String> config_eavesdrop_whisperCommands;		//list of whisper commands to eavesdrop on
 	
@@ -344,7 +345,8 @@ public class GriefPrevention extends JavaPlugin
 		this.config_claims_wildernessBlocksDelay = config.getInt("GriefPrevention.Claims.WildernessWarningBlockCount",15); //number of blocks,0 will disable the wilderness warning.
 		
 		
-		
+		this.config_sign_Eavesdrop = config.getBoolean("GriefPrevention.SignEavesDrop",true);
+		outConfig.set("GriefPrevention.SignEavesDrop", this.config_sign_Eavesdrop);
 		this.config_claims_preventTheft = config.getBoolean("GriefPrevention.Claims.PreventTheft", true);
 		this.config_claims_protectCreatures = config.getBoolean("GriefPrevention.Claims.ProtectCreatures", true);
 		this.config_claims_preventButtonsSwitches = config.getBoolean("GriefPrevention.Claims.PreventButtonsSwitches", true);

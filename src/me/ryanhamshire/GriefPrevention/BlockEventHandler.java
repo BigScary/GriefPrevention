@@ -232,7 +232,7 @@ public class BlockEventHandler implements Listener
 			GriefPrevention.AddLogEntry("[Sign Placement] <" + player.getName() + "> " + lines.toString() + " @ " + GriefPrevention.getfriendlyLocationString(event.getBlock().getLocation()));
 			playerData.lastMessage = signMessage;
 			
-			if(!player.hasPermission("griefprevention.eavesdrop"))
+			if(!player.hasPermission("griefprevention.eavesdrop") && GriefPrevention.instance.config_sign_Eavesdrop)
 			{
 				Player [] players = GriefPrevention.instance.getServer().getOnlinePlayers();
 				for(int i = 0; i < players.length; i++)
