@@ -57,6 +57,10 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.util.Vector;
 
 //event handlers related to blocks
+/**
+ * Listener class for Block-related Event handling.
+ * 
+ */
 public class BlockEventHandler implements Listener 
 {
 	//convenience reference to singleton datastore
@@ -70,7 +74,8 @@ public class BlockEventHandler implements Listener
 		this.dataStore = dataStore;
 		
 		//create the list of blocks which will not trigger a warning when they're placed outside of land claims
-		this.trashBlocks = new ArrayList<Material>();
+		this.trashBlocks = new ArrayList<Material>(GriefPrevention.instance.config_trash_blocks);
+		/*this.trashBlocks = new ArrayList<Material>();
 		this.trashBlocks.add(Material.COBBLESTONE);
 		this.trashBlocks.add(Material.TORCH);
 		this.trashBlocks.add(Material.DIRT);
@@ -78,7 +83,7 @@ public class BlockEventHandler implements Listener
 		this.trashBlocks.add(Material.GRAVEL);
 		this.trashBlocks.add(Material.SAND);
 		this.trashBlocks.add(Material.TNT);
-		this.trashBlocks.add(Material.WORKBENCH);
+		this.trashBlocks.add(Material.WORKBENCH);*/
 	}
 	
 	//when a block is damaged...
@@ -203,7 +208,7 @@ public class BlockEventHandler implements Listener
 		}
 	}
 	
-	//when a player places a sign...
+		//when a player places a sign...
 	@EventHandler(ignoreCancelled = true)
 	public void onSignChanged(SignChangeEvent event)
 	{
@@ -382,10 +387,10 @@ public class BlockEventHandler implements Listener
 		//FEATURE: warn players when they're placing non-trash blocks outside of their claimed areas
 		else if(GriefPrevention.instance.config_claims_warnOnBuildOutside && !this.trashBlocks.contains(block.getType()) && GriefPrevention.instance.claimsEnabledForWorld(block.getWorld()) && playerData.claims.size() > 0)
 		{
-			if(--playerData.unclaimedBlockPlacementsUntilWarning <= 0)
+			if(--playerData.unclaimedBlockPlacementsUntilWarning <= 0 && GriefPrevention.instance.config_claims_wildernessBlocksDelay!=0)
 			{
 				GriefPrevention.sendMessage(player, TextMode.Warn, Messages.BuildingOutsideClaims);
-				playerData.unclaimedBlockPlacementsUntilWarning = 15;
+				playerData.unclaimedBlockPlacementsUntilWarning = GriefPrevention.instance.config_claims_wildernessBlocksDelay;
 				
 				if(playerData.lastClaim != null && playerData.lastClaim.allowBuild(player) == null)
 				{

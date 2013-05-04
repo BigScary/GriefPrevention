@@ -72,6 +72,9 @@ public class GriefPrevention extends JavaPlugin
 	public ArrayList<World> config_claims_enabledWorlds;			//list of worlds where players can create GriefPrevention claims
 	public ArrayList<World> config_claims_enabledCreativeWorlds;	//list of worlds where additional creative mode anti-grief rules apply
 	
+	//blame:BC_Programming, configurable "Trash" blocks that do not notify
+	public List<Material> config_trash_blocks=null;
+	
 	public boolean config_claims_preventTheft;						//whether containers and crafting blocks are protectable
 	public boolean config_claims_protectCreatures;					//whether claimed animals may be injured by players without permission
 	public boolean config_claims_preventButtonsSwitches;			//whether buttons and switches are protectable
@@ -159,6 +162,10 @@ public class GriefPrevention extends JavaPlugin
 	public boolean config_claims_warnOnBuildOutside;				//whether players should be warned when they're building in an unclaimed area
 	
 	public HashMap<String, Integer> config_seaLevelOverride;		//override for sea level, because bukkit doesn't report the right value for all situations
+	//configuration option changes the number of non-trash blocks that can be placed before
+	//the plugin warns about being in the wilderness and all that guff about
+	//players being able to undo your work. 0 disables the display entirely.
+	public int config_claims_wildernessBlocksDelay;
 	
 	//reference to the economy plugin, if economy integration is enabled
 	public static Economy economy = null;					
@@ -296,6 +303,47 @@ public class GriefPrevention extends JavaPlugin
 			outConfig.set("GriefPrevention.SeaLevelOverrides." + worlds.get(i).getName(), seaLevelOverride);
 			this.config_seaLevelOverride.put(worlds.get(i).getName(), seaLevelOverride);
 		}
+		
+		//read trash blocks.
+		//Cobblestone,Torch,Dirt,Sapling,Gravel,Sand,TNT,Workbench
+		this.config_trash_blocks = new ArrayList<Material>();
+		for(Material trashblock:new Material[]{Material.COBBLESTONE,
+				Material.TORCH,Material.DIRT,Material.SAPLING,Material.GRAVEL,Material.SAND,Material.TNT,Material.WORKBENCH}){
+		this.config_trash_blocks.add(trashblock);
+		}
+		List<String> trashblocks= config.getStringList("GriefPrevention.Claims.TrashBlocks");
+		if(trashblocks==null || trashblocks.size()==0){
+		//go with the default, which we already set.	
+			trashblocks = new ArrayList<String>();
+			for(String iterate:new String[] {"COBBLESTONE","TORCH","DIRT","SAPLING","GRAVEL","SAND","TNT","WORKBENCH"}){
+				trashblocks.add(iterate);
+			}
+			//set trashblocks, since we save it to outConfig later, so save out this default. This makes it easier to 
+			//edit.
+			
+		}
+		else {
+			//reset...
+			this.config_trash_blocks=new ArrayList<Material>();
+			for(String trashmaterial:trashblocks){
+				 try {
+					 //replace spaces with underscores...
+					 trashmaterial = trashmaterial.replace(" ", "_");
+				Material parsed = Material.valueOf(trashmaterial.toUpperCase());
+				config_trash_blocks.add(parsed);
+				GriefPrevention.AddLogEntry("trash Material:" + parsed.toString());
+				 }
+				 catch(IllegalArgumentException iae){
+					 //nothing special, log though.
+					 GriefPrevention.AddLogEntry("failed to parse trashmaterial Entry:" + trashmaterial.toUpperCase());
+				 }
+			}
+		}
+		//persist to output...
+		
+		this.config_claims_wildernessBlocksDelay = config.getInt("GriefPrevention.Claims.WildernessWarningBlockCount",15); //number of blocks,0 will disable the wilderness warning.
+		
+		
 		
 		this.config_claims_preventTheft = config.getBoolean("GriefPrevention.Claims.PreventTheft", true);
 		this.config_claims_protectCreatures = config.getBoolean("GriefPrevention.Claims.ProtectCreatures", true);
@@ -576,7 +624,11 @@ public class GriefPrevention extends JavaPlugin
 		outConfig.set("GriefPrevention.Claims.AllowUnclaimingCreativeModeLand", this.config_claims_allowUnclaimInCreative);
 		outConfig.set("GriefPrevention.Claims.AutoRestoreUnclaimedCreativeLand", this.config_claims_autoRestoreUnclaimedCreativeLand);
 		
+		outConfig.set("GriefPrevention.Claims.TrashBlocks",trashblocks);
+		outConfig.set("GriefPrevention.Claims.WildernessWarningBlockCount", this.config_claims_wildernessBlocksDelay);
+		
 		outConfig.set("GriefPrevention.Spam.Enabled", this.config_spam_enabled);
+		
 		outConfig.set("GriefPrevention.Spam.LoginCooldownMinutes", this.config_spam_loginCooldownMinutes);
 		outConfig.set("GriefPrevention.Spam.MonitorSlashCommands", slashCommandsToMonitor);
 		outConfig.set("GriefPrevention.Spam.WarningMessage", this.config_spam_warningMessage);
