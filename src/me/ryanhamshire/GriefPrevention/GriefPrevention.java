@@ -243,7 +243,7 @@ public class GriefPrevention extends JavaPlugin
 		
 		//get creative world names from the config file
 		List<String> creativeClaimsEnabledWorldNames = config.getStringList("GriefPrevention.Claims.CreativeRulesWorlds");
-		if(creativeClaimsEnabledWorldNames == null || creativeClaimsEnabledWorldNames.size() == 0)
+		if(creativeClaimsEnabledWorldNames == null)
 		{			
 			creativeClaimsEnabledWorldNames = defaultCreativeWorldNames;
 		}
@@ -277,7 +277,7 @@ public class GriefPrevention extends JavaPlugin
 		
 		//get pvp world names from the config file
 		List<String> pvpEnabledWorldNames = config.getStringList("GriefPrevention.PvP.Worlds");
-		if(pvpEnabledWorldNames == null || pvpEnabledWorldNames.size() == 0)
+		if(pvpEnabledWorldNames == null)
 		{			
 			pvpEnabledWorldNames = defaultPvpWorldNames;
 		}
@@ -631,7 +631,6 @@ public class GriefPrevention extends JavaPlugin
 		outConfig.set("GriefPrevention.Claims.CreationRequiresPermission", this.config_claims_creationRequiresPermission);
 		outConfig.set("GriefPrevention.Claims.MinimumSize", this.config_claims_minSize);
 		outConfig.set("GriefPrevention.Claims.MaximumDepth", this.config_claims_maxDepth);
-		outConfig.set("GriefPrevention.Claims.IdleLimitDays", this.config_claims_expirationDays);
 		outConfig.set("GriefPrevention.Claims.TrappedCommandCooldownHours", this.config_claims_trappedCooldownHours);
 		outConfig.set("GriefPrevention.Claims.InvestigationTool", this.config_claims_investigationTool.name());
 		outConfig.set("GriefPrevention.Claims.ModificationTool", this.config_claims_modificationTool.name());
