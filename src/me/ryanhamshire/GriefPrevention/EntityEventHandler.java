@@ -82,7 +82,7 @@ class EntityEventHandler implements Listener
 		}
 		
 		//don't allow the wither to break blocks, when the wither is determined, too expensive to constantly check for claimed blocks
-		else if(event.getEntityType() == EntityType.WITHER && GriefPrevention.instance.config_claims_enabledWorlds.contains(event.getBlock().getWorld()))
+		else if(event.getEntityType() == EntityType.WITHER && GriefPrevention.instance.config_claims_enabledWorlds.contains(event.getBlock().getWorld().getName()))
 		{
 			event.setCancelled(true);
 		}
@@ -114,7 +114,7 @@ class EntityEventHandler implements Listener
 		
 		//FEATURE: explosions don't destroy blocks when they explode near or above sea level in standard worlds
 		boolean isCreeper = (explodeEvent.getEntity() != null && explodeEvent.getEntity() instanceof Creeper);
-		if( location.getWorld().getEnvironment() == Environment.NORMAL && GriefPrevention.instance.config_claims_enabledWorlds.contains(location.getWorld()) && ((isCreeper && GriefPrevention.instance.config_blockSurfaceCreeperExplosions) || (!isCreeper && GriefPrevention.instance.config_blockSurfaceOtherExplosions)))			
+		if( location.getWorld().getEnvironment() == Environment.NORMAL && GriefPrevention.instance.config_claims_enabledWorlds.contains(location.getWorld().getName()) && ((isCreeper && GriefPrevention.instance.config_blockSurfaceCreeperExplosions) || (!isCreeper && GriefPrevention.instance.config_blockSurfaceOtherExplosions)))
 		{
 			for(int i = 0; i < blocks.size(); i++)
 			{
