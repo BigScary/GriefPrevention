@@ -656,6 +656,9 @@ public class RestoreNatureProcessingTask implements Runnable
 		playerBlocks.add(Material.GLASS.getId());
 		playerBlocks.add(Material.LAPIS_BLOCK.getId());
 		playerBlocks.add(Material.DISPENSER.getId());
+		playerBlocks.add(Material.HOPPER.getId());
+		playerBlocks.add(Material.DROPPER.getId());
+		playerBlocks.add(Material.ANVIL.getId());
 		playerBlocks.add(Material.NOTE_BLOCK.getId());
 		playerBlocks.add(Material.POWERED_RAIL.getId());
 		playerBlocks.add(Material.DETECTOR_RAIL.getId());
@@ -677,6 +680,7 @@ public class RestoreNatureProcessingTask implements Runnable
 		playerBlocks.add(Material.CHEST.getId());
 		playerBlocks.add(Material.REDSTONE_WIRE.getId());
 		playerBlocks.add(Material.DIAMOND_BLOCK.getId());
+		playerBlocks.add(Material.REDSTONE_BLOCK.getId());
 		playerBlocks.add(Material.WORKBENCH.getId());
 		playerBlocks.add(Material.FURNACE.getId());
 		playerBlocks.add(Material.BURNING_FURNACE.getId());

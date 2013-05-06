@@ -1051,6 +1051,8 @@ class PlayerEventHandler implements Listener
 						clickedBlockType == Material.JUKEBOX || 
 						clickedBlockType == Material.ENCHANTMENT_TABLE ||
 						clickedBlockType == Material.CAKE_BLOCK ||
+						clickedBlockType == Material.DROPPER ||
+						
 						GriefPrevention.instance.config_mods_containerTrustIds.Contains(new MaterialInfo(clickedBlock.getTypeId(), clickedBlock.getData(), null)))))
 		{			
 			//block container use while under siege, so players can't hide items from attackers
