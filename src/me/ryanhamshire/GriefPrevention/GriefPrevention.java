@@ -74,7 +74,7 @@ public class GriefPrevention extends JavaPlugin
 	
 	//blame:BC_Programming, configurable "Trash" blocks that do not notify
 	public List<Material> config_trash_blocks=null;
-	
+	public double  config_claims_AbandonReturnRatio;                //return ratio when abandoning a claim- .80 will result in players getting 80% of the used claim blocks back.
 	public boolean config_claims_preventTheft;						//whether containers and crafting blocks are protectable
 	public boolean config_claims_protectCreatures;					//whether claimed animals may be injured by players without permission
 	public boolean config_claims_preventButtonsSwitches;			//whether buttons and switches are protectable
@@ -88,7 +88,6 @@ public class GriefPrevention extends JavaPlugin
 	public int config_claims_maxAccruedBlocks;						//the limit on accrued blocks (over time).  doesn't limit purchased or admin-gifted blocks 
 	public int config_claims_maxDepth;								//limit on how deep claims can go
 	public int config_claims_expirationDays;						//how many days of inactivity before a player loses his claims
-	
 	public boolean config_claims_allowVillagerTrades;               //allow trades on claims players don't have permissions on 
 	public int config_claims_automaticClaimsForNewPlayersRadius;	//how big automatic new player claims (when they place a chest) should be.  0 to disable
 	public boolean config_claims_creationRequiresPermission;		//whether creating claims with the shovel requires a permission
@@ -103,6 +102,8 @@ public class GriefPrevention extends JavaPlugin
 	public int config_claims_unusedClaimExpirationDays;				//number of days of inactivity before an unused (nothing build) claim will be deleted
 	public boolean config_claims_survivalAutoNatureRestoration;		//whether survival claims will be automatically restored to nature when auto-deleted
 	public boolean config_claims_creativeAutoNatureRestoration;		//whether creative claims will be automatically restored to nature when auto-deleted
+	public boolean config_claims_survival_Abandon_NatureRestoration; //whether survival claims will be automatically restored to nature when abandoned.
+	public boolean config_claims_creative_Abandon_NatureRestoration; //whether creative claims will be automatically restored to nature when abandoned.
 	
 	public int config_claims_trappedCooldownHours;					//number of hours between uses of the /trapped command
 	
@@ -345,6 +346,8 @@ public class GriefPrevention extends JavaPlugin
 		
 		this.config_claims_wildernessBlocksDelay = config.getInt("GriefPrevention.Claims.WildernessWarningBlockCount",15); //number of blocks,0 will disable the wilderness warning.
 		
+		this.config_claims_AbandonReturnRatio = config.getDouble("GriefPrevention.Claims.AbandonReturnRatio",1);
+		outConfig.set("GriefPrevention.Claims.AbandonReturnRatio", this.config_claims_AbandonReturnRatio);
 		
 		this.config_sign_Eavesdrop = config.getBoolean("GriefPrevention.SignEavesDrop",true);
 		outConfig.set("GriefPrevention.SignEavesDrop", this.config_sign_Eavesdrop);
@@ -373,6 +376,12 @@ public class GriefPrevention extends JavaPlugin
 		this.config_claims_allowUnclaimInCreative = config.getBoolean("GriefPrevention.Claims.AllowUnclaimingCreativeModeLand", true);
 		this.config_claims_autoRestoreUnclaimedCreativeLand = config.getBoolean("GriefPrevention.Claims.AutoRestoreUnclaimedCreativeLand", true);		
 
+		this.config_claims_survival_Abandon_NatureRestoration = config.getBoolean("GriefPrevention.Claims.SurvivalAbandonAutoRestore",false);
+		outConfig.set("GriefPrevention.Claims.SurvivalAbandonAutoRestore",this.config_claims_survival_Abandon_NatureRestoration);
+		
+		this.config_claims_creative_Abandon_NatureRestoration = config.getBoolean("GriefPrevention.Claims.CreativeAbandonAutoRestore",false);
+		outConfig.set("GriefPrevention.Claims.CreativeAbandonAutoRestore",this.config_claims_creative_Abandon_NatureRestoration);
+		
 		this.config_claims_chestClaimExpirationDays = config.getInt("GriefPrevention.Claims.Expiration.ChestClaimDays", 7);
 		outConfig.set("GriefPrevention.Claims.Expiration.ChestClaimDays", this.config_claims_chestClaimExpirationDays);
 		
@@ -2043,15 +2052,24 @@ public class GriefPrevention extends JavaPlugin
 	{
 		PlayerData playerData = this.dataStore.getPlayerData(player.getName());
 		
+		
+		
 		//which claim is being abandoned?
 		Claim claim = this.dataStore.getClaimAt(player.getLocation(), true /*ignore height*/, null);
 		if(claim == null)
 		{
 			GriefPrevention.sendMessage(player, TextMode.Instr, Messages.AbandonClaimMissing);
 		}
+
+		int claimarea = claim.getArea();
+		//retrieve (1-abandonclaimration)*totalarea to get amount to subtract from the accrued claim blocks
+		//after we delete the claim.
+		int costoverhead =(int)Math.floor((double)claimarea*(1-GriefPrevention.instance.config_claims_AbandonReturnRatio));
+		System.out.println("costoverhead:" + costoverhead);
+		
 		
 		//verify ownership
-		else if(claim.allowEdit(player) != null)
+		if(claim.allowEdit(player) != null)
 		{
 			GriefPrevention.sendMessage(player, TextMode.Err, Messages.NotYourClaim);
 		}
@@ -2075,7 +2093,17 @@ public class GriefPrevention extends JavaPlugin
 			GriefPrevention.sendMessage(player, TextMode.Warn, Messages.ConfirmAbandonLockedClaim);
 			playerData.warnedAboutMajorDeletion = true;
 		}
-		
+		//if auto-restoration is enabled,
+		else if(!playerData.warnedAboutMajorDeletion && 
+				(GriefPrevention.instance.config_claims_creative_Abandon_NatureRestoration && this.creativeRulesApply(player.getLocation())) ||
+				(GriefPrevention.instance.config_claims_survival_Abandon_NatureRestoration && !this.creativeRulesApply(player.getLocation()))){
+			GriefPrevention.sendMessage(player,TextMode.Warn,Messages.AbandonClaimRestoreWarning);
+			playerData.warnedAboutMajorDeletion=true;
+		}
+		else if(!playerData.warnedAboutMajorDeletion && costoverhead!=claimarea){
+			playerData.warnedAboutMajorDeletion=true;
+			GriefPrevention.sendMessage(player,TextMode.Warn,Messages.AbandonCostWarning,String.valueOf(costoverhead));
+		}
 		//if the claim has lots of surface water or some surface lava, warn the player it will be cleaned up
 		else if(!playerData.warnedAboutMajorDeletion && claim.hasSurfaceFluids() && claim.parent == null)
 		{			
@@ -2090,25 +2118,40 @@ public class GriefPrevention extends JavaPlugin
 			if(claim.parent == null) {
 				claim.removeSurfaceFluids(null);
 			}
+			//retrieve area of this claim...
+			
+			
 			this.dataStore.deleteClaim(claim);
 			
 			//if in a creative mode world, restore the claim area
-			if(GriefPrevention.instance.creativeRulesApply(claim.getLesserBoundaryCorner()))
-			{
+			//CHANGE: option is now determined by configuration options.
+			//if we are in a creative world and the creative Abandon Nature restore option is enabled,
+			//or if we are in a survival world and the creative Abandon Nature restore option is enabled,
+			//then perform the restoration.
+			if((GriefPrevention.instance.config_claims_creative_Abandon_NatureRestoration && this.creativeRulesApply(player.getLocation())) ||
+				(GriefPrevention.instance.config_claims_survival_Abandon_NatureRestoration && !this.creativeRulesApply(player.getLocation()))){
+			
 				GriefPrevention.AddLogEntry(player.getName() + " abandoned a claim @ " + GriefPrevention.getfriendlyLocationString(claim.getLesserBoundaryCorner()));
 				GriefPrevention.sendMessage(player, TextMode.Warn, Messages.UnclaimCleanupWarning);
 				GriefPrevention.instance.restoreClaim(claim, 20L * 60 * 2);
 			}
-			
-			//tell the player how many claim blocks he has left
+			//remove the interest cost, and message the player.
+			if(costoverhead > 0){
+			    playerData.accruedClaimBlocks-=costoverhead;
+				//
+			    GriefPrevention.sendMessage(player, TextMode.Warn, Messages.AbandonCost,0,String.valueOf(costoverhead));
+			}
 			int remainingBlocks = playerData.getRemainingClaimBlocks();
-			GriefPrevention.sendMessage(player, TextMode.Success, Messages.AbandonSuccess, String.valueOf(remainingBlocks));
+			System.out.println("Abandoned...");
+			//tell the player how many claim blocks he has left
+			GriefPrevention.sendMessage(player, TextMode.Success, Messages.AbandonSuccess, 0,String.valueOf(remainingBlocks));
 			
 			//revert any current visualization
 			Visualization.Revert(player);
 			
 			playerData.warnedAboutMajorDeletion = false;
-		}
+			}
+		
 		
 		return true;
 		
@@ -2602,6 +2645,7 @@ public class GriefPrevention extends JavaPlugin
 	//sends a color-coded message to a player
 	static void sendMessage(Player player, ChatColor color, Messages messageID, long delayInTicks, String... args)
 	{
+		System.out.println("sending " + messageID + " to player:" + player.getName());
 		String message = GriefPrevention.instance.dataStore.getMessage(messageID, args);
 		sendMessage(player, color, message, delayInTicks);
 	}
@@ -2637,7 +2681,6 @@ public class GriefPrevention extends JavaPlugin
 	{
 		return this.config_claims_enabledCreativeWorlds.contains(location.getWorld());
 	}
-	
 	public String allowBuild(Player player, Location location)
 	{
 		PlayerData playerData = this.dataStore.getPlayerData(player.getName());

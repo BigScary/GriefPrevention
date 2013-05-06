@@ -44,6 +44,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Hanging;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
+import org.bukkit.entity.Villager;
 import org.bukkit.entity.minecart.HopperMinecart;
 import org.bukkit.entity.minecart.PoweredMinecart;
 import org.bukkit.entity.minecart.StorageMinecart;
@@ -751,6 +752,14 @@ class PlayerEventHandler implements Listener
 				event.setCancelled(true);
 				return;
 			}			
+		}
+		
+		if(entity instanceof Villager && !GriefPrevention.instance.config_claims_allowVillagerTrades){
+		    String noBuildReason = GriefPrevention.instance.allowBuild(player,entity.getLocation());
+		    if(noBuildReason != null){
+		    	GriefPrevention.sendMessage(player,TextMode.Err,"The Villagers reject your attempts to Trade.");
+		    }
+			
 		}
 		
 		//don't allow container access during pvp combat

@@ -185,7 +185,7 @@ permissions:
         default: op
     griefprevention.giveclaimblocks:
         description: Grants permission to give claim blocks to another player.
-        default:false
+        default: false
     griefprevention.transferclaimblocks:
         description: Grants permission to transfer claim blocks from one player to another.
         default: op
