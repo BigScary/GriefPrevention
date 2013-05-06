@@ -540,7 +540,7 @@ public abstract class DataStore
 		}
 		
 		//creative mode claims always go to bedrock
-		if(GriefPrevention.instance.config_claims_enabledCreativeWorlds.contains(world))
+		if(GriefPrevention.instance.config_claims_enabledCreativeWorlds.contains(world.getName()))
 		{
 			smally = 2;
 		}

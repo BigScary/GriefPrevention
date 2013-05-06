@@ -24,6 +24,7 @@ import java.util.List;
 import me.ryanhamshire.GriefPrevention.Claim;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Boat;
@@ -35,24 +36,28 @@ import org.bukkit.entity.Vehicle;
 
 //this main thread task revisits the location of a partially chopped tree from several minutes ago
 //if any part of the tree is still there and nothing else has been built in its place, remove the remaining parts
-public class EntityCleanupTask implements Runnable 
+public class EntityCleanupTask implements Runnable
 {
 	//where to start cleaning in the list of entities
 	private double percentageStart;
-	
+
 	public EntityCleanupTask(double percentageStart)
 	{
 		this.percentageStart = percentageStart;
 	}
-	
+
 	@Override
-	public void run() 
+	public void run()
 	{
-		ArrayList<World> worlds = GriefPrevention.instance.config_claims_enabledCreativeWorlds;
-		
-		for(int i = 0; i < worlds.size(); i++)
+		ArrayList<String> worlds = GriefPrevention.instance.config_claims_enabledCreativeWorlds;
+
+		for (String worldName : worlds)
 		{
-			World world = worlds.get(i);
+			World world = Bukkit.getWorld(worldName);
+			if (world == null)
+			{
+				continue;
+			}
 			
 			List<Entity> entities = world.getEntities();
 			
@@ -129,7 +134,7 @@ public class EntityCleanupTask implements Runnable
 			{
 				//check its entity count and remove any extras
 				claim.allowMoreEntities();
-			}			
+			}
 		}
 		
 		//schedule the next run of this task, in 3 minutes (20L is approximately 1 second)

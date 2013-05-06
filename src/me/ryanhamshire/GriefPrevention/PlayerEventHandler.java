@@ -934,7 +934,7 @@ class PlayerEventHandler implements Listener
 		}
 		
 		//otherwise no wilderness dumping (unless underground) in worlds where claims are enabled
-		else if(GriefPrevention.instance.config_claims_enabledWorlds.contains(block.getWorld()))
+		else if(GriefPrevention.instance.config_claims_enabledWorlds.contains(block.getWorld().getName()))
 		{
 			if(block.getY() >= GriefPrevention.instance.getSeaLevel(block.getWorld()) - 5 && !player.hasPermission("griefprevention.lava"))
 			{
