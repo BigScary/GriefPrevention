@@ -214,7 +214,7 @@ public class GriefPrevention extends JavaPlugin
 		}
 		
 		//validate that list
-		this.config_claims_enabledWorlds = new ArrayList<World>();
+		this.config_claims_enabledWorlds = new ArrayList<String>();
 		for(int i = 0; i < claimsEnabledWorldNames.size(); i++)
 		{
 			String worldName = claimsEnabledWorldNames.get(i);
