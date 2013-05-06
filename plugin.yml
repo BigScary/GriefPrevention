@@ -51,6 +51,10 @@ commands:
       usage: /AdjustBonusClaimBlocks <player> <amount>
       permission: griefprevention.adjustclaimblocks
       aliases: acb
+   transferclaimblocks:
+      description: transfers claim blocks from one player to another.
+      usage: /TransferClaimBlocks <sourceplayer> <targetplayer>
+      permission: griefprevention.transferclaimblocks
    deleteclaim:
       description: Deletes the claim you're standing in, even if it's not your claim.
       usage: /DeleteClaim
@@ -146,6 +150,7 @@ permissions:
             griefprevention.ignoreclaims: true
             griefprevention.adminclaims: true
             griefprevention.adjustclaimblocks: true
+            griefprevention.transferclaimblocks: true
             griefprevention.deleteclaims: true
             griefprevention.spam: true
             griefprevention.lava: true
@@ -168,6 +173,12 @@ permissions:
         default: op
     griefprevention.adjustclaimblocks:
         description: Grants permission to add or remove bonus blocks from a player's account.
+        default: op
+    griefprevention.giveclaimblocks:
+        description: Grants permission to give claim blocks to another player.
+        default:true
+    griefprevention.transferclaimblocks:
+        description: Grants permission to transfer claim blocks from one player to another.
         default: op
     griefprevention.spam:
         description: Grants permission to send messages commands rapidly.

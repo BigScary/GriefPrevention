@@ -89,6 +89,7 @@ public class GriefPrevention extends JavaPlugin
 	public int config_claims_maxDepth;								//limit on how deep claims can go
 	public int config_claims_expirationDays;						//how many days of inactivity before a player loses his claims
 	
+	public boolean config_claims_allowVillagerTrades;               //allow trades on claims players don't have permissions on 
 	public int config_claims_automaticClaimsForNewPlayersRadius;	//how big automatic new player claims (when they place a chest) should be.  0 to disable
 	public boolean config_claims_creationRequiresPermission;		//whether creating claims with the shovel requires a permission
 	public int config_claims_claimsExtendIntoGroundDistance;		//how far below the shoveled block a new claim will reach
@@ -347,6 +348,10 @@ public class GriefPrevention extends JavaPlugin
 		
 		this.config_sign_Eavesdrop = config.getBoolean("GriefPrevention.SignEavesDrop",true);
 		outConfig.set("GriefPrevention.SignEavesDrop", this.config_sign_Eavesdrop);
+		
+		config_claims_allowVillagerTrades = config.getBoolean("GriefPrevention.Claims.PreventTrades",true);
+		outConfig.set("GriefPrevention.Claims.PreventTrades", config_claims_allowVillagerTrades);
+						
 		this.config_claims_preventTheft = config.getBoolean("GriefPrevention.Claims.PreventTheft", true);
 		this.config_claims_protectCreatures = config.getBoolean("GriefPrevention.Claims.ProtectCreatures", true);
 		this.config_claims_preventButtonsSwitches = config.getBoolean("GriefPrevention.Claims.PreventButtonsSwitches", true);
@@ -870,7 +875,33 @@ public class GriefPrevention extends JavaPlugin
 			
 			return true;
 		}
-		
+		else if(cmd.getName().equalsIgnoreCase("giveclaimblocks") && player!=null){
+			if(args.length<2)
+			{
+				return false;
+			}
+			int desiredxfer=0;
+			try {desiredxfer = Integer.parseInt(args[1]);}
+			catch(NumberFormatException nfe){
+				return false;
+			}
+			this.transferClaimBlocks(player.getName(),args[0],desiredxfer);
+		}
+		else if(cmd.getName().equalsIgnoreCase("transferclaimblocks") && player!=null){
+				if(args.length<3){
+					return false;
+				}
+				String sourcename = args[0];
+				String targetname = args[1];
+				int desiredxfer = 0;
+				try {desiredxfer = Integer.parseInt(args[2]);}
+				catch(NumberFormatException exx){
+					return false;
+				}
+				this.transferClaimBlocks(sourcename, targetname, desiredxfer);
+				
+				
+		}
 		//abandonallclaims
 		else if(cmd.getName().equalsIgnoreCase("abandonallclaims") && player != null)
 		{
@@ -1980,7 +2011,29 @@ public class GriefPrevention extends JavaPlugin
 		
 		return false; 
 	}
-	
+	/**
+	 * transfers a number of claim blocks from a source player to a  target player.
+	 * @param Source Source player name. 
+	 * @param string Target Player name.
+	 * @return number of claim blocks transferred.
+	 */
+	private synchronized int transferClaimBlocks(String Source, String Target,int DesiredAmount) {
+		// TODO Auto-generated method stub
+		
+		//transfer claim blocks from source to target, return number of claim blocks transferred.
+		PlayerData playerData = this.dataStore.getPlayerData(Source);
+		PlayerData receiverData = this.dataStore.getPlayerData(Target);
+		if(playerData!=null && receiverData!=null){
+		    int xferamount = Math.min(playerData.accruedClaimBlocks,DesiredAmount);
+		    playerData.accruedClaimBlocks-=xferamount;
+		    receiverData.accruedClaimBlocks+=xferamount;
+		    return xferamount;
+		}
+		return 0;
+		
+		
+	}
+
 	public static String getfriendlyLocationString(Location location) 
 	{
 		return location.getWorld().getName() + "(" + location.getBlockX() + "," + location.getBlockY() + "," + location.getBlockZ() + ")";
