@@ -69,8 +69,8 @@ public class GriefPrevention extends JavaPlugin
 	public DataStore dataStore;
 	
 	//configuration variables, loaded/saved from a config.yml
-	public ArrayList<World> config_claims_enabledWorlds;			//list of worlds where players can create GriefPrevention claims
-	public ArrayList<World> config_claims_enabledCreativeWorlds;	//list of worlds where additional creative mode anti-grief rules apply
+	public ArrayList<String> config_claims_enabledWorlds;			//list of worlds where players can create GriefPrevention claims
+	public ArrayList<String> config_claims_enabledCreativeWorlds;	//list of worlds where additional creative mode anti-grief rules apply
 	
 	//blame:BC_Programming, configurable "Trash" blocks that do not notify
 	public List<Material> config_trash_blocks=null;
@@ -214,7 +214,7 @@ public class GriefPrevention extends JavaPlugin
 		}
 		
 		//validate that list
-		this.config_claims_enabledWorlds = new ArrayList<World>();
+		this.config_claims_enabledWorlds = new ArrayList<String>();
 		for(int i = 0; i < claimsEnabledWorldNames.size(); i++)
 		{
 			String worldName = claimsEnabledWorldNames.get(i);
@@ -225,7 +225,7 @@ public class GriefPrevention extends JavaPlugin
 			}
 			else
 			{
-				this.config_claims_enabledWorlds.add(world);
+				this.config_claims_enabledWorlds.add(world.getName());
 			}
 		}
 		
@@ -249,7 +249,7 @@ public class GriefPrevention extends JavaPlugin
 		}
 		
 		//validate that list
-		this.config_claims_enabledCreativeWorlds = new ArrayList<World>();
+		this.config_claims_enabledCreativeWorlds = new ArrayList<String>();
 		for(int i = 0; i < creativeClaimsEnabledWorldNames.size(); i++)
 		{
 			String worldName = creativeClaimsEnabledWorldNames.get(i);
@@ -260,7 +260,7 @@ public class GriefPrevention extends JavaPlugin
 			}
 			else
 			{
-				this.config_claims_enabledCreativeWorlds.add(world);
+				this.config_claims_enabledCreativeWorlds.add(world.getName());
 			}
 		}
 		
@@ -2397,7 +2397,7 @@ public class GriefPrevention extends JavaPlugin
 	//checks whether players can create claims in a world
 	public boolean claimsEnabledForWorld(World world)
 	{
-		return this.config_claims_enabledWorlds.contains(world);
+		return this.config_claims_enabledWorlds.contains(world.getName());
 	}
 	
 	//checks whether players siege in a world
@@ -2679,7 +2679,7 @@ public class GriefPrevention extends JavaPlugin
 	//determines whether creative anti-grief rules apply at a location
 	public boolean creativeRulesApply(Location location)
 	{
-		return this.config_claims_enabledCreativeWorlds.contains(location.getWorld());
+		return this.config_claims_enabledCreativeWorlds.contains(location.getWorld().getName());
 	}
 	public String allowBuild(Player player, Location location)
 	{
@@ -2702,7 +2702,7 @@ public class GriefPrevention extends JavaPlugin
 			}
 			
 			//no building in survival wilderness when that is configured
-			else if(this.config_claims_noBuildOutsideClaims && this.config_claims_enabledWorlds.contains(location.getWorld()))
+			else if(this.config_claims_noBuildOutsideClaims && this.config_claims_enabledWorlds.contains(location.getWorld().getName()))
 			{
 				return this.dataStore.getMessage(Messages.NoBuildOutsideClaims) + "  " + this.dataStore.getMessage(Messages.SurvivalBasicsDemoAdvertisement);
 			}
@@ -2743,7 +2743,7 @@ public class GriefPrevention extends JavaPlugin
 				return reason;
 			}
 			
-			else if(this.config_claims_noBuildOutsideClaims && this.config_claims_enabledWorlds.contains(location.getWorld()))
+			else if(this.config_claims_noBuildOutsideClaims && this.config_claims_enabledWorlds.contains(location.getWorld().getName()))
 			{
 				return this.dataStore.getMessage(Messages.NoBuildOutsideClaims) + "  " + this.dataStore.getMessage(Messages.SurvivalBasicsDemoAdvertisement);
 			}
