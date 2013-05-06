@@ -53,7 +53,7 @@ commands:
       aliases: acb
    transferclaimblocks:
       description: transfers claim blocks from one player to another.
-      usage: /TransferClaimBlocks <sourceplayer> <targetplayer>
+      usage: /TransferClaimBlocks <sourceplayer> <targetplayer> <amount>
       permission: griefprevention.transferclaimblocks
    deleteclaim:
       description: Deletes the claim you're standing in, even if it's not your claim.
@@ -176,7 +176,7 @@ permissions:
         default: op
     griefprevention.giveclaimblocks:
         description: Grants permission to give claim blocks to another player.
-        default:true
+        default:false
     griefprevention.transferclaimblocks:
         description: Grants permission to transfer claim blocks from one player to another.
         default: op
