@@ -51,6 +51,11 @@ commands:
       usage: /AdjustBonusClaimBlocks <player> <amount>
       permission: griefprevention.adjustclaimblocks
       aliases: acb
+   setblockbank:
+      description: Set the player's accrued blocks bank to the specified amount.
+      usage: /SetBlockBank <player> <amount>
+      permission: griefprevention.setblockbank
+      aliases: sbb
    deleteclaim:
       description: Deletes the claim you're standing in, even if it's not your claim.
       usage: /DeleteClaim
@@ -60,6 +65,10 @@ commands:
       description: Deletes all of another player's claims.
       usage: /DeleteAllClaims <player>
       permission: griefprevention.deleteclaims
+   resetclaims:
+      description: Deletes all of another player's claims AND resets their accrued block bank to the initial value.
+      usage: /ResetClaims <player>
+      permission: griefprevention.resetclaims
    adminclaims:
       description: Switches the shovel tool to administrative claims mode.
       usage: /AdminClaims
