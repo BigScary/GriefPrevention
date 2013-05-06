@@ -168,6 +168,25 @@ class EntityEventHandler implements Listener
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onItemSpawn(ItemSpawnEvent event)
 	{
+		Block centerblock = event.getEntity().getLocation().getBlock();
+        for(int testx=-1;testx<=1;testx++){
+        	for(int testy=-1;testy<=1;testy++){
+        		for(int testz=-1;testz<=1;testz++){
+        		Block grabblock = event.getEntity().getWorld().
+        				getBlockAt(centerblock.getX() + testx,
+        			centerblock.getY()+testy,
+        			centerblock.getZ()+testz);
+        		if(grabblock.getType().equals(Material.DROPPER)){
+        			return;
+        		}
+        		}
+        	}
+        			
+        }
+
+		
+		
+		
 		//if in a creative world, cancel the event (don't drop items on the ground)
 		if(GriefPrevention.instance.creativeRulesApply(event.getLocation()))
 		{

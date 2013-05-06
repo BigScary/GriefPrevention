@@ -679,7 +679,7 @@ public class BlockEventHandler implements Listener
 	{
 		//from where?
 		Block fromBlock = dispenseEvent.getBlock();
-		
+		if(fromBlock.getType().equals(Material.DROPPER)) return;
 		//to where?
 		Vector velocity = dispenseEvent.getVelocity();
 		int xChange = 0;
