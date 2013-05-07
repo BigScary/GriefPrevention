@@ -76,7 +76,7 @@ public class GriefPrevention extends JavaPlugin
 	
 	//blame:BC_Programming, configurable "Trash" blocks that do not notify
 	public List<Material> config_trash_blocks=null;
-	public boolean config_claims_AllowEnvironmentalEntityDamage;                 //whether Entities can take damage from the environment in a claim.
+	public boolean config_claims_AllowEnvironmentalVehicleDamage;                 //whether Entities can take damage from the environment in a claim.
 	public double  config_claims_AbandonReturnRatio;                //return ratio when abandoning a claim- .80 will result in players getting 80% of the used claim blocks back.
 	public boolean config_claims_preventTheft;						//whether containers and crafting blocks are protectable
 	public boolean config_claims_protectCreatures;					//whether claimed animals may be injured by players without permission
@@ -362,8 +362,8 @@ public class GriefPrevention extends JavaPlugin
 		
 		outConfig.set("GriefPrevention.Claims.PerPlayerLimit",config_claims_perplayer_claim_limit);
 		
-		this.config_claims_AllowEnvironmentalEntityDamage = config.getBoolean("GriefPrevention.Claims.EnvironmentalEntityDamage",true);
-		outConfig.set("GriefPrevention.Claims.EnvironmentalEntityDamage",this.config_claims_AllowEnvironmentalEntityDamage);
+		this.config_claims_AllowEnvironmentalVehicleDamage = config.getBoolean("GriefPrevention.Claims.EnvironmentalVehicleDamage",true);
+		outConfig.set("GriefPrevention.Claims.EnvironmentalVehicleDamage",this.config_claims_AllowEnvironmentalVehicleDamage);
 		
 		this.config_claims_preventTheft = config.getBoolean("GriefPrevention.Claims.PreventTheft", true);
 		this.config_claims_protectCreatures = config.getBoolean("GriefPrevention.Claims.ProtectCreatures", true);
