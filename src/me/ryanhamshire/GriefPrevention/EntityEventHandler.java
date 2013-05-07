@@ -32,6 +32,7 @@ import org.bukkit.entity.Egg;
 import org.bukkit.entity.Enderman;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Fireball;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
@@ -39,6 +40,7 @@ import org.bukkit.entity.Snowball;
 import org.bukkit.entity.Snowman;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.entity.Villager;
+import org.bukkit.entity.WitherSkull;
 
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -398,6 +400,18 @@ class EntityEventHandler implements Listener
 			Egg segg = (Egg)damageSource;
 			if(segg.getShooter() instanceof Player){
 				attacker = (Player)segg.getShooter();
+			}
+		}
+		else if(damageSource instanceof Fireball){
+			Fireball fball = (Fireball)damageSource;
+			if(fball.getShooter() instanceof Player){
+				attacker = (Player)fball.getShooter();
+			}
+		}
+		else if(damageSource instanceof WitherSkull){
+			WitherSkull wskull = (WitherSkull)damageSource;
+			if(wskull.getShooter() instanceof Player){
+				attacker = (Player)wskull.getShooter();
 			}
 		}
 		
