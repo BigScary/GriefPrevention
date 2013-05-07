@@ -1755,7 +1755,8 @@ class PlayerEventHandler implements Listener
 					return;
 				}
 				else if(GriefPrevention.instance.config_claims_perplayer_claim_limit > 0 &&
-					playerData.claims.size()==GriefPrevention.instance.config_claims_perplayer_claim_limit){
+					playerData.claims.size()==GriefPrevention.instance.config_claims_perplayer_claim_limit &&
+					!(player.hasPermission("griefprevention.ignoreclaimslimit") )){
 					GriefPrevention.sendMessage(player, TextMode.Err, Messages.PlayerClaimLimit,String.valueOf(GriefPrevention.instance.config_claims_perplayer_claim_limit));
 					return;
 				}

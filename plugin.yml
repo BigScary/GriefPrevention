@@ -18,7 +18,7 @@ commands:
       permission: griefprevention.claims
    trust:
       description: Grants a player full access to your claim(s).
-      usage: /Trust <player>  Graants a player permission to build.  See also /UnTrust, /ContainerTrust, /AccessTrust, and /PermissionTrust.
+      usage: /Trust <player>  Grants a player permission to build.  See also /UnTrust, /ContainerTrust, /AccessTrust, and /PermissionTrust.
       aliases: tr
       permission: griefprevention.claims
    untrust:
@@ -148,6 +148,9 @@ commands:
       description: Unlocks a previously locked claim.
       usage: /UnlockClaim
 permissions:
+    griefprevention.ignoreclaimslimit:
+        description: Allows creation of more claims than any configured per-player limit.
+        default: op
     griefprevention.createclaims:
         description: Grants permission to create claims.
         default: op
