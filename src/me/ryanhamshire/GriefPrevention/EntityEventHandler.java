@@ -552,7 +552,10 @@ class EntityEventHandler implements Listener
 				attacker = (Player)potion.getShooter();
 			}
 		}
-		
+		//if Damage source is unspecified and we allow environmental damage, don't cancel the event.
+		else if(damageSource ==null && GriefPrevention.instance.config_claims_AllowEnvironmentalEntityDamage){
+			return;
+		}
 		//NOTE: vehicles can be pushed around.
 		//so unless precautions are taken by the owner, a resourceful thief might find ways to steal anyway
 		Claim cachedClaim = null;
@@ -568,7 +571,7 @@ class EntityEventHandler implements Listener
 		//if it's claimed
 		if(claim != null)
 		{
-			//if damaged by anything other than a player, cancel the event
+			//if damaged by anything other than a player, or a cactus,
 			if(attacker == null)
 			{
 				event.setCancelled(true);
