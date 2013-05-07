@@ -733,6 +733,22 @@ class PlayerEventHandler implements Listener
 			return;
 		}
 	}
+	@EventHandler(priority=EventPriority.LOWEST)
+	public void onPlayerShearEntity(PlayerShearEntityEvent event){
+		
+		Player player = event.getPlayer();
+		Entity entity = event.getEntity();
+		Claim c = this.dataStore.getClaimAt(entity.getLocation(), true, null);
+		if(c!=null){
+			String noAccessReason = c.allowAccess(player);
+			if(noAccessReason!=null){
+				//if no Access trust, don't allow shearing.
+				GriefPrevention.sendMessage(player, TextMode.Err, noAccessReason);
+				event.setCancelled(true);
+			}
+		}
+	}
+	
 	
 	//when a player interacts with an entity...
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
