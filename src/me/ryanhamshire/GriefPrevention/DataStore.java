@@ -397,7 +397,9 @@ public abstract class DataStore
 	synchronized public Claim getClaimAt(Location location, boolean ignoreHeight, Claim cachedClaim)
 	{
 		//check cachedClaim guess first.  if it's in the datastore and the location is inside it, we're done
-		if(cachedClaim != null && cachedClaim.inDataStore && cachedClaim.contains(location, ignoreHeight, true)) return cachedClaim;
+		if(cachedClaim != null && cachedClaim.inDataStore && cachedClaim.contains(location, ignoreHeight, true)) 
+			return cachedClaim;
+		
 		
 		//the claims list is ordered by greater boundary corner
 		//create a temporary "fake" claim in memory for comparison purposes		
@@ -1162,6 +1164,7 @@ public abstract class DataStore
 		this.addDefault(defaults, Messages.AbandonClaimRestoreWarning, "Abandoning this claim will restore nature! If you still want to abandon it, use /abandonclaim again.",null);
 		this.addDefault(defaults, Messages.AbandonCost,"you lose {0} Claim blocks from abandoning this claim.","0:Number of claim blocks lost");
 		this.addDefault(defaults, Messages.AbandonCostWarning, "You will lose {0} Claim blocks if you abandon this claim. enter /abandonclaim again to confirm.", "0:Number of claim blocks that will be lost");
+		this.addDefault(defaults, Messages.NoVillagerTradeOutsideClaims, "You cannot trade with Villagers outside of Claims.",null);
 		//load the config file
 		FileConfiguration config = YamlConfiguration.loadConfiguration(new File(messagesFilePath));
 		

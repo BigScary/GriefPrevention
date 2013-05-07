@@ -741,7 +741,7 @@ class PlayerEventHandler implements Listener
 		Player player = event.getPlayer();
 		Entity entity = event.getRightClicked();
 		PlayerData playerData = this.dataStore.getPlayerData(player.getName());
-		
+		System.out.println("onPlayerInteractEntity:" + event.getRightClicked().getClass().getName());
 		//don't allow interaction with item frames in claimed areas without build permission
 		if(entity instanceof Hanging)
 		{
@@ -758,6 +758,7 @@ class PlayerEventHandler implements Listener
 		    String noBuildReason = GriefPrevention.instance.allowBuild(player,entity.getLocation());
 		    if(noBuildReason != null){
 		    	GriefPrevention.sendMessage(player,TextMode.Err,"The Villagers reject your attempts to Trade.");
+		    	event.setCancelled(true);
 		    }
 			
 		}
@@ -1052,6 +1053,7 @@ class PlayerEventHandler implements Listener
 						clickedBlockType == Material.ENCHANTMENT_TABLE ||
 						clickedBlockType == Material.CAKE_BLOCK ||
 						clickedBlockType == Material.DROPPER ||
+						clickedBlockType == Material.HOPPER ||
 						
 						GriefPrevention.instance.config_mods_containerTrustIds.Contains(new MaterialInfo(clickedBlock.getTypeId(), clickedBlock.getData(), null)))))
 		{			

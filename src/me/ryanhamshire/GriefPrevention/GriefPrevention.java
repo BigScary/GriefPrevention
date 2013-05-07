@@ -352,8 +352,8 @@ public class GriefPrevention extends JavaPlugin
 		this.config_sign_Eavesdrop = config.getBoolean("GriefPrevention.SignEavesDrop",true);
 		outConfig.set("GriefPrevention.SignEavesDrop", this.config_sign_Eavesdrop);
 		
-		config_claims_allowVillagerTrades = config.getBoolean("GriefPrevention.Claims.PreventTrades",true);
-		outConfig.set("GriefPrevention.Claims.PreventTrades", config_claims_allowVillagerTrades);
+		config_claims_allowVillagerTrades = !config.getBoolean("GriefPrevention.Claims.PreventTrades",true);
+		outConfig.set("GriefPrevention.Claims.PreventTrades", !config_claims_allowVillagerTrades);
 						
 		this.config_claims_preventTheft = config.getBoolean("GriefPrevention.Claims.PreventTheft", true);
 		this.config_claims_protectCreatures = config.getBoolean("GriefPrevention.Claims.ProtectCreatures", true);
