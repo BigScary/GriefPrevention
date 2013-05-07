@@ -2141,7 +2141,6 @@ public class GriefPrevention extends JavaPlugin
 			    GriefPrevention.sendMessage(player, TextMode.Warn, Messages.AbandonCost,0,String.valueOf(costoverhead));
 			}
 			int remainingBlocks = playerData.getRemainingClaimBlocks();
-			System.out.println("Abandoned...");
 			//tell the player how many claim blocks he has left
 			GriefPrevention.sendMessage(player, TextMode.Success, Messages.AbandonSuccess, 0,String.valueOf(remainingBlocks));
 			
@@ -2682,13 +2681,8 @@ public class GriefPrevention extends JavaPlugin
 	}
 	public String allowBuild(Player player, Location location)
 	{
-		System.out.println("allowBuild testing for player " + player.getName() + " at location " + location.toString());
 		PlayerData playerData = this.dataStore.getPlayerData(player.getName());
 		Claim claim = this.dataStore.getClaimAt(location, false, playerData.lastClaim);
-		if(claim!=null){
-			System.out.println("Claim owned by:" + claim.getOwnerName());
-			System.out.println("Is Subclaim:" + claim.parent==null);
-		}
 		//exception: administrators in ignore claims mode and special player accounts created by server mods
 		if(playerData.ignoreClaims || GriefPrevention.instance.config_mods_ignoreClaimsAccounts.contains(player.getName())) return null;
 		
