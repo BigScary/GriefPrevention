@@ -553,7 +553,7 @@ class EntityEventHandler implements Listener
 			}
 		}
 		//if Damage source is unspecified and we allow environmental damage, don't cancel the event.
-		else if(damageSource ==null && GriefPrevention.instance.config_claims_AllowEnvironmentalEntityDamage){
+		else if(damageSource ==null && GriefPrevention.instance.config_claims_AllowEnvironmentalVehicleDamage){
 			return;
 		}
 		//NOTE: vehicles can be pushed around.
