@@ -88,7 +88,7 @@ public class GriefPrevention extends JavaPlugin
 	public int config_claims_maxAccruedBlocks;						//the limit on accrued blocks (over time).  doesn't limit purchased or admin-gifted blocks 
 	public int config_claims_maxDepth;								//limit on how deep claims can go
 	public int config_claims_expirationDays;						//how many days of inactivity before a player loses his claims
-	public boolean config_claims_allowVillagerTrades;               //allow trades on claims players don't have permissions on 
+	public boolean config_claims_preventTrades;                     //prevent trades on claims players don't have permissions on 
 	public int config_claims_automaticClaimsForNewPlayersRadius;	//how big automatic new player claims (when they place a chest) should be.  0 to disable
 	public boolean config_claims_creationRequiresPermission;		//whether creating claims with the shovel requires a permission
 	public int config_claims_claimsExtendIntoGroundDistance;		//how far below the shoveled block a new claim will reach
@@ -352,8 +352,8 @@ public class GriefPrevention extends JavaPlugin
 		this.config_sign_Eavesdrop = config.getBoolean("GriefPrevention.SignEavesDrop",true);
 		outConfig.set("GriefPrevention.SignEavesDrop", this.config_sign_Eavesdrop);
 		
-		config_claims_allowVillagerTrades = !config.getBoolean("GriefPrevention.Claims.PreventTrades",true);
-		outConfig.set("GriefPrevention.Claims.PreventTrades", !config_claims_allowVillagerTrades);
+		config_claims_preventTrades = config.getBoolean("GriefPrevention.Claims.PreventTrades",false);
+		outConfig.set("GriefPrevention.Claims.PreventTrades", config_claims_preventTrades);
 						
 		this.config_claims_preventTheft = config.getBoolean("GriefPrevention.Claims.PreventTheft", true);
 		this.config_claims_protectCreatures = config.getBoolean("GriefPrevention.Claims.ProtectCreatures", true);
@@ -2682,9 +2682,13 @@ public class GriefPrevention extends JavaPlugin
 	}
 	public String allowBuild(Player player, Location location)
 	{
+		System.out.println("allowBuild testing for player " + player.getName() + " at location " + location.toString());
 		PlayerData playerData = this.dataStore.getPlayerData(player.getName());
 		Claim claim = this.dataStore.getClaimAt(location, false, playerData.lastClaim);
-		
+		if(claim!=null){
+			System.out.println("Claim owned by:" + claim.getOwnerName());
+			System.out.println("Is Subclaim:" + claim.parent==null);
+		}
 		//exception: administrators in ignore claims mode and special player accounts created by server mods
 		if(playerData.ignoreClaims || GriefPrevention.instance.config_mods_ignoreClaimsAccounts.contains(player.getName())) return null;
 		
