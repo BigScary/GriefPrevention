@@ -28,12 +28,15 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.Creeper;
+import org.bukkit.entity.Egg;
 import org.bukkit.entity.Enderman;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Snowball;
+import org.bukkit.entity.Snowman;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.entity.Villager;
 
@@ -383,6 +386,18 @@ class EntityEventHandler implements Listener
 			if(potion.getShooter() instanceof Player)
 			{
 				attacker = (Player)potion.getShooter();
+			}
+		}
+		else if(damageSource instanceof Snowball){
+			Snowball sball = (Snowball)damageSource;
+			if(sball.getShooter() instanceof Player){
+				attacker = (Player)sball.getShooter();
+			}
+		}
+		else if(damageSource instanceof Egg){
+			Egg segg = (Egg)damageSource;
+			if(segg.getShooter() instanceof Player){
+				attacker = (Player)segg.getShooter();
 			}
 		}
 		
