@@ -1738,7 +1738,12 @@ class PlayerEventHandler implements Listener
 					GriefPrevention.sendMessage(player, TextMode.Err, Messages.ClaimsDisabledWorld);
 					return;
 				}
-				
+				else if(GriefPrevention.instance.config_claims_perplayer_claim_limit > 0 &&
+					playerData.claims.size()==GriefPrevention.instance.config_claims_perplayer_claim_limit){
+					GriefPrevention.sendMessage(player, TextMode.Err, Messages.PlayerClaimLimit,String.valueOf(GriefPrevention.instance.config_claims_perplayer_claim_limit));
+					return;
+				}
+					
 				
 				
 				//remember it, and start him on the new claim
