@@ -72,6 +72,8 @@ public class GriefPrevention extends JavaPlugin
 	public ArrayList<String> config_claims_enabledWorlds;			//list of worlds where players can create GriefPrevention claims
 	public ArrayList<String> config_claims_enabledCreativeWorlds;	//list of worlds where additional creative mode anti-grief rules apply
 	
+	public int config_claims_perplayer_claim_limit;                        //maximum number of claims a user can have.
+	
 	//blame:BC_Programming, configurable "Trash" blocks that do not notify
 	public List<Material> config_trash_blocks=null;
 	public double  config_claims_AbandonReturnRatio;                //return ratio when abandoning a claim- .80 will result in players getting 80% of the used claim blocks back.
@@ -355,6 +357,10 @@ public class GriefPrevention extends JavaPlugin
 		config_claims_preventTrades = config.getBoolean("GriefPrevention.Claims.PreventTrades",false);
 		outConfig.set("GriefPrevention.Claims.PreventTrades", config_claims_preventTrades);
 						
+		this.config_claims_perplayer_claim_limit = config.getInt("GriefPrevention.Claims.PerPlayerLimit",0);
+		
+		outConfig.set("GriefPrevention.Claims.PerPlayerLimit",config_claims_perplayer_claim_limit);
+		
 		this.config_claims_preventTheft = config.getBoolean("GriefPrevention.Claims.PreventTheft", true);
 		this.config_claims_protectCreatures = config.getBoolean("GriefPrevention.Claims.ProtectCreatures", true);
 		this.config_claims_preventButtonsSwitches = config.getBoolean("GriefPrevention.Claims.PreventButtonsSwitches", true);

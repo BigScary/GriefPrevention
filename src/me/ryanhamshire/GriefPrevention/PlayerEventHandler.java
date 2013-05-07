@@ -1739,6 +1739,8 @@ class PlayerEventHandler implements Listener
 					return;
 				}
 				
+				
+				
 				//remember it, and start him on the new claim
 				playerData.lastShovelLocation = clickedBlock.getLocation();
 				GriefPrevention.sendMessage(player, TextMode.Instr, Messages.ClaimStart);

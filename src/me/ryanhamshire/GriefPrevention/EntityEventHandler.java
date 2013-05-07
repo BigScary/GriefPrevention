@@ -46,6 +46,7 @@ import org.bukkit.event.entity.EntityBreakDoorEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityInteractEvent;
@@ -478,6 +479,7 @@ class EntityEventHandler implements Listener
 				{
 					//if damaged by anything other than a player (exception villagers injured by zombies in admin claims), cancel the event
 					//why exception?  so admins can set up a village which can't be CHANGED by players, but must be "protected" by players.
+					//Additional exception added: cactus, lava, and drowning of entities happens.
 					if(attacker == null)
 					{
 						//exception case
@@ -485,7 +487,9 @@ class EntityEventHandler implements Listener
 						{
 							return;
 						}
-						
+						else if(event.getCause().equals(DamageCause.CONTACT) || event.getCause().equals(DamageCause.DROWNING)){
+							return;
+						}
 						//all other cases
 						else
 						{
