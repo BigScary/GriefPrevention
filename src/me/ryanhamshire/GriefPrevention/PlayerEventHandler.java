@@ -741,7 +741,6 @@ class PlayerEventHandler implements Listener
 		Player player = event.getPlayer();
 		Entity entity = event.getRightClicked();
 		PlayerData playerData = this.dataStore.getPlayerData(player.getName());
-		System.out.println("onPlayerInteractEntity:" + event.getRightClicked().getClass().getName());
 		//don't allow interaction with item frames in claimed areas without build permission
 		if(entity instanceof Hanging)
 		{
@@ -754,12 +753,18 @@ class PlayerEventHandler implements Listener
 			}			
 		}
 		
-		if(entity instanceof Villager && !GriefPrevention.instance.config_claims_allowVillagerTrades){
-		    String noBuildReason = GriefPrevention.instance.allowBuild(player,entity.getLocation());
-		    if(noBuildReason != null){
-		    	GriefPrevention.sendMessage(player,TextMode.Err,"The Villagers reject your attempts to Trade.");
-		    	event.setCancelled(true);
-		    }
+		if(entity instanceof Villager && GriefPrevention.instance.config_claims_preventTrades){
+			//get the claim at that position.
+			Claim claim = this.dataStore.getClaimAt(entity.getLocation(), false, null);
+			if(claim!=null){
+			    String noContainerReason = claim.allowContainers(player);
+			    if(noContainerReason != null){
+			    	GriefPrevention.sendMessage(player,TextMode.Err,noContainerReason);
+			    	event.setCancelled(true);
+			    }
+			} else if(claim==null && GriefPrevention.instance.config_claims_noBuildOutsideClaims){
+				GriefPrevention.sendMessage(player, TextMode.Err, Messages.NoVillagerTradeOutsideClaims);
+			}
 			
 		}
 		
