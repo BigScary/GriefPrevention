@@ -73,8 +73,8 @@ public class GriefPrevention extends JavaPlugin
 	public ArrayList<String> config_claims_enabledCreativeWorlds;	//list of worlds where additional creative mode anti-grief rules apply
 	
 	public int config_claims_perplayer_claim_limit;                        //maximum number of claims a user can have.
-	
 	//blame:BC_Programming, configurable "Trash" blocks that do not notify
+	
 	public List<Material> config_trash_blocks=null;
 	public boolean config_claims_AllowEnvironmentalVehicleDamage;                 //whether Entities can take damage from the environment in a claim.
 	public double  config_claims_AbandonReturnRatio;                //return ratio when abandoning a claim- .80 will result in players getting 80% of the used claim blocks back.
@@ -300,6 +300,10 @@ public class GriefPrevention extends JavaPlugin
 				this.config_pvp_enabledWorlds.add(world);
 			}
 		}
+		
+		
+		
+		
 		
 		//sea level
 		this.config_seaLevelOverride = new HashMap<String, Integer>();
@@ -1191,6 +1195,7 @@ public class GriefPrevention extends JavaPlugin
 			//determine whether a single player or clearing permissions entirely
 			boolean clearPermissions = false;
 			OfflinePlayer otherPlayer = null;
+			System.out.println("clearing perms for name:" + args[0]);
 			if(args[0].equals("all"))				
 			{
 				if(claim == null || claim.allowEdit(player) == null)
@@ -1204,10 +1209,8 @@ public class GriefPrevention extends JavaPlugin
 				}
 			}
 			
-			else
-			{
-				//validate player argument or group argument
-				if(!args[0].startsWith("[") || !args[0].endsWith("]"))
+			else if((!args[0].startsWith("[") || !args[0].endsWith("]"))
+				&& !args[0].toUpperCase().startsWith("G:"))
 				{
 					otherPlayer = this.resolvePlayer(args[0]);
 					if(!clearPermissions && otherPlayer == null && !args[0].equals("public"))
@@ -1220,7 +1223,7 @@ public class GriefPrevention extends JavaPlugin
 					if(otherPlayer != null)
 						args[0] = otherPlayer.getName();
 				}
-			}
+			
 			
 			//if no claim here, apply changes to all his claims
 			if(claim == null)
@@ -2165,6 +2168,7 @@ public class GriefPrevention extends JavaPlugin
 		
 	}
 
+	
 	//helper method keeps the trust commands consistent and eliminates duplicate code
 	private void handleTrustCommand(Player player, ClaimPermission permissionLevel, String recipientName) 
 	{
@@ -2192,16 +2196,26 @@ public class GriefPrevention extends JavaPlugin
 		else
 		{		
 			otherPlayer = this.resolvePlayer(recipientName);
-			if(otherPlayer == null && !recipientName.equals("public") && !recipientName.equals("all"))
+			//addition: if it starts with G:, it indicates a group name, rather than a player name.
+			
+			if(otherPlayer == null && !recipientName.equals("public") && !recipientName.equals("all") &&
+					!recipientName.toUpperCase().startsWith("G:"))
+				
 			{
 				GriefPrevention.sendMessage(player, TextMode.Err, Messages.PlayerNotFound);
 				return;
 			}
+			else if(recipientName.toUpperCase().startsWith("G:")){
+				//keep it as is.
+				//we will give trust to that group, that is...
+				
+			}
 			
-			if(otherPlayer != null)
+			else if(otherPlayer != null)
 			{
 				recipientName = otherPlayer.getName();
 			}
+			
 			else
 			{
 				recipientName = "public";
@@ -2314,18 +2328,22 @@ public class GriefPrevention extends JavaPlugin
 		String location;
 		if(claim == null)
 		{
+			
 			location = this.dataStore.getMessage(Messages.LocationAllClaims);
 		}
 		else
 		{
 			location = this.dataStore.getMessage(Messages.LocationCurrentClaim);
 		}
-		
+		String userecipientName = recipientName;
+		if(userecipientName.toUpperCase().startsWith("G:")){
+			userecipientName="Group " + userecipientName.substring(2);
+		}
 		GriefPrevention.sendMessage(player, TextMode.Success, Messages.GrantPermissionConfirmation, recipientName, permissionDescription, location);
 	}
 
 	//helper method to resolve a player by name
-	private OfflinePlayer resolvePlayer(String name) 
+	public OfflinePlayer resolvePlayer(String name) 
 	{
 		//try online players first
 		Player player = this.getServer().getPlayer(name);

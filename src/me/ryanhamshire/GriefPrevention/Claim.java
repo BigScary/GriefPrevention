@@ -23,6 +23,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -89,6 +90,24 @@ public class Claim
 	
 	//whether or not this is an administrative claim
 	//administrative claims are created and maintained by players with the griefprevention.adminclaims permission.
+	
+	/**
+	 * retrieves the index/ID of a given subclaim.
+	 * @param childclaim Claim to get the index of.
+	 * @return -1 if the given claim is not a subdivided claim of this claim. otherwise, the index of the claim
+	 */
+	public int getChildIndex(Claim childclaim){
+		for(int i=0;i<children.size();i++){
+			if(childclaim==children.get(i))
+				return i;
+		}
+		return -1;
+	}
+	public Claim getChildAt(int Index){
+		if(Index > children.size()-1 || Index < 0)
+			return null;
+		return children.get(Index);
+	}
 	/**
 	 * Whether or not this is an administrative claim.<br />
 	 * Administrative claims are created and maintained by players with the griefprevention.adminclaims permission.
@@ -422,7 +441,37 @@ public class Claim
 				reason += "  " + GriefPrevention.instance.dataStore.getMessage(Messages.IgnoreClaimsAdvertisement);
 		return reason;
 	}
-	
+	/**
+	 * returns whether the given player name fits the given identifier.
+	 * this is added to allow for Group Permissions on a claim.
+	 * @param identifier name of player, or a name of a group. group names must be prefixed with g:
+	 * @param pName name of player to test.
+	 * @return
+	 */
+	private boolean isApplicablePlayer(String identifier,String pName){
+		System.out.println("Checking player " + pName + " matches " + identifier);
+		if(identifier.equalsIgnoreCase(pName)) return true;
+		if(identifier.toUpperCase().startsWith("G:")){
+			identifier = identifier.substring(2);
+			//try to get the player (pName).
+			Player pp = Bukkit.getPlayer(pName);
+			if(pp!=null){
+				String checkperm = "GriefPrevention.TrustGroups." + identifier;
+				if(pp.hasPermission(checkperm))
+				{
+					System.out.println("Player " + pName + "has permission " + checkperm);
+					return true;
+				}
+					
+			}
+			
+			
+			
+			
+		}
+		
+		return false;
+	}
 	private boolean hasExplicitPermission(Player player, ClaimPermission level)
 	{
 		String playerName = player.getName();
@@ -431,8 +480,10 @@ public class Claim
 		while(iterator.hasNext())
 		{
 			String identifier = iterator.next();
-			if(playerName.equalsIgnoreCase(identifier) && this.playerNameToClaimPermissionMap.get(identifier) == level) return true;
 			
+			//if(playerName.equalsIgnoreCase(identifier) && this.playerNameToClaimPermissionMap.get(identifier) == level) return true;
+			
+			if(isApplicablePlayer(identifier,playerName) && this.playerNameToClaimPermissionMap.get(identifier) == level) return true;
 			else if(identifier.startsWith("[") && identifier.endsWith("]"))
 			{
 				//drop the brackets
@@ -995,7 +1046,31 @@ public class Claim
 
 		return (long)score;
 	}
+/**
+ * special routine added for Group support. We need to be able to recognize
+ * player names from a list where the name is actually within a group that is in that list.
+ * @param testlist list of names (possibly including groups) 
+ * @param testfor player name to test for.
+ * @return
+ */
+	private boolean PlayerinList(List<String> testlist,String testfor){
+		//if it starts with g: or G:, remove it.
+		
+		for(String iteratename:testlist){
+			//test if applicable.
+			if(isApplicablePlayer(iteratename,testfor))
+				return true;
 
+			
+			
+		
+			
+		}
+		//we tried to find it in the list and all groups that were in that list, but we didn't find it.
+		return false;
+		
+	}
+	
 	/**
 	 * Checks to see if this player is a manager.
 	 * @param player
@@ -1004,8 +1079,8 @@ public class Claim
 	public boolean isManager(String player) {
 		//if we don't know who's asking, always say no (i've been told some mods can make this happen somehow)
 		if(player == null) return false;
-
-		return managers.contains(player);
+		return PlayerinList(managers,player);
+		//return managers.contains(player);
 	}
 	
 	/**

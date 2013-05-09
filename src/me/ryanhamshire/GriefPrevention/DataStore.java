@@ -82,7 +82,7 @@ public abstract class DataStore
 		this.loadMessages();
 		
 		//collect garbage, since lots of stuff was loaded into memory and then tossed out
-		System.gc();
+		
 	}
 	
 	/**
@@ -1166,6 +1166,7 @@ public abstract class DataStore
 		this.addDefault(defaults, Messages.AbandonCostWarning, "You will lose {0} Claim blocks if you abandon this claim. enter /abandonclaim again to confirm.", "0:Number of claim blocks that will be lost");
 		this.addDefault(defaults, Messages.NoVillagerTradeOutsideClaims, "You cannot trade with Villagers outside of Claims.",null);
 		this.addDefault(defaults, Messages.PlayerClaimLimit,"You have reached the claim limit ({0}) and cannot create new claims.","0:Configuration Claim Limit.");
+		
 		//load the config file
 		FileConfiguration config = YamlConfiguration.loadConfiguration(new File(messagesFilePath));
 		
