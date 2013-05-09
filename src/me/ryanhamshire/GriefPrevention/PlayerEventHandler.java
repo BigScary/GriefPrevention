@@ -740,9 +740,9 @@ class PlayerEventHandler implements Listener
 		Entity entity = event.getEntity();
 		Claim c = this.dataStore.getClaimAt(entity.getLocation(), true, null);
 		if(c!=null){
-			String noAccessReason = c.allowAccess(player);
+			String noAccessReason = c.allowContainers(player);
 			if(noAccessReason!=null){
-				//if no Access trust, don't allow shearing.
+				//if no Container trust, don't allow shearing.
 				GriefPrevention.sendMessage(player, TextMode.Err, noAccessReason);
 				event.setCancelled(true);
 			}
@@ -1490,7 +1490,26 @@ class PlayerEventHandler implements Listener
 				GriefPrevention.sendMessage(player, TextMode.Err, Messages.NoCreateClaimPermission);
 				return;
 			}
-			
+			if(playerData.claimResizing==null){
+				//see if the player has clicked inside one of their claims.
+				Claim checkclaim = GriefPrevention.instance.dataStore.getClaimAt(clickedBlock.getLocation(),true, null);
+				//is there even a claim here?
+				if(checkclaim!=null){
+					//there is a claim; make sure it belongs to this player.
+					String cannotedit=checkclaim.allowEdit(player);
+					if(cannotedit==null){
+						//it DOES belong to them.
+						//automatically switch to advanced claims mode, and show a message.
+						playerData.claimSubdividing = checkclaim;
+						playerData.shovelMode=ShovelMode.Subdivide;
+						GriefPrevention.sendMessage(player, TextMode.Info, "Entering Claim subdivide mode.");
+					} else {
+						//do nothing.
+					}
+				}
+				
+				
+			}
 			//if he's resizing a claim and that claim hasn't been deleted since he started resizing it
 			if(playerData.claimResizing != null && playerData.claimResizing.inDataStore)
 			{
