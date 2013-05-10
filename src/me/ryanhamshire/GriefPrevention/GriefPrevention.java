@@ -76,6 +76,10 @@ public class GriefPrevention extends JavaPlugin
 	//blame:BC_Programming, configurable "Trash" blocks that do not notify
 	
 	public List<Material> config_trash_blocks=null;
+	
+	public int config_message_cooldown_claims = 0; //claims cooldown. 0= no cooldown.
+	public int config_message_cooldown_stuck = 0; //stuck cooldown. 0= no cooldown.
+	
 	public boolean config_claims_AllowEnvironmentalVehicleDamage;                 //whether Entities can take damage from the environment in a claim.
 	public double  config_claims_AbandonReturnRatio;                //return ratio when abandoning a claim- .80 will result in players getting 80% of the used claim blocks back.
 	public boolean config_claims_preventTheft;						//whether containers and crafting blocks are protectable
@@ -350,6 +354,12 @@ public class GriefPrevention extends JavaPlugin
 			}
 		}
 		//persist to output...
+		
+		
+		this.config_message_cooldown_claims = config.getInt("GriefPrevention.Expiration.MessageCooldown.Claim",0);
+		this.config_message_cooldown_stuck = config.getInt("GriefPrevention.Expiration.MessageCooldown.Stuck",0);
+		outConfig.set("GriefPrevention.Expiration.MessageCooldown.Claim", config_message_cooldown_claims);
+		outConfig.set("GriefPrevention.Expiration.MessageCooldown.Stuck", config_message_cooldown_stuck);
 		
 		this.config_claims_wildernessBlocksDelay = config.getInt("GriefPrevention.Claims.WildernessWarningBlockCount",15); //number of blocks,0 will disable the wilderness warning.
 		
@@ -1289,8 +1299,7 @@ public class GriefPrevention extends JavaPlugin
 					if(claim.allowEdit(player) == null)
 					{
 						claim.removeManager(args[0]);
-						//claim.managers.remove(args[0]);
-						
+												
 						//beautify for output
 						if(args[0].equals("public"))
 						{

@@ -646,7 +646,7 @@ public class Claim
 		for(int i = 0; i < this.managers.size(); i++)
 		{
 			String managerID = this.managers.get(i);
-			if(player.getName().equalsIgnoreCase(managerID)) return null;
+			if (this.isApplicablePlayer(managerID, player.getName())) return null;
 			
 			else if(managerID.startsWith("[") && managerID.endsWith("]"))
 			{
@@ -753,6 +753,7 @@ public class Claim
 			}
 		}
 		this.playerNameToClaimPermissionMap.clear();
+		this.managers.clear();
 		return true;
 	}
 

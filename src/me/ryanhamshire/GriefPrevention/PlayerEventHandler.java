@@ -30,6 +30,7 @@ import me.ryanhamshire.GriefPrevention.tasks.PlayerKickBanTask;
 import me.ryanhamshire.GriefPrevention.visualization.Visualization;
 import me.ryanhamshire.GriefPrevention.visualization.VisualizationType;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -106,16 +107,44 @@ class PlayerEventHandler implements Listener
 		{
 			this.howToClaimPattern = Pattern.compile(this.dataStore.getMessage(Messages.HowToClaimRegex), Pattern.CASE_INSENSITIVE);
 		}
-		
+		Messages showclaimmessage =null;
 		if(this.howToClaimPattern.matcher(message).matches())
 		{
 			if(GriefPrevention.instance.creativeRulesApply(player.getLocation()))
 			{
-				GriefPrevention.sendMessage(player, TextMode.Info, Messages.CreativeBasicsDemoAdvertisement, 10L);
+				showclaimmessage=Messages.CreativeBasicsDemoAdvertisement;
+				
 			}
 			else
 			{
-				GriefPrevention.sendMessage(player, TextMode.Info, Messages.SurvivalBasicsDemoAdvertisement, 10L);
+				showclaimmessage = Messages.SurvivalBasicsDemoAdvertisement;
+			}
+			//retrieve the data on this player...
+			final PlayerData pdata = GriefPrevention.instance.dataStore.getPlayerData(player.getName());
+			//if they are currently set to ignore, do not send anything.
+			if(!pdata.IgnoreClaimMessage){
+			
+				//otherwise, set IgnoreClaimMessage and use a anonymous runnable to reset it after the timeout.
+				//of note is that if the value is zero this is pretty much run right away, which means the end result is there
+				//is no actual timeout.
+				pdata.IgnoreClaimMessage=true;
+				
+				Bukkit.getScheduler()
+						.runTaskLater(
+								GriefPrevention.instance,
+								new Runnable() {
+									public void run() {
+										pdata.IgnoreClaimMessage = false;
+									}
+								},GriefPrevention.instance.config_message_cooldown_claims*20);
+				
+				
+				
+				
+				
+				//send off the message.
+				GriefPrevention.sendMessage(player, TextMode.Info, showclaimmessage, 10L);
+			
 			}
 		}
 		
@@ -123,7 +152,23 @@ class PlayerEventHandler implements Listener
 		//check for "trapped" or "stuck" to educate players about the /trapped command
 		if(!message.contains("/trapped") && (message.contains("trapped") || message.contains("stuck") || message.contains(this.dataStore.getMessage(Messages.TrappedChatKeyword))))
 		{
-			GriefPrevention.sendMessage(player, TextMode.Info, Messages.TrappedInstructions, 10L);
+			final PlayerData pdata = GriefPrevention.instance.dataStore.getPlayerData(player.getName());
+			//if not set to ignore the stuck message, show it, set the ignore flag, and set an anonymous runnable to reset it after the
+			//configured delay.
+			if(!pdata.IgnoreStuckMessage){
+			
+				pdata.IgnoreStuckMessage=true;
+				Bukkit.getScheduler()
+				.runTaskLater(
+						GriefPrevention.instance,
+						new Runnable() {
+							public void run() {
+								pdata.IgnoreStuckMessage=true;
+							}
+						},GriefPrevention.instance.config_message_cooldown_stuck*20);
+				
+				GriefPrevention.sendMessage(player, TextMode.Info, Messages.TrappedInstructions, 10L);
+			}
 		}
 		
 		//FEATURE: monitor for chat and command spam

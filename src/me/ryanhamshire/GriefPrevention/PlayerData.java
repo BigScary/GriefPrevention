@@ -78,6 +78,12 @@ public class PlayerData
 	//timestamp of last death, for use in preventing death message spam
 	long lastDeathTimeStamp = 0;
 	
+	public boolean IgnoreClaimMessage = false; //using "claim" in a chat will usually send a message 
+	//to that player about claiming. This is used to implement a cooldown- after a configurable period the player will not
+	//receive another message about Claims as a result of using the trigger words.
+	
+	public boolean IgnoreStuckMessage = false; //save semantics as above, but for Stuck Messages.
+	
 	//spam
 	public Date lastLogin;							//when the player last logged into the server
 	public String lastMessage = "";					//the player's last chat message, or slash command complete with parameters 
