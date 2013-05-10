@@ -74,11 +74,15 @@ public class GriefPrevention extends JavaPlugin
 	
 	public int config_claims_perplayer_claim_limit;                        //maximum number of claims a user can have.
 	//blame:BC_Programming, configurable "Trash" blocks that do not notify
-	
 	public List<Material> config_trash_blocks=null;
 	
 	public int config_message_cooldown_claims = 0; //claims cooldown. 0= no cooldown.
 	public int config_message_cooldown_stuck = 0; //stuck cooldown. 0= no cooldown.
+	
+	public int config_claimcleanup_creativemaximumsize;  //maximum size of claims to cleanup. larger claims are not cleaned up.
+	public int config_claimcleanup_survivalmaximumsize;  //maximum size of claims to cleanup. larger claims are not cleaned up.
+	public int config_claimcleanup_creativemaxinvestmentscore; //maximum investmentscore. claims with a higher score will not be cleaned up. if set to 0, claim cleanup will not have it's score calculated.
+	public int config_claimcleanup_survivalmaxinvestmentscore; //maximum investmentscore. claims with a higher score will not be cleaned up. if set to 0, claim cleanup will not have it's score calculated.
 	
 	public boolean config_claims_AllowEnvironmentalVehicleDamage;                 //whether Entities can take damage from the environment in a claim.
 	public double  config_claims_AbandonReturnRatio;                //return ratio when abandoning a claim- .80 will result in players getting 80% of the used claim blocks back.
@@ -353,8 +357,17 @@ public class GriefPrevention extends JavaPlugin
 				 }
 			}
 		}
-		//persist to output...
+
 		
+		this.config_claimcleanup_creativemaximumsize = config.getInt("GriefPrevention.ClaimCleanup.CreativeMaximumSize",25);
+		this.config_claimcleanup_survivalmaximumsize = config.getInt("GriefPrevention.ClaimCleanup.SurvivalMaximumSize",25);
+		this.config_claimcleanup_creativemaxinvestmentscore = config.getInt("GriefPrevention.ClaimCleanup.CreativeMaxInvestmentScore",400);
+		this.config_claimcleanup_survivalmaxinvestmentscore = config.getInt("GriefPrevention.ClaimCleanup.SurvivalMaxInvestmentScore",100);
+		
+		outConfig.set("GriefPrevention.ClaimCleanup.CreativeMaximumSize", config_claimcleanup_creativemaximumsize);
+		outConfig.set("GriefPrevention.ClaimCleanup.SurvivalMaximumSize", config_claimcleanup_survivalmaximumsize);
+		outConfig.set("GriefPrevention.ClaimCleanup.CreativeMaxInvestmentScore", this.config_claimcleanup_creativemaxinvestmentscore);
+		outConfig.set("GriefPrevention.ClaimCleanup.SurvivalMaxInvestmentScore",this.config_claimcleanup_survivalmaxinvestmentscore);
 		
 		this.config_message_cooldown_claims = config.getInt("GriefPrevention.Expiration.MessageCooldown.Claim",0);
 		this.config_message_cooldown_stuck = config.getInt("GriefPrevention.Expiration.MessageCooldown.Stuck",0);

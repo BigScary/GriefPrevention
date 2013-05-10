@@ -144,24 +144,27 @@ public class CleanupUnusedClaimsTask implements Runnable
 			Calendar earliestAllowedLoginDate = Calendar.getInstance();
 			earliestAllowedLoginDate.add(Calendar.DATE, -GriefPrevention.instance.config_claims_unusedClaimExpirationDays);
 			boolean needsInvestmentScan = earliestAllowedLoginDate.getTime().after(playerData.lastLogin);
+			boolean creativerules = GriefPrevention.instance.creativeRulesApply(claim.getLesserBoundaryCorner());
+			boolean sizelimitreached = (creativerules && claim.getWidth() > GriefPrevention.instance.config_claimcleanup_creativemaximumsize) ||
+					(!creativerules && claim.getWidth() > GriefPrevention.instance.config_claimcleanup_survivalmaximumsize);
 			
 			//avoid scanning large claims, locked claims, and administrative claims
-			if(claim.isAdminClaim() || claim.neverdelete || claim.getWidth() > 25 || claim.getHeight() > 25) return;
+			if(claim.isAdminClaim() || claim.neverdelete || sizelimitreached) return;
 			
 			//if creative mode or the claim owner has been away a long enough time, scan the claim content
-			if(needsInvestmentScan || GriefPrevention.instance.creativeRulesApply(claim.getLesserBoundaryCorner()))
+			if(needsInvestmentScan || creativerules)
 			{
 				int minInvestment;
 				if(GriefPrevention.instance.creativeRulesApply(claim.getLesserBoundaryCorner()))
 				{
-					minInvestment = 400;
+					minInvestment = GriefPrevention.instance.config_claimcleanup_creativemaxinvestmentscore;
 				}
 				else
 				{
-					minInvestment = 100;
+					minInvestment = GriefPrevention.instance.config_claimcleanup_survivalmaxinvestmentscore;
 				}
-				
-				long investmentScore = claim.getPlayerInvestmentScore();
+				//if minInvestment is 0, assume no limitation and force the following conditions to clear the claim.
+				long investmentScore = minInvestment==0?Long.MAX_VALUE:claim.getPlayerInvestmentScore();
 				cleanupChunks = true;
 				boolean removeClaim = false;
 				
@@ -212,9 +215,12 @@ public class CleanupUnusedClaimsTask implements Runnable
 		}
 		
 		//unfortunately, java/minecraft don't do a good job of clearing unused memory, leading to out of memory errors from this type of world scanning
-		if(this.nextClaimIndex % 5 == 0)
-		{		
-			System.gc();
-		}
+		//if(this.nextClaimIndex % 5 == 0)
+		//{		
+		//	System.gc();
+		//}
+		//usage of System.gc() indicates either broken code or crappy code. Let's try to avoid both.
+		//JVM knows more about what to allocate and deallocate here. 
+		
 	}
 }
