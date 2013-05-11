@@ -1233,7 +1233,7 @@ public class GriefPrevention extends JavaPlugin
 			}
 			
 			else if((!args[0].startsWith("[") || !args[0].endsWith("]"))
-				&& !args[0].toUpperCase().startsWith("G:"))
+				&& !args[0].toUpperCase().startsWith("G:") && ! args[0].startsWith("!"))
 				{
 					otherPlayer = this.resolvePlayer(args[0]);
 					if(!clearPermissions && otherPlayer == null && !args[0].equals("public"))
