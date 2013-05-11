@@ -474,6 +474,9 @@ public class Claim
 	}
 	private boolean hasExplicitPermission(Player player, ClaimPermission level)
 	{
+		
+		
+		
 		String playerName = player.getName();
 		Set<String> keys = this.playerNameToClaimPermissionMap.keySet();
 		Iterator<String> iterator = keys.iterator();
@@ -482,8 +485,24 @@ public class Claim
 			String identifier = iterator.next();
 			
 			//if(playerName.equalsIgnoreCase(identifier) && this.playerNameToClaimPermissionMap.get(identifier) == level) return true;
+			boolean forcedeny = false;
+			//special logic: names starting with ! mean to explicitly deny that permission to any player that matches the name after !.
+			//in order to allow group ability, we have this flag. if forcedeny is false, a match means
+			//we need to forcibly return false if it matches.
+			if(identifier.startsWith("!")){
+				//if it starts with a exclamation, remove it and set forcedeny to true.
+				identifier=identifier.substring(1);
+				forcedeny=true;
+			}
 			
-			if(isApplicablePlayer(identifier,playerName) && this.playerNameToClaimPermissionMap.get(identifier) == level) return true;
+			
+			if(isApplicablePlayer(identifier,playerName) && this.playerNameToClaimPermissionMap.get(identifier) == level) {
+				//it matches. if we started with a !, however, it means that we are to explicitly
+				//DENY that permission. Otherwise, we return true.
+				return !forcedeny;
+				
+			}
+			
 			else if(identifier.startsWith("[") && identifier.endsWith("]"))
 			{
 				//drop the brackets
@@ -493,7 +512,8 @@ public class Claim
 				if(permissionIdentifier == null || permissionIdentifier.isEmpty()) continue;
 				
 				//check permission
-				if(player.hasPermission(permissionIdentifier) && this.playerNameToClaimPermissionMap.get(identifier) == level) return true;
+				if(player.hasPermission(permissionIdentifier) && this.playerNameToClaimPermissionMap.get(identifier) == level) 
+					return !forcedeny;
 			}
 		}
 		
@@ -550,6 +570,9 @@ public class Claim
 	 */
 	public String allowAccess(Player player)
 	{
+		
+		
+		
 		//following a siege where the defender lost, the claim will allow everyone access for a time
 		if(this.doorsOpen) return null;
 		
@@ -691,6 +714,9 @@ public class Claim
 			default:
 				permtype = null;
 			}
+			
+			
+			
 			ClaimModifiedEvent claimevent = new ClaimModifiedEvent(this, null, permtype);
 			Bukkit.getServer().getPluginManager().callEvent(claimevent);
 			if(claimevent.isCancelled()) {
@@ -767,6 +793,7 @@ public class Claim
 	public void getPermissions(ArrayList<String> builders, ArrayList<String> containers, ArrayList<String> accessors, ArrayList<String> managers)
 	{
 		//loop through all the entries in the hash map
+		//if we have a parent, add the parent permissions first, then overwrite them.
 		Iterator<Map.Entry<String, ClaimPermission>> mappingsIterator = this.playerNameToClaimPermissionMap.entrySet().iterator(); 
 		while(mappingsIterator.hasNext())
 		{
@@ -792,6 +819,9 @@ public class Claim
 		{
 			managers.add(this.managers.get(i));
 		}
+
+		
+		
 	}
 	
 	/**

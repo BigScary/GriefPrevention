@@ -2200,6 +2200,15 @@ public class GriefPrevention extends JavaPlugin
 		//validate player or group argument
 		String permission = null;
 		OfflinePlayer otherPlayer = null;
+		boolean isforceddenial = false;
+		//if it starts with "!", remove it and set the forced denial value.
+		//we use this flag to indicate to add in a "!" again when we set the perm.
+		//This will have the effect of causing the logic to explicitly deny permissions for players that do not match.
+		if(recipientName.startsWith("!")){
+			isforceddenial=true;
+			recipientName = recipientName.substring(1); //remove the exclamation for the rest of the parsing.
+		}
+		
 		if(recipientName.startsWith("[") && recipientName.endsWith("]"))
 		{
 			permission = recipientName.substring(1, recipientName.length() - 1);
@@ -2303,12 +2312,13 @@ public class GriefPrevention extends JavaPlugin
 		}
 		
 		//if we didn't determine which claims to modify, tell the player to be specific
-		if(targetClaims.size() == 0)
+		if(targetClaims.size() ==  0)
 		{
 			GriefPrevention.sendMessage(player, TextMode.Err, Messages.GrantPermissionNoClaim);
 			return;
 		}
-		
+		//if forcedenial is true, we will add the exclamation back to the name for addition.
+		if(isforceddenial) recipientName = "!" + recipientName;
 		//apply changes
 		for(int i = 0; i < targetClaims.size(); i++)
 		{
