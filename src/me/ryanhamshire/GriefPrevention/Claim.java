@@ -449,7 +449,7 @@ public class Claim
 	 * @return
 	 */
 	private boolean isApplicablePlayer(String identifier,String pName){
-		System.out.println("Checking player " + pName + " matches " + identifier);
+		//System.out.println("Checking player " + pName + " matches " + identifier);
 		if(identifier.equalsIgnoreCase(pName)) return true;
 		if(identifier.toUpperCase().startsWith("G:")){
 			identifier = identifier.substring(2);
@@ -459,7 +459,7 @@ public class Claim
 				String checkperm = "GriefPrevention.TrustGroups." + identifier;
 				if(pp.hasPermission(checkperm))
 				{
-					System.out.println("Player " + pName + "has permission " + checkperm);
+					//System.out.println("Player " + pName + "has permission " + checkperm);
 					return true;
 				}
 					
@@ -753,7 +753,6 @@ public class Claim
 			}
 		}
 		this.playerNameToClaimPermissionMap.clear();
-		this.managers.clear();
 		return true;
 	}
 
