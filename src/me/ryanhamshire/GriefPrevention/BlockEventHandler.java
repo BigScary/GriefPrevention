@@ -254,6 +254,17 @@ public class BlockEventHandler implements Listener
 		Player player = placeEvent.getPlayer();
 		Block block = placeEvent.getBlock();
 		
+		if(GriefPrevention.instance.config_claims_noBuildOutsideClaims){
+			//if set, then we only allow Trash Blocks to be placed.
+			Claim testclaim = GriefPrevention.instance.dataStore.getClaimAt(block.getLocation(), true, null);
+			if(testclaim==null){
+				if(GriefPrevention.instance.config_trash_blocks.contains(block.getType())){
+				return;	
+				}
+			}
+		}
+		
+		
 		//FEATURE: limit fire placement, to prevent PvP-by-fire
 		
 		//if placed block is fire and pvp is off, apply rules for proximity to other players 
@@ -383,6 +394,8 @@ public class BlockEventHandler implements Listener
 				}
 			}
 		}	
+		
+		
 		
 		//FEATURE: warn players when they're placing non-trash blocks outside of their claimed areas
 		else if(GriefPrevention.instance.config_claims_warnOnBuildOutside && !this.trashBlocks.contains(block.getType()) && GriefPrevention.instance.claimsEnabledForWorld(block.getWorld()) && playerData.claims.size() > 0)

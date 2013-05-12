@@ -174,6 +174,9 @@ class EntityEventHandler implements Listener
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onItemSpawn(ItemSpawnEvent event)
 	{
+		//precheck: always allow Droppers to drop items when triggered.
+		//We do this by seeing of there is a Dropper within a few blocks of the spawned item.
+		
 		Block centerblock = event.getEntity().getLocation().getBlock();
         for(int testx=-1;testx<=1;testx++){
         	for(int testy=-1;testy<=1;testy++){

@@ -822,9 +822,12 @@ class PlayerEventHandler implements Listener
 			    if(noContainerReason != null){
 			    	GriefPrevention.sendMessage(player,TextMode.Err,noContainerReason);
 			    	event.setCancelled(true);
+			    	return;
 			    }
 			} else if(claim==null && GriefPrevention.instance.config_claims_noBuildOutsideClaims){
 				GriefPrevention.sendMessage(player, TextMode.Err, Messages.NoVillagerTradeOutsideClaims);
+				event.setCancelled(true);
+				return;
 			}
 			
 		}
