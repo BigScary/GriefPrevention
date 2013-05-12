@@ -454,16 +454,13 @@ public class Claim
 		if(identifier.toUpperCase().startsWith("G:")){
 			identifier = identifier.substring(2);
 			//try to get the player (pName).
-			Player pp = Bukkit.getPlayer(pName);
-			if(pp!=null){
-				String checkperm = "GriefPrevention.TrustGroups." + identifier;
-				if(pp.hasPermission(checkperm))
-				{
-					//System.out.println("Player " + pName + "has permission " + checkperm);
-					return true;
-				}
-					
-			}
+			
+			//try to get this group from the GP instance PlayerGroups cfg.
+			PlayerGroup FoundGroup = GriefPrevention.instance.config_player_groups.getGroupByName(identifier);
+			if(FoundGroup==null) return false; //group not found. Well THIS is awkward.
+			
+			return FoundGroup.MatchPlayer(pName);
+			
 			
 			
 			

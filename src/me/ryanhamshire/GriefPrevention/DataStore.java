@@ -1170,6 +1170,7 @@ public abstract class DataStore
 		this.addDefault(defaults, Messages.ClearManagersSuccess,"Cleared all Managers in this Claim.",null);
 		this.addDefault(defaults, Messages.ClearManagersNotOwned,"Only {0} can clear managers in their Claim.","0:Claim Owner");
 		this.addDefault(defaults, Messages.ClearManagersNotAdmin, "Only Administrators can change managers on an admin claim.",null);
+		this.addDefault(defaults, Messages.GroupNotFound, "Group {0} Not found.", "0:Name of Group");
 		//load the config file
 		FileConfiguration config = YamlConfiguration.loadConfiguration(new File(messagesFilePath));
 		

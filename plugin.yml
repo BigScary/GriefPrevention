@@ -4,6 +4,10 @@ softdepend: [Vault, Multiverse-Core, My Worlds, MystCraft, Transporter]
 dev-url: http://dev.bukkit.org/server-mods/grief-prevention
 version: 7.7
 commands:
+   cleanclaim
+      description: cleans all of a given material from a owned claim. target material defaults to AIR.
+      usage: /CleanClaim <source> <target>
+      permission:griefprevention.cleanclaim
    clearmanagers:
       description: Clears all managers on a claim.
       usage: /ClearManagers
@@ -155,6 +159,8 @@ commands:
       description: reloads GP configuration.
       usage: /gpreload
 permissions:
+    griefprevention.cleanclaim:
+        description: Allows the use of the cleanclaim command to cleanup owned claims.
     griefprevention.reload:
         description: Allows the use of the /gpreload command to reload configuration data without a server restart.
         default: op

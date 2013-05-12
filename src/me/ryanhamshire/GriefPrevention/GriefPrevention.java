@@ -68,7 +68,7 @@ public class GriefPrevention extends JavaPlugin
 	
 	//this handles data storage, like player and region data
 	public DataStore dataStore;
-	
+	public PlayerGroups config_player_groups = null;
 	//configuration variables, loaded/saved from a config.yml
 	public ArrayList<String> config_claims_enabledWorlds;			//list of worlds where players can create GriefPrevention claims
 	public ArrayList<String> config_claims_enabledCreativeWorlds;	//list of worlds where additional creative mode anti-grief rules apply
@@ -311,8 +311,10 @@ public class GriefPrevention extends JavaPlugin
 		}
 		
 		
-		
-		
+		//load player groups.
+		System.out.println("reading player groups...");
+		this.config_player_groups = new PlayerGroups(config,"GriefPrevention.Groups");
+		this.config_player_groups.Save(outConfig, "GriefPrevention.Groups");
 		
 		//sea level
 		this.config_seaLevelOverride = new HashMap<String, Integer>();
@@ -881,7 +883,29 @@ public class GriefPrevention extends JavaPlugin
 			}
 		}
 	}
-	
+	private void HandleClaimClean(Claim c,MaterialInfo source,MaterialInfo target,Player player){
+		Location lesser = c.getLesserBoundaryCorner();
+		Location upper = c.getGreaterBoundaryCorner();
+		
+		
+		for(int x =lesser.getBlockX();x<=upper.getBlockX();x++){
+			for(int y = lesser.getBlockY();y<=upper.getBlockY();y++){
+				for(int z = lesser.getBlockZ();z<=upper.getBlockZ();z++){
+					Location createloc =  new Location(lesser.getWorld(),x,y,z);
+					Block acquired = lesser.getWorld().getBlockAt(createloc);
+					if(acquired.getTypeId() == source.typeID && acquired.getData() == source.data){
+						acquired.setTypeIdAndData(target.typeID, target.data, true);
+					}
+					
+					
+					
+				}
+			}
+		}
+		
+		
+		
+	}
 	//handles slash commands
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args){
 		
@@ -896,6 +920,45 @@ public class GriefPrevention extends JavaPlugin
 		{
 			return this.abandonClaimHandler(player, false);
 		}		
+		else if(cmd.getName().equalsIgnoreCase("cleanclaim") && player !=null){
+			//source is first arg; target is second arg.
+			MaterialInfo source = MaterialInfo.fromString(args[0]);
+		    if(source==null){
+		    	
+		    	Material attemptparse = Material.valueOf(args[0]); 
+		    	if(attemptparse!=null){
+		    		source = new MaterialInfo(attemptparse.getId(),(byte)0,args[0]);
+		    	}
+		    	else
+		    	{
+		    		player.sendMessage("Failed to parse Source Material," + args[0]);
+		    		return true;
+		    	}
+		    	
+		    }
+		    MaterialInfo target = new MaterialInfo(Material.AIR.getId(),(byte)0,"Air");
+		    if(args.length >1){
+		    	target = MaterialInfo.fromString(args[1]);
+		    	if(target==null){
+		    		Material attemptparse = Material.valueOf(args[1]);
+		    		if(attemptparse!=null){
+		    			target = new MaterialInfo(attemptparse.getId(),(byte)0,args[0]);
+		    		}
+		    		else {
+		    			player.sendMessage("Failed to parse Target Material," + args[1]);
+		    		}
+		    	}
+		    
+		    }
+		    Claim retrieveclaim = dataStore.getClaimAt(player.getLocation(), true, null);
+		    if(retrieveclaim.ownerName.equalsIgnoreCase(player.getName())){
+		    	HandleClaimClean(retrieveclaim,source,target,player);
+		    	return true;
+		    }
+			
+			
+			
+		}
 		if(cmd.getName().equalsIgnoreCase("clearmanagers") && player!=null){
 			Claim claimatpos = dataStore.getClaimAt(player.getLocation(), true, null);
 			PlayerData pdata = dataStore.getPlayerData(player.getName());
@@ -920,8 +983,10 @@ public class GriefPrevention extends JavaPlugin
 			}
 		}
 		if(cmd.getName().equalsIgnoreCase("gpreload")){
+			if(player==null || player.hasPermission("griefprevention.reload")){
 			this.onDisable();
 			this.onEnable();
+			}
 		}
 		//abandontoplevelclaim
 		if(cmd.getName().equalsIgnoreCase("abandontoplevelclaim") && player != null)
@@ -1274,7 +1339,16 @@ public class GriefPrevention extends JavaPlugin
 					if(otherPlayer != null)
 						args[0] = otherPlayer.getName();
 				}
-			
+			else if(args[0].startsWith("G:")){
+				//make sure the group exists, otherwise show the message.
+				String groupname = args[0].substring(2);
+				if(!config_player_groups.GroupExists(groupname)){
+					GriefPrevention.sendMessage(player, TextMode.Err, Messages.GroupNotFound);
+					return true;
+				}
+			}
+					
+					
 			
 			//if no claim here, apply changes to all his claims
 			if(claim == null)
@@ -2218,6 +2292,7 @@ public class GriefPrevention extends JavaPlugin
 		
 	}
 
+	
 	
 	//helper method keeps the trust commands consistent and eliminates duplicate code
 	private void handleTrustCommand(Player player, ClaimPermission permissionLevel, String recipientName) 
