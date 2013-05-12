@@ -84,7 +84,7 @@ public class GriefPrevention extends JavaPlugin
 	public int config_claimcleanup_survivalmaximumsize;  //maximum size of claims to cleanup. larger claims are not cleaned up.
 	public int config_claimcleanup_creativemaxinvestmentscore; //maximum investmentscore. claims with a higher score will not be cleaned up. if set to 0, claim cleanup will not have it's score calculated.
 	public int config_claimcleanup_survivalmaxinvestmentscore; //maximum investmentscore. claims with a higher score will not be cleaned up. if set to 0, claim cleanup will not have it's score calculated.
-	
+	public boolean config_claimcleanup_enabled;                       //whether the cleanup task is activated.
 	public boolean config_claims_AllowEnvironmentalVehicleDamage;                 //whether Entities can take damage from the environment in a claim.
 	public double  config_claims_AbandonReturnRatio;                //return ratio when abandoning a claim- .80 will result in players getting 80% of the used claim blocks back.
 	public boolean config_claims_preventTheft;						//whether containers and crafting blocks are protectable
@@ -358,7 +358,7 @@ public class GriefPrevention extends JavaPlugin
 			}
 		}
 
-		
+		this.config_claimcleanup_enabled = config.getBoolean("GriefPrevention.ClaimCleanup.Enabled",true); 
 		this.config_claimcleanup_creativemaximumsize = config.getInt("GriefPrevention.ClaimCleanup.CreativeMaximumSize",25);
 		this.config_claimcleanup_survivalmaximumsize = config.getInt("GriefPrevention.ClaimCleanup.SurvivalMaximumSize",25);
 		this.config_claimcleanup_creativemaxinvestmentscore = config.getInt("GriefPrevention.ClaimCleanup.CreativeMaxInvestmentScore",400);
@@ -368,7 +368,7 @@ public class GriefPrevention extends JavaPlugin
 		outConfig.set("GriefPrevention.ClaimCleanup.SurvivalMaximumSize", config_claimcleanup_survivalmaximumsize);
 		outConfig.set("GriefPrevention.ClaimCleanup.CreativeMaxInvestmentScore", this.config_claimcleanup_creativemaxinvestmentscore);
 		outConfig.set("GriefPrevention.ClaimCleanup.SurvivalMaxInvestmentScore",this.config_claimcleanup_survivalmaxinvestmentscore);
-		
+		outConfig.set("GriefPrevention.ClaimCleanup.Enabled",this.config_claimcleanup_enabled);
 		this.config_message_cooldown_claims = config.getInt("GriefPrevention.Expiration.MessageCooldown.Claim",0);
 		this.config_message_cooldown_stuck = config.getInt("GriefPrevention.Expiration.MessageCooldown.Stuck",0);
 		outConfig.set("GriefPrevention.Expiration.MessageCooldown.Claim", config_message_cooldown_claims);
@@ -825,9 +825,11 @@ public class GriefPrevention extends JavaPlugin
 		this.getServer().getScheduler().scheduleSyncDelayedTask(GriefPrevention.instance, task, 20L);
 		
 		//start recurring cleanup scan for unused claims belonging to inactive players
+		//if the option is enabled.
+		if(this.config_claimcleanup_enabled){
 		CleanupUnusedClaimsTask task2 = new CleanupUnusedClaimsTask();
 		this.getServer().getScheduler().scheduleSyncRepeatingTask(this, task2, 20L * 60 * 2, 20L * 60 * 5);
-		
+		}
 		//register for events
 		PluginManager pluginManager = this.getServer().getPluginManager();
 		
