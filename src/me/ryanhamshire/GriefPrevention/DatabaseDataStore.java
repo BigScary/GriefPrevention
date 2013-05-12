@@ -77,16 +77,26 @@ public class DatabaseDataStore extends DataStore
 			//ensure the data tables exist
 			Statement statement = databaseConnection.createStatement();
 			
-			statement.execute("CREATE TABLE IF NOT EXISTS griefprevention_nextclaimid (nextid INT(15));");
-			
-			statement.execute("CREATE TABLE IF NOT EXISTS griefprevention_claimdata (id INT(15), owner VARCHAR(50), lessercorner VARCHAR(100), greatercorner VARCHAR(100), builders VARCHAR(1000), containers VARCHAR(1000), accessors VARCHAR(1000), managers VARCHAR(1000), parentid INT(15), neverdelete BOOLEAN NOT NULL DEFAULT 0);");
-			
-			statement.execute("CREATE TABLE IF NOT EXISTS griefprevention_playerdata (name VARCHAR(50), lastlogin DATETIME, accruedblocks INT(15), bonusblocks INT(15));");
-			
-			ResultSet tempresult = statement.executeQuery("SHOW COLUMNS FROM griefprevention_claimdata LIKE 'neverdelete';");
-			
-			if(!tempresult.next()) {
-				statement.execute("ALTER TABLE griefprevention_claimdata ADD neverdelete BOOLEAN NOT NULL DEFAULT 0;");
+			if (this.databaseUrl.startsWith("jdbc:postgresql"))
+			{
+				statement.execute("CREATE TABLE IF NOT EXISTS griefprevention_nextclaimid (nextid INTEGER);");
+
+				statement.execute("CREATE TABLE IF NOT EXISTS griefprevention_claimdata (id INTEGER, owner VARCHAR(50), lessercorner VARCHAR(100), greatercorner VARCHAR(100), builders TEXT, containers TEXT, accessors TEXT, managers TEXT, parentid INTEGER, neverdelete BOOLEAN NOT NULL DEFAULT false);");
+
+				statement.execute("CREATE TABLE IF NOT EXISTS griefprevention_playerdata (name VARCHAR(50), lastlogin TIMESTAMP WITH TIME ZONE, accruedblocks INTEGER, bonusblocks INTEGER);");
+			}
+			else
+			{
+				statement.execute("CREATE TABLE IF NOT EXISTS griefprevention_nextclaimid (nextid INT(15));");
+
+				statement.execute("CREATE TABLE IF NOT EXISTS griefprevention_claimdata (id INT(15), owner VARCHAR(50), lessercorner VARCHAR(100), greatercorner VARCHAR(100), builders VARCHAR(1000), containers VARCHAR(1000), accessors VARCHAR(1000), managers VARCHAR(1000), parentid INT(15), neverdelete BOOLEAN NOT NULL DEFAULT 0);");
+
+				statement.execute("CREATE TABLE IF NOT EXISTS griefprevention_playerdata (name VARCHAR(50), lastlogin DATETIME, accruedblocks INT(15), bonusblocks INT(15));");
+
+				ResultSet tempresult = statement.executeQuery("SHOW COLUMNS FROM griefprevention_claimdata LIKE 'neverdelete';");
+				if (!tempresult.next()) {
+					statement.execute("ALTER TABLE griefprevention_claimdata ADD neverdelete BOOLEAN NOT NULL DEFAULT 0;");
+				}
 			}
 		}
 		catch(Exception e3)
