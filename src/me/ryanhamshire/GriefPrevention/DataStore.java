@@ -1166,7 +1166,10 @@ public abstract class DataStore
 		this.addDefault(defaults, Messages.AbandonCostWarning, "You will lose {0} Claim blocks if you abandon this claim. enter /abandonclaim again to confirm.", "0:Number of claim blocks that will be lost");
 		this.addDefault(defaults, Messages.NoVillagerTradeOutsideClaims, "You cannot trade with Villagers outside of Claims.",null);
 		this.addDefault(defaults, Messages.PlayerClaimLimit,"You have reached the claim limit ({0}) and cannot create new claims.","0:Configuration Claim Limit.");
-		
+		this.addDefault(defaults, Messages.ClearManagersNotFound, "You must be in a claim to clear it's Managers.", null);
+		this.addDefault(defaults, Messages.ClearManagersSuccess,"Cleared all Managers in this Claim.",null);
+		this.addDefault(defaults, Messages.ClearManagersNotOwned,"Only {0} can clear managers in their Claim.","0:Claim Owner");
+		this.addDefault(defaults, Messages.ClearManagersNotAdmin, "Only Administrators can change managers on an admin claim.",null);
 		//load the config file
 		FileConfiguration config = YamlConfiguration.loadConfiguration(new File(messagesFilePath));
 		

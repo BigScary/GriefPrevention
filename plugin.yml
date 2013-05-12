@@ -4,6 +4,10 @@ softdepend: [Vault, Multiverse-Core, My Worlds, MystCraft, Transporter]
 dev-url: http://dev.bukkit.org/server-mods/grief-prevention
 version: 7.7
 commands:
+   clearmanagers:
+      description: Clears all managers on a claim.
+      usage: /ClearManagers
+      permission: griefprevention.claims
    abandonclaim:
       description: Deletes a claim.
       usage: /AbandonClaim
@@ -147,7 +151,13 @@ commands:
    unlockclaim:
       description: Unlocks a previously locked claim.
       usage: /UnlockClaim
+   gpreload:
+      description: reloads GP configuration.
+      usage: /gpreload
 permissions:
+    griefprevention.reload:
+        description: Allows the use of the /gpreload command to reload configuration data without a server restart.
+        default: op
     griefprevention.ignoreclaimslimit:
         description: Allows creation of more claims than any configured per-player limit.
         default: op

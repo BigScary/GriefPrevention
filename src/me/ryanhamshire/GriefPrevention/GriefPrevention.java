@@ -37,6 +37,7 @@ import me.ryanhamshire.GriefPrevention.tasks.TreeCleanupTask;
 import me.ryanhamshire.GriefPrevention.visualization.Visualization;
 import net.milkbowl.vault.economy.Economy;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.GameMode;
@@ -349,7 +350,6 @@ public class GriefPrevention extends JavaPlugin
 					 trashmaterial = trashmaterial.replace(" ", "_");
 				Material parsed = Material.valueOf(trashmaterial.toUpperCase());
 				config_trash_blocks.add(parsed);
-				GriefPrevention.AddLogEntry("trash Material:" + parsed.toString());
 				 }
 				 catch(IllegalArgumentException iae){
 					 //nothing special, log though.
@@ -894,7 +894,33 @@ public class GriefPrevention extends JavaPlugin
 		{
 			return this.abandonClaimHandler(player, false);
 		}		
-		
+		if(cmd.getName().equalsIgnoreCase("clearmanagers") && player!=null){
+			Claim claimatpos = dataStore.getClaimAt(player.getLocation(), true, null);
+			PlayerData pdata = dataStore.getPlayerData(player.getName());
+			if(claimatpos!=null){
+				if(claimatpos.isAdminClaim()){
+					GriefPrevention.sendMessage(player, TextMode.Err, Messages.ClearManagersNotAdmin);
+					return true;
+				}
+				if(pdata.ignoreClaims ||  claimatpos.ownerName.equalsIgnoreCase(player.getName())){
+					for(String currmanager :claimatpos.getManagerList()){
+						claimatpos.removeManager(currmanager);
+					}
+					GriefPrevention.sendMessage(player, TextMode.Err, Messages.ClearManagersSuccess);
+				} else {
+					//nope
+					GriefPrevention.sendMessage(player, TextMode.Err, Messages.ClearManagersNotOwned);
+				}
+				
+			}
+			else {
+				GriefPrevention.sendMessage(player, TextMode.Err, Messages.ClearManagersNotFound);
+			}
+		}
+		if(cmd.getName().equalsIgnoreCase("gpreload")){
+			this.onDisable();
+			this.onEnable();
+		}
 		//abandontoplevelclaim
 		if(cmd.getName().equalsIgnoreCase("abandontoplevelclaim") && player != null)
 		{
@@ -2406,7 +2432,8 @@ public class GriefPrevention extends JavaPlugin
 			PlayerData playerData = this.dataStore.getPlayerData(playerName);
 			this.dataStore.savePlayerData(playerName, playerData);
 		}
-		
+		//cancel ALL pending tasks.
+		Bukkit.getScheduler().cancelTasks(this);
 		this.dataStore.close();
 		
 		AddLogEntry("GriefPrevention disabled.");
