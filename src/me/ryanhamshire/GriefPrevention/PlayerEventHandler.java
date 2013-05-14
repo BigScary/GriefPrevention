@@ -283,7 +283,7 @@ class PlayerEventHandler implements Listener
 				if(GriefPrevention.instance.config_spam_banOffenders)
 				{
 					//log entry
-					GriefPrevention.AddLogEntry("Banning " + player.getName() + " for spam.");
+					GriefPrevention.AddLogEntry("Acting on " + player.getName() + " for spam.");
 					
 					//kick and ban
 					PlayerKickBanTask task = new PlayerKickBanTask(player, GriefPrevention.instance.config_spam_banMessage);
@@ -1189,6 +1189,7 @@ class PlayerEventHandler implements Listener
 		//otherwise apply rules for buttons and switches
 		else if(GriefPrevention.instance.config_claims_preventButtonsSwitches && (clickedBlockType == null || clickedBlockType == Material.STONE_BUTTON || clickedBlockType == Material.WOOD_BUTTON || clickedBlockType == Material.LEVER || GriefPrevention.instance.config_mods_accessTrustIds.Contains(new MaterialInfo(clickedBlock.getTypeId(), clickedBlock.getData(), null))))
 		{
+			
 			Claim claim = this.dataStore.getClaimAt(clickedBlock.getLocation(), false, playerData.lastClaim);
 			if(claim != null)
 			{

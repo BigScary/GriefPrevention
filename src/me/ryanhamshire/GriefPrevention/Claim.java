@@ -1145,7 +1145,14 @@ public class Claim
 		managers.remove(player);
 		return true;
 	}
-	
+	public void clearManagers(){
+		
+		for(String iterateman:managers){
+			removeManager(iterateman);
+		}
+		
+		
+	}
 	/**
 	 * This returns a copy of the managers list. Additions and removals in this list do not affect the claim.
 	 * @return The list of the managers.

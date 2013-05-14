@@ -84,7 +84,10 @@ public class GriefPrevention extends JavaPlugin
 	public int config_claimcleanup_survivalmaximumsize;  //maximum size of claims to cleanup. larger claims are not cleaned up.
 	public int config_claimcleanup_creativemaxinvestmentscore; //maximum investmentscore. claims with a higher score will not be cleaned up. if set to 0, claim cleanup will not have it's score calculated.
 	public int config_claimcleanup_survivalmaxinvestmentscore; //maximum investmentscore. claims with a higher score will not be cleaned up. if set to 0, claim cleanup will not have it's score calculated.
+	public boolean config_entitycleanup_enabled;
+	public boolean config_treecleanup_enabled;
 	public boolean config_claimcleanup_enabled;                       //whether the cleanup task is activated.
+	public boolean config_naturerestorecleanup_enabled;
 	public boolean config_claims_AllowEnvironmentalVehicleDamage;                 //whether Entities can take damage from the environment in a claim.
 	public double  config_claims_AbandonReturnRatio;                //return ratio when abandoning a claim- .80 will result in players getting 80% of the used claim blocks back.
 	public boolean config_claims_preventTheft;						//whether containers and crafting blocks are protectable
@@ -133,7 +136,8 @@ public class GriefPrevention extends JavaPlugin
 	public String config_spam_warningMessage;						//message to show a player who is close to spam level
 	public String config_spam_allowedIpAddresses;					//IP addresses which will not be censored
 	public int config_spam_deathMessageCooldownSeconds;				//cooldown period for death messages (per player) in seconds
-	
+	public String config_spam_bancommand;                           //command to run when spam detector triggers. {0} will be player name.
+	public String config_spam_kickcommand;                          //command(s) to run when spam detector triggers and kicks. {0} will be player name.
 	public ArrayList<World> config_pvp_enabledWorlds;				//list of worlds where pvp anti-grief rules apply
 	public boolean config_pvp_protectFreshSpawns;					//whether to make newly spawned players immune until they pick up an item
 	public boolean config_pvp_punishLogout;						    //whether to kill players who log out during PvP combat
@@ -312,7 +316,7 @@ public class GriefPrevention extends JavaPlugin
 		
 		
 		//load player groups.
-		System.out.println("reading player groups...");
+		//System.out.println("reading player groups...");
 		this.config_player_groups = new PlayerGroups(config,"GriefPrevention.Groups");
 		this.config_player_groups.Save(outConfig, "GriefPrevention.Groups");
 		
@@ -360,6 +364,10 @@ public class GriefPrevention extends JavaPlugin
 			}
 		}
 
+		
+		this.config_entitycleanup_enabled = config.getBoolean("GriefPrevention.CleanupTasks.Entity",true);
+		this.config_treecleanup_enabled = config.getBoolean("GriefPrevention.CleanupTasks.Trees",true);
+		this.config_naturerestorecleanup_enabled = config.getBoolean("GriefPrevention.CleanupTasks.NatureRestore",true);
 		this.config_claimcleanup_enabled = config.getBoolean("GriefPrevention.ClaimCleanup.Enabled",true); 
 		this.config_claimcleanup_creativemaximumsize = config.getInt("GriefPrevention.ClaimCleanup.CreativeMaximumSize",25);
 		this.config_claimcleanup_survivalmaximumsize = config.getInt("GriefPrevention.ClaimCleanup.SurvivalMaximumSize",25);
@@ -444,6 +452,12 @@ public class GriefPrevention extends JavaPlugin
 		this.config_spam_banMessage = config.getString("GriefPrevention.Spam.BanMessage", "Banned for spam.");
 		String slashCommandsToMonitor = config.getString("GriefPrevention.Spam.MonitorSlashCommands", "/me;/tell;/global;/local");
 		this.config_spam_deathMessageCooldownSeconds = config.getInt("GriefPrevention.Spam.DeathMessageCooldownSeconds", 60);		
+		
+		
+		this.config_spam_kickcommand = config.getString("GriefPrevention.Spam.KickCommand","kick {0}");
+		this.config_spam_bancommand = config.getString("GriefPrevention.Spam.BanCommand","ban {0};kick {0}");
+		outConfig.set("GriefPrevention.Spam.KickCommand", this.config_spam_kickcommand);
+		outConfig.set("GriefPrevention.spam.BanCommand", config_spam_bancommand);
 		
 		this.config_pvp_protectFreshSpawns = config.getBoolean("GriefPrevention.PvP.ProtectFreshSpawns", true);
 		this.config_pvp_punishLogout = config.getBoolean("GriefPrevention.PvP.PunishLogout", true);
@@ -822,10 +836,11 @@ public class GriefPrevention extends JavaPlugin
 			this.getServer().getScheduler().scheduleSyncRepeatingTask(this, task, 20L * 60 * 5, 20L * 60 * 5);
 		}
 		
-		//start the recurring cleanup event for entities in creative worlds
+		//start the recurring cleanup event for entities in creative worlds, if enabled.
+		if(this.config_entitycleanup_enabled){
 		EntityCleanupTask task = new EntityCleanupTask(0);
 		this.getServer().getScheduler().scheduleSyncDelayedTask(GriefPrevention.instance, task, 20L);
-		
+		}
 		//start recurring cleanup scan for unused claims belonging to inactive players
 		//if the option is enabled.
 		if(this.config_claimcleanup_enabled){
@@ -950,8 +965,9 @@ public class GriefPrevention extends JavaPlugin
 		    	}
 		    
 		    }
+		    PlayerData pd = dataStore.getPlayerData(player.getName());
 		    Claim retrieveclaim = dataStore.getClaimAt(player.getLocation(), true, null);
-		    if(retrieveclaim.ownerName.equalsIgnoreCase(player.getName())){
+		    if(pd.ignoreClaims || retrieveclaim.ownerName.equalsIgnoreCase(player.getName())){
 		    	HandleClaimClean(retrieveclaim,source,target,player);
 		    	return true;
 		    }
