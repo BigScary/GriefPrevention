@@ -85,9 +85,9 @@ public class GriefPrevention extends JavaPlugin
 	public int config_claimcleanup_creativemaxinvestmentscore; //maximum investmentscore. claims with a higher score will not be cleaned up. if set to 0, claim cleanup will not have it's score calculated.
 	public int config_claimcleanup_survivalmaxinvestmentscore; //maximum investmentscore. claims with a higher score will not be cleaned up. if set to 0, claim cleanup will not have it's score calculated.
 	public boolean config_entitycleanup_enabled;
-	public boolean config_treecleanup_enabled;
+//	public boolean config_treecleanup_enabled;
 	public boolean config_claimcleanup_enabled;                       //whether the cleanup task is activated.
-	public boolean config_naturerestorecleanup_enabled;
+//	public boolean config_naturerestorecleanup_enabled;
 	public boolean config_claims_AllowEnvironmentalVehicleDamage;                 //whether Entities can take damage from the environment in a claim.
 	public double  config_claims_AbandonReturnRatio;                //return ratio when abandoning a claim- .80 will result in players getting 80% of the used claim blocks back.
 	public boolean config_claims_preventTheft;						//whether containers and crafting blocks are protectable
@@ -366,8 +366,9 @@ public class GriefPrevention extends JavaPlugin
 
 		
 		this.config_entitycleanup_enabled = config.getBoolean("GriefPrevention.CleanupTasks.Entity",true);
-		this.config_treecleanup_enabled = config.getBoolean("GriefPrevention.CleanupTasks.Trees",true);
-		this.config_naturerestorecleanup_enabled = config.getBoolean("GriefPrevention.CleanupTasks.NatureRestore",true);
+		outConfig.set("GriefPrevention.CleanupTasks.Entity", this.config_entitycleanup_enabled);
+		//this.config_treecleanup_enabled = config.getBoolean("GriefPrevention.CleanupTasks.Trees",true);
+		//this.config_naturerestorecleanup_enabled = config.getBoolean("GriefPrevention.CleanupTasks.NatureRestore",true);
 		this.config_claimcleanup_enabled = config.getBoolean("GriefPrevention.ClaimCleanup.Enabled",true); 
 		this.config_claimcleanup_creativemaximumsize = config.getInt("GriefPrevention.ClaimCleanup.CreativeMaximumSize",25);
 		this.config_claimcleanup_survivalmaximumsize = config.getInt("GriefPrevention.ClaimCleanup.SurvivalMaximumSize",25);
