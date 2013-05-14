@@ -7,7 +7,7 @@ commands:
    cleanclaim:
       description: cleans all of a given material from a owned claim. target material defaults to AIR.
       usage: /CleanClaim <source> <target>
-      permission:griefprevention.cleanclaim
+      permission: griefprevention.cleanclaim
    clearmanagers:
       description: Clears all managers on a claim.
       usage: /ClearManagers
