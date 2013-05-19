@@ -108,6 +108,8 @@ public class GriefPrevention extends JavaPlugin
 	public boolean config_claims_creationRequiresPermission;		//whether creating claims with the shovel requires a permission
 	public int config_claims_claimsExtendIntoGroundDistance;		//how far below the shoveled block a new claim will reach
 	public int config_claims_minSize;								//minimum width and height for non-admin claims
+	public boolean config_claims_allowWitherGrief;                   //when set, Withers do not respect ClaimExplosions, or set claims.
+	public boolean config_claims_allowCreeperGrief;
 	public boolean config_claims_allowUnclaimInCreative;			//whether players may unclaim land (resize or abandon) in creative mode
 	public boolean config_claims_autoRestoreUnclaimedCreativeLand; 	//whether unclaimed land in creative worlds is automatically /restorenature-d
 	
@@ -402,6 +404,12 @@ public class GriefPrevention extends JavaPlugin
 		
 		this.config_claims_AllowEnvironmentalVehicleDamage = config.getBoolean("GriefPrevention.Claims.EnvironmentalVehicleDamage",true);
 		outConfig.set("GriefPrevention.Claims.EnvironmentalVehicleDamage",this.config_claims_AllowEnvironmentalVehicleDamage);
+		
+		this.config_claims_allowWitherGrief = config.getBoolean("GriefPrevention.Claims.AllowWitherGrief",false);
+		outConfig.set("GriefPrevention.Claims.AllowWitherGrief",this.config_claims_allowWitherGrief);
+		
+		this.config_claims_allowCreeperGrief = config.getBoolean("GriefPrevention.Claims.AllowCreeperGrief",false);
+		outConfig.set("GriefPrevention.Claims.AllowCreeperGrief",this.config_claims_allowCreeperGrief);
 		
 		this.config_claims_preventTheft = config.getBoolean("GriefPrevention.Claims.PreventTheft", true);
 		this.config_claims_protectCreatures = config.getBoolean("GriefPrevention.Claims.ProtectCreatures", true);
@@ -902,15 +910,16 @@ public class GriefPrevention extends JavaPlugin
 	private void HandleClaimClean(Claim c,MaterialInfo source,MaterialInfo target,Player player){
 		Location lesser = c.getLesserBoundaryCorner();
 		Location upper = c.getGreaterBoundaryCorner();
-		
+		System.out.println("HandleClaimClean:" + source.typeID + " to " + target.typeID);
 		
 		for(int x =lesser.getBlockX();x<=upper.getBlockX();x++){
-			for(int y = lesser.getBlockY();y<=upper.getBlockY();y++){
+			for(int y = 0;y<=255;y++){
 				for(int z = lesser.getBlockZ();z<=upper.getBlockZ();z++){
 					Location createloc =  new Location(lesser.getWorld(),x,y,z);
 					Block acquired = lesser.getWorld().getBlockAt(createloc);
 					if(acquired.getTypeId() == source.typeID && acquired.getData() == source.data){
 						acquired.setTypeIdAndData(target.typeID, target.data, true);
+						
 					}
 					
 					
@@ -938,6 +947,10 @@ public class GriefPrevention extends JavaPlugin
 		}		
 		else if(cmd.getName().equalsIgnoreCase("cleanclaim") && player !=null){
 			//source is first arg; target is second arg.
+			player.sendMessage("cleanclaim command..." + args.length);
+			if(args.length==0){
+				return true;
+			}
 			MaterialInfo source = MaterialInfo.fromString(args[0]);
 		    if(source==null){
 		    	
@@ -958,7 +971,7 @@ public class GriefPrevention extends JavaPlugin
 		    	if(target==null){
 		    		Material attemptparse = Material.valueOf(args[1]);
 		    		if(attemptparse!=null){
-		    			target = new MaterialInfo(attemptparse.getId(),(byte)0,args[0]);
+		    			target = new MaterialInfo(attemptparse.getId(),(byte)0,args[1]);
 		    		}
 		    		else {
 		    			player.sendMessage("Failed to parse Target Material," + args[1]);
@@ -966,12 +979,19 @@ public class GriefPrevention extends JavaPlugin
 		    	}
 		    
 		    }
+		    System.out.println(source.typeID + " " +target.typeID);
 		    PlayerData pd = dataStore.getPlayerData(player.getName());
 		    Claim retrieveclaim = dataStore.getClaimAt(player.getLocation(), true, null);
-		    if(pd.ignoreClaims || retrieveclaim.ownerName.equalsIgnoreCase(player.getName())){
-		    	HandleClaimClean(retrieveclaim,source,target,player);
-		    	return true;
+		    if(retrieveclaim!=null){
+			    if(pd.ignoreClaims || retrieveclaim.ownerName.equalsIgnoreCase(player.getName())){
+			    	HandleClaimClean(retrieveclaim,source,target,player);
+			    	return true;
+			    }
 		    }
+			
+			
+		}
+		if(cmd.getName().equalsIgnoreCase("setclaimblocks") && player !=null){
 			
 			
 			

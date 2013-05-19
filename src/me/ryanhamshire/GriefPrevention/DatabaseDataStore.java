@@ -154,6 +154,7 @@ public class DatabaseDataStore extends DataStore
 				long parentId = results.getLong("parentid");
 				if(parentId != -1) continue;
 				
+				
 				long claimID = results.getLong("id");
 					
 				String lesserCornerString = results.getString("lessercorner");
@@ -210,7 +211,7 @@ public class DatabaseDataStore extends DataStore
 				{			
 					lesserCornerString = childResults.getString("lessercorner");
 					lesserBoundaryCorner = this.locationFromString(lesserCornerString);
-					
+					Long subid = childResults.getLong("id");
 					greaterCornerString = childResults.getString("greatercorner");
 					greaterBoundaryCorner = this.locationFromString(greaterCornerString);
 					
@@ -233,6 +234,7 @@ public class DatabaseDataStore extends DataStore
 					//add this claim to the list of children of the current top level claim
 					childClaim.parent = topLevelClaim;
 					topLevelClaim.children.add(childClaim);
+					childClaim.subClaimid= subid;
 					childClaim.inDataStore = true;						
 				}
 			}
@@ -322,6 +324,7 @@ public class DatabaseDataStore extends DataStore
 		}
 		
 		long parentId;
+		long id;
 		if(claim.parent == null)
 		{
 			parentId = -1;
@@ -329,12 +332,14 @@ public class DatabaseDataStore extends DataStore
 		else
 		{
 			parentId = claim.parent.id;
+			
+			id = claim.getSubClaimID()!=null?claim.getSubClaimID():claim.parent.children.indexOf(claim);
 		}
 		
-		long id;
+		
 		if(claim.id == null)
 		{
-			id = -1;
+			id = claim.getSubClaimID()!=null?claim.getSubClaimID():-1;
 		}
 		else
 		{

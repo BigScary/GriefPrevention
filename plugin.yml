@@ -4,6 +4,10 @@ softdepend: [Vault, Multiverse-Core, My Worlds, MystCraft, Transporter]
 dev-url: http://dev.bukkit.org/server-mods/grief-prevention
 version: 7.7
 commands:
+   setclaimblocks:
+      description: sets the claim blocks for a player to a specific value.
+      usage: /SetClaimBlocks <player> <amount>
+      permission: griefprevention.setclaimblocks
    cleanclaim:
       description: cleans all of a given material from a owned claim. target material defaults to AIR.
       usage: /CleanClaim <source> <target>

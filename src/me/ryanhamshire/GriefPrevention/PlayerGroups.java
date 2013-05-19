@@ -17,6 +17,11 @@ public class PlayerGroups {
 	public boolean GroupExists(String testName){
 		return getGroupByName(testName) !=null;
 	}
+	/**
+	 * retrieves a a specified group, or null of the name does not match any group.
+	 * @param groupname
+	 * @return
+	 */
 	public PlayerGroup getGroupByName(String groupname){
 		String capgroup = groupname.toUpperCase();
 		if(!PlayerGroups.containsKey(capgroup))
@@ -31,6 +36,11 @@ public class PlayerGroups {
  * 
  * 
  */
+	/**
+	 * Initializes this PlayerGroups collection based on data in the given configuration file at the specified node.
+	 * @param Source
+	 * @param SourceNode
+	 */
 	public PlayerGroups(FileConfiguration Source,String SourceNode){
 		List<PlayerGroup> checklist = PlayerGroup.getGroups(Source, SourceNode);
 		for(PlayerGroup iterate:checklist){

@@ -21,7 +21,10 @@ public class PlayerGroup {
 	 * @return
 	 */
 	public List<String> getPlayerNames() { return new ArrayList<String>(PlayerNames);}
-	
+	/**
+	 * retrieves the name of this Group.
+	 * @return
+	 */
 	public String getGroupName(){ return GroupName;}
 	
 	/**
@@ -44,9 +47,15 @@ public class PlayerGroup {
   Names:[Donator,HalfOp]:
     Donator: [Chicken,Waffle]
     HalfOp:  [Choodles,Smeagle]*/
+	/**
+	 * reads Groups from the given Configuration file and Source Node.
+	 * @param Source Config to read from.
+	 * @param SourceNode Source node to read from within the configuration.
+	 * @return
+	 */
 	public static List<PlayerGroup> getGroups(FileConfiguration Source,String SourceNode){
 		//sourcenode will be the node: normally, GriefPrevention.Groups.
-		System.out.println("Attempting to read groups from" + SourceNode);
+		//System.out.println("Attempting to read groups from" + SourceNode);
 		ArrayList<PlayerGroup> results = new ArrayList<PlayerGroup>();
 		List<String> GroupNames = Source.getStringList(SourceNode + ".Names");
 		System.out.println("Found " + GroupNames.size() + " Groups" );
@@ -61,6 +70,11 @@ public class PlayerGroup {
 		}
 		return results;
 	}
+	/**
+	 * Saves this PlayerGroup to the given configuration file at the specified node.
+	 * @param Target Configuration file to save to.
+	 * @param TargetNode Node to save to in the given configuration file.
+	 */
 	public void Save(FileConfiguration Target, String TargetNode){
 		
 
@@ -68,8 +82,9 @@ public class PlayerGroup {
 		
 		
 	}
+	
 	private PlayerGroup(FileConfiguration Source,String SourceNode){
-		System.out.println("reading group from " + SourceNode);
+		//System.out.println("reading group from " + SourceNode);
 		//Source is the Config to load from.
 		//Node is the first node. An example of the Groups:
 		
@@ -86,6 +101,7 @@ public class PlayerGroup {
 		//now we want the list at this Node.
 		PlayerNames = new ArrayList<String>();
 		for(String iteratename:Source.getStringList(SourceNode)){
+			System.out.println("Group-" + SourceNode + " " + iteratename);
 			PlayerNames.add(iteratename);
 			
 		}

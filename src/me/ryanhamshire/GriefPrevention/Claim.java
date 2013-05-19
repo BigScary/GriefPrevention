@@ -53,6 +53,9 @@ public class Claim
 	//id number.  unique to this claim, never changes.
 	Long id = null;
 	
+	//Subclaim ID. null for top-level claims, unique among subclaims otherwise.
+	Long subClaimid=null;
+	
 	//ownername.  for admin claims, this is the empty string
 	//use getOwnerName() to get a friendly name (will be "an administrator" for admin claims)
 	public String ownerName;
@@ -117,7 +120,15 @@ public class Claim
 	{
 		return (this.ownerName == null || this.ownerName.isEmpty());
 	}
-	
+	public Claim getSubClaim(long pID){
+		for(Claim subclaim:children){
+			if(subclaim.getSubClaimID()==pID) return subclaim;
+		}
+		return null;
+	}
+	public Long getSubClaimID(){
+		return this.subClaimid;
+	}
 	//accessor for ID
 	public Long getID()
 	{

@@ -1,9 +1,10 @@
 package me.ryanhamshire.GriefPrevention;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class ClaimArray {
+public class ClaimArray implements Iterable {
 	
 	private ArrayList<Claim> claims = new ArrayList<Claim>();
 	ConcurrentHashMap<Long, Claim> claimmap = new ConcurrentHashMap<Long, Claim>();
@@ -21,7 +22,21 @@ public class ClaimArray {
 	public Claim getID(long i) {
 		return claimmap.get(i);
 	}
-
+	/**
+	 * Retrieves a Sub Claim given it's parent ID and Subclaim ID. 
+	 * @param ClaimID ID of parent Claim.
+	 * @param SubClaimID SubClaimID of child claim. Unique only among child claims.
+	 * @return Child claim of the claim with the Parent ID with the given Subclaim ID, or null if the parent or subclaim ID is not valid.
+	 */
+	public Claim getID(long ClaimID,long SubClaimID){
+	
+		Claim grabclaim = getID(ClaimID);
+		if(grabclaim==null) return null;
+		Claim getchild = grabclaim.getSubClaim(SubClaimID);
+		return getchild;
+		
+		
+	}
 	public void add(int j, Claim newClaim) {
 		claims.add(j, newClaim);
 		claimmap.put(newClaim.getID(), newClaim);
@@ -85,6 +100,13 @@ public class ClaimArray {
 			}
 		}
 		return chunks;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public Iterator<Claim> iterator() {
+		// TODO Auto-generated method stub
+		return ((ArrayList<Claim>)claims.clone()).iterator();
 	}
 
 }

@@ -151,8 +151,8 @@ public class FlatFileDataStore extends DataStore
 				try
 				{		
 					Claim topLevelClaim = null;
-					
-					inStream = new BufferedReader(new FileReader(files[i].getAbsolutePath()));
+					FileReader fr = new FileReader(files[i].getAbsolutePath());
+					inStream = new BufferedReader(fr);
 					String line = inStream.readLine();
 					
 					while(line != null)
@@ -233,8 +233,30 @@ public class FlatFileDataStore extends DataStore
 						//otherwise there's already a top level claim, so this must be a subdivision of that top level claim
 						else
 						{
+							Long usesubid = 0l;
+							inStream.mark(512); //mark current position, in case this is an older file.
+							String nextline = inStream.readLine();
+							//if it starts with "sub:" then it is a subid.
+							if(nextline!=null && nextline.toUpperCase().startsWith("SUB:")){
+							     try {
+							    	 usesubid = (long) Integer.parseInt(nextline.substring(4));
+							    	 System.out.println("Current file: SubID:" + usesubid +" with Parent claim:" + topLevelClaim);
+							     }
+							     catch(NumberFormatException ex){
+							    	 usesubid = (long) topLevelClaim.children.size();
+							     }
+							}
+							else {
+								
+								//otherwise, must be older file without subclaim ID. default to current count of children.
+								usesubid = (long) topLevelClaim.children.size();
+								System.out.println("Older file: Assigned SubID:" + usesubid +" with Parent claim:" + topLevelClaim);
+								//reset...
+								inStream.reset();
+							}
+							//as such, try to read in the subclaim ID.
 							Claim subdivision = new Claim(lesserBoundaryCorner, greaterBoundaryCorner, "--subdivision--", builderNames, containerNames, accessorNames, managerNames, null, neverdelete);
-							
+							subdivision.subClaimid= usesubid;
 							subdivision.modifiedDate = new Date(files[i].lastModified());
 							subdivision.parent = topLevelClaim;
 							topLevelClaim.children.add(subdivision);
@@ -255,7 +277,8 @@ public class FlatFileDataStore extends DataStore
 				//if there's any problem with the file's content, log an error message and skip it
 				catch(Exception e)
 				{
-					 GriefPrevention.AddLogEntry("Unable to load data for claim \"" + files[i].getName() + "\": " + e.getMessage());
+					 GriefPrevention.AddLogEntry("Unable to load data for claim \"" + files[i].getName() + "\": " + e.getClass().getName() + " " +  e.getMessage());
+					 e.printStackTrace();
 				}
 				
 				try
@@ -289,8 +312,14 @@ public class FlatFileDataStore extends DataStore
 			//for each subdivision
 			for(int i = 0; i < claim.children.size(); i++)
 			{
+				
 				//write the subdivision's data to the file
-				this.writeClaimData(claim.children.get(i), outStream);
+				//write it's unique ID.
+				Claim childclaim = claim.children.get(i);
+				Long childid = childclaim.getSubClaimID();
+				System.out.println("Attempting to write child claim: SubID: " + childid);
+				this.writeClaimData(childclaim, outStream);
+				outStream.write("Sub:" + String.valueOf(childid));
 			}
 		}		
 		
