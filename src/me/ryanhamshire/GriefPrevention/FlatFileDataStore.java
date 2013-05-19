@@ -240,7 +240,7 @@ public class FlatFileDataStore extends DataStore
 							if(nextline!=null && nextline.toUpperCase().startsWith("SUB:")){
 							     try {
 							    	 usesubid = (long) Integer.parseInt(nextline.substring(4));
-							    	 System.out.println("Current file: SubID:" + usesubid +" with Parent claim:" + topLevelClaim);
+							    	// System.out.println("Current file: SubID:" + usesubid +" with Parent claim:" + topLevelClaim);
 							     }
 							     catch(NumberFormatException ex){
 							    	 usesubid = (long) topLevelClaim.children.size();
@@ -250,7 +250,7 @@ public class FlatFileDataStore extends DataStore
 								
 								//otherwise, must be older file without subclaim ID. default to current count of children.
 								usesubid = (long) topLevelClaim.children.size();
-								System.out.println("Older file: Assigned SubID:" + usesubid +" with Parent claim:" + topLevelClaim);
+							//	System.out.println("Older file: Assigned SubID:" + usesubid +" with Parent claim:" + topLevelClaim);
 								//reset...
 								inStream.reset();
 							}
@@ -317,7 +317,7 @@ public class FlatFileDataStore extends DataStore
 				//write it's unique ID.
 				Claim childclaim = claim.children.get(i);
 				Long childid = childclaim.getSubClaimID();
-				System.out.println("Attempting to write child claim: SubID: " + childid);
+				//System.out.println("Attempting to write child claim: SubID: " + childid);
 				this.writeClaimData(childclaim, outStream);
 				outStream.write("Sub:" + String.valueOf(childid));
 			}
