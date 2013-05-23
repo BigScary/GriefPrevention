@@ -23,6 +23,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 
+import me.ryanhamshire.GriefPrevention.Configuration.WorldConfig;
 import me.ryanhamshire.GriefPrevention.events.ClaimResizeEvent;
 import me.ryanhamshire.GriefPrevention.events.NewClaimCreated;
 import me.ryanhamshire.GriefPrevention.exceptions.WorldNotFoundException;
@@ -54,8 +55,8 @@ public abstract class DataStore
 	Long nextClaimID = (long)0;
 	
 	//path information, for where stuff stored on disk is well...  stored
-	protected final static String dataLayerFolderPath = "plugins" + File.separator + "GriefPreventionData";
-	final static String configFilePath = dataLayerFolderPath + File.separator + "config.yml";
+	public final static String dataLayerFolderPath = "plugins" + File.separator + "GriefPreventionData";
+	public final static String configFilePath = dataLayerFolderPath + File.separator + "config.yml";
 	final static String messagesFilePath = dataLayerFolderPath + File.separator + "messages.yml";
 	
 	//initialization!
@@ -504,7 +505,7 @@ public abstract class DataStore
 	synchronized private CreateClaimResult createClaim(World world, int x1, int x2, int y1, int y2, int z1, int z2, String ownerName, Claim parent, Long id, boolean neverdelete, Claim oldclaim)
 	{
 		CreateClaimResult result = new CreateClaimResult();
-		
+		WorldConfig wc = GriefPrevention.instance.getWorldCfg(world);
 		int smallx, bigx, smally, bigy, smallz, bigz;
 
 		//determine small versus big inputs
@@ -542,7 +543,7 @@ public abstract class DataStore
 		}
 		
 		//creative mode claims always go to bedrock
-		if(GriefPrevention.instance.config_claims_enabledCreativeWorlds.contains(world.getName()))
+		if(wc.creative_rules() )
 		{
 			smally = 2;
 		}
@@ -635,7 +636,10 @@ public abstract class DataStore
 	 */
 	synchronized public void extendClaim(Claim claim, int newDepth) 
 	{
-		if(newDepth < GriefPrevention.instance.config_claims_maxDepth) newDepth = GriefPrevention.instance.config_claims_maxDepth;
+		
+		WorldConfig wc = GriefPrevention.instance.getWorldCfg(claim.getLesserBoundaryCorner().getWorld());
+		
+		if(newDepth < wc.claims_maxDepth()) newDepth = wc.claims_maxDepth();
 		
 		if(claim.parent != null) claim = claim.parent;
 		

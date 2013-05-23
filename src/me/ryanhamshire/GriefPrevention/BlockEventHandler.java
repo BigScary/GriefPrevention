@@ -21,6 +21,7 @@ package me.ryanhamshire.GriefPrevention;
 import java.util.ArrayList;
 import java.util.List;
 
+import me.ryanhamshire.GriefPrevention.Configuration.WorldConfig;
 import me.ryanhamshire.GriefPrevention.visualization.Visualization;
 import me.ryanhamshire.GriefPrevention.visualization.VisualizationType;
 
@@ -66,7 +67,7 @@ public class BlockEventHandler implements Listener
 	//convenience reference to singleton datastore
 	private DataStore dataStore;
 	
-	private ArrayList<Material> trashBlocks;
+	//private ArrayList<Material> trashBlocks;
 	
 	//constructor
 	public BlockEventHandler(DataStore dataStore)
@@ -74,7 +75,7 @@ public class BlockEventHandler implements Listener
 		this.dataStore = dataStore;
 		
 		//create the list of blocks which will not trigger a warning when they're placed outside of land claims
-		this.trashBlocks = new ArrayList<Material>(GriefPrevention.instance.config_trash_blocks);
+		//this.trashBlocks = new ArrayList<Material>(GriefPrevention.instance.config_trash_blocks);
 		/*this.trashBlocks = new ArrayList<Material>();
 		this.trashBlocks.add(Material.COBBLESTONE);
 		this.trashBlocks.add(Material.TORCH);
@@ -90,8 +91,10 @@ public class BlockEventHandler implements Listener
 	@EventHandler(ignoreCancelled = true)
 	public void onBlockDamaged(BlockDamageEvent event)
 	{
+		WorldConfig wc = GriefPrevention.instance.getWorldCfg(event.getBlock().getLocation().getWorld());
 		//if placing items in protected chests isn't enabled, none of this code needs to run
-		if(!GriefPrevention.instance.config_addItemsToClaimedChests) return;
+		
+		if(!wc.addItemsToClaimedChests()) return;
 		
 		Block block = event.getBlock();
 		Player player = event.getPlayer();
@@ -173,6 +176,7 @@ public class BlockEventHandler implements Listener
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
 	public void onBlockBreak(BlockBreakEvent breakEvent)
 	{
+		WorldConfig wc = GriefPrevention.instance.getWorldCfg(breakEvent.getBlock().getWorld());
 		Player player = breakEvent.getPlayer();
 		Block block = breakEvent.getBlock();		
 		
@@ -195,13 +199,13 @@ public class BlockEventHandler implements Listener
 			if(block.getY() < claim.lesserBoundaryCorner.getBlockY() && claim.allowBuild(player) == null)
 			{
 				//extend the claim downward beyond the breakage point
-				this.dataStore.extendClaim(claim, claim.getLesserBoundaryCorner().getBlockY() - GriefPrevention.instance.config_claims_claimsExtendIntoGroundDistance);
+				this.dataStore.extendClaim(claim, claim.getLesserBoundaryCorner().getBlockY() - wc.claims_claimsExtendIntoGroundDistance());
 			}
 		}
 		
 		//FEATURE: automatically clean up hanging treetops
 		//if it's a log
-		if(block.getType() == Material.LOG && GriefPrevention.instance.config_trees_removeFloatingTreetops)
+		if(block.getType() == Material.LOG && wc.trees_removeFloatingTreetops())
 		{
 			//run the specialized code for treetop removal (see below)
 			GriefPrevention.instance.handleLogBroken(block);
@@ -212,9 +216,10 @@ public class BlockEventHandler implements Listener
 	@EventHandler(ignoreCancelled = true)
 	public void onSignChanged(SignChangeEvent event)
 	{
+		
 		Player player = event.getPlayer();
 		if(player == null) return;
-		
+		WorldConfig wc = GriefPrevention.instance.getWorldCfg(event.getPlayer().getWorld());
 		StringBuilder lines = new StringBuilder();
 		boolean notEmpty = false;
 		for(int i = 0; i < event.getLines().length; i++)
@@ -232,7 +237,7 @@ public class BlockEventHandler implements Listener
 			GriefPrevention.AddLogEntry("[Sign Placement] <" + player.getName() + "> " + lines.toString() + " @ " + GriefPrevention.getfriendlyLocationString(event.getBlock().getLocation()));
 			playerData.lastMessage = signMessage;
 			
-			if(!player.hasPermission("griefprevention.eavesdrop") && GriefPrevention.instance.config_sign_Eavesdrop)
+			if(!player.hasPermission("griefprevention.eavesdrop") && wc.sign_Eavesdrop())
 			{
 				Player [] players = GriefPrevention.instance.getServer().getOnlinePlayers();
 				for(int i = 0; i < players.length; i++)
@@ -253,12 +258,12 @@ public class BlockEventHandler implements Listener
 	{
 		Player player = placeEvent.getPlayer();
 		Block block = placeEvent.getBlock();
-		
-		if(GriefPrevention.instance.config_claims_noBuildOutsideClaims){
+		WorldConfig wc = GriefPrevention.instance.getWorldCfg(block.getWorld());
+		if(wc.claims_noBuildOutsideClaims()){
 			//if set, then we only allow Trash Blocks to be placed.
 			Claim testclaim = GriefPrevention.instance.dataStore.getClaimAt(block.getLocation(), true, null);
 			if(testclaim==null){
-				if(GriefPrevention.instance.config_trash_blocks.contains(block.getType())){
+				if(wc.getTrashBlocks().contains(block.getType())){
 				return;	
 				}
 			}
@@ -268,7 +273,7 @@ public class BlockEventHandler implements Listener
 		//FEATURE: limit fire placement, to prevent PvP-by-fire
 		
 		//if placed block is fire and pvp is off, apply rules for proximity to other players 
-		if(block.getType() == Material.FIRE && !GriefPrevention.instance.config_pvp_enabledWorlds.contains(block.getWorld()) && !player.hasPermission("griefprevention.lava"))
+		if(block.getType() == Material.FIRE && !player.getWorld().getPVP() && !player.hasPermission("griefprevention.lava"))
 		{
 			List<Player> players = block.getWorld().getPlayers();
 			for(int i = 0; i < players.size(); i++)
@@ -309,7 +314,7 @@ public class BlockEventHandler implements Listener
 			if(block.getY() < claim.lesserBoundaryCorner.getBlockY() && claim.allowBuild(player) == null)
 			{
 				//extend the claim downward
-				this.dataStore.extendClaim(claim, claim.getLesserBoundaryCorner().getBlockY() - GriefPrevention.instance.config_claims_claimsExtendIntoGroundDistance);
+				this.dataStore.extendClaim(claim, claim.getLesserBoundaryCorner().getBlockY() - wc.claims_claimsExtendIntoGroundDistance());
 			}
 			
 			//reset the counter for warning the player when he places outside his claims
@@ -319,22 +324,24 @@ public class BlockEventHandler implements Listener
 		//FEATURE: automatically create a claim when a player who has no claims places a chest
 		
 		//otherwise if there's no claim, the player is placing a chest, and new player automatic claims are enabled
-		else if(block.getType() == Material.CHEST && GriefPrevention.instance.config_claims_automaticClaimsForNewPlayersRadius > -1 && GriefPrevention.instance.claimsEnabledForWorld(block.getWorld()))
+		else if(block.getType() == Material.CHEST && 
+				wc.claims_automaticClaimsForNewPlayerRadius() > -1 && 
+				GriefPrevention.instance.claimsEnabledForWorld(block.getWorld()))
 		{			
 			//if the chest is too deep underground, don't create the claim and explain why
-			if(GriefPrevention.instance.config_claims_preventTheft && block.getY() < GriefPrevention.instance.config_claims_maxDepth)
+			if(wc.claims_preventTheft() && block.getY() < wc.claims_maxDepth())
 			{
 				GriefPrevention.sendMessage(player, TextMode.Warn, Messages.TooDeepToClaim);
 				return;
 			}
 			
-			int radius = GriefPrevention.instance.config_claims_automaticClaimsForNewPlayersRadius;
+			int radius = wc.claims_automaticClaimsForNewPlayerRadius();
 			
 			//if the player doesn't have any claims yet, automatically create a claim centered at the chest
 			if(playerData.claims.size() == 0)
 			{
 				//radius == 0 means protect ONLY the chest
-				if(GriefPrevention.instance.config_claims_automaticClaimsForNewPlayersRadius == 0)
+				if(wc.claims_automaticClaimsForNewPlayerRadius() == 0)
 				{					
 					this.dataStore.createClaim(block.getWorld(), block.getX(), block.getX(), block.getY(), block.getY(), block.getZ(), block.getZ(), player.getName(), null, null, false);
 					GriefPrevention.sendMessage(player, TextMode.Success, Messages.ChestClaimConfirmation);						
@@ -347,7 +354,7 @@ public class BlockEventHandler implements Listener
 					//note that since the player had permission to place the chest, at the very least, the automatic claim will include the chest
 					while(radius >= 0 && (this.dataStore.createClaim(block.getWorld(), 
 							block.getX() - radius, block.getX() + radius, 
-							block.getY() - GriefPrevention.instance.config_claims_claimsExtendIntoGroundDistance, block.getY(), 
+							block.getY() - wc.claims_claimsExtendIntoGroundDistance(), block.getY(), 
 							block.getZ() - radius, block.getZ() + radius, 
 							player.getName(), 
 							null, null, false).succeeded != CreateClaimResult.Result.Success))
@@ -368,21 +375,24 @@ public class BlockEventHandler implements Listener
 				GriefPrevention.sendMessage(player, TextMode.Instr, Messages.TrustCommandAdvertisement);
 				
 				//unless special permission is required to create a claim with the shovel, educate the player about the shovel
-				if(!GriefPrevention.instance.config_claims_creationRequiresPermission)
+				if(!wc.claims_creationRequiresPermission())
 				{
 					GriefPrevention.sendMessage(player, TextMode.Instr, Messages.GoldenShovelAdvertisement);
 				}
 			}
 			
 			//check to see if this chest is in a claim, and warn when it isn't
-			if(GriefPrevention.instance.config_claims_preventTheft && this.dataStore.getClaimAt(block.getLocation(), false, playerData.lastClaim) == null)
+			
+			if(GriefPrevention.instance.getWorldCfg(player.getWorld()).claims_preventTheft() && this.dataStore.getClaimAt(block.getLocation(), false, playerData.lastClaim) == null)
 			{
 				GriefPrevention.sendMessage(player, TextMode.Warn, Messages.UnprotectedChestWarning);				
 			}
 		}
 		
 		//FEATURE: limit wilderness tree planting to grass, or dirt with more blocks beneath it
-		else if(block.getType() == Material.SAPLING && GriefPrevention.instance.config_blockSkyTrees && GriefPrevention.instance.claimsEnabledForWorld(player.getWorld()))
+		else if(block.getType() == Material.SAPLING && 
+				GriefPrevention.instance.getWorldCfg(player.getWorld()).blockSkyTrees() && 
+				GriefPrevention.instance.claimsEnabledForWorld(player.getWorld()))
 		{
 			Block earthBlock = placeEvent.getBlockAgainst();
 			if(earthBlock.getType() != Material.GRASS)
@@ -398,12 +408,12 @@ public class BlockEventHandler implements Listener
 		
 		
 		//FEATURE: warn players when they're placing non-trash blocks outside of their claimed areas
-		else if(GriefPrevention.instance.config_claims_warnOnBuildOutside && !this.trashBlocks.contains(block.getType()) && GriefPrevention.instance.claimsEnabledForWorld(block.getWorld()) && playerData.claims.size() > 0)
+		else if(wc.claims_warnOnBuildOutside() && !wc.getTrashBlocks().contains(block.getType()) && wc.claims_enabled() && playerData.claims.size() > 0)
 		{
-			if(--playerData.unclaimedBlockPlacementsUntilWarning <= 0 && GriefPrevention.instance.config_claims_wildernessBlocksDelay!=0)
+			if(--playerData.unclaimedBlockPlacementsUntilWarning <= 0 && wc.claims_wildernessBlocksDelay()!=0)
 			{
 				GriefPrevention.sendMessage(player, TextMode.Warn, Messages.BuildingOutsideClaims);
-				playerData.unclaimedBlockPlacementsUntilWarning = GriefPrevention.instance.config_claims_wildernessBlocksDelay;
+				playerData.unclaimedBlockPlacementsUntilWarning = wc.claims_wildernessBlocksDelay();
 				
 				if(playerData.lastClaim != null && playerData.lastClaim.allowBuild(player) == null)
 				{
@@ -414,7 +424,8 @@ public class BlockEventHandler implements Listener
 		}
 		
 		//warn players when they place TNT above sea level, since it doesn't destroy blocks there
-		if(	GriefPrevention.instance.config_blockSurfaceOtherExplosions && block.getType() == Material.TNT &&
+		
+		if(	wc.blockSurfaceOtherExplosions() && block.getType() == Material.TNT &&
 			block.getWorld().getEnvironment() != Environment.NETHER &&
 			block.getY() > GriefPrevention.instance.getSeaLevel(block.getWorld()) - 5)
 		{
@@ -553,7 +564,8 @@ public class BlockEventHandler implements Listener
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onBlockIgnite (BlockIgniteEvent igniteEvent)
 	{
-		if(!GriefPrevention.instance.config_fireSpreads && igniteEvent.getCause() != IgniteCause.FLINT_AND_STEEL &&  igniteEvent.getCause() != IgniteCause.LIGHTNING)
+		WorldConfig wc = GriefPrevention.instance.getWorldCfg(igniteEvent.getBlock().getWorld());
+		if(!wc.fireSpreads() && igniteEvent.getCause() != IgniteCause.FLINT_AND_STEEL &&  igniteEvent.getCause() != IgniteCause.LIGHTNING)
 		{	
 			igniteEvent.setCancelled(true);			
 		}
@@ -563,9 +575,10 @@ public class BlockEventHandler implements Listener
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onBlockSpread (BlockSpreadEvent spreadEvent)
 	{
+		WorldConfig wc = GriefPrevention.instance.getWorldCfg(spreadEvent.getBlock().getWorld());
 		if(spreadEvent.getSource().getType() != Material.FIRE) return;
 		
-		if(!GriefPrevention.instance.config_fireSpreads)
+		if(!wc.fireSpreads())
 		{
 			spreadEvent.setCancelled(true);
 			
@@ -596,7 +609,8 @@ public class BlockEventHandler implements Listener
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onBlockBurn (BlockBurnEvent burnEvent)
 	{
-		if(!GriefPrevention.instance.config_fireDestroys)
+		WorldConfig wc = (WorldConfig) burnEvent.getBlock().getWorld();
+		if(!wc.fireDestroys())
 		{
 			burnEvent.setCancelled(true);
 			Block block = burnEvent.getBlock();
@@ -640,8 +654,9 @@ public class BlockEventHandler implements Listener
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
 	public void onBlockFromTo (BlockFromToEvent spreadEvent)
 	{
+		WorldConfig wc = GriefPrevention.instance.getWorldCfg(spreadEvent.getBlock().getWorld());
 		//don't track fluid movement in worlds where claims are not enabled
-		if(!GriefPrevention.instance.config_claims_enabledWorlds.contains(spreadEvent.getBlock().getWorld().getName())) return;
+		if(!wc.claims_enabled()) return;
 		
 		//always allow fluids to flow straight down
 		if(spreadEvent.getFace() == BlockFace.DOWN) return;
@@ -692,6 +707,7 @@ public class BlockEventHandler implements Listener
 	{
 		//from where?
 		Block fromBlock = dispenseEvent.getBlock();
+		WorldConfig wc = GriefPrevention.instance.getWorldCfg(fromBlock.getLocation().getWorld());
 		if(fromBlock.getType().equals(Material.DROPPER)) return;
 		//to where?
 		Vector velocity = dispenseEvent.getVelocity();
@@ -715,7 +731,7 @@ public class BlockEventHandler implements Listener
 		
 		//into wilderness is NOT OK when surface buckets are limited
 		Material materialDispensed = dispenseEvent.getItem().getType();
-		if((materialDispensed == Material.WATER_BUCKET || materialDispensed == Material.LAVA_BUCKET) && GriefPrevention.instance.config_blockWildernessWaterBuckets && GriefPrevention.instance.claimsEnabledForWorld(fromBlock.getWorld()) && toClaim == null)
+		if((materialDispensed == Material.WATER_BUCKET || materialDispensed == Material.LAVA_BUCKET) && wc.blockWildernessWaterBuckets() && GriefPrevention.instance.claimsEnabledForWorld(fromBlock.getWorld()) && toClaim == null)
 		{
 			dispenseEvent.setCancelled(true);
 			return;

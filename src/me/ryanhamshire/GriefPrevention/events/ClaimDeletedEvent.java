@@ -2,6 +2,7 @@ package me.ryanhamshire.GriefPrevention.events;
 
 import me.ryanhamshire.GriefPrevention.Claim;
 
+import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
@@ -24,10 +25,11 @@ public class ClaimDeletedEvent extends Event implements Cancellable {
         return handlers;
     }
     
-    Claim claim;
-    
-    public ClaimDeletedEvent(Claim claim) {
+    private Claim claim;
+    private Player player;
+    public ClaimDeletedEvent(Claim claim,Player player) {
     	this.claim = claim;
+    	this.player=player;
     }
     
     /**
@@ -37,6 +39,12 @@ public class ClaimDeletedEvent extends Event implements Cancellable {
     public Claim getClaim() {
     	return claim;
     }
+    
+    /**
+     * returns the player deleting the Claim.
+     * @return
+     */
+    public Player getPlayer(){ return player;}
     
     boolean canceled = false;
 

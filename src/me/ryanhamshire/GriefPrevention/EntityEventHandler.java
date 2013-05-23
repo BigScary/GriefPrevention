@@ -21,6 +21,8 @@ package me.ryanhamshire.GriefPrevention;
 import java.util.Calendar;
 import java.util.List;
 
+import me.ryanhamshire.GriefPrevention.Configuration.WorldConfig;
+
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World.Environment;
@@ -38,6 +40,7 @@ import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Snowball;
 import org.bukkit.entity.Snowman;
+import org.bukkit.entity.TNTPrimed;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.entity.Villager;
 import org.bukkit.entity.WitherSkull;
@@ -72,25 +75,31 @@ class EntityEventHandler implements Listener
 	{
 		this.dataStore = dataStore;
 	}
-	
+	private Claim ChangeBlockClaimCache = null;
 	//don't allow endermen to change blocks
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
 	public void onEntityChangeBLock(EntityChangeBlockEvent event)
 	{
-		if(!GriefPrevention.instance.config_endermenMoveBlocks && event.getEntityType() == EntityType.ENDERMAN)
+		WorldConfig wc = GriefPrevention.instance.getWorldCfg(event.getEntity().getWorld());
+		
+		
+		if(!wc.endermenMoveBlocks() && event.getEntityType() == EntityType.ENDERMAN)
 		{
 			event.setCancelled(true);
 		}
 		
-		else if(!GriefPrevention.instance.config_silverfishBreakBlocks && event.getEntityType() == EntityType.SILVERFISH)
+		else if(!wc.silverfishBreakBlocks() && event.getEntityType() == EntityType.SILVERFISH)
 		{
 			event.setCancelled(true);
 		}
+		
+		
 		
 		//don't allow the wither to break blocks, when the wither is determined, too expensive to constantly check for claimed blocks
-		else if(event.getEntityType() == EntityType.WITHER && GriefPrevention.instance.config_claims_enabledWorlds.contains(event.getBlock().getWorld().getName()))
+		else if(event.getEntityType() == EntityType.WITHER && wc.claims_enabled())
 		{
-			event.setCancelled(true);
+			
+			event.setCancelled(!wc.claims_allowWitherGrief());
 		}
 	}
 	
@@ -98,14 +107,16 @@ class EntityEventHandler implements Listener
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
 	public void onZombieBreakDoor(EntityBreakDoorEvent event)
 	{		
-		if(!GriefPrevention.instance.config_zombiesBreakDoors) event.setCancelled(true);
+		WorldConfig wc = GriefPrevention.instance.getWorldCfg(event.getEntity().getWorld());
+		if(!wc.zombiesBreakDoors()) event.setCancelled(true);
 	}
 	
 	//don't allow entities to trample crops
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
 	public void onEntityInteract(EntityInteractEvent event)
 	{
-		if(!GriefPrevention.instance.config_creaturesTrampleCrops && event.getBlock().getType() == Material.SOIL)
+		WorldConfig wc = GriefPrevention.instance.getWorldCfg(event.getEntity().getWorld());
+		if(!wc.creaturesTrampleCrops() && event.getBlock().getType() == Material.SOIL)
 		{
 			event.setCancelled(true);
 		}
@@ -115,17 +126,41 @@ class EntityEventHandler implements Listener
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
 	public void onEntityExplode(EntityExplodeEvent explodeEvent)
 	{		
+		
 		List<Block> blocks = explodeEvent.blockList();
 		Location location = explodeEvent.getLocation();
-		
+		WorldConfig wc = GriefPrevention.instance.getWorldCfg(location.getWorld());
 		//FEATURE: explosions don't destroy blocks when they explode near or above sea level in standard worlds
-		boolean isCreeper = (explodeEvent.getEntity() != null && explodeEvent.getEntity() instanceof Creeper);
-		if( location.getWorld().getEnvironment() == Environment.NORMAL && GriefPrevention.instance.config_claims_enabledWorlds.contains(location.getWorld().getName()) && ((isCreeper && GriefPrevention.instance.config_blockSurfaceCreeperExplosions) || (!isCreeper && GriefPrevention.instance.config_blockSurfaceOtherExplosions)))
+		boolean isCreeper = (explodeEvent.getEntity() !=null && explodeEvent.getEntity() instanceof Creeper);
+		boolean isTNT = (explodeEvent.getEntity()!=null && explodeEvent.getEntity() instanceof TNTPrimed);
+		if(isCreeper){
+			if(wc.claims_allowCreeperGrief()){
+				
+				Claim cacheclaim = null;
+				//iterate through the explosion blocklist and remove blocks that are not inside a claim.
+				for(int i=0;i<blocks.size();i++){
+					Block block = blocks.get(i);
+					if(wc.mods_explodableIds().Contains(new MaterialInfo(block.getTypeId(), block.getData(), null))) continue;
+					
+					cacheclaim = GriefPrevention.instance.dataStore.getClaimAt(block.getLocation(), false, cacheclaim);
+					if(cacheclaim==null){
+						blocks.remove(i--);
+					}
+					
+				}
+				
+			}
+		}
+		
+		if( location.getWorld().getEnvironment() == Environment.NORMAL && 
+				wc.claims_enabled() && 
+				((isCreeper && wc.claims_allowCreeperGrief()) || 
+						(!isCreeper && !wc.blockSurfaceOtherExplosions())))
 		{
 			for(int i = 0; i < blocks.size(); i++)
 			{
 				Block block = blocks.get(i);
-				if(GriefPrevention.instance.config_mods_explodableIds.Contains(new MaterialInfo(block.getTypeId(), block.getData(), null))) continue;
+				if(wc.mods_explodableIds().Contains(new MaterialInfo(block.getTypeId(), block.getData(), null))) continue;
 				
 				if(block.getLocation().getBlockY() > GriefPrevention.instance.getSeaLevel(location.getWorld()) - 7)
 				{
@@ -140,7 +175,7 @@ class EntityEventHandler implements Listener
 			for(int i = 0; i < blocks.size(); i++)
 			{
 				Block block = blocks.get(i);
-				if(GriefPrevention.instance.config_mods_explodableIds.Contains(new MaterialInfo(block.getTypeId(), block.getData(), null))) continue;
+				if(wc.mods_explodableIds().Contains(new MaterialInfo(block.getTypeId(), block.getData(), null))) continue;
 				
 				blocks.remove(i--);
 			}
@@ -153,7 +188,7 @@ class EntityEventHandler implements Listener
 			Block block = blocks.get(i);
 			if(block.getType() == Material.AIR) continue;  //if it's air, we don't care
 			
-			if(GriefPrevention.instance.config_mods_explodableIds.Contains(new MaterialInfo(block.getTypeId(), block.getData(), null))) continue;
+			if(wc.mods_explodableIds().Contains(new MaterialInfo(block.getTypeId(), block.getData(), null))) continue;
 			
 			claim = this.dataStore.getClaimAt(block.getLocation(), false, claim); 
 			//if the block is claimed, remove it from the list of destroyed blocks
@@ -363,7 +398,7 @@ class EntityEventHandler implements Listener
 	{
 		//only actually interested in entities damaging entities (ignoring environmental damage)
 		if(!(event instanceof EntityDamageByEntityEvent)) return;
-		
+		WorldConfig wc = GriefPrevention.instance.getWorldCfg(event.getEntity().getWorld());
 		//monsters are never protected
 		if(event.getEntity() instanceof Monster) return;
 		
@@ -419,7 +454,7 @@ class EntityEventHandler implements Listener
 		}
 		
 		//if the attacker is a player and defender is a player (pvp combat)
-		if(attacker != null && event.getEntity() instanceof Player && GriefPrevention.instance.config_pvp_enabledWorlds.contains(attacker.getWorld()))
+		if(attacker != null && event.getEntity() instanceof Player && event.getEntity().getWorld().getPVP())
 		{
 			//FEATURE: prevent pvp in the first minute after spawn, and prevent pvp when one or both players have no inventory
 			
@@ -433,7 +468,7 @@ class EntityEventHandler implements Listener
 			PlayerData attackerData = this.dataStore.getPlayerData(attacker.getName());
 			
 			//otherwise if protecting spawning players
-			if(GriefPrevention.instance.config_pvp_protectFreshSpawns)
+			if(wc.protectFreshSpawns())
 			{
 				if(defenderData.pvpImmune)
 				{
@@ -451,12 +486,12 @@ class EntityEventHandler implements Listener
 			}
 			
 			//FEATURE: prevent players from engaging in PvP combat inside land claims (when it's disabled)
-			if(GriefPrevention.instance.config_pvp_noCombatInPlayerLandClaims || GriefPrevention.instance.config_pvp_noCombatInAdminLandClaims)
+			if(wc.pvp_noCombatinPlayerClaims() || wc.pvp_noCombatinAdminClaims())
 			{
 				Claim attackerClaim = this.dataStore.getClaimAt(attacker.getLocation(), false, attackerData.lastClaim);
 				if(	attackerClaim != null && 
-					(attackerClaim.isAdminClaim() && GriefPrevention.instance.config_pvp_noCombatInAdminLandClaims ||
-					!attackerClaim.isAdminClaim() && GriefPrevention.instance.config_pvp_noCombatInPlayerLandClaims))
+					(attackerClaim.isAdminClaim() && wc.pvp_noCombatinAdminClaims() ||
+					!attackerClaim.isAdminClaim() && wc.pvp_noCombatinPlayerClaims()))
 				{
 					attackerData.lastClaim = attackerClaim;
 					event.setCancelled(true);
@@ -466,8 +501,8 @@ class EntityEventHandler implements Listener
 				
 				Claim defenderClaim = this.dataStore.getClaimAt(defender.getLocation(), false, defenderData.lastClaim);
 				if( defenderClaim != null &&
-					(defenderClaim.isAdminClaim() && GriefPrevention.instance.config_pvp_noCombatInAdminLandClaims ||
-					!defenderClaim.isAdminClaim() && GriefPrevention.instance.config_pvp_noCombatInPlayerLandClaims))
+					(defenderClaim.isAdminClaim() && wc.pvp_noCombatinAdminClaims() ||
+					!defenderClaim.isAdminClaim() && wc.pvp_noCombatinPlayerClaims()))
 				{
 					defenderData.lastClaim = defenderClaim;
 					event.setCancelled(true);
@@ -494,8 +529,9 @@ class EntityEventHandler implements Listener
 		if(event instanceof EntityDamageByEntityEvent)
 		{
 			//if the entity is an non-monster creature (remember monsters disqualified above), or a vehicle
-			if ((subEvent.getEntity() instanceof Creature && GriefPrevention.instance.config_claims_protectCreatures))
+			if ((subEvent.getEntity() instanceof Creature && wc.claims_protectCreatures()))
 			{
+				
 				Claim cachedClaim = null;
 				PlayerData playerData = null;
 				if(attacker != null)
@@ -558,8 +594,10 @@ class EntityEventHandler implements Listener
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
 	public void onVehicleDamage (VehicleDamageEvent event)
 	{
+		WorldConfig wc = new WorldConfig(event.getVehicle().getWorld());
+		
 		//all of this is anti theft code
-		if(!GriefPrevention.instance.config_claims_preventTheft) return;		
+		if(!wc.claims_preventTheft()) return;		
 		
 		//determine which player is attacking, if any
 		Player attacker = null;
@@ -585,7 +623,7 @@ class EntityEventHandler implements Listener
 			}
 		}
 		//if Damage source is unspecified and we allow environmental damage, don't cancel the event.
-		else if(damageSource ==null && GriefPrevention.instance.config_claims_AllowEnvironmentalVehicleDamage){
+		else if(damageSource ==null && wc.claims_AllowEnvironmentalVehicleDamage()){
 			return;
 		}
 		//NOTE: vehicles can be pushed around.

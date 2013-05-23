@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Set;
 
 
+import me.ryanhamshire.GriefPrevention.Configuration.WorldConfig;
 import me.ryanhamshire.GriefPrevention.events.ClaimModifiedEvent;
 import me.ryanhamshire.GriefPrevention.tasks.RestoreNatureProcessingTask;
 
@@ -162,6 +163,8 @@ public class Claim
 	 */
 	public void removeSurfaceFluids(Claim exclusionClaim)
 	{
+		WorldConfig wc = GriefPrevention.instance.getWorldCfg(exclusionClaim.getLesserBoundaryCorner().getWorld());
+		
 		//don't do this for administrative claims
 		if(this.isAdminClaim()) return;
 		
@@ -169,7 +172,7 @@ public class Claim
 		if(this.getArea() > 10000) return;
 		
 		//don't do it when surface fluids are allowed to be dumped
-		if(!GriefPrevention.instance.config_blockWildernessWaterBuckets) return;
+		if(!wc.blockWildernessWaterBuckets()) return;
 		
 		Location lesser = this.getLesserBoundaryCorner();
 		Location greater = this.getGreaterBoundaryCorner();
@@ -536,15 +539,16 @@ public class Claim
 	 */
 	public String allowBreak(Player player, Material material)
 	{
+		WorldConfig wc = GriefPrevention.instance.getWorldCfg(player.getWorld());
 		//if under siege, some blocks will be breakable
 		if(this.siegeData != null)
 		{
 			boolean breakable = false;
 			
 			//search for block type in list of breakable blocks
-			for(int i = 0; i < GriefPrevention.instance.config_siege_blocks.size(); i++)
+			for(int i = 0; i < wc.siege_blocks().size(); i++)
 			{
-				Material breakableMaterial = GriefPrevention.instance.config_siege_blocks.get(i);
+				Material breakableMaterial = wc.siege_blocks().get(i);
 				if(breakableMaterial.getId() == material.getId())
 				{
 					breakable = true;

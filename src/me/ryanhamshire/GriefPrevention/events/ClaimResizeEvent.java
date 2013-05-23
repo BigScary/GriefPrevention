@@ -2,6 +2,7 @@ package me.ryanhamshire.GriefPrevention.events;
 
 import me.ryanhamshire.GriefPrevention.Claim;
 
+import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
@@ -24,10 +25,13 @@ public class ClaimResizeEvent extends Event implements Cancellable {
         return handlers;
     }
     
-    Claim oldclaim;
-    Claim newclaim;
-    
-    public ClaimResizeEvent(Claim oldclaim, Claim newclaim) {
+    private Claim oldclaim;
+    private Claim newclaim;
+    private Player resizer;
+    public ClaimResizeEvent(Claim oldclaim,Claim newclaim){
+    	this(oldclaim,newclaim,null);
+    }
+    public ClaimResizeEvent(Claim oldclaim, Claim newclaim,Player Resizer) {
     	this.oldclaim = oldclaim;
     	this.newclaim = newclaim;
     }
@@ -47,7 +51,11 @@ public class ClaimResizeEvent extends Event implements Cancellable {
     public Claim getNewClaim() {
     	return newclaim;
     }
-    
+    /**
+     * retrieves the Player performing this resize.
+     * @return
+     */
+    public Player getResizer(){ return resizer;}
     boolean canceled = false;
 
 	@Override
