@@ -19,7 +19,9 @@
 package me.ryanhamshire.GriefPrevention.tasks;
 
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
+import me.ryanhamshire.GriefPrevention.Configuration.WorldConfig;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 //kicks or bans a player
@@ -38,24 +40,46 @@ public class PlayerKickBanTask implements Runnable
 		this.player = player;
 		this.banReason = banReason;		
 	}
-	
+	private void runCommands(String cmds,String... replacements){
+		
+		String[] commandsrun = cmds.split(";");
+		
+		
+		for(String cmd:commandsrun){
+			int i=0;
+			for(String replacement:replacements){
+				String substitution = "{" + i + "}";
+				cmd.replace(substitution, replacement);
+				i++;
+				
+			}
+			if(cmd.startsWith("/")) cmd = cmd.substring(2);
+			Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd);
+			
+		}
+		
+		
+		
+		
+		
+	}
 	@Override
 	public void run()
 	{
+		WorldConfig wc = GriefPrevention.instance.getWorldCfg(player.getWorld());
+		String kickcommands = wc.spam_kickcommand();
+		String bancommands = wc.spam_bancommand();
+		
+		
 		if(this.banReason != null)
 		{		
 			//ban
-			GriefPrevention.instance.getServer().getOfflinePlayer(this.player.getName()).setBanned(true);
-		
-			//kick
-			if(this.player.isOnline())
-			{
-				this.player.kickPlayer(this.banReason);
-			}
+			//GriefPrevention.instance.getServer().getOfflinePlayer(this.player.getName()).setBanned(true);
+			runCommands(bancommands,this.player.getName());
 		}	
 		else if(this.player.isOnline())
 		{
-			this.player.kickPlayer("");
+			runCommands(kickcommands,this.player.getName());
 		}
 	}
 }

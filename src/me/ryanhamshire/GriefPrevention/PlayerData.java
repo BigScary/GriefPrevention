@@ -25,9 +25,12 @@ import java.util.Vector;
 import me.ryanhamshire.GriefPrevention.Claim;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import me.ryanhamshire.GriefPrevention.ShovelMode;
+import me.ryanhamshire.GriefPrevention.Configuration.WorldConfig;
 import me.ryanhamshire.GriefPrevention.visualization.Visualization;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
 
 //holds all of GriefPrevention's player-tied data
 public class PlayerData 
@@ -126,17 +129,21 @@ public class PlayerData
 		this.lastLogin = lastYear.getTime();		
 		this.lastTrappedUsage = lastYear.getTime();
 	}
-	
+	private WorldConfig wc(){
+		Player p = Bukkit.getPlayer(playerName);
+		return GriefPrevention.instance.getWorldCfg(p.getWorld());
+	}
 	//whether or not this player is "in" pvp combat
 	public boolean inPvpCombat()
 	{
 		if(this.lastPvpTimestamp == 0) return false;
 		
+		WorldConfig wc = wc();
 		long now = Calendar.getInstance().getTimeInMillis();
 		
 		long elapsed = now - this.lastPvpTimestamp;
 		
-		if(elapsed > GriefPrevention.instance.config_pvp_combatTimeoutSeconds * 1000) //X seconds
+		if(elapsed > wc.pvp_combatTimeoutSeconds() * 1000) //X seconds
 		{
 			this.lastPvpTimestamp = 0;
 			return false;

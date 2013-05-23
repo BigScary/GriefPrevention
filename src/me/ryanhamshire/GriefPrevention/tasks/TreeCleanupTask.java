@@ -21,6 +21,7 @@ package me.ryanhamshire.GriefPrevention.tasks;
 import java.util.ArrayList;
 
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
+import me.ryanhamshire.GriefPrevention.Configuration.WorldConfig;
 
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -51,6 +52,7 @@ public class TreeCleanupTask implements Runnable
 	public void run() 
 	{
 		//if this chunk is no longer loaded, load it and come back in a few seconds
+		WorldConfig wc = GriefPrevention.instance.getWorldCfg(originalChoppedBlock.getWorld());
 		Chunk chunk = this.originalChoppedBlock.getWorld().getChunkAt(this.originalChoppedBlock); 
 		if(!chunk.isLoaded())
 		{
@@ -90,7 +92,7 @@ public class TreeCleanupTask implements Runnable
 		}
 		
 		//if any were actually removed and we're set to automatically replant griefed trees, place a sapling where the root block was previously
-		if(logsRemaining && GriefPrevention.instance.config_trees_regrowGriefedTrees)
+		if(logsRemaining && wc.trees_regrowGriefedTrees())
 		{
 			Block currentBlock = this.originalRootBlock.getLocation().getBlock();
 			//make sure there's grass or dirt underneath

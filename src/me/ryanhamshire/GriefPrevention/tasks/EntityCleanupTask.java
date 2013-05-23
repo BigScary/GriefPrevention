@@ -23,6 +23,7 @@ import java.util.List;
 
 import me.ryanhamshire.GriefPrevention.Claim;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
+import me.ryanhamshire.GriefPrevention.Configuration.WorldConfig;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -49,11 +50,11 @@ public class EntityCleanupTask implements Runnable
 	@Override
 	public void run()
 	{
-		ArrayList<String> worlds = GriefPrevention.instance.config_claims_enabledCreativeWorlds;
+		List<WorldConfig> worlds = GriefPrevention.instance.Configuration.getCreativeRulesConfigs();
 
-		for (String worldName : worlds)
+		for (WorldConfig worldconfiguration : worlds)
 		{
-			World world = Bukkit.getWorld(worldName);
+			World world = Bukkit.getWorld(worldconfiguration.getWorldName());
 			if (world == null)
 			{
 				continue;
@@ -142,7 +143,7 @@ public class EntityCleanupTask implements Runnable
 		if(nextRunPercentageStart > .99)
 		{
 			nextRunPercentageStart = 0;
-			System.gc();  //clean up every hour
+			//System.gc();  //clean up every hour
 		}
 		
 		EntityCleanupTask task = new EntityCleanupTask(nextRunPercentageStart);

@@ -23,6 +23,7 @@ import me.ryanhamshire.GriefPrevention.Messages;
 import me.ryanhamshire.GriefPrevention.PlayerData;
 import me.ryanhamshire.GriefPrevention.ShovelMode;
 import me.ryanhamshire.GriefPrevention.TextMode;
+import me.ryanhamshire.GriefPrevention.Configuration.WorldConfig;
 
 import org.bukkit.entity.Player;
 
@@ -44,9 +45,9 @@ public class EquipShovelProcessingTask implements Runnable
 	{
 		//if he logged out, don't do anything
 		if(!player.isOnline()) return;
-		
+		WorldConfig wc = GriefPrevention.instance.getWorldCfg(player.getWorld());
 		//if he's not holding the golden shovel anymore, do nothing
-		if(player.getItemInHand().getType() != GriefPrevention.instance.config_claims_modificationTool) return;
+		if(player.getItemInHand().getType() != wc.claims_modificationTool()) return;
 		
 		PlayerData playerData = GriefPrevention.instance.dataStore.getPlayerData(player.getName());
 		

@@ -21,6 +21,7 @@
 import me.ryanhamshire.GriefPrevention.DataStore;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import me.ryanhamshire.GriefPrevention.PlayerData;
+import me.ryanhamshire.GriefPrevention.Configuration.WorldConfig;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -36,13 +37,19 @@ public class DeliverClaimBlocksTask implements Runnable
 		Player [] players = GriefPrevention.instance.getServer().getOnlinePlayers();
 		
 		//ensure players get at least 1 block (if accrual is totally disabled, this task won't even be scheduled)
-		int accruedBlocks = GriefPrevention.instance.config_claims_blocksAccruedPerHour / 12;
-		if(accruedBlocks < 0) accruedBlocks = 1;
+		//BC: refactored, now it calculates the blocks that have been accrued on a per-Player basis.
+		
 		
 		//for each online player
 		for(int i = 0; i < players.length; i++)
 		{
 			Player player = players[i];
+			WorldConfig wc = GriefPrevention.instance.getWorldCfg(player.getWorld());
+			
+			int accruedBlocks = wc.claims_blocksAccruedPerHour() / 12;
+			if(accruedBlocks < 0) accruedBlocks = 1;
+			
+			
 			DataStore dataStore = GriefPrevention.instance.dataStore;
 			PlayerData playerData = dataStore.getPlayerData(player.getName());
 			

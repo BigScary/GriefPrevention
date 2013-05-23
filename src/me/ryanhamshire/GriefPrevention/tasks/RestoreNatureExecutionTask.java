@@ -50,8 +50,8 @@ class RestoreNatureExecutionTask implements Runnable
 	//player who should be notified about the result (will see a visualization when the restoration is complete)
 	private Player player;
 
-	public RestoreNatureExecutionTask(BlockSnapshot[][][] snapshots, int miny, Location lesserCorner, Location greaterCorner, Player player)
-	{
+	public RestoreNatureExecutionTask(BlockSnapshot[][][] snapshots, int miny, Location lesserCorner, Location greaterCorner, Player player){
+	
 		this.snapshots = snapshots;
 		this.miny = miny;
 		this.lesserCorner = lesserCorner;
