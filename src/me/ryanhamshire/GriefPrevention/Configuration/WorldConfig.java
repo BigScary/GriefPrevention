@@ -2,6 +2,8 @@ package me.ryanhamshire.GriefPrevention.Configuration;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
@@ -27,6 +29,42 @@ import org.bukkit.configuration.file.YamlConfiguration;
  */
 public class WorldConfig {
 
+
+	
+	//Explosion and similar effect information.
+	//we've moved this to another class for brevity as well as to make it easier to deal with and more flexible.
+	//you know- all the standard reasons for moving things into a class. I'll shut up now and get to writing the applicable code.
+	
+	//data for Creeper Explosions. This indicates where they can occur.
+	private ClaimBehaviourData CreeperExplosionBehaviour;
+	public ClaimBehaviourData getCreeperExplosionBehaviour(){ return CreeperExplosionBehaviour;}
+	//data for TNT Explosions. this indicates where they can occur. Applies for both TNT and TNT minecarts.
+	private ClaimBehaviourData TNTExplosionBehaviour;
+	public ClaimBehaviourData getTNTExplosionBehaviour(){ return TNTExplosionBehaviour;}
+	
+	private ClaimBehaviourData WitherExplosionBehaviour;
+	public ClaimBehaviourData getWitherExplosionBehaviour(){ return WitherExplosionBehaviour;}
+	
+	private ClaimBehaviourData WitherEatBehaviour;
+	public ClaimBehaviourData getWitherEatBehaviour() { return WitherEatBehaviour;}
+	
+	public ClaimBehaviourData OtherExplosionBehaviour;
+	public ClaimBehaviourData getOtherExplosionBehaviour(){ return OtherExplosionBehaviour;}
+	
+	private ClaimBehaviourData WitherSpawnBehaviour; //data for how Withers can be spawned.
+	public ClaimBehaviourData getWitherSpawnBehaviour(){ return WitherSpawnBehaviour;}
+	private ClaimBehaviourData IronGolemSpawnBehaviour; //data for how IronGolems can be spawned.
+	public ClaimBehaviourData getIronGolemSpawnBehaviour(){return IronGolemSpawnBehaviour;}
+	private ClaimBehaviourData SnowGolemSpawnBehaviour; //data for now Snow Golems can be spawned.
+	public ClaimBehaviourData getSnowGolemSpawnBehaviour(){ return SnowGolemSpawnBehaviour;}
+	
+	
+	private ClaimBehaviourData WaterBucketBehaviour;
+	public ClaimBehaviourData getWaterBucketBehaviour(){ return WaterBucketBehaviour;}
+	
+	
+	
+	
 	
 	//private members followed by their read-only accessor.
 	private boolean claims_Seige_Enabled;
@@ -109,13 +147,11 @@ public class WorldConfig {
 	public int claims_claimsExtendIntoGroundDistance(){ return config_claims_claimsExtendIntoGroundDistance;}
 	private int config_claims_minSize;								//minimum width and height for non-admin claims
 	public int claims_minSize(){ return config_claims_minSize;}
-	private boolean config_claims_allowWitherGrief;                   //when set, Withers do not respect ClaimExplosions, or set claims.
-	public boolean claims_allowWitherGrief(){ return config_claims_allowWitherGrief;}
-	private boolean config_claims_allowCreeperGrief;
-	public boolean claims_allowCreeperGrief(){ return config_claims_allowCreeperGrief;}
-
-	private boolean config_blockSurfaceOtherExplosions;
-	public boolean blockSurfaceOtherExplosions(){ return config_blockSurfaceOtherExplosions;}
+	
+	
+	
+	
+	
 	
 	private boolean config_claims_creativeRules;
 	public boolean claims_creativeRules(){ return config_claims_creativeRules;}
@@ -151,7 +187,7 @@ public class WorldConfig {
 	public boolean spam_enabled(){ return config_spam_enabled;}
 	private int config_spam_loginCooldownMinutes;					//how long players must wait between logins.  combats login spam.
 	public int spam_loginCooldownMinutes(){ return config_spam_loginCooldownMinutes;}
-	private ArrayList<String> config_spam_monitorSlashCommands;  	//the list of slash commands monitored for spam
+	private List<String> config_spam_monitorSlashCommands;  	//the list of slash commands monitored for spam
 	public List<String> spam_monitorSlashCommands(){ return config_spam_monitorSlashCommands;}
 	private boolean config_spam_banOffenders;						//whether or not to ban spammers automatically
 	public boolean spam_banOffenders(){ return config_spam_banOffenders;}
@@ -235,7 +271,12 @@ public class WorldConfig {
 	public boolean claims_warnOnBuildOutside(){ return config_claims_warnOnBuildOutside;}
 	private int config_seaLevelOverride;
 	//private HashMap<String, Integer> config_seaLevelOverride;		//override for sea level, because bukkit doesn't report the right value for all situations
-	public Integer seaLevelOverride(){ return config_seaLevelOverride;}
+	public Integer seaLevelOverride(){
+		if(config_seaLevelOverride==-1)
+		return (config_seaLevelOverride=Bukkit.getWorld(this.getWorldName()).getSeaLevel());
+		else
+			return config_seaLevelOverride;
+		}
 	//configuration option changes the number of non-trash blocks that can be placed before
 	//the plugin warns about being in the wilderness and all that guff about
 	//players being able to undo your work. 0 disables the display entirely.
@@ -245,10 +286,6 @@ public class WorldConfig {
 	public int claims_perplayer_claims_limit(){ return config_claims_perplayer_claim_limit;}
 
 	
-	//config options for explosions.
-	private boolean BlockSurfaceWildCreeperExplosions; //creeper Explosions above Sea level are blocked? ClaimExplosions will override this.
-	private boolean BlockSurfaceWildTNTExplosions; //TNT explosions above SeaLevel are blocked. Claimexplosions will override this.
-	private boolean BlockSurfaceWildOtherExplosions; //block explosions not covered by medicare, I mean the above.
 	
 	
 	
@@ -270,6 +307,25 @@ public class WorldConfig {
 		
 		GriefPrevention.instance.getLogger().log(Level.INFO,"Reading Configuration for World:" + pName);
 		this.config_seaLevelOverride = config.getInt("GriefPrevention.SeaLevelOverride");
+		
+		//read in the data for TNT explosions and Golem/Wither placements.
+		
+		this.CreeperExplosionBehaviour = new ClaimBehaviourData(config,outConfig,"GriefPrevention.CreeperExplosions",
+				new ClaimBehaviourData(true,false,true,false));
+		
+		this.WitherExplosionBehaviour= new ClaimBehaviourData(config,outConfig,"GriefPrevention.WitherExplosions",
+				ClaimBehaviourData.OutsideClaims);
+		
+		this.WitherEatBehaviour = new ClaimBehaviourData(config,outConfig,"GriefPrevention.WitherEating",
+				ClaimBehaviourData.OutsideClaims);
+		
+		
+		this.TNTExplosionBehaviour = new ClaimBehaviourData(config,outConfig,"GriefPrevention.TNTExplosions",
+				new ClaimBehaviourData(true,false,true,false));
+		
+		this.WaterBucketBehaviour = new ClaimBehaviourData(config,outConfig,"GriefPrevention.WaterBuckets",
+		new ClaimBehaviourData(true,false,true,false));
+		//Snow golem spawn rules.
 		
 		
 		
@@ -348,11 +404,7 @@ public class WorldConfig {
 		this.config_claims_AllowEnvironmentalVehicleDamage = config.getBoolean("GriefPrevention.Claims.EnvironmentalVehicleDamage",true);
 		outConfig.set("GriefPrevention.Claims.EnvironmentalVehicleDamage",this.config_claims_AllowEnvironmentalVehicleDamage);
 		
-		this.config_claims_allowWitherGrief = config.getBoolean("GriefPrevention.Claims.AllowWitherGrief",false);
-		outConfig.set("GriefPrevention.Claims.AllowWitherGrief",this.config_claims_allowWitherGrief);
-		
-		this.config_claims_allowCreeperGrief = config.getBoolean("GriefPrevention.Claims.AllowCreeperGrief",false);
-		outConfig.set("GriefPrevention.Claims.AllowCreeperGrief",this.config_claims_allowCreeperGrief);
+	
 		
 		this.config_claims_preventTheft = config.getBoolean("GriefPrevention.Claims.PreventTheft", true);
 		this.config_claims_protectCreatures = config.getBoolean("GriefPrevention.Claims.ProtectCreatures", true);
@@ -400,6 +452,7 @@ public class WorldConfig {
 		this.config_spam_banOffenders = config.getBoolean("GriefPrevention.Spam.BanOffenders", true);		
 		this.config_spam_banMessage = config.getString("GriefPrevention.Spam.BanMessage", "Banned for spam.");
 		String slashCommandsToMonitor = config.getString("GriefPrevention.Spam.MonitorSlashCommands", "/me;/tell;/global;/local");
+		this.config_spam_monitorSlashCommands = Arrays.asList(slashCommandsToMonitor.split(";"));
 		this.config_spam_deathMessageCooldownSeconds = config.getInt("GriefPrevention.Spam.DeathMessageCooldownSeconds", 60);		
 		
 		
@@ -419,10 +472,8 @@ public class WorldConfig {
 		
 		
 		
-		this.BlockSurfaceWildCreeperExplosions = config.getBoolean("GriefPrevention.Explosions.Surface.BlockCreeper", true);
-		this.BlockSurfaceWildTNTExplosions = config.getBoolean("GriefPrevention.Explosions.Surface.BlockTNT", true);
-		this.BlockSurfaceWildOtherExplosions = config.getBoolean("GriefPrevention.Explosions.Surface.BlockOther",true);
-		this.config_blockWildernessWaterBuckets = config.getBoolean("GriefPrevention.LimitSurfaceWaterBuckets", true);
+		
+		//this.config_blockWildernessWaterBuckets = config.getBoolean("GriefPrevention.LimitSurfaceWaterBuckets", true);
 		this.config_blockSkyTrees = config.getBoolean("GriefPrevention.LimitSkyTrees", true);
 				
 		this.config_fireSpreads = config.getBoolean("GriefPrevention.FireSpreads", false);
@@ -644,7 +695,7 @@ public class WorldConfig {
 		
 		
 		
-		outConfig.set("GriefPrevention.Explosions.blockSurfaceOtherExplosions", config_blockSurfaceOtherExplosions);
+		
 		
 		
 		//outConfig.set("GriefPrevention.BlockSurfaceWildCreeperExplosions", this.config_blockSurfaceWildCreeperExplosions);

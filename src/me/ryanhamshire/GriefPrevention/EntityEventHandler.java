@@ -21,6 +21,7 @@ package me.ryanhamshire.GriefPrevention;
 import java.util.Calendar;
 import java.util.List;
 
+import me.ryanhamshire.GriefPrevention.Configuration.ClaimBehaviourData;
 import me.ryanhamshire.GriefPrevention.Configuration.WorldConfig;
 
 import org.bukkit.Location;
@@ -43,7 +44,9 @@ import org.bukkit.entity.Snowman;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.entity.Villager;
+import org.bukkit.entity.Wither;
 import org.bukkit.entity.WitherSkull;
+import org.bukkit.entity.minecart.ExplosiveMinecart;
 
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -99,7 +102,7 @@ class EntityEventHandler implements Listener
 		else if(event.getEntityType() == EntityType.WITHER && wc.claims_enabled())
 		{
 			
-			event.setCancelled(!wc.claims_allowWitherGrief());
+			event.setCancelled(!wc.getWitherEatBehaviour().Allowed(event.getEntity().getLocation()));
 		}
 	}
 	
@@ -121,7 +124,73 @@ class EntityEventHandler implements Listener
 			event.setCancelled(true);
 		}
 	}
-	
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
+	public void onEntityExplode(EntityExplodeEvent explodeEvent)
+	{		
+		
+		List<Block> blocks = explodeEvent.blockList();
+		Location location = explodeEvent.getLocation();
+		WorldConfig wc = GriefPrevention.instance.getWorldCfg(location.getWorld());
+		
+		Claim claimatEntity = GriefPrevention.instance.dataStore.getClaimAt(location, true, null);
+		//quickest exit: if we are inside a claim and allowExplosions is false, break.
+		if(claimatEntity!=null && claimatEntity.areExplosivesAllowed) return;
+		System.out.println("onEntityExplode: claim=null:" + claimatEntity==null);
+	    //logic: we have Creeper and TNT Explosions currently. each one has special configuration options.
+		//make sure that we are allowed to explode, first.
+		Entity explodingEntity = explodeEvent.getEntity();
+		boolean isCreeper = explodingEntity!=null && explodingEntity instanceof Creeper;
+		boolean isTNT = explodingEntity !=null && 
+				(explodingEntity instanceof TNTPrimed || explodingEntity instanceof ExplosiveMinecart);
+		
+		boolean isWither = explodingEntity !=null && (
+				explodingEntity instanceof WitherSkull || explodingEntity instanceof Wither);
+		
+		ClaimBehaviourData usebehaviour = null;
+		if(isCreeper) 
+			usebehaviour = wc.getCreeperExplosionBehaviour();
+		else if(isWither) 
+			usebehaviour = wc.getWitherExplosionBehaviour();
+		else if(isTNT) 
+			usebehaviour = wc.getTNTExplosionBehaviour();
+		else 
+			usebehaviour = wc.getOtherExplosionBehaviour();
+		Claim claimpos = null;
+		////go through each block that was affected...
+		for(int i=0;i<blocks.size();i++){
+			Block block = blocks.get(i);
+			if(wc.mods_explodableIds().Contains(new MaterialInfo(block.getTypeId(), block.getData(), null))) continue;
+			//creative rules stop all explosions, regardless of the other settings.
+			if(wc.creative_rules() ||  !usebehaviour.Allowed(block.getLocation())){
+				//if not allowed. remove it...
+				blocks.remove(i--);
+			}
+			else {
+				//it is allowed, however, if it is on a claim only allow if explosions are enabled for that claim.
+				claimpos = GriefPrevention.instance.dataStore.getClaimAt(block.getLocation(), false, claimpos);
+				if(claimpos!=null && !claimpos.areExplosivesAllowed){
+					blocks.remove(i--);
+				}
+				else if(block.getType() == Material.LOG)
+				{
+					GriefPrevention.instance.handleLogBroken(block);
+				}
+				
+				
+			}
+
+		}
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	}
+	/*
 	//when an entity explodes...
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
 	public void onEntityExplode(EntityExplodeEvent explodeEvent)
@@ -132,9 +201,16 @@ class EntityEventHandler implements Listener
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(location.getWorld());
 		//FEATURE: explosions don't destroy blocks when they explode near or above sea level in standard worlds
 		boolean isCreeper = (explodeEvent.getEntity() !=null && explodeEvent.getEntity() instanceof Creeper);
+		boolean isWither = (explodeEvent.getEntity() !=null && explodeEvent.getEntity() instanceof Wither);
 		boolean isTNT = (explodeEvent.getEntity()!=null && explodeEvent.getEntity() instanceof TNTPrimed);
+		isTNT |= (explodeEvent.getEntity()!=null && explodeEvent.getEntity() instanceof ExplosiveMinecart);
+		boolean CreeperCapable = wc.getCreeperExplosionBehaviour().Allowed(explodeEvent.getEntity().getLocation());
+		boolean TNTCapable = wc.getTNTExplosionBehaviour().Allowed(explodeEvent.getEntity().getLocation());
+		
+		
+		
 		if(isCreeper){
-			if(wc.claims_allowCreeperGrief()){
+			if(CreeperCapable){
 				
 				Claim cacheclaim = null;
 				//iterate through the explosion blocklist and remove blocks that are not inside a claim.
@@ -154,8 +230,8 @@ class EntityEventHandler implements Listener
 		
 		if( location.getWorld().getEnvironment() == Environment.NORMAL && 
 				wc.claims_enabled() && 
-				((isCreeper && wc.claims_allowCreeperGrief()) || 
-						(!isCreeper && !wc.blockSurfaceOtherExplosions())))
+				((isCreeper && CreeperCapable) || 
+						(isTNT && TNTCapable)))
 		{
 			for(int i = 0; i < blocks.size(); i++)
 			{
@@ -204,7 +280,7 @@ class EntityEventHandler implements Listener
 			}
 		}
 	}
-	
+	*/
 	//when an item spawns...
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onItemSpawn(ItemSpawnEvent event)
