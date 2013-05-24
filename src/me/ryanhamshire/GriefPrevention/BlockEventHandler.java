@@ -425,7 +425,10 @@ public class BlockEventHandler implements Listener
 		
 		//warn players when they place TNT above sea level, since it doesn't destroy blocks there
 		
-		if(	wc.blockSurfaceOtherExplosions() && block.getType() == Material.TNT &&
+		//warn players if Explosions are not allowed at the position they place it.
+		boolean TNTAllowed = wc.getTNTExplosionBehaviour().Allowed(block.getLocation());
+		
+		if(	!TNTAllowed && block.getType() == Material.TNT &&
 			block.getWorld().getEnvironment() != Environment.NETHER &&
 			block.getY() > GriefPrevention.instance.getSeaLevel(block.getWorld()) - 5)
 		{
