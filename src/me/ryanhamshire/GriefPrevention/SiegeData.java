@@ -30,6 +30,8 @@ public class SiegeData
 	public Player attacker;
 	public ArrayList<Claim> claims;
 	public int checkupTaskID;
+	//number of containers that have been looted.
+	public int LootedContainers;
 	
 	public SiegeData(Player attacker, Player defender, Claim claim)
 	{

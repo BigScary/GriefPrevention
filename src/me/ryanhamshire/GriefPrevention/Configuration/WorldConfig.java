@@ -221,6 +221,11 @@ public class WorldConfig {
 	public int pvp_combatTimeoutSeconds(){ return config_pvp_combatTimeoutSeconds;}
 	private boolean config_pvp_allowCombatItemDrop;					//whether a player can drop items during combat to hide them
 	public boolean pvp_allowCombatItemDrop(){ return config_pvp_allowCombatItemDrop;}
+	
+	private int config_pvp_Seige_Loot_Chests; //defaults to 0, above zero means that a player is allowed to look into and take items from X chests on a claim they seige.
+	
+	public int getSeigeLootChests(){ return config_pvp_Seige_Loot_Chests;}
+	
 	private ArrayList<String> config_pvp_blockedCommands;			//list of commands which may not be used during pvp combat
 	public List<String> pvp_blockedCommands(){ return config_pvp_blockedCommands;}
 	private boolean config_pvp_noCombatInPlayerLandClaims;			//whether players may fight in player-owned land claims
@@ -387,6 +392,7 @@ public class WorldConfig {
 			}
 		}
 
+		
 		this.claims_enabled = config.getBoolean("GriefPrevention.Claims.Enabled",true);
 		outConfig.set("GriefPrevention.Claims.Enabled", claims_enabled);
 		this.config_entitycleanup_enabled = config.getBoolean("GriefPrevention.CleanupTasks.Claims",true);
@@ -428,7 +434,8 @@ public class WorldConfig {
 		outConfig.set("GriefPrevention.Claims.EnvironmentalVehicleDamage",this.config_claims_AllowEnvironmentalVehicleDamage);
 		
 	
-		
+		this.config_pvp_Seige_Loot_Chests = config.getInt("GriefPrevention.Claims.SeigeLootChests",0);
+		outConfig.set("GriefPrevention.Claims.SeigeLootChests", config_pvp_Seige_Loot_Chests);
 		this.config_claims_preventTheft = config.getBoolean("GriefPrevention.Claims.PreventTheft", true);
 		this.config_claims_protectCreatures = config.getBoolean("GriefPrevention.Claims.ProtectCreatures", true);
 		this.config_claims_preventButtonsSwitches = config.getBoolean("GriefPrevention.Claims.PreventButtonsSwitches", true);

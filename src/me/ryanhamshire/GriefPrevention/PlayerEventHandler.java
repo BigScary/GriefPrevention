@@ -1109,7 +1109,12 @@ class PlayerEventHandler implements Listener
 			Claim claim = this.dataStore.getClaimAt(clickedBlock.getLocation(), false, playerData.lastClaim);
 			if(claim != null)
 			{
+				
+				
+				
 				playerData.lastClaim = claim;
+				
+				
 				
 				String noBuildReason = claim.allowBuild(player);
 				if(noBuildReason != null)
@@ -1145,6 +1150,23 @@ class PlayerEventHandler implements Listener
 				event.setCancelled(true);
 				return;
 			}
+			
+			//special Chest looting behaviour.
+			Claim cc = this.dataStore.getClaimAt(clickedBlock.getLocation(),true,null);
+			//if doorsOpen...
+			if(cc.doorsOpen){
+				if((cc.LootedChests++)<=wc.getSeigeLootChests()){
+					//tell the player how many more chests they can loot.
+					player.sendMessage(ChatColor.YELLOW + " You may loot " + (wc.getSeigeLootChests()-cc.LootedChests) + " more chests");
+					
+					
+					return;
+				}
+				
+				
+				
+			}
+			
 			
 			//block container use during pvp combat, same reason
 			if(playerData.inPvpCombat())

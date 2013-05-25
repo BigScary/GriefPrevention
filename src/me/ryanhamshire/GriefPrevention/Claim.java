@@ -88,7 +88,9 @@ public class Claim
 	
 	//following a siege, buttons/levers are unlocked temporarily.  this represents that state
 	public boolean doorsOpen = false;
+	//following a siege, anybody can open containers in that claim, up to a set limit.
 	
+	public int LootedChests = 0;
 	//This variable sets whether a claim gets deleted with the automatic cleanup.
 	public boolean neverdelete = false;
 	

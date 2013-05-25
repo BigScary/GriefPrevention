@@ -180,6 +180,17 @@ public class BlockEventHandler implements Listener
 		Player player = breakEvent.getPlayer();
 		Block block = breakEvent.getBlock();		
 		
+		//if no survival building outside claims is enabled...
+		//if the block is a trash block....
+		if(wc.getTrashBlocks().contains(breakEvent.getBlock().getType())){
+			// and if this location is applicable for trash block placement...
+			if(wc.getTrashBlockPlacementBehaviour().Allowed(breakEvent.getBlock().getLocation()));
+			//allow it with abandon...
+			return;
+			
+			
+		}
+		
 		//make sure the player is allowed to break at the location
 		String noBuildReason = GriefPrevention.instance.allowBreak(player, block.getLocation());
 		if(noBuildReason != null)

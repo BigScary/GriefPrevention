@@ -749,6 +749,7 @@ public abstract class DataStore
 			if(grantAccess)
 			{
 				claim.doorsOpen = true;
+				claim.LootedChests=0;
 			}
 		}
 
@@ -771,6 +772,9 @@ public abstract class DataStore
 				GriefPrevention.sendMessage(winner, TextMode.Success, Messages.SiegeWinDoorsOpen);
 				
 				//schedule a task to secure the claims in about 5 minutes
+				//set siegeData's LootedChests to 0, and also register it for events temporarily so it can
+				//handle Inventory Open events.
+				siegeData.LootedContainers = 0;
 				SecureClaimTask task = new SecureClaimTask(siegeData);
 				GriefPrevention.instance.getServer().getScheduler().scheduleSyncDelayedTask(GriefPrevention.instance, task, 20L * 60 * 5);
 			}
