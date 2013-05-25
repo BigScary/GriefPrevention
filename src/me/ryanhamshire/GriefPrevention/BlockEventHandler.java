@@ -259,12 +259,14 @@ public class BlockEventHandler implements Listener
 		Player player = placeEvent.getPlayer();
 		Block block = placeEvent.getBlock();
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(block.getWorld());
-		if(wc.claims_noBuildOutsideClaims()){
-			//if set, then we only allow Trash Blocks to be placed.
+		if(wc.claims_ApplyTrashBlockRules()){
+			//if set, then we only allow Trash Blocks to be placed, and only in the allowed places.
 			Claim testclaim = GriefPrevention.instance.dataStore.getClaimAt(block.getLocation(), true, null);
 			if(testclaim==null){
-				if(wc.getTrashBlocks().contains(block.getType())){
-				return;	
+				if(wc.getTrashBlockPlacementBehaviour().Allowed(block.getLocation())){
+					if(wc.getTrashBlocks().contains(block.getType())){
+					return;	
+					}
 				}
 			}
 		}
@@ -612,7 +614,7 @@ public class BlockEventHandler implements Listener
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onBlockBurn (BlockBurnEvent burnEvent)
 	{
-		WorldConfig wc = (WorldConfig) burnEvent.getBlock().getWorld();
+		WorldConfig wc = (WorldConfig) GriefPrevention.instance.getWorldCfg(burnEvent.getBlock().getWorld().getName());
 		if(!wc.fireDestroys())
 		{
 			burnEvent.setCancelled(true);
@@ -734,7 +736,11 @@ public class BlockEventHandler implements Listener
 		
 		//into wilderness is NOT OK when surface buckets are limited
 		Material materialDispensed = dispenseEvent.getItem().getType();
-		if((materialDispensed == Material.WATER_BUCKET || materialDispensed == Material.LAVA_BUCKET) && wc.blockWildernessWaterBuckets() && GriefPrevention.instance.claimsEnabledForWorld(fromBlock.getWorld()) && toClaim == null)
+		
+		if(
+				(materialDispensed == Material.WATER_BUCKET && wc.getWaterBucketBehaviour().Allowed(toBlock.getLocation()) ||
+				(materialDispensed == Material.LAVA_BUCKET && wc.getLavaBucketBehaviour().Allowed(toBlock.getLocation()))
+				&& GriefPrevention.instance.claimsEnabledForWorld(fromBlock.getWorld())))		
 		{
 			dispenseEvent.setCancelled(true);
 			return;

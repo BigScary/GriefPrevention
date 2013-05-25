@@ -832,7 +832,7 @@ class PlayerEventHandler implements Listener
 			    	event.setCancelled(true);
 			    	return;
 			    }
-			} else if(claim==null && wc.claims_noBuildOutsideClaims()){
+			} else if(claim==null && wc.claims_ApplyTrashBlockRules()){
 				GriefPrevention.sendMessage(player, TextMode.Err, Messages.NoVillagerTradeOutsideClaims);
 				event.setCancelled(true);
 				return;
@@ -1020,7 +1020,7 @@ class PlayerEventHandler implements Listener
 		{
 			if(block.getY() >= GriefPrevention.instance.getSeaLevel(block.getWorld()) - 5 && !player.hasPermission("griefprevention.lava"))
 			{
-				if(bucketEvent.getBucket() == Material.LAVA_BUCKET || wc.blockWildernessWaterBuckets())
+				if(bucketEvent.getBucket() == Material.LAVA_BUCKET || ! wc.getLavaBucketBehaviour().Allowed(block.getLocation()))
 				{
 					GriefPrevention.sendMessage(player, TextMode.Err, Messages.NoWildernessBuckets);
 					bucketEvent.setCancelled(true);
@@ -1835,10 +1835,15 @@ class PlayerEventHandler implements Listener
 					return;
 				}
 				else if(wc.claims_perplayer_claims_limit() > 0 &&
-					playerData.claims.size()==wc.claims_perplayer_claims_limit() &&
 					!(player.hasPermission("griefprevention.ignoreclaimslimit") )){
+					
+					//get the number of claims the player has in this world.
+					if(wc.claims_perplayer_claims_limit() >= playerData.getWorldClaims(clickedBlock.getWorld()).size()){
+					
+					
 					GriefPrevention.sendMessage(player, TextMode.Err, Messages.PlayerClaimLimit,String.valueOf(wc.claims_perplayer_claims_limit()));
 					return;
+					}
 				}
 					
 				

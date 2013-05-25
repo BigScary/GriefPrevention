@@ -163,7 +163,7 @@ public class Claim
 	 */
 	public void removeSurfaceFluids(Claim exclusionClaim)
 	{
-		WorldConfig wc = GriefPrevention.instance.getWorldCfg(exclusionClaim.getLesserBoundaryCorner().getWorld());
+		WorldConfig wc = GriefPrevention.instance.getWorldCfg(getLesserBoundaryCorner().getWorld());
 		
 		//don't do this for administrative claims
 		if(this.isAdminClaim()) return;
@@ -172,7 +172,8 @@ public class Claim
 		if(this.getArea() > 10000) return;
 		
 		//don't do it when surface fluids are allowed to be dumped
-		if(!wc.blockWildernessWaterBuckets()) return;
+		if(!wc.getWaterBucketBehaviour().Allowed(getLesserBoundaryCorner()))
+			return;
 		
 		Location lesser = this.getLesserBoundaryCorner();
 		Location greater = this.getGreaterBoundaryCorner();

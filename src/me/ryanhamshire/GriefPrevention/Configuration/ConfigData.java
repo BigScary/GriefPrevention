@@ -139,28 +139,31 @@ public class ConfigData {
 		GriefPrevention.instance.getLogger().log(Level.INFO, "Reading WorldConfigurations from " + ConfigLocation.getAbsolutePath());
 		if(ConfigLocation.exists() && ConfigLocation.isDirectory()){
 			for(File lookfile: ConfigLocation.listFiles()){
+				//System.out.println(lookfile);
+				if(lookfile.isFile()){
+					String Extension = lookfile.getName().substring(lookfile.getName().indexOf('.')+1);
+					String baseName = Extension.length()==0?
+							lookfile.getName():
+							lookfile.getName().substring(0,lookfile.getName().length()-Extension.length()-1);
+					if(baseName.startsWith("_")) continue; //configs starting with underscore are templates. Normally just _template.cfg.
+					//if baseName is an existing world...
+					if(Bukkit.getWorld(baseName)!=null){
+						GriefPrevention.instance.getLogger().log(Level.INFO, "World " + baseName + " Configuration found.");
+					}
+					//read it in...
+					FileConfiguration Source = YamlConfiguration.loadConfiguration(new File(lookfile.getAbsolutePath()));
+					FileConfiguration Target = new YamlConfiguration();
+					//load in the WorldConfig...
+					WorldConfig wc = new WorldConfig(baseName,Source,Target);
+					try {
+						Target.save(lookfile);
+						
+					}catch(IOException iex){
+						GriefPrevention.instance.getLogger().log(Level.SEVERE, "Failed to save to " + lookfile.getAbsolutePath());
+					}
 				
-				String Extension = lookfile.getName().substring(lookfile.getName().indexOf('.')+1);
-				String baseName = lookfile.getName().substring(0,lookfile.getName().length()-Extension.length()-1);
-				if(baseName.startsWith("_")) continue; //configs starting with underscore are templates. Normally just _template.cfg.
-				//if baseName is an existing world...
-				if(Bukkit.getWorld(baseName)!=null){
-					GriefPrevention.instance.getLogger().log(Level.INFO, "World " + baseName + " Configuration found.");
+				
 				}
-				//read it in...
-				FileConfiguration Source = YamlConfiguration.loadConfiguration(new File(lookfile.getAbsolutePath()));
-				FileConfiguration Target = new YamlConfiguration();
-				//load in the WorldConfig...
-				WorldConfig wc = new WorldConfig(baseName,Source,Target);
-				try {
-					Target.save(lookfile);
-					
-				}catch(IOException iex){
-					GriefPrevention.instance.getLogger().log(Level.SEVERE, "Failed to save to " + lookfile.getAbsolutePath());
-				}
-				
-				
-				
 			}
 			
 			

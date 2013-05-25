@@ -134,7 +134,7 @@ class EntityEventHandler implements Listener
 		
 		Claim claimatEntity = GriefPrevention.instance.dataStore.getClaimAt(location, true, null);
 		//quickest exit: if we are inside a claim and allowExplosions is false, break.
-		if(claimatEntity!=null && claimatEntity.areExplosivesAllowed) return;
+		//if(claimatEntity!=null && claimatEntity.areExplosivesAllowed) return;
 		System.out.println("onEntityExplode: claim=null:" + claimatEntity==null);
 	    //logic: we have Creeper and TNT Explosions currently. each one has special configuration options.
 		//make sure that we are allowed to explode, first.

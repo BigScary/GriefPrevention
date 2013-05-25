@@ -10,10 +10,16 @@ import org.bukkit.configuration.file.FileConfiguration;
 //holds data pertaining to an option and where it works. 
 //used primarily for information on explosions.
 public class ClaimBehaviourData {
-	private boolean BelowSeaLevelWilderness;
-	private boolean BelowSeaLevelClaims;
-	private boolean AboveSeaLevelWilderness;
-	private boolean AboveSeaLevelClaims;
+	private PlacementRules Wilderness;
+	private PlacementRules Claims;
+	
+	private boolean OwnedClaim;
+	/**
+	 * returns whether, for applicable Claim allowances and for behaviours applicable for a player, that action
+	 * can only be performed by the player that owns the claim.
+	 * @return
+	 */
+	public boolean getOwnedClaim(){ return OwnedClaim;}
 	
 	public boolean Allowed(Location position){
 		
@@ -24,76 +30,50 @@ public class ClaimBehaviourData {
 		boolean abovesealevel = yposition > sealevel;
 		if(testclaim==null){
 			//we aren't inside a claim.
-			if(abovesealevel) return AboveSeaLevelWilderness; else return BelowSeaLevelWilderness;
+			return Wilderness.Allow(position);
 			
 			
 		}
 		else{
 			//we are inside a claim.
-			if(abovesealevel) return AboveSeaLevelClaims; else return BelowSeaLevelClaims;
+			return Claims.Allow(position);
 		}
 		
 		
 		
 	}
-	/**
-	 * returns whether the specified element can act below sea level in the wilderness. (unclaimed areas).
-	 * @return
-	 */
-	public boolean getBelowSeaLevelWilderness(){
-		return BelowSeaLevelWilderness;
-	}
-	/**
-	 * returns whether the specified element can act below sea level in claims.
-	 * @return
-	 */
-	public boolean getBelowSeaLevelClaims(){
-		return BelowSeaLevelClaims;
-	}
-	/**
-	 * returns whether this element can act above SeaLevel in the wilderness. (unclaimed land)
-	 * @return
-	 */
-	public boolean getAboveSeaLevelWilderness(){
-		return BelowSeaLevelWilderness;
-	}
-	/**
-	 * returns whether this element can act above sea level in claims.
-	 * @return
-	 */
-	public boolean getAboveSeaLevelClaims(){
-		return AboveSeaLevelClaims;
-	}
+	public PlacementRules getWildernessRules() { return Wilderness;}
+	public PlacementRules getClaimsRules(){ return Claims;}
+	
+	
 	public ClaimBehaviourData(FileConfiguration Source,FileConfiguration outConfig,String NodePath,ClaimBehaviourData Defaults){
 		
 		
 		//we want to read NodePath.BelowSeaLevelWilderness and whatnot.
 		//bases Defaults off another ClaimBehaviourData instance.
-		BelowSeaLevelWilderness = Source.getBoolean(NodePath + ".BelowSeaLevelWilderness",Defaults.BelowSeaLevelWilderness);
-		BelowSeaLevelClaims = Source.getBoolean(NodePath +".BelowSeaLevelClaims",Defaults.BelowSeaLevelClaims);
-		AboveSeaLevelWilderness = Source.getBoolean(NodePath + ".AboveSeaLevelWilderness",Defaults.AboveSeaLevelWilderness);
-		AboveSeaLevelClaims = Source.getBoolean(NodePath + ".AboveSeaLevelClaims",Defaults.AboveSeaLevelClaims);
+		Wilderness = new PlacementRules(Source,outConfig,NodePath + ".Wilderness",Defaults.getWildernessRules());
+		Claims = new PlacementRules (Source,outConfig,NodePath + ".Claims",Defaults.getClaimsRules());
+		
+		this.OwnedClaim = Source.getBoolean(NodePath + ".OwnedClaim",Defaults.getOwnedClaim());
 		//now save it to the given outConfig.
-		outConfig.set(NodePath + ".BelowSeaLevelWilderness", BelowSeaLevelWilderness);
-		outConfig.set(NodePath + ".BelowSeaLevelClaims", BelowSeaLevelClaims);
-		outConfig.set(NodePath + ".AboveSeaLevelWilderness", AboveSeaLevelWilderness);
-		outConfig.set(NodePath + ".AboveSeaLevelClaims",AboveSeaLevelClaims);
+		
+		outConfig.set(NodePath + ".OwnedClaim", OwnedClaim);
 		
 	}
-	public ClaimBehaviourData(boolean pBelowSeaLevelWilderness,
-			boolean pBelowSeaLevelClaims,
-			boolean pAboveSeaLevelWilderness,
-			boolean pAboveSeaLevelClaims){
-		BelowSeaLevelWilderness = pBelowSeaLevelWilderness;
-		BelowSeaLevelClaims = pBelowSeaLevelClaims;
-		AboveSeaLevelWilderness = pAboveSeaLevelWilderness;
-		AboveSeaLevelClaims = pAboveSeaLevelClaims;
+	public ClaimBehaviourData(PlacementRules pWilderness,PlacementRules pClaims,
+			boolean pOwnedClaim){
+	Wilderness = pWilderness;
+	Claims = pClaims;
+	OwnedClaim = pOwnedClaim;
+		
+		
 	}
 	
-	public static final ClaimBehaviourData OutsideClaims = new ClaimBehaviourData(true,false,true,false);
-	public static final ClaimBehaviourData InsideClaims = new ClaimBehaviourData(false,true,false,true);
-	public static final ClaimBehaviourData AboveSeaLevel = new ClaimBehaviourData(false,false,true,true);
-	public static final ClaimBehaviourData BelowSeaLevel = new ClaimBehaviourData(true,true,false,false);
+	
+	public static final ClaimBehaviourData OutsideClaims = new ClaimBehaviourData(PlacementRules.Both,PlacementRules.Neither,false);
+	public static final ClaimBehaviourData InsideClaims = new ClaimBehaviourData(PlacementRules.Neither,PlacementRules.Neither,false);
+	public static final ClaimBehaviourData AboveSeaLevel = new ClaimBehaviourData(PlacementRules.AboveOnly,PlacementRules.AboveOnly,false);
+	public static final ClaimBehaviourData BelowSeaLevel = new ClaimBehaviourData(PlacementRules.BelowOnly,PlacementRules.BelowOnly,false);
 	
 	
 }

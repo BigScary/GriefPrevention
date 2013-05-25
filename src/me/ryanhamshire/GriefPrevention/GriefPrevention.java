@@ -2301,14 +2301,17 @@ public class GriefPrevention extends JavaPlugin
 			}
 			
 			//no building in survival wilderness when that is configured
-			else if(wc.claims_noBuildOutsideClaims() && wc.claims_enabled())
+			else if(wc.claims_ApplyTrashBlockRules() && wc.claims_enabled())
 			{
-				return this.dataStore.getMessage(Messages.NoBuildOutsideClaims) + "  " + this.dataStore.getMessage(Messages.SurvivalBasicsDemoAdvertisement);
+				if(!wc.getTrashBlockPlacementBehaviour().Allowed(location))
+					return this.dataStore.getMessage(Messages.NoBuildOutsideClaims) + "  " + this.dataStore.getMessage(Messages.SurvivalBasicsDemoAdvertisement);
+				else
+					return null;
 			}
 			
 			else
 			{
-				//but it's fine in survival mode
+				//but it's fine in creative
 				return null;
 			}			
 		}
@@ -2342,7 +2345,7 @@ public class GriefPrevention extends JavaPlugin
 				return reason;
 			}
 			
-			else if(wc.claims_noBuildOutsideClaims() && wc.claims_enabled())
+			else if(wc.claims_ApplyTrashBlockRules() && wc.claims_enabled())
 			{
 				return this.dataStore.getMessage(Messages.NoBuildOutsideClaims) + "  " + this.dataStore.getMessage(Messages.SurvivalBasicsDemoAdvertisement);
 			}

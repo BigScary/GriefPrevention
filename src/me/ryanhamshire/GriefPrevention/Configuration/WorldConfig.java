@@ -35,6 +35,13 @@ public class WorldConfig {
 	//we've moved this to another class for brevity as well as to make it easier to deal with and more flexible.
 	//you know- all the standard reasons for moving things into a class. I'll shut up now and get to writing the applicable code.
 	
+	private ClaimBehaviourData TrashBlockPlacementBehaviour;
+	/**
+	 * Rules that determine how TrashBlocks can be placed.
+	 * @return
+	 */
+	public ClaimBehaviourData getTrashBlockPlacementBehaviour() { return TrashBlockPlacementBehaviour;}
+	
 	//data for Creeper Explosions. This indicates where they can occur.
 	private ClaimBehaviourData CreeperExplosionBehaviour;
 	public ClaimBehaviourData getCreeperExplosionBehaviour(){ return CreeperExplosionBehaviour;}
@@ -62,6 +69,8 @@ public class WorldConfig {
 	private ClaimBehaviourData WaterBucketBehaviour;
 	public ClaimBehaviourData getWaterBucketBehaviour(){ return WaterBucketBehaviour;}
 	
+	private ClaimBehaviourData LavaBucketBehaviour;
+	public ClaimBehaviourData getLavaBucketBehaviour(){ return LavaBucketBehaviour;}
 	
 	
 	
@@ -160,8 +169,8 @@ public class WorldConfig {
 	public boolean claims_allowUnclaim(){ return config_claims_allowUnclaim;}
 	private boolean config_claims_autoRestoreUnclaimed; 	//whether unclaimed land in creative worlds is automatically /restorenature-d
 	public boolean claims_autoRestoreUnclaimed(){ return config_claims_autoRestoreUnclaimed;}
-	private boolean config_claims_noBuildOutsideClaims;				//whether players can build in survival worlds outside their claimed areas
-	public boolean claims_noBuildOutsideClaims(){ return config_claims_noBuildOutsideClaims;}
+	private boolean config_claims_ApplyTrashBlockRules;				//whether players can build in survival worlds outside their claimed areas
+	public boolean claims_ApplyTrashBlockRules(){ return config_claims_ApplyTrashBlockRules;}
 	
 	private int config_claims_chestClaimExpirationDays;				//number of days of inactivity before an automatic chest claim will be deleted
 	public int claims_chestClaimExpirationDays(){ return config_claims_chestClaimExpirationDays;}
@@ -227,8 +236,8 @@ public class WorldConfig {
 	
 	
 	
-	private boolean config_blockWildernessWaterBuckets;				//whether players can dump water buckets outside their claims
-	public boolean blockWildernessWaterBuckets(){ return config_blockWildernessWaterBuckets;}
+	//private boolean config_blockWildernessWaterBuckets;				//whether players can dump water buckets outside their claims
+	//public boolean blockWildernessWaterBuckets(){ return config_blockWildernessWaterBuckets;}
 	private boolean config_blockSkyTrees;							//whether players can build trees on platforms in the sky
 	public boolean blockSkyTrees(){ return config_blockSkyTrees;}
 	
@@ -311,7 +320,7 @@ public class WorldConfig {
 		//read in the data for TNT explosions and Golem/Wither placements.
 		
 		this.CreeperExplosionBehaviour = new ClaimBehaviourData(config,outConfig,"GriefPrevention.CreeperExplosions",
-				new ClaimBehaviourData(true,false,true,false));
+				ClaimBehaviourData.OutsideClaims);
 		
 		this.WitherExplosionBehaviour= new ClaimBehaviourData(config,outConfig,"GriefPrevention.WitherExplosions",
 				ClaimBehaviourData.OutsideClaims);
@@ -321,14 +330,28 @@ public class WorldConfig {
 		
 		
 		this.TNTExplosionBehaviour = new ClaimBehaviourData(config,outConfig,"GriefPrevention.TNTExplosions",
-				new ClaimBehaviourData(true,false,true,false));
+				ClaimBehaviourData.OutsideClaims);
 		
 		this.WaterBucketBehaviour = new ClaimBehaviourData(config,outConfig,"GriefPrevention.WaterBuckets",
-		new ClaimBehaviourData(true,false,true,false));
+		ClaimBehaviourData.AboveSeaLevel);
+		
+		this.LavaBucketBehaviour = new ClaimBehaviourData(config,outConfig,"GriefPrevention.LavaBuckets",
+				ClaimBehaviourData.AboveSeaLevel);
+		
 		//Snow golem spawn rules.
 		
+		this.IronGolemSpawnBehaviour = new ClaimBehaviourData(config,outConfig,"GriefPrevention.BuildIronGolem",
+				ClaimBehaviourData.InsideClaims);
+		
+		this.SnowGolemSpawnBehaviour = new ClaimBehaviourData(config,outConfig,"GriefPrevention.BuildSnowGolem",
+				ClaimBehaviourData.InsideClaims);
 		
 		
+		this.WitherSpawnBehaviour = new ClaimBehaviourData(config,outConfig,"GriefPrevention.BuildWither",
+				ClaimBehaviourData.InsideClaims);
+		
+		TrashBlockPlacementBehaviour = new ClaimBehaviourData(config,outConfig,"GriefPrevention.TrashBlockPlacementRules",
+				ClaimBehaviourData.OutsideClaims);
 		//read trash blocks.
 		//Cobblestone,Torch,Dirt,Sapling,Gravel,Sand,TNT,Workbench
 		this.config_trash_blocks = new ArrayList<Material>();
@@ -420,7 +443,7 @@ public class WorldConfig {
 		this.config_claims_minSize = config.getInt("GriefPrevention.Claims.MinimumSize", 10);
 		this.config_claims_maxDepth = config.getInt("GriefPrevention.Claims.MaximumDepth", 0);
 		this.config_claims_trappedCooldownHours = config.getInt("GriefPrevention.Claims.TrappedCommandCooldownHours", 8);
-		this.config_claims_noBuildOutsideClaims = config.getBoolean("GriefPrevention.Claims.NoSurvivalBuildingOutsideClaims", false);
+		this.config_claims_ApplyTrashBlockRules = config.getBoolean("GriefPrevention.Claims.NoSurvivalBuildingOutsideClaims", false);
 		this.config_claims_warnOnBuildOutside = config.getBoolean("GriefPrevention.Claims.WarnWhenBuildingOutsideClaims", true);
 		this.config_claims_allowUnclaim = config.getBoolean("GriefPrevention.Claims.AllowUnclaimingLand", true);
 		this.config_claims_autoRestoreUnclaimed = config.getBoolean("GriefPrevention.Claims.AutoRestoreUnclaimedLand", true);		
@@ -663,7 +686,7 @@ public class WorldConfig {
 		outConfig.set("GriefPrevention.Claims.TrappedCommandCooldownHours", this.config_claims_trappedCooldownHours);
 		outConfig.set("GriefPrevention.Claims.InvestigationTool", this.config_claims_investigationTool.name());
 		outConfig.set("GriefPrevention.Claims.ModificationTool", this.config_claims_modificationTool.name());
-		outConfig.set("GriefPrevention.Claims.NoSurvivalBuildingOutsideClaims", this.config_claims_noBuildOutsideClaims);
+		outConfig.set("GriefPrevention.Claims.NoSurvivalBuildingOutsideClaims", this.config_claims_ApplyTrashBlockRules);
 		outConfig.set("GriefPrevention.Claims.WarnWhenBuildingOutsideClaims", this.config_claims_warnOnBuildOutside);
 		outConfig.set("GriefPrevention.Claims.AllowUnclaimingLand", this.config_claims_allowUnclaim);
 		outConfig.set("GriefPrevention.Claims.AutoRestoreUnclaimedLand", this.config_claims_autoRestoreUnclaimed);
@@ -700,7 +723,7 @@ public class WorldConfig {
 		
 		//outConfig.set("GriefPrevention.BlockSurfaceWildCreeperExplosions", this.config_blockSurfaceWildCreeperExplosions);
 		//outConfig.set("GriefPrevention.BlockSurfaceWildOtherExplosions", this.config_blockSurfaceWildOtherExplosions);
-		outConfig.set("GriefPrevention.LimitSurfaceWaterBuckets", this.config_blockWildernessWaterBuckets);
+		
 		outConfig.set("GriefPrevention.LimitSkyTrees", this.config_blockSkyTrees);
 		
 		outConfig.set("GriefPrevention.FireSpreads", this.config_fireSpreads);
