@@ -30,6 +30,7 @@ import me.ryanhamshire.GriefPrevention.visualization.Visualization;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 //holds all of GriefPrevention's player-tied data
@@ -40,6 +41,18 @@ public class PlayerData
 	
 	//the player's claims
 	public Vector<Claim> claims = new Vector<Claim>();
+	
+	public Vector<Claim> getWorldClaims(World p){
+		Vector<Claim> makeresult = new Vector<Claim>();
+		for(Claim cc:claims){
+			if(cc.getLesserBoundaryCorner().getWorld().equals(p)){
+				makeresult.add(cc);
+			}
+		}
+		return makeresult;
+		
+		
+	}
 	
 	//how many claim blocks the player has earned via play time
 	public int accruedClaimBlocks = GriefPrevention.instance.config_claims_initialBlocks;
