@@ -174,7 +174,7 @@ public class Claim
 		if(this.getArea() > 10000) return;
 		
 		//don't do it when surface fluids are allowed to be dumped
-		if(!wc.getWaterBucketBehaviour().Allowed(getLesserBoundaryCorner()))
+		if(!wc.getWaterBucketBehaviour().Allowed(getLesserBoundaryCorner(),null))
 			return;
 		
 		Location lesser = this.getLesserBoundaryCorner();

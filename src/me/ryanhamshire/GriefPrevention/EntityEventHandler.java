@@ -102,7 +102,7 @@ class EntityEventHandler implements Listener
 		else if(event.getEntityType() == EntityType.WITHER && wc.claims_enabled())
 		{
 			
-			event.setCancelled(!wc.getWitherEatBehaviour().Allowed(event.getEntity().getLocation()));
+			event.setCancelled(!wc.getWitherEatBehaviour().Allowed(event.getEntity().getLocation(),null));
 		}
 	}
 	
@@ -161,7 +161,7 @@ class EntityEventHandler implements Listener
 			Block block = blocks.get(i);
 			if(wc.mods_explodableIds().Contains(new MaterialInfo(block.getTypeId(), block.getData(), null))) continue;
 			//creative rules stop all explosions, regardless of the other settings.
-			if(wc.creative_rules() ||  !usebehaviour.Allowed(block.getLocation())){
+			if(wc.creative_rules() ||  !usebehaviour.Allowed(block.getLocation(),null)){
 				//if not allowed. remove it...
 				blocks.remove(i--);
 			}

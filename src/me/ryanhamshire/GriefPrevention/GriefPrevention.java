@@ -103,7 +103,7 @@ public class GriefPrevention extends JavaPlugin
 		return Configuration.getWorldConfig(worldname);
 	}
 	
-	
+	private static boolean eventsRegistered = false;
 	//initializes well...   everything
 	public void onEnable()
 	{ 		
@@ -247,20 +247,24 @@ public class GriefPrevention extends JavaPlugin
 		CleanupUnusedClaimsTask task2 = new CleanupUnusedClaimsTask();
 		this.getServer().getScheduler().scheduleSyncRepeatingTask(this, task2, 20L * 60 * 2, 20L * 60 * 5);
 		}
-		//register for events
-		PluginManager pluginManager = this.getServer().getPluginManager();
 		
-		//player events
-		PlayerEventHandler playerEventHandler = new PlayerEventHandler(this.dataStore, this);
-		pluginManager.registerEvents(playerEventHandler, this);
-		
-		//block events
-		BlockEventHandler blockEventHandler = new BlockEventHandler(this.dataStore);
-		pluginManager.registerEvents(blockEventHandler, this);
-				
-		//entity events
-		EntityEventHandler entityEventHandler = new EntityEventHandler(this.dataStore);
-		pluginManager.registerEvents(entityEventHandler, this);
+			//register for events
+			if(!eventsRegistered){
+				eventsRegistered=true;
+			PluginManager pluginManager = this.getServer().getPluginManager();
+			
+			//player events
+			PlayerEventHandler playerEventHandler = new PlayerEventHandler(this.dataStore, this);
+			pluginManager.registerEvents(playerEventHandler, this);
+			
+			//block events
+			BlockEventHandler blockEventHandler = new BlockEventHandler(this.dataStore);
+			pluginManager.registerEvents(blockEventHandler, this);
+					
+			//entity events
+			EntityEventHandler entityEventHandler = new EntityEventHandler(this.dataStore);
+			pluginManager.registerEvents(entityEventHandler, this);
+			}
 		try {
 			outConfig.save(new File(DataStore.configFilePath));
 		} catch (IOException e) {
@@ -352,7 +356,6 @@ public class GriefPrevention extends JavaPlugin
 			}
 			MaterialInfo source = MaterialInfo.fromString(args[0]);
 		    if(source==null){
-		    	
 		    	Material attemptparse = Material.valueOf(args[0]); 
 		    	if(attemptparse!=null){
 		    		source = new MaterialInfo(attemptparse.getId(),(byte)0,args[0]);
@@ -2303,7 +2306,7 @@ public class GriefPrevention extends JavaPlugin
 			//no building in survival wilderness when that is configured
 			else if(wc.claims_ApplyTrashBlockRules() && wc.claims_enabled())
 			{
-				if(!wc.getTrashBlockPlacementBehaviour().Allowed(location))
+				if(!wc.getTrashBlockPlacementBehaviour().Allowed(location,player))
 					return this.dataStore.getMessage(Messages.NoBuildOutsideClaims) + "  " + this.dataStore.getMessage(Messages.SurvivalBasicsDemoAdvertisement);
 				else
 					return null;

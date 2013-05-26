@@ -2,34 +2,96 @@ package me.ryanhamshire.GriefPrevention.Configuration;
 
 import me.ryanhamshire.GriefPrevention.Claim;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
-
+import me.ryanhamshire.GriefPrevention.TextMode;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 //this enum is used for some of the configuration options.
+import org.bukkit.entity.Player;
 
 //holds data pertaining to an option and where it works. 
 //used primarily for information on explosions.
 public class ClaimBehaviourData {
+	public enum ClaimBehaviourMode{
+		None,
+		ForceAllow,
+		RequireOwner,
+		RequireManager,
+		RequireAccess,
+		RequireContainer;
+		
+		
+		public static ClaimBehaviourMode parseMode(String name){
+			System.out.println("Looking for " + name);
+			for(ClaimBehaviourMode cb:ClaimBehaviourMode.values()){
+				System.out.println(cb.name());
+				if(cb.name().equalsIgnoreCase(name))
+					return cb;
+			}
+			return ClaimBehaviourMode.None;
+			
+		}
+		
+	}
 	private PlacementRules Wilderness;
 	private PlacementRules Claims;
+	private ClaimBehaviourMode ClaimBehaviour = ClaimBehaviourMode.None;
 	
-	private boolean OwnedClaim;
-	/**
-	 * returns whether, for applicable Claim allowances and for behaviours applicable for a player, that action
-	 * can only be performed by the player that owns the claim.
-	 * @return
-	 */
-	public boolean getOwnedClaim(){ return OwnedClaim;}
+	public ClaimBehaviourMode getClaimBehaviour(){ return ClaimBehaviour;}
 	
-	public boolean Allowed(Location position){
-		
+	
+	public boolean Allowed(Location position,Player RelevantPlayer){
+		String result=null;
 		Claim testclaim = GriefPrevention.instance.dataStore.getClaimAt(position, true, null);
+		if(ClaimBehaviour!=ClaimBehaviourMode.None && testclaim!=null){
+			
+			//if forcibly allowed, allow.
+			if(ClaimBehaviour == ClaimBehaviourMode.ForceAllow){
+				return true;
+			}
+			else if(ClaimBehaviour == ClaimBehaviourMode.RequireOwner){
+				//RequireOwner means it only applies if the player passed is the owner.
+				//if the passed player is null, then we assume the operation has no relevant player, so allow it in this case.
+				if(RelevantPlayer!=null){
+					if(!testclaim.getOwnerName().equalsIgnoreCase(RelevantPlayer.getName())){
+						//they aren't the owner, so fail the test.
+						return false;
+					}
+					
+				}
+			}
+			else if(ClaimBehaviour == ClaimBehaviourMode.RequireAccess){
+				if(RelevantPlayer!=null){
+					if(null!=(result =testclaim.allowAccess(RelevantPlayer))){
+						GriefPrevention.sendMessage(RelevantPlayer, TextMode.Err, result);
+						return false;
+					}
+				}
+			}
+			else if(ClaimBehaviour == ClaimBehaviourMode.RequireContainer){
+				if(RelevantPlayer!=null){
+					if(null!=(result = testclaim.allowContainers(RelevantPlayer))){
+						GriefPrevention.sendMessage(RelevantPlayer, TextMode.Err, result);
+						return false;
+					}
+				}
+			}
+			else if(ClaimBehaviour == ClaimBehaviourMode.RequireManager){
+				if(RelevantPlayer!=null){
+					if(!testclaim.isManager(RelevantPlayer.getName())){
+						return false;
+					}
+				}
+			}
+		}
+
+		
 		//retrieve the appropriate Sea Level for this world.
-		int sealevel = GriefPrevention.instance.getWorldCfg(position.getWorld()).seaLevelOverride();
+		/*int sealevel = GriefPrevention.instance.getWorldCfg(position.getWorld()).seaLevelOverride();
 		int yposition = position.getBlockY();
-		boolean abovesealevel = yposition > sealevel;
+		boolean abovesealevel = yposition > sealevel;*/
 		if(testclaim==null){
 			//we aren't inside a claim.
+			System.out.println("Wilderness test...");
 			return Wilderness.Allow(position);
 			
 			
@@ -54,26 +116,28 @@ public class ClaimBehaviourData {
 		Wilderness = new PlacementRules(Source,outConfig,NodePath + ".Wilderness",Defaults.getWildernessRules());
 		Claims = new PlacementRules (Source,outConfig,NodePath + ".Claims",Defaults.getClaimsRules());
 		
-		this.OwnedClaim = Source.getBoolean(NodePath + ".OwnedClaim",Defaults.getOwnedClaim());
-		//now save it to the given outConfig.
 		
-		outConfig.set(NodePath + ".OwnedClaim", OwnedClaim);
+		String claimbehave = Source.getString(NodePath + ".Claims.Behaviour","None");
+		System.out.println(NodePath + ".Claims.Behaviour:" + claimbehave);
+		ClaimBehaviour = ClaimBehaviourMode.parseMode(claimbehave);
+		
+		outConfig.set(NodePath + ".Claims.Behaviour",ClaimBehaviour.name());
 		
 	}
 	public ClaimBehaviourData(PlacementRules pWilderness,PlacementRules pClaims,
-			boolean pOwnedClaim){
+			ClaimBehaviourMode cb){
 	Wilderness = pWilderness;
 	Claims = pClaims;
-	OwnedClaim = pOwnedClaim;
+	ClaimBehaviour = cb;
 		
 		
 	}
 	
 	
-	public static final ClaimBehaviourData OutsideClaims = new ClaimBehaviourData(PlacementRules.Both,PlacementRules.Neither,false);
-	public static final ClaimBehaviourData InsideClaims = new ClaimBehaviourData(PlacementRules.Neither,PlacementRules.Neither,false);
-	public static final ClaimBehaviourData AboveSeaLevel = new ClaimBehaviourData(PlacementRules.AboveOnly,PlacementRules.AboveOnly,false);
-	public static final ClaimBehaviourData BelowSeaLevel = new ClaimBehaviourData(PlacementRules.BelowOnly,PlacementRules.BelowOnly,false);
+	public static final ClaimBehaviourData OutsideClaims = new ClaimBehaviourData(PlacementRules.Both,PlacementRules.Neither,ClaimBehaviourMode.None);
+	public static final ClaimBehaviourData InsideClaims = new ClaimBehaviourData(PlacementRules.Neither,PlacementRules.Neither,ClaimBehaviourMode.None);
+	public static final ClaimBehaviourData AboveSeaLevel = new ClaimBehaviourData(PlacementRules.AboveOnly,PlacementRules.AboveOnly,ClaimBehaviourMode.None);
+	public static final ClaimBehaviourData BelowSeaLevel = new ClaimBehaviourData(PlacementRules.BelowOnly,PlacementRules.BelowOnly,ClaimBehaviourMode.None);
 	
 	
 }

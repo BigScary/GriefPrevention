@@ -58,8 +58,11 @@ public class PlacementRules {
 	 */
 	public boolean Allow(Location Target){
 		int SeaLevelofWorld = GriefPrevention.instance.getSeaLevel(Target.getWorld());
-		return (AboveSeaLevel && Target.getBlockY() > SeaLevelofWorld) ||
-				(BelowSeaLevel && Target.getBlockY() < SeaLevelofWorld);
+		boolean result =  (AboveSeaLevel && (Target.getBlockY() > SeaLevelofWorld)) ||
+				(BelowSeaLevel && (Target.getBlockY() < SeaLevelofWorld));
+		System.out.println("Allow:" + result);
+		return result;
+		
 	}
 	
 }

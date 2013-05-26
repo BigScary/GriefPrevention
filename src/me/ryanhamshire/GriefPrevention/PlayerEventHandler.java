@@ -1010,23 +1010,35 @@ class PlayerEventHandler implements Listener
 		//if the bucket is being used in a claim, allow for dumping lava closer to other players
 		PlayerData playerData = this.dataStore.getPlayerData(player.getName());
 		Claim claim = this.dataStore.getClaimAt(block.getLocation(), false, playerData.lastClaim);
+
+		
 		if(claim != null)
 		{
 			minLavaDistance = 3;
 		}
-		
 		//otherwise no wilderness dumping (unless underground) in worlds where claims are enabled
 		else if(wc.claims_enabled())
 		{
-			if(block.getY() >= GriefPrevention.instance.getSeaLevel(block.getWorld()) - 5 && !player.hasPermission("griefprevention.lava"))
+			if(player.hasPermission("griefprevention.lava"))
 			{
-				if(bucketEvent.getBucket() == Material.LAVA_BUCKET || ! wc.getLavaBucketBehaviour().Allowed(block.getLocation()))
+				if(bucketEvent.getBucket() == Material.LAVA_BUCKET)
 				{
+					if(!wc.getLavaBucketBehaviour().Allowed(block.getLocation(),player))
+				
 					GriefPrevention.sendMessage(player, TextMode.Err, Messages.NoWildernessBuckets);
+					bucketEvent.setCancelled(true);
+					return;
+					}
+				}
+			 if(bucketEvent.getBucket() == Material.WATER_BUCKET){
+				
+				if(!wc.getWaterBucketBehaviour().Allowed(block.getLocation(), player)){
+					GriefPrevention.sendMessage(player,TextMode.Err,Messages.NoWildernessBuckets);
 					bucketEvent.setCancelled(true);
 					return;
 				}
 			}
+			
 		}
 		
 		//lava buckets can't be dumped near other players unless pvp is on
@@ -1056,12 +1068,12 @@ class PlayerEventHandler implements Listener
 	{
 		Player player = bucketEvent.getPlayer();
 		Block block = bucketEvent.getBlockClicked();
-		
+		WorldConfig wc = GriefPrevention.instance.getWorldCfg(block.getWorld());
 		//make sure the player is allowed to build at the location
-		String noBuildReason = GriefPrevention.instance.allowBuild(player, block.getLocation());
-		if(noBuildReason != null)
+		//String noBuildReason = GriefPrevention.instance.allowBuild(player, block.getLocation());
+		if(!wc.getWaterBucketBehaviour().Allowed(block.getLocation(), player))
 		{
-			GriefPrevention.sendMessage(player, TextMode.Err, noBuildReason);
+			//GriefPrevention.sendMessage(player, TextMode.Err, noBuildReason);
 			bucketEvent.setCancelled(true);
 			return;
 		}
@@ -1154,7 +1166,7 @@ class PlayerEventHandler implements Listener
 			//special Chest looting behaviour.
 			Claim cc = this.dataStore.getClaimAt(clickedBlock.getLocation(),true,null);
 			//if doorsOpen...
-			if(cc.doorsOpen){
+			if(cc!=null && cc.doorsOpen){
 				if((cc.LootedChests++)<=wc.getSeigeLootChests()){
 					//tell the player how many more chests they can loot.
 					player.sendMessage(ChatColor.YELLOW + " You may loot " + (wc.getSeigeLootChests()-cc.LootedChests) + " more chests");
