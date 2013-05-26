@@ -392,6 +392,9 @@ public class WorldConfig {
 			}
 		}
 
+		this.claims_Seige_Enabled = config.getBoolean("GriefPrevention.Siege.Enabled",true);
+		outConfig.set("GriefPrevention.Siege.Enabled", claims_Seige_Enabled);
+		
 		
 		this.claims_enabled = config.getBoolean("GriefPrevention.Claims.Enabled",true);
 		outConfig.set("GriefPrevention.Claims.Enabled", claims_enabled);
@@ -405,8 +408,8 @@ public class WorldConfig {
 		this.config_claimcleanup_maxinvestmentscore = 
 				config.getInt("GriefPrevention.ClaimCleanup.MaxInvestmentScore",isCreative?400:100);
 		
-		config_claims_blocksAccruedPerHour = config.getInt("GriefPrevention.BlocksAccruedPerHour",100);
-		outConfig.set("GriefPrevention.BlocksAccruedPerHour",config_claims_blocksAccruedPerHour);
+		config_claims_blocksAccruedPerHour = config.getInt("GriefPrevention.Claims.BlocksAccruedPerHour",100);
+		outConfig.set("GriefPrevention.Claims.BlocksAccruedPerHour",config_claims_blocksAccruedPerHour);
 		outConfig.set("GriefPrevention.ClaimCleanup.MaximumSize", config_claimcleanup_maximumsize);
 		outConfig.set("GriefPrevention.ClaimCleanup.MaxInvestmentScore", this.config_claimcleanup_maxinvestmentscore);
 		outConfig.set("GriefPrevention.ClaimCleanup.Enabled",this.config_claimcleanup_enabled);
@@ -443,7 +446,7 @@ public class WorldConfig {
 		this.config_claims_lockTrapDoors = config.getBoolean("GriefPrevention.Claims.LockTrapDoors", false);
 		this.config_claims_lockFenceGates = config.getBoolean("GriefPrevention.Claims.LockFenceGates", true);
 		this.config_claims_enderPearlsRequireAccessTrust = config.getBoolean("GriefPrevention.Claims.EnderPearlsRequireAccessTrust", true);
-		this.config_claims_blocksAccruedPerHour = config.getInt("GriefPrevention.Claims.BlocksAccruedPerHour", 100);
+
 		this.config_claims_automaticClaimsForNewPlayersRadius = config.getInt("GriefPrevention.Claims.AutomaticNewPlayerClaimsRadius", 4);
 		this.config_claims_claimsExtendIntoGroundDistance = config.getInt("GriefPrevention.Claims.ExtendIntoGroundDistance", 5);
 		this.config_claims_creationRequiresPermission = config.getBoolean("GriefPrevention.Claims.CreationRequiresPermission", false);
@@ -683,7 +686,7 @@ public class WorldConfig {
 		outConfig.set("GriefPrevention.Claims.LockFenceGates", this.config_claims_lockFenceGates);
 		outConfig.set("GriefPrevention.Claims.EnderPearlsRequireAccessTrust", this.config_claims_enderPearlsRequireAccessTrust);
 		
-		outConfig.set("GriefPrevention.Claims.BlocksAccruedPerHour", this.config_claims_blocksAccruedPerHour);
+		
 		
 		outConfig.set("GriefPrevention.Claims.AutomaticNewPlayerClaimsRadius", this.config_claims_automaticClaimsForNewPlayersRadius);
 		outConfig.set("GriefPrevention.Claims.ExtendIntoGroundDistance", this.config_claims_claimsExtendIntoGroundDistance);
