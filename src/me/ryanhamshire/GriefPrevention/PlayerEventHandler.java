@@ -156,20 +156,21 @@ class PlayerEventHandler implements Listener
 		//check for "trapped" or "stuck" to educate players about the /trapped command
 		if(!message.contains("/trapped") && (message.contains("trapped") || message.contains("stuck") || message.contains(this.dataStore.getMessage(Messages.TrappedChatKeyword))))
 		{
-			final PlayerData pdata = GriefPrevention.instance.dataStore.getPlayerData(player.getName());
+			final PlayerData pdata = 
+					GriefPrevention.instance.dataStore.getPlayerData(player.getName());
 			//if not set to ignore the stuck message, show it, set the ignore flag, and set an anonymous runnable to reset it after the
 			//configured delay.
 			if(!pdata.IgnoreStuckMessage){
 			
 				pdata.IgnoreStuckMessage=true;
+				
 				Bukkit.getScheduler()
-				.runTaskLater(
-						GriefPrevention.instance,
-						new Runnable() {
-							public void run() {
+				.runTaskLater(GriefPrevention.instance,new Runnable() {
+								public void run() {
 								pdata.IgnoreStuckMessage=true;
 							}
-						},wc.message_cooldown_stuck()*20);
+						}
+			,wc.message_cooldown_stuck()*20);
 				
 				GriefPrevention.sendMessage(player, TextMode.Info, Messages.TrappedInstructions, 10L);
 			}
@@ -1011,24 +1012,39 @@ class PlayerEventHandler implements Listener
 		PlayerData playerData = this.dataStore.getPlayerData(player.getName());
 		Claim claim = this.dataStore.getClaimAt(block.getLocation(), false, playerData.lastClaim);
 
+		//checks for Behaviour perms.
+		if(bucketEvent.getBucket() == Material.LAVA_BUCKET){
+			if(!wc.getLavaBucketBehaviour().Allowed(block.getLocation(),player)){
+				GriefPrevention.sendMessage(player, TextMode.Err, Messages.ConfigDisabled,"Lava placement ");
+				bucketEvent.setCancelled(true);
+				return;
+			}
+		}
+		else if(bucketEvent.getBucket() == Material.WATER_BUCKET){
+			if(!wc.getLavaBucketBehaviour().Allowed(block.getLocation(),player)){
+				GriefPrevention.sendMessage(player, TextMode.Err, Messages.ConfigDisabled,"Water placement ");
+				bucketEvent.setCancelled(true);
+				return;
+			}
+		}
+		
+		
 		
 		if(claim != null)
 		{
+			
 			minLavaDistance = 3;
 		}
 		//otherwise no wilderness dumping (unless underground) in worlds where claims are enabled
-		else if(wc.claims_enabled())
+		else if(wc.claims_enabled()) //outside claims logic...
 		{
-			if(player.hasPermission("griefprevention.lava"))
+			if(!player.hasPermission("griefprevention.lava"))
 			{
 				if(bucketEvent.getBucket() == Material.LAVA_BUCKET)
 				{
-					if(!wc.getLavaBucketBehaviour().Allowed(block.getLocation(),player))
-				
-					GriefPrevention.sendMessage(player, TextMode.Err, Messages.NoWildernessBuckets);
-					bucketEvent.setCancelled(true);
-					return;
-					}
+						GriefPrevention.sendMessage(player, TextMode.Err, Messages.NoWildernessBuckets);
+						bucketEvent.setCancelled(true);
+						return;
 				}
 			 if(bucketEvent.getBucket() == Material.WATER_BUCKET){
 				
@@ -1040,12 +1056,19 @@ class PlayerEventHandler implements Listener
 			}
 			
 		}
-		
+		}
 		//lava buckets can't be dumped near other players unless pvp is on
 		if(!block.getWorld().getPVP() && !player.hasPermission("griefprevention.lava"))
 		{
 			if(bucketEvent.getBucket() == Material.LAVA_BUCKET)
 			{
+				
+				if(!wc.getLavaBucketBehaviour().Allowed(block.getLocation(), player)){
+					GriefPrevention.sendMessage(player,TextMode.Err,Messages.ConfigDisabled,"Lava Placement");
+					bucketEvent.setCancelled(true);
+					return;
+				}
+				
 				List<Player> players = block.getWorld().getPlayers();
 				for(int i = 0; i < players.size(); i++)
 				{
@@ -1056,7 +1079,7 @@ class PlayerEventHandler implements Listener
 						GriefPrevention.sendMessage(player, TextMode.Err, Messages.NoLavaNearOtherPlayer, otherPlayer.getName());
 						bucketEvent.setCancelled(true);
 						return;
-					}					
+					}				
 				}
 			}
 		}

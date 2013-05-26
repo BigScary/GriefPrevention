@@ -67,6 +67,7 @@ import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.hanging.HangingBreakEvent;
 import org.bukkit.event.hanging.HangingPlaceEvent;
 import org.bukkit.event.vehicle.VehicleDamageEvent;
+import org.bukkit.inventory.ItemStack;
 
 //handles events related to entities
 class EntityEventHandler implements Listener
@@ -161,7 +162,7 @@ class EntityEventHandler implements Listener
 			Block block = blocks.get(i);
 			if(wc.mods_explodableIds().Contains(new MaterialInfo(block.getTypeId(), block.getData(), null))) continue;
 			//creative rules stop all explosions, regardless of the other settings.
-			if(wc.creative_rules() ||  !usebehaviour.Allowed(block.getLocation(),null)){
+			if(wc.creative_rules() ||  (usebehaviour!=null && !usebehaviour.Allowed(block.getLocation(),null))){
 				//if not allowed. remove it...
 				blocks.remove(i--);
 			}
@@ -330,21 +331,61 @@ class EntityEventHandler implements Listener
 	public void onEntitySpawn(CreatureSpawnEvent event)
 	{
 		LivingEntity entity = event.getEntity();
-		
+		WorldConfig wc = GriefPrevention.instance.getWorldCfg(entity.getWorld());
 		//these rules apply only to creative worlds
-		if(!GriefPrevention.instance.creativeRulesApply(entity.getLocation())) return;
+		
 		
 		//chicken eggs and breeding could potentially make a mess in the wilderness, once griefers get involved
 		SpawnReason reason = event.getSpawnReason();
-		if(reason != SpawnReason.SPAWNER_EGG && reason != SpawnReason.BUILD_IRONGOLEM && reason != SpawnReason.BUILD_SNOWMAN)
+
+		if(reason == SpawnReason.BUILD_WITHER){
+			//can we build a wither?
+			if(!wc.getWitherSpawnBehaviour().Allowed(entity.getLocation(), null)){
+				event.setCancelled(true);
+				//spawn what was used to make the wither (four soul sand and three skull items).
+				//ItemStack SoulSand = new ItemStack(Material.SOUL_SAND,4);
+				//ItemStack WitherSkulls = new ItemStack(Material.SKULL_ITEM,3,(short) 1);
+				//entity.getWorld().dropItem(entity.getLocation(), SoulSand);
+				//entity.getWorld().dropItem(entity.getLocation(),WitherSkulls);
+				return;
+			}
+		}
+		else if(reason == SpawnReason.BUILD_SNOWMAN){
+			//can we build a snowman?
+			if(!wc.getSnowGolemSpawnBehaviour().Allowed(entity.getLocation(),null)){
+				event.setCancelled(true);
+				//spawn what was used to make the snowman. we'll spawn 8 snowball and a pumpkin.
+				//ItemStack Snowballs = new ItemStack(Material.SNOW_BLOCK,2);
+				//ItemStack Pumpkin = new ItemStack(Material.PUMPKIN,1);
+				//entity.getWorld().dropItem(entity.getLocation(),Snowballs);
+				//entity.getWorld().dropItem(entity.getLocation(),Pumpkin);
+				return;
+			}
+		}
+		else if(reason == SpawnReason.BUILD_IRONGOLEM){
+			
+			if(!wc.getIronGolemSpawnBehaviour().Allowed(entity.getLocation(), null)){
+				event.setCancelled(true);
+				//ItemStack IronBlocks = new ItemStack(Material.IRON_BLOCK,3);
+				//ItemStack Pumpkin = new ItemStack(Material.PUMPKIN,1);
+			    //entity.getWorld().dropItem(entity.getLocation(),IronBlocks);
+			    //entity.getWorld().dropItem(entity.getLocation(),Pumpkin);
+			    return;
+			    
+			}
+			
+			
+		}
+		if(!GriefPrevention.instance.creativeRulesApply(entity.getLocation())) return;
+
+		//otherwise, just apply the limit on total entities per claim 
+		Claim claim = this.dataStore.getClaimAt(event.getLocation(), false, null);
+		if(claim.allowMoreEntities() != null)
 		{
 			event.setCancelled(true);
 			return;
 		}
-
-		//otherwise, just apply the limit on total entities per claim (and no spawning in the wilderness!)
-		Claim claim = this.dataStore.getClaimAt(event.getLocation(), false, null);
-		if(claim == null || claim.allowMoreEntities() != null)
+		if(reason != SpawnReason.SPAWNER_EGG && reason != SpawnReason.BUILD_IRONGOLEM && reason != SpawnReason.BUILD_SNOWMAN)
 		{
 			event.setCancelled(true);
 			return;
