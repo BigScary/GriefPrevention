@@ -312,6 +312,7 @@ public class WorldConfig {
 		
 		//determine defaults based on the world itself (isCreative, isPvP)
 		boolean isCreative=false,isPvP=false;
+		WorldName = pName;
 		World getworld = Bukkit.getWorld(pName);
 		if(getworld!=null){
 			isCreative = Bukkit.getServer().getDefaultGameMode()==GameMode.CREATIVE;
@@ -320,43 +321,44 @@ public class WorldConfig {
 		
 		
 		GriefPrevention.instance.getLogger().log(Level.INFO,"Reading Configuration for World:" + pName);
-		this.config_seaLevelOverride = config.getInt("GriefPrevention.SeaLevelOverride");
+		this.config_seaLevelOverride = config.getInt("GriefPrevention.SeaLevelOverride",-1);
 		
+		outConfig.set("GriefPrevention.SeaLevelOverride", config_seaLevelOverride);
 		//read in the data for TNT explosions and Golem/Wither placements.
 		
-		this.CreeperExplosionBehaviour = new ClaimBehaviourData(config,outConfig,"GriefPrevention.CreeperExplosions",
-				ClaimBehaviourData.OutsideClaims);
+		this.CreeperExplosionBehaviour = new ClaimBehaviourData("Creeper Explosions",config,outConfig,"GriefPrevention.CreeperExplosions",
+				ClaimBehaviourData.getOutsideClaims("Creeper Explosions"));
 		
-		this.WitherExplosionBehaviour= new ClaimBehaviourData(config,outConfig,"GriefPrevention.WitherExplosions",
-				ClaimBehaviourData.OutsideClaims);
+		this.WitherExplosionBehaviour= new ClaimBehaviourData("Wither Explosions",config,outConfig,"GriefPrevention.WitherExplosions",
+				ClaimBehaviourData.getOutsideClaims("Wither Explosions"));
 		
-		this.WitherEatBehaviour = new ClaimBehaviourData(config,outConfig,"GriefPrevention.WitherEating",
-				ClaimBehaviourData.OutsideClaims);
+		this.WitherEatBehaviour = new ClaimBehaviourData("Wither Eating",config,outConfig,"GriefPrevention.WitherEating",
+				ClaimBehaviourData.getOutsideClaims("Wither Eating"));
 		
 		
-		this.TNTExplosionBehaviour = new ClaimBehaviourData(config,outConfig,"GriefPrevention.TNTExplosions",
-				ClaimBehaviourData.OutsideClaims);
+		this.TNTExplosionBehaviour = new ClaimBehaviourData("TNT Explosions",config,outConfig,"GriefPrevention.TNTExplosions",
+				ClaimBehaviourData.getOutsideClaims("TNTExplosions"));
 		
-		this.WaterBucketBehaviour = new ClaimBehaviourData(config,outConfig,"GriefPrevention.WaterBuckets",
-		ClaimBehaviourData.AboveSeaLevel);
+		this.WaterBucketBehaviour = new ClaimBehaviourData("Water Placement",config,outConfig,"GriefPrevention.WaterBuckets",
+		ClaimBehaviourData.getAboveSeaLevel("Water Placement"));
 		
-		this.LavaBucketBehaviour = new ClaimBehaviourData(config,outConfig,"GriefPrevention.LavaBuckets",
-				ClaimBehaviourData.AboveSeaLevel);
+		this.LavaBucketBehaviour = new ClaimBehaviourData("Lava Placement",config,outConfig,"GriefPrevention.LavaBuckets",
+				ClaimBehaviourData.getAboveSeaLevel("Lava Placement"));
 		
 		//Snow golem spawn rules.
 		
-		this.IronGolemSpawnBehaviour = new ClaimBehaviourData(config,outConfig,"GriefPrevention.BuildIronGolem",
-				ClaimBehaviourData.InsideClaims);
+		this.IronGolemSpawnBehaviour = new ClaimBehaviourData("Iron Golem Spawning",config,outConfig,"GriefPrevention.BuildIronGolem",
+				ClaimBehaviourData.getInsideClaims("Iron Golem Spawning"));
 		
-		this.SnowGolemSpawnBehaviour = new ClaimBehaviourData(config,outConfig,"GriefPrevention.BuildSnowGolem",
-				ClaimBehaviourData.InsideClaims);
+		this.SnowGolemSpawnBehaviour = new ClaimBehaviourData("Snow Golem Spawning",config,outConfig,"GriefPrevention.BuildSnowGolem",
+				ClaimBehaviourData.getInsideClaims("Snow Golem Spawning"));
 		
 		
-		this.WitherSpawnBehaviour = new ClaimBehaviourData(config,outConfig,"GriefPrevention.BuildWither",
-				ClaimBehaviourData.InsideClaims);
+		this.WitherSpawnBehaviour = new ClaimBehaviourData("Wither Spawning",config,outConfig,"GriefPrevention.BuildWither",
+				ClaimBehaviourData.getInsideClaims("Wither Spawning"));
 		
-		TrashBlockPlacementBehaviour = new ClaimBehaviourData(config,outConfig,"GriefPrevention.TrashBlockPlacementRules",
-				ClaimBehaviourData.OutsideClaims);
+		TrashBlockPlacementBehaviour = new ClaimBehaviourData("Trash Block Placement",config,outConfig,"GriefPrevention.TrashBlockPlacementRules",
+				ClaimBehaviourData.getOutsideClaims("Trash Block Placement"));
 		//read trash blocks.
 		//Cobblestone,Torch,Dirt,Sapling,Gravel,Sand,TNT,Workbench
 		this.config_trash_blocks = new ArrayList<Material>();

@@ -1021,7 +1021,7 @@ class PlayerEventHandler implements Listener
 			}
 		}
 		else if(bucketEvent.getBucket() == Material.WATER_BUCKET){
-			if(!wc.getLavaBucketBehaviour().Allowed(block.getLocation(),player)){
+			if(!wc.getWaterBucketBehaviour().Allowed(block.getLocation(),player)){
 				GriefPrevention.sendMessage(player, TextMode.Err, Messages.ConfigDisabled,"Water placement ");
 				bucketEvent.setCancelled(true);
 				return;

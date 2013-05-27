@@ -21,9 +21,9 @@ public class ClaimBehaviourData {
 		
 		
 		public static ClaimBehaviourMode parseMode(String name){
-			System.out.println("Looking for " + name);
+			//System.out.println("Looking for " + name);
 			for(ClaimBehaviourMode cb:ClaimBehaviourMode.values()){
-				System.out.println(cb.name());
+				//System.out.println(cb.name());
 				if(cb.name().equalsIgnoreCase(name))
 					return cb;
 			}
@@ -40,6 +40,8 @@ public class ClaimBehaviourData {
 	
 	
 	public boolean Allowed(Location position,Player RelevantPlayer){
+		
+		//System.out.println("Testing Allowed," + BehaviourName);
 		String result=null;
 		Claim testclaim = GriefPrevention.instance.dataStore.getClaimAt(position, true, null);
 		if(ClaimBehaviour!=ClaimBehaviourMode.None && testclaim!=null){
@@ -91,13 +93,14 @@ public class ClaimBehaviourData {
 		boolean abovesealevel = yposition > sealevel;*/
 		if(testclaim==null){
 			//we aren't inside a claim.
-			System.out.println("Wilderness test...");
+			//System.out.println(BehaviourName + "Wilderness test...");
 			return Wilderness.Allow(position);
 			
 			
 		}
 		else{
 			//we are inside a claim.
+			//System.out.println(BehaviourName + "Claim test...");
 			return Claims.Allow(position);
 		}
 		
@@ -106,11 +109,12 @@ public class ClaimBehaviourData {
 	}
 	public PlacementRules getWildernessRules() { return Wilderness;}
 	public PlacementRules getClaimsRules(){ return Claims;}
+	private String BehaviourName;
+	public String getBehaviourName(){ return BehaviourName;}
 	
-	
-	public ClaimBehaviourData(FileConfiguration Source,FileConfiguration outConfig,String NodePath,ClaimBehaviourData Defaults){
+	public ClaimBehaviourData(String pName,FileConfiguration Source,FileConfiguration outConfig,String NodePath,ClaimBehaviourData Defaults){
 		
-		
+		BehaviourName = pName;
 		//we want to read NodePath.BelowSeaLevelWilderness and whatnot.
 		//bases Defaults off another ClaimBehaviourData instance.
 		Wilderness = new PlacementRules(Source,outConfig,NodePath + ".Wilderness",Defaults.getWildernessRules());
@@ -118,26 +122,26 @@ public class ClaimBehaviourData {
 		
 		
 		String claimbehave = Source.getString(NodePath + ".Claims.Behaviour","None");
-		System.out.println(NodePath + ".Claims.Behaviour:" + claimbehave);
+		//System.out.println(NodePath + ".Claims.Behaviour:" + claimbehave);
 		ClaimBehaviour = ClaimBehaviourMode.parseMode(claimbehave);
 		
 		outConfig.set(NodePath + ".Claims.Behaviour",ClaimBehaviour.name());
 		
 	}
-	public ClaimBehaviourData(PlacementRules pWilderness,PlacementRules pClaims,
+	public ClaimBehaviourData(String pName,PlacementRules pWilderness,PlacementRules pClaims,
 			ClaimBehaviourMode cb){
-	Wilderness = pWilderness;
-	Claims = pClaims;
-	ClaimBehaviour = cb;
-		
+		Wilderness = pWilderness;
+		Claims = pClaims;
+		ClaimBehaviour = cb;
+		BehaviourName=pName;
 		
 	}
 	
 	
-	public static final ClaimBehaviourData OutsideClaims = new ClaimBehaviourData(PlacementRules.Both,PlacementRules.Neither,ClaimBehaviourMode.None);
-	public static final ClaimBehaviourData InsideClaims = new ClaimBehaviourData(PlacementRules.Neither,PlacementRules.Neither,ClaimBehaviourMode.None);
-	public static final ClaimBehaviourData AboveSeaLevel = new ClaimBehaviourData(PlacementRules.AboveOnly,PlacementRules.AboveOnly,ClaimBehaviourMode.None);
-	public static final ClaimBehaviourData BelowSeaLevel = new ClaimBehaviourData(PlacementRules.BelowOnly,PlacementRules.BelowOnly,ClaimBehaviourMode.None);
+	public static ClaimBehaviourData getOutsideClaims(String pName) { return new ClaimBehaviourData(pName,PlacementRules.Both,PlacementRules.Neither,ClaimBehaviourMode.None);}
+	public static ClaimBehaviourData getInsideClaims(String pName) {return new ClaimBehaviourData(pName,PlacementRules.Neither,PlacementRules.Neither,ClaimBehaviourMode.None);}
+	public static ClaimBehaviourData getAboveSeaLevel(String pName){return new ClaimBehaviourData(pName,PlacementRules.AboveOnly,PlacementRules.AboveOnly,ClaimBehaviourMode.None);}
+	public static ClaimBehaviourData getBelowSeaLevel(String pName){return new ClaimBehaviourData(pName,PlacementRules.BelowOnly,PlacementRules.BelowOnly,ClaimBehaviourMode.None);}
 	
 	
 }
