@@ -72,8 +72,14 @@ public class WorldConfig {
 	private ClaimBehaviourData LavaBucketBehaviour;
 	public ClaimBehaviourData getLavaBucketBehaviour(){ return LavaBucketBehaviour;}
 	
+	private ClaimBehaviourData VillagerTrades;                     //prevent trades on claims players don't have permissions on
+	public ClaimBehaviourData getVillagerTrades(){ return VillagerTrades;}
 	
+	private ClaimBehaviourData EnvironmentalVehicleDamage;
+	public ClaimBehaviourData getEnvironmentalVehicleDamage(){return EnvironmentalVehicleDamage;}
 	
+	private ClaimBehaviourData ZombieDoorBreaking;
+	public ClaimBehaviourData getZombieDoorBreaking(){ return ZombieDoorBreaking;}
 	
 	//private members followed by their read-only accessor.
 	private boolean claims_Seige_Enabled;
@@ -117,8 +123,8 @@ public class WorldConfig {
 	public boolean claimcleanup_enabled(){ return config_claimcleanup_enabled;}
 	public boolean treecleanup_enabled(){return config_claimcleanup_enabled;}
 //	private boolean config_naturerestorecleanup_enabled;
-	private boolean config_claims_AllowEnvironmentalVehicleDamage;                 //whether Entities can take damage from the environment in a claim.
-	public boolean claims_AllowEnvironmentalVehicleDamage(){return config_claims_AllowEnvironmentalVehicleDamage;}
+	//private boolean config_claims_AllowEnvironmentalVehicleDamage;                 //whether Entities can take damage from the environment in a claim.
+	//public boolean claims_AllowEnvironmentalVehicleDamage(){return config_claims_AllowEnvironmentalVehicleDamage;}
 	private double  config_claims_AbandonReturnRatio;                //return ratio when abandoning a claim- .80 will result in players getting 80% of the used claim blocks back.
 	public double claims_AbandonReturnRatio(){ return config_claims_AbandonReturnRatio;}
 	private boolean config_claims_preventTheft;						//whether containers and crafting blocks are protectable
@@ -146,8 +152,7 @@ public class WorldConfig {
 	public int claims_maxDepth(){ return config_claims_maxDepth;}
 	private int config_claims_expirationDays;						//how many days of inactivity before a player loses his claims
 	public int claims_expirationDays(){ return config_claims_expirationDays;}
-	private boolean config_claims_preventTrades;                     //prevent trades on claims players don't have permissions on
-	public boolean claims_preventTrades(){ return config_claims_preventTrades;}
+	
 	private int config_claims_automaticClaimsForNewPlayersRadius;	//how big automatic new player claims (when they place a chest) should be.  0 to disable
 	public int claims_automaticClaimsForNewPlayerRadius(){ return config_claims_automaticClaimsForNewPlayersRadius;}
 	private boolean config_claims_creationRequiresPermission;		//whether creating claims with the shovel requires a permission
@@ -269,8 +274,7 @@ public class WorldConfig {
 	public boolean silverfishBreakBlocks(){ return config_silverfishBreakBlocks;}
 	private boolean config_creaturesTrampleCrops;					//whether or not non-player entities may trample crops
 	public boolean creaturesTrampleCrops(){ return config_creaturesTrampleCrops;}
-	private boolean config_zombiesBreakDoors;						//whether or not hard-mode zombies may break down wooden doors
-	public boolean zombiesBreakDoors(){ return config_zombiesBreakDoors;}
+
 	
 	private MaterialCollection config_mods_accessTrustIds;			//list of block IDs which should require /accesstrust for player interaction
 	public MaterialCollection mods_accessTrustIds(){ return config_mods_accessTrustIds;}
@@ -359,6 +363,17 @@ public class WorldConfig {
 		
 		TrashBlockPlacementBehaviour = new ClaimBehaviourData("Trash Block Placement",config,outConfig,"GriefPrevention.TrashBlockPlacementRules",
 				ClaimBehaviourData.getOutsideClaims("Trash Block Placement"));
+		
+		VillagerTrades = new ClaimBehaviourData("Villager Trading",config,outConfig,"GriefPrevention.Claims.VillagerTrading",
+				ClaimBehaviourData.getInsideClaims("Villager Trading"));
+	
+		this.EnvironmentalVehicleDamage = new ClaimBehaviourData("Environmental Vehicle Damage",config,outConfig,"GriefPrevention.Claims.EnvironmentalVehicleDamage",
+				ClaimBehaviourData.getOutsideClaims("Environmental Vehicle Damage"));
+		
+		
+		this.ZombieDoorBreaking = new ClaimBehaviourData("Zombie Door Breaking",config,outConfig,"GriefPrevention.ZombieDoorBreaking",
+				ClaimBehaviourData.getNone("Zombie Door Breaking"));
+		
 		//read trash blocks.
 		//Cobblestone,Torch,Dirt,Sapling,Gravel,Sand,TNT,Workbench
 		this.config_trash_blocks = new ArrayList<Material>();
@@ -428,15 +443,14 @@ public class WorldConfig {
 		this.config_sign_Eavesdrop = config.getBoolean("GriefPrevention.SignEavesDrop",true);
 		outConfig.set("GriefPrevention.SignEavesDrop", this.config_sign_Eavesdrop);
 		
-		config_claims_preventTrades = config.getBoolean("GriefPrevention.Claims.PreventTrades",false);
-		outConfig.set("GriefPrevention.Claims.PreventTrades", config_claims_preventTrades);
+		
 						
 		this.config_claims_perplayer_claim_limit = config.getInt("GriefPrevention.Claims.PerPlayerLimit",0);
 		
 		outConfig.set("GriefPrevention.Claims.PerPlayerLimit",config_claims_perplayer_claim_limit);
 		
-		this.config_claims_AllowEnvironmentalVehicleDamage = config.getBoolean("GriefPrevention.Claims.EnvironmentalVehicleDamage",true);
-		outConfig.set("GriefPrevention.Claims.EnvironmentalVehicleDamage",this.config_claims_AllowEnvironmentalVehicleDamage);
+		
+		
 		
 	
 		this.config_pvp_Seige_Loot_Chests = config.getInt("GriefPrevention.Claims.SeigeLootChests",0);
@@ -523,8 +537,6 @@ public class WorldConfig {
 		this.config_endermenMoveBlocks = config.getBoolean("GriefPrevention.EndermenMoveBlocks", false);
 		this.config_silverfishBreakBlocks = config.getBoolean("GriefPrevention.SilverfishBreakBlocks", false);
 		this.config_creaturesTrampleCrops = config.getBoolean("GriefPrevention.CreaturesTrampleCrops", false);
-		this.config_zombiesBreakDoors = config.getBoolean("GriefPrevention.HardModeZombiesBreakDoors", false);
-		
 		this.config_mods_ignoreClaimsAccounts = config.getStringList("GriefPrevention.Mods.PlayersIgnoringAllClaims");
 		
 		if(this.config_mods_ignoreClaimsAccounts == null) this.config_mods_ignoreClaimsAccounts = new ArrayList<String>();
@@ -753,7 +765,7 @@ public class WorldConfig {
 		outConfig.set("GriefPrevention.EndermenMoveBlocks", this.config_endermenMoveBlocks);
 		outConfig.set("GriefPrevention.SilverfishBreakBlocks", this.config_silverfishBreakBlocks);		
 		outConfig.set("GriefPrevention.CreaturesTrampleCrops", this.config_creaturesTrampleCrops);
-		outConfig.set("GriefPrevention.HardModeZombiesBreakDoors", this.config_zombiesBreakDoors);		
+				
 		
 			
 		

@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Logger;
 
+import me.ryanhamshire.GriefPrevention.Configuration.ClaimMetaHandler;
 import me.ryanhamshire.GriefPrevention.Configuration.ConfigData;
 import me.ryanhamshire.GriefPrevention.Configuration.WorldConfig;
 import me.ryanhamshire.GriefPrevention.tasks.CleanupUnusedClaimsTask;
@@ -79,7 +80,7 @@ public class GriefPrevention extends JavaPlugin
 	//start removal....
 	//reference to the economy plugin, if economy integration is enabled
 	public static Economy economy = null;	
-	private ArrayList<World> config_siege_enabledWorlds;				//whether or not /siege is enabled on this server
+	//private ArrayList<World> config_siege_enabledWorlds;				//whether or not /siege is enabled on this server
 	
 	private double config_economy_claimBlocksPurchaseCost;			//cost to purchase a claim block.  set to zero to disable purchase.
 	
@@ -99,10 +100,20 @@ public class GriefPrevention extends JavaPlugin
 	public WorldConfig getWorldCfg(World world){
 		return Configuration.getWorldConfig(world);
 	}
+	/**
+	 * Retrieves a World Configuration given the World Name. If the World Configuration is not loaded, it will be loaded
+	 * from the /WorldConfigs folder. If a file is not present, the template will be used and a new file will be created for
+	 * the given name.
+	 * @param worldname Name of world to get configuration for.
+	 * @return WorldConfig representing the configuration of the given world.
+	 */
 	public WorldConfig getWorldCfg(String worldname){
 		return Configuration.getWorldConfig(worldname);
 	}
-	
+	private ClaimMetaHandler MetaHandler = null;
+	public ClaimMetaHandler getMetaHandler(){
+		return MetaHandler;
+	}
 	private static boolean eventsRegistered = false;
 	//initializes well...   everything
 	public void onEnable()
@@ -306,6 +317,7 @@ public class GriefPrevention extends JavaPlugin
 				GriefPrevention.AddLogEntry("ERROR: Vault was unable to find a supported economy plugin.  Either install a Vault-compatible economy plugin, or set both of the economy config variables to zero.");
 			}
 		}
+		MetaHandler = new ClaimMetaHandler();
 	}
 	private void HandleClaimClean(Claim c,MaterialInfo source,MaterialInfo target,Player player){
 		Location lesser = c.getLesserBoundaryCorner();
@@ -1394,7 +1406,7 @@ public class GriefPrevention extends JavaPlugin
 				String permissionIdentifier = args[0].substring(1, args[0].length() - 1);
 				int newTotal = this.dataStore.adjustGroupBonusBlocks(permissionIdentifier, adjustment);
 				
-				GriefPrevention.sendMessage(player, TextMode.Success, Messages.AdjustGroupBlocksSuccess, permissionIdentifier, String.valueOf(adjustment), String.valueOf(newTotal));
+				if(player!=null) GriefPrevention.sendMessage(player, TextMode.Success, Messages.AdjustGroupBlocksSuccess, permissionIdentifier, String.valueOf(adjustment), String.valueOf(newTotal));
 				if(player != null) GriefPrevention.AddLogEntry(player.getName() + " adjusted " + permissionIdentifier + "'s bonus claim blocks by " + adjustment + ".");
 				
 				return true;
@@ -1404,7 +1416,7 @@ public class GriefPrevention extends JavaPlugin
 			OfflinePlayer targetPlayer = this.resolvePlayer(args[0]);
 			if(targetPlayer == null)
 			{
-				GriefPrevention.sendMessage(player, TextMode.Err, Messages.PlayerNotFound);
+				if(player!=null) GriefPrevention.sendMessage(player, TextMode.Err, Messages.PlayerNotFound);
 				return true;
 			}
 			
@@ -2003,7 +2015,7 @@ public class GriefPrevention extends JavaPlugin
 	//checks whether players siege in a world
 	public boolean siegeEnabledForWorld(World world)
 	{
-		return this.config_siege_enabledWorlds.contains(world);
+		return this.getWorldCfg(world).Seige_Enabled();
 	}
 
 	//processes broken log blocks to automatically remove floating treetops
@@ -2306,7 +2318,7 @@ public class GriefPrevention extends JavaPlugin
 			//no building in survival wilderness when that is configured
 			else if(wc.claims_ApplyTrashBlockRules() && wc.claims_enabled())
 			{
-				if(!wc.getTrashBlockPlacementBehaviour().Allowed(location,player))
+				if(wc.getTrashBlockPlacementBehaviour().Allowed(location,player).Denied())
 					return this.dataStore.getMessage(Messages.NoBuildOutsideClaims) + "  " + this.dataStore.getMessage(Messages.SurvivalBasicsDemoAdvertisement);
 				else
 					return null;

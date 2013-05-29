@@ -823,23 +823,15 @@ class PlayerEventHandler implements Listener
 			}			
 		}
 		
-		if(entity instanceof Villager && wc.claims_preventTrades()){
-			//get the claim at that position.
-			Claim claim = this.dataStore.getClaimAt(entity.getLocation(), false, null);
-			if(claim!=null){
-			    String noContainerReason = claim.allowContainers(player);
-			    if(noContainerReason != null){
-			    	GriefPrevention.sendMessage(player,TextMode.Err,noContainerReason);
+		if(entity instanceof Villager && wc.getVillagerTrades().Allowed(entity.getLocation(),player).Denied()){
+			
+			    	
 			    	event.setCancelled(true);
 			    	return;
 			    }
-			} else if(claim==null && wc.claims_ApplyTrashBlockRules()){
-				GriefPrevention.sendMessage(player, TextMode.Err, Messages.NoVillagerTradeOutsideClaims);
-				event.setCancelled(true);
-				return;
-			}
+	
 			
-		}
+		
 		
 		//don't allow container access during pvp combat
 		
@@ -1014,14 +1006,14 @@ class PlayerEventHandler implements Listener
 
 		//checks for Behaviour perms.
 		if(bucketEvent.getBucket() == Material.LAVA_BUCKET){
-			if(!wc.getLavaBucketBehaviour().Allowed(block.getLocation(),player)){
+			if(wc.getLavaBucketBehaviour().Allowed(block.getLocation(),player).Denied()){
 				GriefPrevention.sendMessage(player, TextMode.Err, Messages.ConfigDisabled,"Lava placement ");
 				bucketEvent.setCancelled(true);
 				return;
 			}
 		}
 		else if(bucketEvent.getBucket() == Material.WATER_BUCKET){
-			if(!wc.getWaterBucketBehaviour().Allowed(block.getLocation(),player)){
+			if(wc.getWaterBucketBehaviour().Allowed(block.getLocation(),player).Denied()){
 				GriefPrevention.sendMessage(player, TextMode.Err, Messages.ConfigDisabled,"Water placement ");
 				bucketEvent.setCancelled(true);
 				return;
@@ -1048,7 +1040,7 @@ class PlayerEventHandler implements Listener
 				}
 			 if(bucketEvent.getBucket() == Material.WATER_BUCKET){
 				
-				if(!wc.getWaterBucketBehaviour().Allowed(block.getLocation(), player)){
+				if(wc.getWaterBucketBehaviour().Allowed(block.getLocation(), player).Denied()){
 					GriefPrevention.sendMessage(player,TextMode.Err,Messages.NoWildernessBuckets);
 					bucketEvent.setCancelled(true);
 					return;
@@ -1063,7 +1055,7 @@ class PlayerEventHandler implements Listener
 			if(bucketEvent.getBucket() == Material.LAVA_BUCKET)
 			{
 				
-				if(!wc.getLavaBucketBehaviour().Allowed(block.getLocation(), player)){
+				if(wc.getLavaBucketBehaviour().Allowed(block.getLocation(), player).Denied()){
 					GriefPrevention.sendMessage(player,TextMode.Err,Messages.ConfigDisabled,"Lava Placement");
 					bucketEvent.setCancelled(true);
 					return;
@@ -1094,7 +1086,7 @@ class PlayerEventHandler implements Listener
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(block.getWorld());
 		//make sure the player is allowed to build at the location
 		//String noBuildReason = GriefPrevention.instance.allowBuild(player, block.getLocation());
-		if(!wc.getWaterBucketBehaviour().Allowed(block.getLocation(), player))
+		if(wc.getWaterBucketBehaviour().Allowed(block.getLocation(), player).Denied())
 		{
 			//GriefPrevention.sendMessage(player, TextMode.Err, noBuildReason);
 			bucketEvent.setCancelled(true);

@@ -38,14 +38,17 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Monster;
+import org.bukkit.entity.Ocelot;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Snowball;
 import org.bukkit.entity.Snowman;
 import org.bukkit.entity.TNTPrimed;
+import org.bukkit.entity.Tameable;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.entity.Villager;
 import org.bukkit.entity.Wither;
 import org.bukkit.entity.WitherSkull;
+import org.bukkit.entity.Wolf;
 import org.bukkit.entity.minecart.ExplosiveMinecart;
 
 import org.bukkit.event.EventHandler;
@@ -103,7 +106,7 @@ class EntityEventHandler implements Listener
 		else if(event.getEntityType() == EntityType.WITHER && wc.claims_enabled())
 		{
 			
-			event.setCancelled(!wc.getWitherEatBehaviour().Allowed(event.getEntity().getLocation(),null));
+			event.setCancelled(wc.getWitherEatBehaviour().Allowed(event.getEntity().getLocation(),null).Denied());
 		}
 	}
 	
@@ -112,7 +115,8 @@ class EntityEventHandler implements Listener
 	public void onZombieBreakDoor(EntityBreakDoorEvent event)
 	{		
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(event.getEntity().getWorld());
-		if(!wc.zombiesBreakDoors()) event.setCancelled(true);
+		if(!wc.getZombieDoorBreaking().Allowed(event.getEntity().getLocation(), null).Allowed()) 
+			event.setCancelled(true);
 	}
 	
 	//don't allow entities to trample crops
@@ -162,7 +166,7 @@ class EntityEventHandler implements Listener
 			Block block = blocks.get(i);
 			if(wc.mods_explodableIds().Contains(new MaterialInfo(block.getTypeId(), block.getData(), null))) continue;
 			//creative rules stop all explosions, regardless of the other settings.
-			if(wc.creative_rules() ||  (usebehaviour!=null && !usebehaviour.Allowed(block.getLocation(),null))){
+			if(wc.creative_rules() ||  (usebehaviour!=null && usebehaviour.Allowed(block.getLocation(),null).Denied())){
 				//if not allowed. remove it...
 				blocks.remove(i--);
 			}
@@ -340,7 +344,7 @@ class EntityEventHandler implements Listener
 
 		if(reason == SpawnReason.BUILD_WITHER){
 			//can we build a wither?
-			if(!wc.getWitherSpawnBehaviour().Allowed(entity.getLocation(), null)){
+			if(wc.getWitherSpawnBehaviour().Allowed(entity.getLocation(), null).Denied()){
 				event.setCancelled(true);
 				//spawn what was used to make the wither (four soul sand and three skull items).
 				//ItemStack SoulSand = new ItemStack(Material.SOUL_SAND,4);
@@ -352,7 +356,7 @@ class EntityEventHandler implements Listener
 		}
 		else if(reason == SpawnReason.BUILD_SNOWMAN){
 			//can we build a snowman?
-			if(!wc.getSnowGolemSpawnBehaviour().Allowed(entity.getLocation(),null)){
+			if(wc.getSnowGolemSpawnBehaviour().Allowed(entity.getLocation(),null).Denied()){
 				event.setCancelled(true);
 				//spawn what was used to make the snowman. we'll spawn 8 snowball and a pumpkin.
 				//ItemStack Snowballs = new ItemStack(Material.SNOW_BLOCK,2);
@@ -364,7 +368,7 @@ class EntityEventHandler implements Listener
 		}
 		else if(reason == SpawnReason.BUILD_IRONGOLEM){
 			
-			if(!wc.getIronGolemSpawnBehaviour().Allowed(entity.getLocation(), null)){
+			if(wc.getIronGolemSpawnBehaviour().Allowed(entity.getLocation(), null).Denied()){
 				event.setCancelled(true);
 				//ItemStack IronBlocks = new ItemStack(Material.IRON_BLOCK,3);
 				//ItemStack Pumpkin = new ItemStack(Material.PUMPKIN,1);
@@ -422,6 +426,51 @@ class EntityEventHandler implements Listener
 			//end it, with the dieing player being the loser
 			this.dataStore.endSiege(playerData.siegeData, null, player.getName(), true /*ended due to death*/);
 		}
+		
+		//if it is an ocelot or wolf, and the owner is under seige, 
+		//inform the owner of the casualty on the line of battle.
+		
+		if(entity instanceof Wolf || entity instanceof Ocelot){
+			
+			if(entity instanceof Tameable){
+				Tameable tamed = (Tameable)entity;
+				if(tamed.isTamed()){
+					String ownername = tamed.getOwner().getName();
+					PlayerData ownerdata = GriefPrevention.instance.dataStore.getPlayerData(ownername);
+					if(ownerdata!=null){
+						if(ownerdata.siegeData!=null){
+							//if the owner is the Defender...
+							if(ownerdata.siegeData.defender == tamed.getOwner()){
+								//inform them of the loss to their great cause.
+								if(tamed.getOwner() instanceof Player){
+									String tamedname = "";
+									if(tamed instanceof Wolf) tamedname = "Wolf"; else tamedname="Ocelot";
+									
+									Player theplayer = (Player)tamed.getOwner();
+									GriefPrevention.sendMessage(theplayer, TextMode.Info, Messages.TamedDeathDefend,tamedname);
+									//theplayer.sendMessage(arg0)
+								}
+								
+								
+								
+							}
+							
+							
+						}
+					}
+					
+					
+					
+				}
+				
+				
+			}
+			
+			
+			
+		}
+		
+		
 	}
 	
 	//when an entity picks up an item
@@ -646,6 +695,7 @@ class EntityEventHandler implements Listener
 		if(event instanceof EntityDamageByEntityEvent)
 		{
 			//if the entity is an non-monster creature (remember monsters disqualified above), or a vehicle
+			//
 			if ((subEvent.getEntity() instanceof Creature && wc.claims_protectCreatures()))
 			{
 				
@@ -682,9 +732,33 @@ class EntityEventHandler implements Listener
 						}						
 					}
 					
-					//otherwise the player damaging the entity must have permission
+					//otherwise the player damaging the entity must have permission,
+					//or, for wolves and ocelots, apply special logic for sieges.
 					else
 					{		
+						if(event.getEntityType()==EntityType.WOLF || event.getEntityType()==EntityType.OCELOT){
+							//get the claim at this position...
+							Claim mobclaim = GriefPrevention.instance.dataStore.getClaimAt(event.getEntity().getLocation(),true,null);
+							//is this claim under siege?
+							if(mobclaim!=null && mobclaim.siegeData!=null){
+								
+								SiegeData sd = mobclaim.siegeData;
+								//get the defending player.
+								Player defender = sd.defender;
+								//if the player attacking this entity is within 15 blocks, don't cancel.
+								if(attacker.getLocation().distance(defender.getLocation()) < 20){
+									event.setCancelled(false);
+									return;
+								}
+								
+								
+							}
+							
+							
+							
+						}
+						
+						
 						String noContainersReason = claim.allowContainers(attacker);
 						if(noContainersReason != null)
 						{
@@ -740,7 +814,7 @@ class EntityEventHandler implements Listener
 			}
 		}
 		//if Damage source is unspecified and we allow environmental damage, don't cancel the event.
-		else if(damageSource ==null && wc.claims_AllowEnvironmentalVehicleDamage()){
+		else if(damageSource ==null && wc.getEnvironmentalVehicleDamage().Allowed(event.getVehicle().getLocation(),attacker).Allowed()){
 			return;
 		}
 		//NOTE: vehicles can be pushed around.

@@ -1180,6 +1180,7 @@ public abstract class DataStore
 		this.addDefault(defaults, Messages.ClearManagersNotAdmin, "Only Administrators can change managers on an admin claim.",null);
 		this.addDefault(defaults, Messages.GroupNotFound, "Group {0} Not found.", "0:Name of Group");
 		this.addDefault(defaults, Messages.ConfigDisabled,"{0} has been disabled for this location.", "0:name of operation");
+		this.addDefault(defaults,Messages.TamedDeathDefend,"A {0} has been killed in defense of your Claim!","0:Type of tamed animal;1:Attacker");
 		//load the config file
 		FileConfiguration config = YamlConfiguration.loadConfiguration(new File(messagesFilePath));
 		
