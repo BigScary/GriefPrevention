@@ -339,16 +339,19 @@ public abstract class DataStore
 	
 	abstract PlayerData getPlayerDataFromStorage(String playerName);
 	
+	synchronized public void deleteClaim(Claim claim){
+		deleteClaim(claim,null);
+	}
 	/**
 	 * Deletes a claim or subdivision
 	 * @param claim
 	 */
-	synchronized public void deleteClaim(Claim claim) {
-		deleteClaim(claim, true);
+	synchronized public void deleteClaim(Claim claim,Player p) {
+		deleteClaim(claim, true,p);
 	}
 	
 	//deletes a claim or subdivision
-	synchronized private void deleteClaim(Claim claim, boolean sendevent)
+	synchronized private void deleteClaim(Claim claim, boolean sendevent,Player p)
 	{
 		//subdivisions are simple - just remove them from their parent claim and save that claim
 		if(claim.parent != null)
@@ -508,6 +511,7 @@ public abstract class DataStore
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(world);
 		int smallx, bigx, smally, bigy, smallz, bigz;
 
+		Player gotplayer = Bukkit.getPlayer(ownerName);
 		//determine small versus big inputs
 		if(x1 < x2)
 		{
@@ -598,14 +602,14 @@ public abstract class DataStore
 			}
 		}
 		if(oldclaim == null) {
-			NewClaimCreated claimevent = new NewClaimCreated(newClaim);
+			NewClaimCreated claimevent = new NewClaimCreated(newClaim,gotplayer);
 			Bukkit.getServer().getPluginManager().callEvent(claimevent);
 			if(claimevent.isCancelled()) {
 				result.succeeded = CreateClaimResult.Result.Canceled;
 				return result;
 			}
 		}else {
-			ClaimResizeEvent claimevent = new ClaimResizeEvent(oldclaim, newClaim);
+			ClaimResizeEvent claimevent = new ClaimResizeEvent(oldclaim, newClaim,gotplayer);
 			Bukkit.getServer().getPluginManager().callEvent(claimevent);
 			if(claimevent.isCancelled()) {
 				result.succeeded = CreateClaimResult.Result.Canceled;

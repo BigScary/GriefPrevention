@@ -2,6 +2,7 @@ package me.ryanhamshire.GriefPrevention.events;
 
 import me.ryanhamshire.GriefPrevention.Claim;
 
+import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
@@ -23,8 +24,9 @@ public class NewClaimCreated extends Event implements Cancellable {
     }
     
     Claim claim;
-    
-    public NewClaimCreated(Claim claim) {
+    Player p;
+    public Player getPlayer(){ return p;}
+    public NewClaimCreated(Claim claim,Player p) {
     	this.claim = claim;
     }
     

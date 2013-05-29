@@ -28,9 +28,7 @@ public class ClaimResizeEvent extends Event implements Cancellable {
     private Claim oldclaim;
     private Claim newclaim;
     private Player resizer;
-    public ClaimResizeEvent(Claim oldclaim,Claim newclaim){
-    	this(oldclaim,newclaim,null);
-    }
+  
     public ClaimResizeEvent(Claim oldclaim, Claim newclaim,Player Resizer) {
     	this.oldclaim = oldclaim;
     	this.newclaim = newclaim;
