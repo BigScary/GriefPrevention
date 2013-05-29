@@ -184,7 +184,7 @@ public class BlockEventHandler implements Listener
 		//if the block is a trash block....
 		if(wc.getTrashBlocks().contains(breakEvent.getBlock().getType())){
 			// and if this location is applicable for trash block placement...
-			if(wc.getTrashBlockPlacementBehaviour().Allowed(breakEvent.getBlock().getLocation(),player));
+			if(wc.getTrashBlockPlacementBehaviour().Allowed(breakEvent.getBlock().getLocation(),player).Allowed());
 			//allow it with abandon...
 			return;
 			
@@ -274,7 +274,7 @@ public class BlockEventHandler implements Listener
 			//if set, then we only allow Trash Blocks to be placed, and only in the allowed places.
 			Claim testclaim = GriefPrevention.instance.dataStore.getClaimAt(block.getLocation(), true, null);
 			if(testclaim==null){
-				if(wc.getTrashBlockPlacementBehaviour().Allowed(block.getLocation(),player)){
+				if(wc.getTrashBlockPlacementBehaviour().Allowed(block.getLocation(),player).Allowed()){
 					if(wc.getTrashBlocks().contains(block.getType())){
 					return;	
 					}
@@ -439,7 +439,7 @@ public class BlockEventHandler implements Listener
 		//warn players when they place TNT above sea level, since it doesn't destroy blocks there
 		
 		//warn players if Explosions are not allowed at the position they place it.
-		boolean TNTAllowed = wc.getTNTExplosionBehaviour().Allowed(block.getLocation(),null);
+		boolean TNTAllowed = wc.getTNTExplosionBehaviour().Allowed(block.getLocation(),null).Allowed();
 		
 		if(	!TNTAllowed && block.getType() == Material.TNT &&
 			block.getWorld().getEnvironment() != Environment.NETHER &&
@@ -749,8 +749,8 @@ public class BlockEventHandler implements Listener
 		Material materialDispensed = dispenseEvent.getItem().getType();
 		
 		if(
-				(materialDispensed == Material.WATER_BUCKET && wc.getWaterBucketBehaviour().Allowed(toBlock.getLocation(),null) ||
-				(materialDispensed == Material.LAVA_BUCKET && wc.getLavaBucketBehaviour().Allowed(toBlock.getLocation(),null))
+				(materialDispensed == Material.WATER_BUCKET && wc.getWaterBucketBehaviour().Allowed(toBlock.getLocation(),null).Allowed() ||
+				(materialDispensed == Material.LAVA_BUCKET && wc.getLavaBucketBehaviour().Allowed(toBlock.getLocation(),null).Allowed())
 				&& GriefPrevention.instance.claimsEnabledForWorld(fromBlock.getWorld())))		
 		{
 			dispenseEvent.setCancelled(true);
