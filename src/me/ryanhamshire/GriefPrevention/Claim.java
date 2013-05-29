@@ -48,50 +48,78 @@ public class Claim
 	Location lesserBoundaryCorner;
 	Location greaterBoundaryCorner;
 	
-	//modification date.  this comes from the file timestamp during load, and is updated with runtime changes
+	/**
+	 * modification date.  this comes from the file timestamp during load, and is updated with runtime changes
+	 */
 	public Date modifiedDate;
 	
-	//id number.  unique to this claim, never changes.
+	/**id number.  unique to this claim, never changes.
+	 * 
+	 */
 	Long id = null;
 	
-	//Subclaim ID. null for top-level claims, unique among subclaims otherwise.
+	/**
+	 * Subclaim ID. null for top-level claims, unique among subclaims otherwise.
+	 */
 	Long subClaimid=null;
 	
-	//ownername.  for admin claims, this is the empty string
-	//use getOwnerName() to get a friendly name (will be "an administrator" for admin claims)
+	/**
+	 * ownername.  for admin claims, this is the empty string
+	 * use getOwnerName() to get a friendly name (will be "an administrator" for admin claims)
+	 */
 	public String ownerName;
 	
-	//list of players who (beyond the claim owner) have permission to grant permissions in this claim
+	/**
+	 * list of players who (beyond the claim owner) have permission to grant permissions in this claim
+	 */
 	private ArrayList<String> managers = new ArrayList<String>();
 	
 	//permissions for this claim, see ClaimPermission class
 	private HashMap<String, ClaimPermission> playerNameToClaimPermissionMap = new HashMap<String, ClaimPermission>();
 	
-	//whether or not this claim is in the data store
-	//if a claim instance isn't in the data store, it isn't "active" - players can't interract with it 
-	//why keep this?  so that claims which have been removed from the data store can be correctly 
-	//ignored even though they may have references floating around
-	public boolean inDataStore = false;
+	/**
+	 * whether or not this claim is in the data store
+	 * if a claim instance isn't in the data store, it isn't "active" - players can't interract with it 
+	 * why keep this?  so that claims which have been removed from the data store can be correctly 
+	 * ignored even though they may have references floating around
+	 */
 	
+	public boolean inDataStore = false;
+	/**
+	 * seld-explanatory: whether Explosives can affect this claim. This is an additional requirement in addition to
+	 * the world configuration allowing for Explosions within claims either above or below sea-level.
+	 */
 	public boolean areExplosivesAllowed = false;
 	
-	//parent claim
-	//only used for claim subdivisions.  top level claims have null here
+
+	/** parent claim
+	 * only used for claim subdivisions.  top level claims have null here
+	 */
 	public Claim parent = null;
 	
-	//children (subdivisions)
-	//note subdivisions themselves never have children
+	/**
+	 * children (subdivisions)
+	 * note subdivisions themselves never have children
+	 */
+	
 	public ArrayList<Claim> children = new ArrayList<Claim>();
 	
-	//information about a siege involving this claim.  null means no siege is impacting this claim
+	/**
+	 * information about a siege involving this claim.  null means no siege is currently impacting this claim
+	 */
 	public SiegeData siegeData = null;
 	
-	//following a siege, buttons/levers are unlocked temporarily.  this represents that state
+	/**
+	 * following a siege, buttons/levers are unlocked temporarily.  this represents that state
+	 */
 	public boolean doorsOpen = false;
-	//following a siege, anybody can open containers in that claim, up to a set limit.
-	
+	/**
+	 * following a siege, anybody can open containers in that claim, up to a set limit.
+	 */
 	public int LootedChests = 0;
-	//This variable sets whether a claim gets deleted with the automatic cleanup.
+	/**
+	 * This variable sets whether a claim gets deleted with the automatic cleanup.
+	 */
 	public boolean neverdelete = false;
 	
 	//whether or not this is an administrative claim
@@ -123,6 +151,11 @@ public class Claim
 	{
 		return (this.ownerName == null || this.ownerName.isEmpty());
 	}
+	/**
+	 * retrieves a Subclaim by the Subclaim's unique index.
+	 * @param pID
+	 * @return
+	 */
 	public Claim getSubClaim(long pID){
 		for(Claim subclaim:children){
 			if(subclaim.getSubClaimID()==pID) return subclaim;
@@ -174,7 +207,7 @@ public class Claim
 		if(this.getArea() > 10000) return;
 		
 		//don't do it when surface fluids are allowed to be dumped
-		if(!wc.getWaterBucketBehaviour().Allowed(getLesserBoundaryCorner(),null))
+		if(wc.getWaterBucketBehaviour().Allowed(getLesserBoundaryCorner(),null).Denied())
 			return;
 		
 		Location lesser = this.getLesserBoundaryCorner();
