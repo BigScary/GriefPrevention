@@ -1212,6 +1212,7 @@ class PlayerEventHandler implements Listener
 				String noContainersReason = claim.allowContainers(player);
 				if(noContainersReason != null)
 				{
+					System.out.println("CANCELLING Container Access.");
 					event.setCancelled(true);
 					GriefPrevention.sendMessage(player, TextMode.Err, noContainersReason);
 					return;
@@ -1240,6 +1241,7 @@ class PlayerEventHandler implements Listener
 				String noAccessReason = claim.allowAccess(player);
 				if(noAccessReason != null)
 				{
+					System.out.println("CANCELLING Access.");
 					event.setCancelled(true);
 					GriefPrevention.sendMessage(player, TextMode.Err, noAccessReason);
 					return;
@@ -1259,6 +1261,7 @@ class PlayerEventHandler implements Listener
 				String noAccessReason = claim.allowAccess(player);
 				if(noAccessReason != null)
 				{
+					System.out.println("CANCELLING Container Access.");
 					event.setCancelled(true);
 					GriefPrevention.sendMessage(player, TextMode.Err, noAccessReason);
 					return;
@@ -1283,6 +1286,7 @@ class PlayerEventHandler implements Listener
 				String noBuildReason = claim.allowBuild(player);
 				if(noBuildReason != null)
 				{
+					System.out.println("CANCELLING Container Access.");
 					event.setCancelled(true);
 					GriefPrevention.sendMessage(player, TextMode.Err, noBuildReason);
 					return;
@@ -1306,6 +1310,7 @@ class PlayerEventHandler implements Listener
 				String noBuildReason = GriefPrevention.instance.allowBuild(player, clickedBlock.getLocation());
 				if(noBuildReason != null)
 				{
+					
 					GriefPrevention.sendMessage(player, TextMode.Err, noBuildReason);
 					event.setCancelled(true);
 				}
@@ -1338,6 +1343,7 @@ class PlayerEventHandler implements Listener
 				if(noBuildReason != null)
 				{
 					GriefPrevention.sendMessage(player, TextMode.Err, noBuildReason);
+					System.out.println("CANCELLING Container Access.");
 					event.setCancelled(true);
 					return;
 				}
@@ -1612,6 +1618,7 @@ class PlayerEventHandler implements Listener
 						//automatically switch to advanced claims mode, and show a message.
 						playerData.claimSubdividing = checkclaim;
 						playerData.shovelMode=ShovelMode.Subdivide;
+						//TODO: Raise StartClaimSubdivideEvent
 						GriefPrevention.sendMessage(player, TextMode.Info, "Entering Claim subdivide mode.");
 					} else {
 						//do nothing.
@@ -1728,6 +1735,8 @@ class PlayerEventHandler implements Listener
 				
 				if(result.succeeded == CreateClaimResult.Result.Success)
 				{
+					//TODO: Raise a ClaimResizeEvent here.
+					
 					//inform and show the player
 					GriefPrevention.sendMessage(player, TextMode.Success, Messages.ClaimResizeSuccess, String.valueOf(playerData.getRemainingClaimBlocks()));
 					Visualization visualization = Visualization.FromClaim(result.claim, clickedBlock.getY(), VisualizationType.Claim, player.getLocation());
@@ -1778,6 +1787,7 @@ class PlayerEventHandler implements Listener
 					{
 						playerData.claimResizing = claim;
 						playerData.lastShovelLocation = clickedBlock.getLocation();
+						//TODO: Raise ClaimResizeBegin Event here
 						GriefPrevention.sendMessage(player, TextMode.Instr, Messages.ResizeStart);
 					}
 					
@@ -1796,6 +1806,7 @@ class PlayerEventHandler implements Listener
 							//otherwise start a new subdivision
 							else
 							{
+								//RaiseCreateSubdivisionStart
 								GriefPrevention.sendMessage(player, TextMode.Instr, Messages.SubdivisionStart);
 								playerData.lastShovelLocation = clickedBlock.getLocation();
 								playerData.claimSubdividing = claim;
@@ -1900,7 +1911,7 @@ class PlayerEventHandler implements Listener
 				//remember it, and start him on the new claim
 				playerData.lastShovelLocation = clickedBlock.getLocation();
 				GriefPrevention.sendMessage(player, TextMode.Instr, Messages.ClaimStart);
-				
+				//TODO: raise ClaimCreateStartEvent
 				//show him where he's working
 				Visualization visualization = Visualization.FromClaim(new Claim(clickedBlock.getLocation(), clickedBlock.getLocation(), "", new String[]{}, new String[]{}, new String[]{}, new String[]{}, null, false), clickedBlock.getY(), VisualizationType.RestoreNature, player.getLocation());
 				Visualization.Apply(player, visualization);
