@@ -92,7 +92,7 @@ public class TreeCleanupTask implements Runnable
 		}
 		
 		//if any were actually removed and we're set to automatically replant griefed trees, place a sapling where the root block was previously
-		if(logsRemaining && wc.trees_regrowGriefedTrees())
+		if(logsRemaining && wc.getRegrowGriefedTrees())
 		{
 			Block currentBlock = this.originalRootBlock.getLocation().getBlock();
 			//make sure there's grass or dirt underneath

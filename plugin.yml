@@ -8,6 +8,10 @@ commands:
       description: sets the claim blocks for a player to a specific value.
       usage: /SetClaimBlocks <player> <amount>
       permission: griefprevention.setclaimblocks
+   claiminfo:
+      description: displays advanced information about a claim.
+      usage: /ClaimInfo [claimid]
+      permission: griefprevention.claiminfo
    cleanclaim:
       description: cleans all of a given material from a owned claim. target material defaults to AIR.
       usage: /CleanClaim <source> <target>

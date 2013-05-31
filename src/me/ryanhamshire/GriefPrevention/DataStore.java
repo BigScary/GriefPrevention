@@ -547,7 +547,7 @@ public abstract class DataStore
 		}
 		
 		//creative mode claims always go to bedrock
-		if(wc.creative_rules() )
+		if(wc.getCreativeRules() )
 		{
 			smally = 2;
 		}
@@ -643,7 +643,7 @@ public abstract class DataStore
 		
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(claim.getLesserBoundaryCorner().getWorld());
 		
-		if(newDepth < wc.claims_maxDepth()) newDepth = wc.claims_maxDepth();
+		if(newDepth < wc.getClaimsMaxDepth()) newDepth = wc.getClaimsMaxDepth();
 		
 		if(claim.parent != null) claim = claim.parent;
 		

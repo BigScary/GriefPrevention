@@ -87,19 +87,15 @@ public class WorldConfig {
 	 * Returns whether Seige is Enabled for this world.
 	 * @return
 	 */
-	public boolean Seige_Enabled(){ return claims_Seige_Enabled;}
+	public boolean getSeigeEnabled(){ return claims_Seige_Enabled;}
 	private boolean claims_enabled;
 	/**
 	 * returns whether Claims are enabled. Most configuration Options, while still present and readable, become redundant when this is false.
 	 * @return
 	 */
-	public boolean claims_enabled(){ return claims_enabled;}
+	public boolean getClaimsEnabled(){ return claims_enabled;}
 	private boolean claims_creative_rules;
-	/**
-	 * returns whether Creative mode rules are being applied to this world.
-	 * @return
-	 */
-	public boolean creative_rules(){ return claims_creative_rules;}
+	
 	private List<Material> config_trash_blocks=null;
 	/**
 	 * returns the List of Trash block materials for this world. These are Materials that can be 
@@ -108,59 +104,62 @@ public class WorldConfig {
 	 */
 	public List<Material> getTrashBlocks() { return config_trash_blocks;}
 	private int config_message_cooldown_claims = 0; //claims cooldown. 0= no cooldown.
-	public int message_cooldown_claims(){ return config_message_cooldown_claims;}
+	public int getMessageCooldownClaims(){ return config_message_cooldown_claims;}
 	private int config_message_cooldown_stuck = 0; //stuck cooldown. 0= no cooldown.
-	public int message_cooldown_stuck(){return config_message_cooldown_stuck;}
+	public int getMessageCooldownStuck(){return config_message_cooldown_stuck;}
 	private int config_claimcleanup_maximumsize;  //maximum size of claims to cleanup. larger claims are not cleaned up.
-	public int claimcleanup_maximumsize(){ return config_claimcleanup_maximumsize;}
+	public int getClaimCleanupMaximumSize(){ return config_claimcleanup_maximumsize;}
 	private int config_claimcleanup_maxinvestmentscore; //maximum investmentscore. claims with a higher score will not be cleaned up. if set to 0, claim cleanup will not have it's score calculated.
-	public int claimcleanup_maxinvestmentscore() { return config_claimcleanup_maxinvestmentscore;}
+	public int getClaimCleanupMaxInvestmentScore() { return config_claimcleanup_maxinvestmentscore;}
 	
 	private boolean config_entitycleanup_enabled;
-	public boolean entitycleanup_enabled(){ return config_entitycleanup_enabled;}
+	public boolean getEntityCleanupEnabled(){ return config_entitycleanup_enabled;}
 //	private boolean config_treecleanup_enabled;
 	private boolean config_claimcleanup_enabled;                       //whether the cleanup task is activated.
-	public boolean claimcleanup_enabled(){ return config_claimcleanup_enabled;}
-	public boolean treecleanup_enabled(){return config_claimcleanup_enabled;}
+	public boolean getClaimCleanupEnabled(){ return config_claimcleanup_enabled;}
+	public boolean getTreecleanupEnabled(){return config_claimcleanup_enabled;}
+	
 //	private boolean config_naturerestorecleanup_enabled;
 	//private boolean config_claims_AllowEnvironmentalVehicleDamage;                 //whether Entities can take damage from the environment in a claim.
 	//public boolean claims_AllowEnvironmentalVehicleDamage(){return config_claims_AllowEnvironmentalVehicleDamage;}
 	private double  config_claims_AbandonReturnRatio;                //return ratio when abandoning a claim- .80 will result in players getting 80% of the used claim blocks back.
-	public double claims_AbandonReturnRatio(){ return config_claims_AbandonReturnRatio;}
+	public double getClaimsAbandonReturnRatio(){ return config_claims_AbandonReturnRatio;}
 	private boolean config_claims_preventTheft;						//whether containers and crafting blocks are protectable
-	public boolean claims_preventTheft(){ return config_claims_preventTheft;}
+	public boolean getClaimsPreventTheft(){ return config_claims_preventTheft;}
 	private boolean config_claims_protectCreatures;					//whether claimed animals may be injured by players without permission
-	public boolean claims_protectCreatures(){ return config_claims_protectCreatures;}
+	public boolean getClaimsProtectCreatures(){ return config_claims_protectCreatures;}
 	private boolean config_claims_preventButtonsSwitches;			//whether buttons and switches are protectable
-	public boolean claims_preventButtonsSwitches(){ return config_claims_preventButtonsSwitches;}
+	public boolean getClaimsPreventButtonsSwitches(){ return config_claims_preventButtonsSwitches;}
 	private boolean config_claims_lockWoodenDoors;					//whether wooden doors should be locked by default (require /accesstrust)
-	public boolean claims_lockWoodenDoors(){ return config_claims_lockWoodenDoors;}
+	public boolean getClaimsLockWoodenDoors(){ return config_claims_lockWoodenDoors;}
 	private boolean config_claims_lockTrapDoors;						//whether trap doors should be locked by default (require /accesstrust)
-	public boolean claims_lockTrapDoors(){ return config_claims_lockTrapDoors;}
+	public boolean getClaimsLockTrapDoors(){ return config_claims_lockTrapDoors;}
 	private boolean config_claims_lockFenceGates;					//whether fence gates should be locked by default (require /accesstrust)
-	public boolean claims_lockFenceGates(){ return config_claims_lockFenceGates;}
+	public boolean getClaimsLockFenceGates(){ return config_claims_lockFenceGates;}
 	private boolean config_claims_enderPearlsRequireAccessTrust;		//whether teleporting into a claim with a pearl requires access trust
-	public boolean claims_enderPearlsRequireAccessTrust(){ return config_claims_enderPearlsRequireAccessTrust;}
+	public boolean getEnderPearlsRequireAccessTrust(){ return config_claims_enderPearlsRequireAccessTrust;}
 	
 	
 	private int config_claims_blocksAccruedPerHour;					//how many additional blocks players get each hour of play (can be zero)
-	public int claims_blocksAccruedPerHour(){ return config_claims_blocksAccruedPerHour;}
+	public int getClaimBlocksAccruedPerHour(){ return config_claims_blocksAccruedPerHour;}
 	
+	private int Siege_TamedAnimalDistance;
+	public int getSiegeTamedAnimalDistance(){ return Siege_TamedAnimalDistance;}
 	
 	//public int claims_maxAccruedBlocks(){ return config_claims_maxAccruedBlocks;}
 	private int config_claims_maxDepth;								//limit on how deep claims can go
-	public int claims_maxDepth(){ return config_claims_maxDepth;}
+	public int getClaimsMaxDepth(){ return config_claims_maxDepth;}
 	private int config_claims_expirationDays;						//how many days of inactivity before a player loses his claims
-	public int claims_expirationDays(){ return config_claims_expirationDays;}
+	public int getClaimsExpirationDays(){ return config_claims_expirationDays;}
 	
 	private int config_claims_automaticClaimsForNewPlayersRadius;	//how big automatic new player claims (when they place a chest) should be.  0 to disable
-	public int claims_automaticClaimsForNewPlayerRadius(){ return config_claims_automaticClaimsForNewPlayersRadius;}
+	public int getAutomaticClaimsForNewPlayerRadius(){ return config_claims_automaticClaimsForNewPlayersRadius;}
 	private boolean config_claims_creationRequiresPermission;		//whether creating claims with the shovel requires a permission
-	public boolean claims_creationRequiresPermission(){ return config_claims_creationRequiresPermission;}
+	public boolean getCreateClaimRequiresPermission(){ return config_claims_creationRequiresPermission;}
 	private int config_claims_claimsExtendIntoGroundDistance;		//how far below the shoveled block a new claim will reach
-	public int claims_claimsExtendIntoGroundDistance(){ return config_claims_claimsExtendIntoGroundDistance;}
+	public int getClaimsExtendIntoGroundDistance(){ return config_claims_claimsExtendIntoGroundDistance;}
 	private int config_claims_minSize;								//minimum width and height for non-admin claims
-	public int claims_minSize(){ return config_claims_minSize;}
+	public int getMinClaimSize(){ return config_claims_minSize;}
 	
 	
 	
@@ -168,80 +167,80 @@ public class WorldConfig {
 	
 	
 	private boolean config_claims_creativeRules;
-	public boolean claims_creativeRules(){ return config_claims_creativeRules;}
+	public boolean getCreativeRules(){ return config_claims_creativeRules;}
 	
 	private boolean config_claims_allowUnclaim;			//whether players may unclaim land (resize or abandon) 
-	public boolean claims_allowUnclaim(){ return config_claims_allowUnclaim;}
+	public boolean getAllowUnclaim(){ return config_claims_allowUnclaim;}
 	private boolean config_claims_autoRestoreUnclaimed; 	//whether unclaimed land in creative worlds is automatically /restorenature-d
-	public boolean claims_autoRestoreUnclaimed(){ return config_claims_autoRestoreUnclaimed;}
+	public boolean getAutoRestoreUnclaimed(){ return config_claims_autoRestoreUnclaimed;}
 	private boolean config_claims_ApplyTrashBlockRules;				//whether players can build in survival worlds outside their claimed areas
-	public boolean claims_ApplyTrashBlockRules(){ return config_claims_ApplyTrashBlockRules;}
+	public boolean getApplyTrashBlockRules(){ return config_claims_ApplyTrashBlockRules;}
 	
 	private int config_claims_chestClaimExpirationDays;				//number of days of inactivity before an automatic chest claim will be deleted
-	public int claims_chestClaimExpirationDays(){ return config_claims_chestClaimExpirationDays;}
+	public int getChestClaimExpirationDays(){ return config_claims_chestClaimExpirationDays;}
 	private int config_claims_unusedClaimExpirationDays;				//number of days of inactivity before an unused (nothing build) claim will be deleted
-	public int claims_unusedClaimExpirationDays(){ return config_claims_unusedClaimExpirationDays;}
+	public int getUnusedClaimExpirationDays(){ return config_claims_unusedClaimExpirationDays;}
 	private boolean config_claims_AutoNatureRestoration;		//whether survival claims will be automatically restored to nature when auto-deleted
-	public boolean claims_AutoNatureRestoration(){ return config_claims_AutoNatureRestoration;}
+	public boolean getClaimsAutoNatureRestoration(){ return config_claims_AutoNatureRestoration;}
 	private boolean config_claims_Abandon_NatureRestoration; //whether survival claims will be automatically restored to nature when abandoned.
-	public boolean claims_AbandonNatureRestoration(){ return config_claims_Abandon_NatureRestoration;}
+	public boolean getClaimsAbandonNatureRestoration(){ return config_claims_Abandon_NatureRestoration;}
 	
 	private int config_claims_trappedCooldownHours;					//number of hours between uses of the /trapped command
-	public int claims_trappedCooldownHours(){ return config_claims_trappedCooldownHours;}
+	public int getClaimsTrappedCooldownHours(){ return config_claims_trappedCooldownHours;}
 	
 	private Material config_claims_investigationTool;				//which material will be used to investigate claims with a right click
-	public Material claims_investigationTool(){ return config_claims_investigationTool;}
+	public Material getClaimsInvestigationTool(){ return config_claims_investigationTool;}
 	private Material config_claims_modificationTool;	  				//which material will be used to create/resize claims with a right click
-	public Material claims_modificationTool(){ return config_claims_modificationTool;}
+	public Material getClaimsModificationTool(){ return config_claims_modificationTool;}
 	
 	
 	private ArrayList<Material> config_siege_blocks;					//which blocks will be breakable in siege mode
-	public List<Material> siege_blocks() { return config_siege_blocks;}
+	public List<Material> getSiegeBlocks() { return config_siege_blocks;}
 	private boolean config_spam_enabled;								//whether or not to monitor for spam
-	public boolean spam_enabled(){ return config_spam_enabled;}
+	public boolean getSpamProtectionEnabled(){ return config_spam_enabled;}
 	private int config_spam_loginCooldownMinutes;					//how long players must wait between logins.  combats login spam.
-	public int spam_loginCooldownMinutes(){ return config_spam_loginCooldownMinutes;}
+	public int getSpamLoginCooldownMinutes(){ return config_spam_loginCooldownMinutes;}
 	private List<String> config_spam_monitorSlashCommands;  	//the list of slash commands monitored for spam
-	public List<String> spam_monitorSlashCommands(){ return config_spam_monitorSlashCommands;}
+	public List<String> getSpamMonitorSlashCommands(){ return config_spam_monitorSlashCommands;}
 	private boolean config_spam_banOffenders;						//whether or not to ban spammers automatically
-	public boolean spam_banOffenders(){ return config_spam_banOffenders;}
+	public boolean getSpamBanOffenders(){ return config_spam_banOffenders;}
 	private String config_spam_banMessage;							//message to show an automatically banned player
-	public String spam_banMessage(){ return config_spam_banMessage;}
+	public String getSpamBanMessage(){ return config_spam_banMessage;}
 	private String config_spam_warningMessage;						//message to show a player who is close to spam level
-	public String spam_warningMessage(){return config_spam_warningMessage;}
+	public String getSpamWarningMessage(){return config_spam_warningMessage;}
 	private String config_spam_allowedIpAddresses;					//IP addresses which will not be censored
-	public String spam_allowedIpAddresses(){ return config_spam_allowedIpAddresses;}
+	public String getSpamAllowedIpAddresses(){ return config_spam_allowedIpAddresses;}
 	private int config_spam_deathMessageCooldownSeconds;				//cooldown period for death messages (per player) in seconds
-	public int spam_deathMessageCooldownSeconds(){ return config_spam_deathMessageCooldownSeconds;}
+	public int getSpamDeathMessageCooldownSeconds(){ return config_spam_deathMessageCooldownSeconds;}
 	private String config_spam_bancommand;                           //command to run when spam detector triggers. {0} will be player name.
-	public String spam_bancommand(){ return config_spam_bancommand;}
+	public String getSpamBanCommand(){ return config_spam_bancommand;}
 	private String config_spam_kickcommand;                          //command(s) to run when spam detector triggers and kicks. {0} will be player name.
-	public String spam_kickcommand(){ return config_spam_kickcommand;}
+	public String getSpamKickCommand(){ return config_spam_kickcommand;}
 	//private ArrayList<World> config_pvp_enabledWorlds;				//list of worlds where pvp anti-grief rules apply
 	private boolean config_pvp_protectFreshSpawns;					//whether to make newly spawned players immune until they pick up an item
-	public boolean protectFreshSpawns(){ return config_pvp_protectFreshSpawns;}
+	public boolean getProtectFreshSpawns(){ return config_pvp_protectFreshSpawns;}
 	private boolean config_pvp_punishLogout;						    //whether to kill players who log out during PvP combat
-	public boolean pvp_punishLogout() { return config_pvp_punishLogout;}
+	public boolean getPvPPunishLogout() { return config_pvp_punishLogout;}
 	private int config_pvp_combatTimeoutSeconds;						//how long combat is considered to continue after the most recent damage
-	public int pvp_combatTimeoutSeconds(){ return config_pvp_combatTimeoutSeconds;}
+	public int getPvPCombatTimeoutSeconds(){ return config_pvp_combatTimeoutSeconds;}
 	private boolean config_pvp_allowCombatItemDrop;					//whether a player can drop items during combat to hide them
-	public boolean pvp_allowCombatItemDrop(){ return config_pvp_allowCombatItemDrop;}
+	public boolean getAllowCombatItemDrop(){ return config_pvp_allowCombatItemDrop;}
 	
 	private int config_pvp_Seige_Loot_Chests; //defaults to 0, above zero means that a player is allowed to look into and take items from X chests on a claim they seige.
 	
 	public int getSeigeLootChests(){ return config_pvp_Seige_Loot_Chests;}
 	
 	private ArrayList<String> config_pvp_blockedCommands;			//list of commands which may not be used during pvp combat
-	public List<String> pvp_blockedCommands(){ return config_pvp_blockedCommands;}
+	public List<String> getPvPBlockedCommands(){ return config_pvp_blockedCommands;}
 	private boolean config_pvp_noCombatInPlayerLandClaims;			//whether players may fight in player-owned land claims
-	public boolean pvp_noCombatinPlayerClaims(){ return config_pvp_noCombatInPlayerLandClaims;}
+	public boolean getPvPNoCombatinPlayerClaims(){ return config_pvp_noCombatInPlayerLandClaims;}
 	private boolean config_pvp_noCombatInAdminLandClaims;			//whether players may fight in admin-owned land claims
-	public boolean pvp_noCombatinAdminClaims(){ return config_pvp_noCombatInAdminLandClaims;}
+	public boolean getNoPvPCombatinAdminClaims(){ return config_pvp_noCombatInAdminLandClaims;}
 	
 	private boolean config_trees_removeFloatingTreetops;				//whether to automatically remove partially cut trees
-	public boolean trees_removeFloatingTreetops(){ return config_trees_removeFloatingTreetops;}
+	public boolean getRemoveFloatingTreetops(){ return config_trees_removeFloatingTreetops;}
 	private boolean config_trees_regrowGriefedTrees;					//whether to automatically replant partially cut trees
-	public boolean trees_regrowGriefedTrees(){ return config_trees_regrowGriefedTrees;}
+	public boolean getRegrowGriefedTrees(){ return config_trees_regrowGriefedTrees;}
 	
 	
 	
@@ -249,47 +248,51 @@ public class WorldConfig {
 	//private boolean config_blockWildernessWaterBuckets;				//whether players can dump water buckets outside their claims
 	//public boolean blockWildernessWaterBuckets(){ return config_blockWildernessWaterBuckets;}
 	private boolean config_blockSkyTrees;							//whether players can build trees on platforms in the sky
-	public boolean blockSkyTrees(){ return config_blockSkyTrees;}
+	public boolean getBlockSkyTrees(){ return config_blockSkyTrees;}
 	
 	private boolean config_fireSpreads;								//whether fire spreads outside of claims
-	public boolean fireSpreads(){ return config_fireSpreads;}
+	public boolean getFireSpreads(){ return config_fireSpreads;}
 	private boolean config_fireDestroys;								//whether fire destroys blocks outside of claims
-	public boolean fireDestroys(){ return config_fireDestroys;}
+	public boolean getFireDestroys(){ return config_fireDestroys;}
 	
 	private boolean config_addItemsToClaimedChests;					//whether players may add items to claimed chests by left-clicking them
-	public boolean addItemsToClaimedChests(){ return config_addItemsToClaimedChests;}
+	public boolean getAddItemsToClaimedChests(){ return config_addItemsToClaimedChests;}
 	private boolean config_sign_Eavesdrop;                           //whether to allow sign eavesdropping at all.
-	public boolean sign_Eavesdrop(){ return config_sign_Eavesdrop;}
+	public boolean getSignEavesdrop(){ return config_sign_Eavesdrop;}
 	private boolean config_eavesdrop; 								//whether whispered messages will be visible to administrators
-	public boolean EavesDrop(){ return config_eavesdrop;}
+	public boolean getEavesDrop(){ return config_eavesdrop;}
+	private boolean config_eavesdrop_bookdrop;
+	public boolean getEavesDropBookDrop(){ return config_eavesdrop_bookdrop;}
+	
+	
 	private ArrayList<String> config_eavesdrop_whisperCommands;		//list of whisper commands to eavesdrop on
 	public List<String> eavesdrop_whisperCommands(){ return config_eavesdrop_whisperCommands;}
 	
 	private boolean config_smartBan;									//whether to ban accounts which very likely owned by a banned player
-	public boolean smartBan(){ return config_smartBan;}
+	public boolean getSmartBan(){ return config_smartBan;}
 	
 	private boolean config_endermenMoveBlocks;						//whether or not endermen may move blocks around
 	public boolean endermenMoveBlocks(){ return config_endermenMoveBlocks;}
 	private boolean config_silverfishBreakBlocks;					//whether silverfish may break blocks
-	public boolean silverfishBreakBlocks(){ return config_silverfishBreakBlocks;}
+	public boolean getSilverfishBreakBlocks(){ return config_silverfishBreakBlocks;}
 	private boolean config_creaturesTrampleCrops;					//whether or not non-player entities may trample crops
 	public boolean creaturesTrampleCrops(){ return config_creaturesTrampleCrops;}
 
 	
 	private MaterialCollection config_mods_accessTrustIds;			//list of block IDs which should require /accesstrust for player interaction
-	public MaterialCollection mods_accessTrustIds(){ return config_mods_accessTrustIds;}
+	public MaterialCollection getModsAccessTrustIds(){ return config_mods_accessTrustIds;}
 	private MaterialCollection config_mods_containerTrustIds;		//list of block IDs which should require /containertrust for player interaction
-	public MaterialCollection mods_containerTrustIds(){ return config_mods_containerTrustIds;}
+	public MaterialCollection getModsContainerTrustIds(){ return config_mods_containerTrustIds;}
 	private List<String> config_mods_ignoreClaimsAccounts;			//list of player names which ALWAYS ignore claims
-	public List<String> mods_ignoreClaimsAccounts(){ return config_mods_ignoreClaimsAccounts;}
+	public List<String> getModsIgnoreClaimsAccounts(){ return config_mods_ignoreClaimsAccounts;}
 	private MaterialCollection config_mods_explodableIds;			//list of block IDs which can be destroyed by explosions, even in claimed areas
-	public MaterialCollection mods_explodableIds() {return config_mods_explodableIds;}
+	public MaterialCollection getModsExplodableIds() {return config_mods_explodableIds;}
 
 	private boolean config_claims_warnOnBuildOutside;				//whether players should be warned when they're building in an unclaimed area
 	public boolean claims_warnOnBuildOutside(){ return config_claims_warnOnBuildOutside;}
 	private int config_seaLevelOverride;
 	//private HashMap<String, Integer> config_seaLevelOverride;		//override for sea level, because bukkit doesn't report the right value for all situations
-	public Integer seaLevelOverride(){
+	public Integer getSeaLevelOverride(){
 		if(config_seaLevelOverride==-1)
 		return (config_seaLevelOverride=Bukkit.getWorld(this.getWorldName()).getSeaLevel());
 		else
@@ -299,9 +302,9 @@ public class WorldConfig {
 	//the plugin warns about being in the wilderness and all that guff about
 	//players being able to undo your work. 0 disables the display entirely.
 	private int config_claims_wildernessBlocksDelay;
-	public int claims_wildernessBlocksDelay(){ return config_claims_wildernessBlocksDelay;}
+	public int getClaimsWildernessBlocksDelay(){ return config_claims_wildernessBlocksDelay;}
 	private int config_claims_perplayer_claim_limit;                        //maximum number of claims a user can have.
-	public int claims_perplayer_claims_limit(){ return config_claims_perplayer_claim_limit;}
+	public int getClaimsPerPlayerLimit(){ return config_claims_perplayer_claim_limit;}
 
 	
 	
@@ -412,7 +415,8 @@ public class WorldConfig {
 		this.claims_Seige_Enabled = config.getBoolean("GriefPrevention.Siege.Enabled",true);
 		outConfig.set("GriefPrevention.Siege.Enabled", claims_Seige_Enabled);
 		
-		
+		this.Siege_TamedAnimalDistance = config.getInt("GriefPrevention.Claims.SiegeTamedAnimalDistance",20);
+		outConfig.set("GriefPrevention.Claims.SiegeTamedAnimalDistance", Siege_TamedAnimalDistance);
 		this.claims_enabled = config.getBoolean("GriefPrevention.Claims.Enabled",true);
 		outConfig.set("GriefPrevention.Claims.Enabled", claims_enabled);
 		this.config_entitycleanup_enabled = config.getBoolean("GriefPrevention.CleanupTasks.Claims",true);

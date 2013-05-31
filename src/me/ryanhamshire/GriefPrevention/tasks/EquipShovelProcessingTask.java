@@ -47,7 +47,7 @@ public class EquipShovelProcessingTask implements Runnable
 		if(!player.isOnline()) return;
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(player.getWorld());
 		//if he's not holding the golden shovel anymore, do nothing
-		if(player.getItemInHand().getType() != wc.claims_modificationTool()) return;
+		if(player.getItemInHand().getType() != wc.getClaimsModificationTool()) return;
 		
 		PlayerData playerData = GriefPrevention.instance.dataStore.getPlayerData(player.getName());
 		

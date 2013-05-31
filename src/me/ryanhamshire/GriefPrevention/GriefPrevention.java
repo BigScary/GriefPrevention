@@ -25,6 +25,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import me.ryanhamshire.GriefPrevention.Configuration.ClaimMetaHandler;
@@ -97,12 +98,21 @@ public class GriefPrevention extends JavaPlugin
 	{
 		log.info("GriefPrevention: " + entry);
 	}
+	/**
+	 * Retrieves a World Configuration given the World. if the World Configuration is not loaded,
+	 * it will be loaded from the plugins/GriefPreventionData/WorldConfigs folder. If a file is not present for the world,
+	 * the template file will be used. The template file is configured in config.yml, and defaults to _template.cfg in the given folder.
+	 * if no template is found, a default, empty configuration is created and returned.
+	 * @param world World to retrieve configuration for.
+	 * @return WorldConfig representing the configuration of the given world.
+	 * @see getWorldCfg
+	 */
 	public WorldConfig getWorldCfg(World world){
 		return Configuration.getWorldConfig(world);
 	}
 	/**
 	 * Retrieves a World Configuration given the World Name. If the World Configuration is not loaded, it will be loaded
-	 * from the /WorldConfigs folder. If a file is not present, the template will be used and a new file will be created for
+	 * from the plugins/GriefPreventionData/WorldConfigs folder. If a file is not present, the template will be used and a new file will be created for
 	 * the given name.
 	 * @param worldname Name of world to get configuration for.
 	 * @return WorldConfig representing the configuration of the given world.
@@ -111,6 +121,13 @@ public class GriefPrevention extends JavaPlugin
 		return Configuration.getWorldConfig(worldname);
 	}
 	private ClaimMetaHandler MetaHandler = null;
+	/**
+	 * Retrieves the Claim Metadata handler. Unused by GP itself, this is useful for 
+	 * Plugins that which to create Claim-based data. A prime example is a plugin like GriefPreventionFlags, which
+	 * adds Claim-based flag information to claims. Many plugins use their own special methods of indexing per-claim,
+	 * so I thought it made sense to add a sort of "official" API to it, so that they are all consistent.
+	 * @return ClaimMetaHandler object.
+	 */
 	public ClaimMetaHandler getMetaHandler(){
 		return MetaHandler;
 	}
@@ -127,7 +144,12 @@ public class GriefPrevention extends JavaPlugin
 		FileConfiguration outConfig = new YamlConfiguration();
 		Configuration = new ConfigData(config,outConfig);
 		//read configuration settings (note defaults)
-		
+		try {
+			outConfig.save(DataStore.configFilePath);
+		}
+		catch(IOException exx){
+			this.log.log(Level.SEVERE, "Failed to save primary configuration file:" + DataStore.configFilePath);
+		}
 		
 		
 		//load player groups.
@@ -222,7 +244,7 @@ public class GriefPrevention extends JavaPlugin
 		}
 		boolean claimblockaccrual = false;
 		for(WorldConfig wconfig:this.Configuration.getWorldConfigs().values()){
-			if(wconfig.claims_blocksAccruedPerHour()>0){
+			if(wconfig.getClaimBlocksAccruedPerHour()>0){
 				claimblockaccrual=true;
 				break;
 			}
@@ -243,9 +265,9 @@ public class GriefPrevention extends JavaPlugin
 		boolean claimcleanupOn=false;
 		boolean entitycleanupEnabled=false;
 		for(WorldConfig wconfig:Configuration.getWorldConfigs().values()){
-			if(wconfig.claimcleanup_enabled())
+			if(wconfig.getClaimCleanupEnabled())
 				claimcleanupOn=true;
-			if(wconfig.entitycleanup_enabled())
+			if(wconfig.getEntityCleanupEnabled())
 				entitycleanupEnabled=true;
 		}
 		
@@ -360,6 +382,63 @@ public class GriefPrevention extends JavaPlugin
 		{
 			return this.abandonClaimHandler(player, false);
 		}		
+		else if(cmd.getName().equalsIgnoreCase("claiminfo") && player !=null){
+			//show information about a claim.
+			Claim claimatpos = null;
+			if(args.length ==0)
+				claimatpos = dataStore.getClaimAt(player.getLocation(),true,null);
+			else {
+				int claimid = Integer.parseInt(args[0]);
+				claimatpos = dataStore.getClaim(claimid);
+				if(claimatpos==null){
+				    GriefPrevention.sendMessage(player, TextMode.Err, "Invalid Claim ID:" + claimid);
+				    return true;
+				}
+			}
+			if(claimatpos==null){
+				GriefPrevention.sendMessage(player,TextMode.Err, "There is no Claim here!");
+				GriefPrevention.sendMessage(player,TextMode.Err, "Make sure you are inside a claim.");
+				
+				return true;
+			}
+			else {
+				//there is a claim, show all sorts of pointless info about it.
+				//we do not show trust, since that can be shown with /trustlist.
+				//first, get the upper and lower boundary.
+				String lowerboundary = GriefPrevention.getfriendlyLocationString(claimatpos.getLesserBoundaryCorner());
+				String upperboundary = GriefPrevention.getfriendlyLocationString(claimatpos.getGreaterBoundaryCorner()) ;
+				String SizeString = "(" +String.valueOf(claimatpos.getWidth()) + "," + String.valueOf(claimatpos.getHeight()) + ")";
+				String ClaimOwner = claimatpos.getOwnerName();
+				GriefPrevention.sendMessage(player,TextMode.Info, "ID:" + claimatpos.getID());
+				GriefPrevention.sendMessage(player,TextMode.Info, "Position:" + lowerboundary + "-" + upperboundary);
+				GriefPrevention.sendMessage(player,TextMode.Info,"Size:" + SizeString);
+				GriefPrevention.sendMessage(player, TextMode.Info, "Owner:" + ClaimOwner);
+				String parentid = claimatpos.parent==null?"(no parent)":String.valueOf(claimatpos.parent.getID());
+				GriefPrevention.sendMessage(player,TextMode.Info, "Parent ID:" + parentid);
+				String childinfo = "";
+				//if no subclaims, set childinfo to indicate as such.
+				if(claimatpos.children.size() ==0){
+					childinfo = "No subclaims.";
+				}
+				else { //otherwise, we need to get the childclaim info by iterating through each child claim.
+					childinfo = claimatpos.children.size() + " (";
+					
+					for(Claim childclaim:claimatpos.children){
+					    childinfo+=String.valueOf(childclaim.getID()) + ",";	
+					}
+					//remove the last character since it is a comma we do not want.
+					childinfo = childinfo.substring(0,childinfo.length()-1);
+					
+					//tada
+				}
+				GriefPrevention.sendMessage(player,TextMode.Info,"Subclaims:" + childinfo);
+				
+				return true;
+			}
+			
+			
+			
+		}
 		else if(cmd.getName().equalsIgnoreCase("cleanclaim") && player !=null){
 			//source is first arg; target is second arg.
 			player.sendMessage("cleanclaim command..." + args.length);
@@ -500,7 +579,7 @@ public class GriefPrevention extends JavaPlugin
 				deletelocked = Boolean.parseBoolean(args[0]);
 			}
 			
-			if(!wc.claims_allowUnclaim())
+			if(!wc.getAllowUnclaim())
 			{
 				GriefPrevention.sendMessage(player, TextMode.Err, Messages.NoCreativeUnClaim);
 				return true;
@@ -1149,7 +1228,7 @@ public class GriefPrevention extends JavaPlugin
 						this.dataStore.deleteClaim(claim);
 						
 						//if in a creative mode world, /restorenature the claim
-						if(wc.claims_autoRestoreUnclaimed() && GriefPrevention.instance.creativeRulesApply(claim.getLesserBoundaryCorner()))
+						if(wc.getAutoRestoreUnclaimed() && GriefPrevention.instance.creativeRulesApply(claim.getLesserBoundaryCorner()))
 						{
 							GriefPrevention.instance.restoreClaim(claim, 0);
 						}
@@ -1468,11 +1547,11 @@ public class GriefPrevention extends JavaPlugin
 			
 			//check cooldown
 			long lastTrappedUsage = playerData.lastTrappedUsage.getTime();
-			long nextTrappedUsage = lastTrappedUsage + 1000 * 60 * 60 * wc.claims_trappedCooldownHours(); 
+			long nextTrappedUsage = lastTrappedUsage + 1000 * 60 * 60 * wc.getClaimsTrappedCooldownHours(); 
 			long now = Calendar.getInstance().getTimeInMillis();
 			if(now < nextTrappedUsage)
 			{
-				GriefPrevention.sendMessage(player, TextMode.Err, Messages.TrappedOnCooldown, String.valueOf(wc.claims_trappedCooldownHours()), String.valueOf((nextTrappedUsage - now) / (1000 * 60) + 1));
+				GriefPrevention.sendMessage(player, TextMode.Err, Messages.TrappedOnCooldown, String.valueOf(wc.getClaimsTrappedCooldownHours()), String.valueOf((nextTrappedUsage - now) / (1000 * 60) + 1));
 				return true;
 			}
 			
@@ -1630,6 +1709,11 @@ public class GriefPrevention extends JavaPlugin
 		
 	}
 
+	/**
+	 * Creates a friendly Location string for the given Location.
+	 * @param location Location to retrieve a string for.
+	 * @return a formatted String to be shown to a user or for a log file depicting the approximate given location.
+	 */
 	public static String getfriendlyLocationString(Location location) 
 	{
 		return location.getWorld().getName() + "(" + location.getBlockX() + "," + location.getBlockY() + "," + location.getBlockZ() + ")";
@@ -1651,7 +1735,7 @@ public class GriefPrevention extends JavaPlugin
 		int claimarea = claim.getArea();
 		//retrieve (1-abandonclaimration)*totalarea to get amount to subtract from the accrued claim blocks
 		//after we delete the claim.
-		int costoverhead =(int)Math.floor((double)claimarea*(1-wc.claims_AbandonReturnRatio()));
+		int costoverhead =(int)Math.floor((double)claimarea*(1-wc.getClaimsAbandonReturnRatio()));
 		System.out.println("costoverhead:" + costoverhead);
 		
 		
@@ -1662,7 +1746,7 @@ public class GriefPrevention extends JavaPlugin
 		}
 		
 		//don't allow abandon of claims if not configured to allow.
-		else if(!wc.claims_allowUnclaim() )
+		else if(!wc.getAllowUnclaim() )
 		{
 			GriefPrevention.sendMessage(player, TextMode.Err, Messages.NoCreativeUnClaim);
 		}
@@ -1681,7 +1765,7 @@ public class GriefPrevention extends JavaPlugin
 			playerData.warnedAboutMajorDeletion = true;
 		}
 		//if auto-restoration is enabled,
-		else if(!playerData.warnedAboutMajorDeletion && wc.claims_AbandonNatureRestoration())
+		else if(!playerData.warnedAboutMajorDeletion && wc.getClaimsAbandonNatureRestoration())
 				{
 			GriefPrevention.sendMessage(player,TextMode.Warn,Messages.AbandonClaimRestoreWarning);
 			playerData.warnedAboutMajorDeletion=true;
@@ -1707,14 +1791,14 @@ public class GriefPrevention extends JavaPlugin
 			//retrieve area of this claim...
 			
 			
-			this.dataStore.deleteClaim(claim);
+			this.dataStore.deleteClaim(claim,player);
 			
 			//if in a creative mode world, restore the claim area
 			//CHANGE: option is now determined by configuration options.
 			//if we are in a creative world and the creative Abandon Nature restore option is enabled,
 			//or if we are in a survival world and the creative Abandon Nature restore option is enabled,
 			//then perform the restoration.
-			if((wc.claims_AbandonNatureRestoration())){
+			if((wc.getClaimsAbandonNatureRestoration())){
 			
 				GriefPrevention.AddLogEntry(player.getName() + " abandoned a claim @ " + GriefPrevention.getfriendlyLocationString(claim.getLesserBoundaryCorner()));
 				GriefPrevention.sendMessage(player, TextMode.Warn, Messages.UnclaimCleanupWarning);
@@ -1976,7 +2060,7 @@ public class GriefPrevention extends JavaPlugin
 		if(player.getGameMode() == GameMode.CREATIVE) return;
 		
 		//if anti spawn camping feature is not enabled, do nothing
-		if(!wc.protectFreshSpawns()) return;
+		if(!wc.getProtectFreshSpawns()) return;
 		
 		//if the player has the damage any player permission enabled, do nothing
 		if(player.hasPermission("griefprevention.nopvpimmunity")) return;
@@ -2009,13 +2093,13 @@ public class GriefPrevention extends JavaPlugin
 	//checks whether players can create claims in a world
 	public boolean claimsEnabledForWorld(World world)
 	{
-		return this.getWorldCfg(world).claims_enabled();
+		return this.getWorldCfg(world).getClaimsEnabled();
 	}
 	
 	//checks whether players siege in a world
 	public boolean siegeEnabledForWorld(World world)
 	{
-		return this.getWorldCfg(world).Seige_Enabled();
+		return this.getWorldCfg(world).getSeigeEnabled();
 	}
 
 	//processes broken log blocks to automatically remove floating treetops
@@ -2257,7 +2341,7 @@ public class GriefPrevention extends JavaPlugin
 	//sends a color-coded message to a player
 	static void sendMessage(Player player, ChatColor color, Messages messageID, long delayInTicks, String... args)
 	{
-		System.out.println("sending " + messageID + " to player:" + player.getName());
+		if(player!=null) System.out.println("sending " + messageID + " to player:" + player.getName());
 		String message = GriefPrevention.instance.dataStore.getMessage(messageID, args);
 		if(message==null || message.equals("")) return;
 		sendMessage(player, color, message, delayInTicks);
@@ -2293,7 +2377,7 @@ public class GriefPrevention extends JavaPlugin
 	public boolean creativeRulesApply(Location location)
 	{
 		//return this.config_claims_enabledCreativeWorlds.contains(location.getWorld().getName());
-		return Configuration.getWorldConfig(location.getWorld()).creative_rules();
+		return Configuration.getWorldConfig(location.getWorld()).getCreativeRules();
 	}
 	public String allowBuild(Player player, Location location)
 	{
@@ -2301,7 +2385,7 @@ public class GriefPrevention extends JavaPlugin
 		Claim claim = this.dataStore.getClaimAt(location, false, playerData.lastClaim);
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(player.getWorld());
 		//exception: administrators in ignore claims mode and special player accounts created by server mods
-		if(playerData.ignoreClaims || wc.mods_ignoreClaimsAccounts().contains(player.getName())) return null;
+		if(playerData.ignoreClaims || wc.getModsIgnoreClaimsAccounts().contains(player.getName())) return null;
 		
 		//wilderness rules
 		if(claim == null)
@@ -2316,7 +2400,7 @@ public class GriefPrevention extends JavaPlugin
 			}
 			
 			//no building in survival wilderness when that is configured
-			else if(wc.claims_ApplyTrashBlockRules() && wc.claims_enabled())
+			else if(wc.getApplyTrashBlockRules() && wc.getClaimsEnabled())
 			{
 				if(wc.getTrashBlockPlacementBehaviour().Allowed(location,player).Denied())
 					return this.dataStore.getMessage(Messages.NoBuildOutsideClaims) + "  " + this.dataStore.getMessage(Messages.SurvivalBasicsDemoAdvertisement);
@@ -2346,7 +2430,7 @@ public class GriefPrevention extends JavaPlugin
 		Claim claim = this.dataStore.getClaimAt(location, false, playerData.lastClaim);
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(player.getWorld());
 		//exception: administrators in ignore claims mode, and special player accounts created by server mods
-		if(playerData.ignoreClaims || wc.mods_ignoreClaimsAccounts().contains(player.getName())) return null;
+		if(playerData.ignoreClaims || wc.getModsIgnoreClaimsAccounts().contains(player.getName())) return null;
 		
 		//wilderness rules
 		if(claim == null)
@@ -2360,7 +2444,7 @@ public class GriefPrevention extends JavaPlugin
 				return reason;
 			}
 			
-			else if(wc.claims_ApplyTrashBlockRules() && wc.claims_enabled())
+			else if(wc.getApplyTrashBlockRules() && wc.getClaimsEnabled())
 			{
 				return this.dataStore.getMessage(Messages.NoBuildOutsideClaims) + "  " + this.dataStore.getMessage(Messages.SurvivalBasicsDemoAdvertisement);
 			}
@@ -2465,7 +2549,7 @@ public class GriefPrevention extends JavaPlugin
 	
 	public int getSeaLevel(World world)
 	{
-		int overrideValue = getWorldCfg(world).seaLevelOverride();
+		int overrideValue = getWorldCfg(world).getSeaLevelOverride();
 		
 		
 		/*if(overrideValue == null || overrideValue == -1)

@@ -95,7 +95,7 @@ class EntityEventHandler implements Listener
 			event.setCancelled(true);
 		}
 		
-		else if(!wc.silverfishBreakBlocks() && event.getEntityType() == EntityType.SILVERFISH)
+		else if(!wc.getSilverfishBreakBlocks() && event.getEntityType() == EntityType.SILVERFISH)
 		{
 			event.setCancelled(true);
 		}
@@ -103,7 +103,7 @@ class EntityEventHandler implements Listener
 		
 		
 		//don't allow the wither to break blocks, when the wither is determined, too expensive to constantly check for claimed blocks
-		else if(event.getEntityType() == EntityType.WITHER && wc.claims_enabled())
+		else if(event.getEntityType() == EntityType.WITHER && wc.getClaimsEnabled())
 		{
 			
 			event.setCancelled(wc.getWitherEatBehaviour().Allowed(event.getEntity().getLocation(),null).Denied());
@@ -164,9 +164,9 @@ class EntityEventHandler implements Listener
 		////go through each block that was affected...
 		for(int i=0;i<blocks.size();i++){
 			Block block = blocks.get(i);
-			if(wc.mods_explodableIds().Contains(new MaterialInfo(block.getTypeId(), block.getData(), null))) continue;
+			if(wc.getModsExplodableIds().Contains(new MaterialInfo(block.getTypeId(), block.getData(), null))) continue;
 			//creative rules stop all explosions, regardless of the other settings.
-			if(wc.creative_rules() ||  (usebehaviour!=null && usebehaviour.Allowed(block.getLocation(),null).Denied())){
+			if(wc.getCreativeRules() ||  (usebehaviour!=null && usebehaviour.Allowed(block.getLocation(),null).Denied())){
 				//if not allowed. remove it...
 				blocks.remove(i--);
 			}
@@ -384,7 +384,7 @@ class EntityEventHandler implements Listener
 
 		//otherwise, just apply the limit on total entities per claim 
 		Claim claim = this.dataStore.getClaimAt(event.getLocation(), false, null);
-		if(claim.allowMoreEntities() != null)
+		if(claim!=null && claim.allowMoreEntities() != null)
 		{
 			event.setCancelled(true);
 			return;
@@ -634,7 +634,7 @@ class EntityEventHandler implements Listener
 			PlayerData attackerData = this.dataStore.getPlayerData(attacker.getName());
 			
 			//otherwise if protecting spawning players
-			if(wc.protectFreshSpawns())
+			if(wc.getProtectFreshSpawns())
 			{
 				if(defenderData.pvpImmune)
 				{
@@ -652,12 +652,12 @@ class EntityEventHandler implements Listener
 			}
 			
 			//FEATURE: prevent players from engaging in PvP combat inside land claims (when it's disabled)
-			if(wc.pvp_noCombatinPlayerClaims() || wc.pvp_noCombatinAdminClaims())
+			if(wc.getPvPNoCombatinPlayerClaims() || wc.getNoPvPCombatinAdminClaims())
 			{
 				Claim attackerClaim = this.dataStore.getClaimAt(attacker.getLocation(), false, attackerData.lastClaim);
 				if(	attackerClaim != null && 
-					(attackerClaim.isAdminClaim() && wc.pvp_noCombatinAdminClaims() ||
-					!attackerClaim.isAdminClaim() && wc.pvp_noCombatinPlayerClaims()))
+					(attackerClaim.isAdminClaim() && wc.getNoPvPCombatinAdminClaims() ||
+					!attackerClaim.isAdminClaim() && wc.getPvPNoCombatinPlayerClaims()))
 				{
 					attackerData.lastClaim = attackerClaim;
 					event.setCancelled(true);
@@ -667,8 +667,8 @@ class EntityEventHandler implements Listener
 				
 				Claim defenderClaim = this.dataStore.getClaimAt(defender.getLocation(), false, defenderData.lastClaim);
 				if( defenderClaim != null &&
-					(defenderClaim.isAdminClaim() && wc.pvp_noCombatinAdminClaims() ||
-					!defenderClaim.isAdminClaim() && wc.pvp_noCombatinPlayerClaims()))
+					(defenderClaim.isAdminClaim() && wc.getNoPvPCombatinAdminClaims() ||
+					!defenderClaim.isAdminClaim() && wc.getPvPNoCombatinPlayerClaims()))
 				{
 					defenderData.lastClaim = defenderClaim;
 					event.setCancelled(true);
@@ -696,7 +696,7 @@ class EntityEventHandler implements Listener
 		{
 			//if the entity is an non-monster creature (remember monsters disqualified above), or a vehicle
 			//
-			if ((subEvent.getEntity() instanceof Creature && wc.claims_protectCreatures()))
+			if ((subEvent.getEntity() instanceof Creature && wc.getClaimsProtectCreatures()))
 			{
 				
 				Claim cachedClaim = null;
@@ -723,7 +723,7 @@ class EntityEventHandler implements Listener
 							return;
 						}
 						else if(event.getCause().equals(DamageCause.CONTACT) || event.getCause().equals(DamageCause.DROWNING)){
-							return;
+								return;
 						}
 						//all other cases
 						else
@@ -746,7 +746,7 @@ class EntityEventHandler implements Listener
 								//get the defending player.
 								Player defender = sd.defender;
 								//if the player attacking this entity is within 15 blocks, don't cancel.
-								if(attacker.getLocation().distance(defender.getLocation()) < 20){
+								if(attacker.getLocation().distance(defender.getLocation()) < wc.getSiegeTamedAnimalDistance()){
 									event.setCancelled(false);
 									return;
 								}
@@ -788,7 +788,7 @@ class EntityEventHandler implements Listener
 		WorldConfig wc = new WorldConfig(event.getVehicle().getWorld());
 		
 		//all of this is anti theft code
-		if(!wc.claims_preventTheft()) return;		
+		if(!wc.getClaimsPreventTheft()) return;		
 		
 		//determine which player is attacking, if any
 		Player attacker = null;

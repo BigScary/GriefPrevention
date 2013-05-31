@@ -582,9 +582,9 @@ public class Claim
 			boolean breakable = false;
 			
 			//search for block type in list of breakable blocks
-			for(int i = 0; i < wc.siege_blocks().size(); i++)
+			for(int i = 0; i < wc.getSiegeBlocks().size(); i++)
 			{
-				Material breakableMaterial = wc.siege_blocks().get(i);
+				Material breakableMaterial = wc.getSiegeBlocks().get(i);
 				if(breakableMaterial.getId() == material.getId())
 				{
 					breakable = true;

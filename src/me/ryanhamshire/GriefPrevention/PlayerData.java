@@ -156,7 +156,7 @@ public class PlayerData
 		
 		long elapsed = now - this.lastPvpTimestamp;
 		
-		if(elapsed > wc.pvp_combatTimeoutSeconds() * 1000) //X seconds
+		if(elapsed > wc.getPvPCombatTimeoutSeconds() * 1000) //X seconds
 		{
 			this.lastPvpTimestamp = 0;
 			return false;

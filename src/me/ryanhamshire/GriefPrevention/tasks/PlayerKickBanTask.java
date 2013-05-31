@@ -67,8 +67,8 @@ public class PlayerKickBanTask implements Runnable
 	public void run()
 	{
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(player.getWorld());
-		String kickcommands = wc.spam_kickcommand();
-		String bancommands = wc.spam_bancommand();
+		String kickcommands = wc.getSpamKickCommand();
+		String bancommands = wc.getSpamBanCommand();
 		
 		
 		if(this.banReason != null)

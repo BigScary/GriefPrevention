@@ -78,28 +78,28 @@ public class CleanupUnusedClaimsTask implements Runnable
 		
 		//determine area of the default chest claim
 		int areaOfDefaultClaim = 0;
-		if(wc.claims_automaticClaimsForNewPlayerRadius() >= 0)
+		if(wc.getAutomaticClaimsForNewPlayerRadius() >= 0)
 		{
-			areaOfDefaultClaim = (int)Math.pow(wc.claims_automaticClaimsForNewPlayerRadius() * 2 + 1, 2);  
+			areaOfDefaultClaim = (int)Math.pow(wc.getAutomaticClaimsForNewPlayerRadius() * 2 + 1, 2);  
 		}
 		
 		//if he's been gone at least a week, if he has ONLY the new player claim, it will be removed
 		Calendar sevenDaysAgo = Calendar.getInstance();
-		sevenDaysAgo.add(Calendar.DATE, -wc.claims_chestClaimExpirationDays());
+		sevenDaysAgo.add(Calendar.DATE, -wc.getChestClaimExpirationDays());
 		boolean newPlayerClaimsExpired = sevenDaysAgo.getTime().after(playerData.lastLogin);
 		
 		//if only one claim, and the player hasn't played in a week
 		if(newPlayerClaimsExpired && playerData.claims.size() == 1)
 		{
 			//if that's a chest claim and those are set to expire
-			if(claim.getArea() <= areaOfDefaultClaim && wc.claims_chestClaimExpirationDays() > 0)
+			if(claim.getArea() <= areaOfDefaultClaim && wc.getChestClaimExpirationDays() > 0)
 			{
 				claim.removeSurfaceFluids(null);
 				GriefPrevention.instance.dataStore.deleteClaim(claim);
 				cleanupChunks = true;
 				
 				//if configured to do so, restore the land to natural
-				if(wc.claims_AutoNatureRestoration())
+				if(wc.getClaimsAutoNatureRestoration())
 				{
 					GriefPrevention.instance.restoreClaim(claim, 0);
 				}
@@ -109,10 +109,10 @@ public class CleanupUnusedClaimsTask implements Runnable
 		}
 		
 		//if configured to always remove claims after some inactivity period without exceptions...
-		else if(wc.claims_expirationDays() > 0)
+		else if(wc.getClaimsExpirationDays() > 0)
 		{
 			Calendar earliestPermissibleLastLogin = Calendar.getInstance();
-			earliestPermissibleLastLogin.add(Calendar.DATE, -wc.claims_expirationDays());
+			earliestPermissibleLastLogin.add(Calendar.DATE, -wc.getClaimsExpirationDays());
 			
 			if(earliestPermissibleLastLogin.getTime().after(playerData.lastLogin))
 			{
@@ -130,7 +130,7 @@ public class CleanupUnusedClaimsTask implements Runnable
 				for(int i = 0; i < claims.size(); i++)
 				{
 					//if configured to do so, restore the land to natural
-					if( wc.claims_AutoNatureRestoration())
+					if( wc.getClaimsAutoNatureRestoration())
 					{
 						GriefPrevention.instance.restoreClaim(claims.get(i), 0);
 						cleanupChunks = true;				
@@ -139,14 +139,14 @@ public class CleanupUnusedClaimsTask implements Runnable
 			}
 		}
 		
-		else if(wc.claims_unusedClaimExpirationDays() > 0)
+		else if(wc.getUnusedClaimExpirationDays() > 0)
 		{		
 			//if the player has been gone two weeks, scan claim content to assess player investment
 			Calendar earliestAllowedLoginDate = Calendar.getInstance();
-			earliestAllowedLoginDate.add(Calendar.DATE, -wc.claims_unusedClaimExpirationDays());
+			earliestAllowedLoginDate.add(Calendar.DATE, -wc.getUnusedClaimExpirationDays());
 			boolean needsInvestmentScan = earliestAllowedLoginDate.getTime().after(playerData.lastLogin);
 			boolean creativerules = GriefPrevention.instance.creativeRulesApply(claim.getLesserBoundaryCorner());
-			boolean sizelimitreached = (creativerules && claim.getWidth() > wc.claimcleanup_maximumsize());
+			boolean sizelimitreached = (creativerules && claim.getWidth() > wc.getClaimCleanupMaximumSize());
 			
 			
 			//avoid scanning large claims, locked claims, and administrative claims
@@ -156,7 +156,7 @@ public class CleanupUnusedClaimsTask implements Runnable
 			if(needsInvestmentScan || creativerules)
 			{
 				int minInvestment;
-				minInvestment = wc.claimcleanup_maxinvestmentscore();
+				minInvestment = wc.getClaimCleanupMaxInvestmentScore();
 				//if minInvestment is 0, assume no limitation and force the following conditions to clear the claim.
 				long investmentScore = minInvestment==0?Long.MAX_VALUE:claim.getPlayerInvestmentScore();
 				cleanupChunks = true;
@@ -182,7 +182,7 @@ public class CleanupUnusedClaimsTask implements Runnable
 					GriefPrevention.AddLogEntry("Removed " + claim.getOwnerName() + "'s unused claim @ " + GriefPrevention.getfriendlyLocationString(claim.getLesserBoundaryCorner()));
 					
 					//if configured to do so, restore the claim area to natural state
-					if(wc.claims_AutoNatureRestoration())
+					if(wc.getClaimsAutoNatureRestoration())
 					{
 						GriefPrevention.instance.restoreClaim(claim, 0);
 					}
