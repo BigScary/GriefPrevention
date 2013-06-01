@@ -62,6 +62,8 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.gmail.nossr50.mcMMO;
+
 public class GriefPrevention extends JavaPlugin
 {
 	//for convenience, a reference to the instance of this plugin
@@ -82,7 +84,7 @@ public class GriefPrevention extends JavaPlugin
 	//reference to the economy plugin, if economy integration is enabled
 	public static Economy economy = null;	
 	//private ArrayList<World> config_siege_enabledWorlds;				//whether or not /siege is enabled on this server
-	
+	public static mcMMO MinecraftMMO = null; 
 	private double config_economy_claimBlocksPurchaseCost;			//cost to purchase a claim block.  set to zero to disable purchase.
 	
 	private double config_economy_claimBlocksSellValue;				//return on a sold claim block.  set to zero to disable sale.
@@ -138,6 +140,7 @@ public class GriefPrevention extends JavaPlugin
 		AddLogEntry("Grief Prevention enabled.");
 		
 		instance = this;
+		MinecraftMMO = (mcMMO) Bukkit.getPluginManager().getPlugin("mcMMO");
 		
 		//load the config if it exists
 		FileConfiguration config = YamlConfiguration.loadConfiguration(new File(DataStore.configFilePath));
@@ -365,6 +368,59 @@ public class GriefPrevention extends JavaPlugin
 		
 		
 	}
+	private static final String[] HelpIndex = new String[] { 
+			ChatColor.AQUA + "-----=GriefPrevention Help Index=------",
+	                         "use /gphelp [topic] to view each topic." ,
+	ChatColor.YELLOW +       "Topics: Claims,Trust"};
+	
+	
+	private static final String[] ClaimsHelp = new String[] {
+			ChatColor.AQUA + "-----=GriefPrevention Claims=------" ,
+	      ChatColor.YELLOW + " GriefPrevention uses Claims to allow you to claim areas and prevent " ,
+	      ChatColor.YELLOW + "other players from messing with your stuff without your permission.",
+	      ChatColor.YELLOW + "Claims are created by either placing your first Chest or by using the",
+	      ChatColor.YELLOW + "Claim creation tool, which is by default a Golden Shovel.",
+	      ChatColor.YELLOW + "You can resize your claims by using a Golden Shovel on a corner, or",
+	      ChatColor.YELLOW + "by defining a new claim that encompasses it. The original claim",
+	      ChatColor.YELLOW + "Will be resized. you can use trust commands to give other players abilities",
+	      ChatColor.YELLOW + "In your claim. See /gphelp trust for more information"};
+	
+	private static final String[] TrustHelp = new String[] {
+		ChatColor.AQUA +     "------=GriefPrevention Trust=------",
+		ChatColor.YELLOW +   "You can control who can do things in your claims by using the trust commands",
+		ChatColor.YELLOW +   "/accesstrust can be used to allow a player to interact with items in your claim",
+		ChatColor.YELLOW +   "/containertrust can be used to allow a player to interact with your chests.",
+		ChatColor.YELLOW +   "/trust allows players to build on your claim.",
+		ChatColor.YELLOW +   "Each trust builds upon the previous one in this list; containertrust includes accesstrust",
+		ChatColor.YELLOW +   "and build trust includes container trust and access trust."};
+		                     
+		
+		
+	
+	        
+	private void handleHelp(Player p,String Topic){
+		if(p==null) return;
+		String[] uselines;
+		if(Topic.equalsIgnoreCase("claims"))
+			uselines = ClaimsHelp;
+		else if(Topic.equalsIgnoreCase("trust"))
+			uselines = TrustHelp;
+		else
+			uselines = HelpIndex;
+			
+			
+		for(String iterate:uselines){
+		    p.sendMessage(uselines);	
+		}
+			
+			
+			
+		
+		
+		
+		
+		
+	}
 	//handles slash commands
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args){
 		
@@ -378,7 +434,14 @@ public class GriefPrevention extends JavaPlugin
 		}
 		
 		//abandonclaim
-		if(cmd.getName().equalsIgnoreCase("abandonclaim") && player != null)
+		if(cmd.getName().equalsIgnoreCase("gphelp") && player != null){
+		String topic="index";
+		if(args.length>0) topic = args[0];
+		handleHelp(player,topic);
+		
+			
+		}
+		else if(cmd.getName().equalsIgnoreCase("abandonclaim") && player != null)
 		{
 			return this.abandonClaimHandler(player, false);
 		}		
@@ -700,13 +763,59 @@ public class GriefPrevention extends JavaPlugin
 			
 			return true;
 		}
-		
+		else if(cmd.getName().equalsIgnoreCase("giveclaim") && player!=null){
+			//gives a claim to another player. get the source player first.
+			if(args.length==0) return false;
+			Player source = player;
+			Player target = Bukkit.getPlayer(args[0]);
+			if(target==null){
+				GriefPrevention.sendMessage(source,TextMode.Err, Messages.PlayerNotFound,args[0]);
+				return true;
+			}
+			//if it's not null, make sure they have either have giveclaim permission or adminclaims permission.
+			
+			if(!(source.hasPermission("griefprevention.giveclaims") || source.hasPermission("griefprevention.adminclaims"))){
+			
+				//find the claim at the players location.
+				Claim claimtogive = dataStore.getClaimAt(source.getLocation(), true, null);
+				//if the owner is not the source, they have to have adminclaims permission too.
+				if(!claimtogive.getOwnerName().equalsIgnoreCase(source.getName())){
+					//if they don't have adminclaims permission, deny it.
+					if(!source.hasPermission("griefprevention.adminclaims")){
+						GriefPrevention.sendMessage(source, TextMode.Err, Messages.NoAdminClaimsPermission);
+						return true;
+					}
+				}
+				//transfer ownership.
+				claimtogive.ownerName = target.getName();
+
+				String originalOwner = claimtogive.getOwnerName();
+				try {dataStore.changeClaimOwner(claimtogive, target.getName());
+				//message both players.
+				GriefPrevention.sendMessage(source, TextMode.Success, Messages.GiveSuccessSender,originalOwner,target.getName());
+				if(target!=null && target.isOnline()){
+					GriefPrevention.sendMessage(target,TextMode.Success,Messages.GiveSuccessTarget,originalOwner);
+				}
+				}
+				catch(Exception exx){
+					GriefPrevention.sendMessage(source, TextMode.Err, "Failed to transfer Claim.");
+				}
+				
+				
+				
+			}
+			
+			
+			
+		}
 		//transferclaim <player>
 		else if(cmd.getName().equalsIgnoreCase("transferclaim") && player != null)
 		{
-			//requires exactly one parameter, the other player's name
-			if(args.length != 1) return false;
-			
+			//can take two parameters. Source Player and target player.
+			if(args.length == 0) return false;
+			//one arg requires "GriefPrevention.transferclaims" or "GriefPrevention.adminclaims" permission.
+			//two args requires the latter.
+			if(args.length >0)
 			//check additional permission
 			if(!player.hasPermission("griefprevention.adminclaims"))
 			{

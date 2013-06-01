@@ -47,7 +47,7 @@ public class Claim
 	//note that the upper Y value is always ignored, because claims ALWAYS extend up to the sky
 	Location lesserBoundaryCorner;
 	Location greaterBoundaryCorner;
-	
+	//test
 	/**
 	 * modification date.  this comes from the file timestamp during load, and is updated with runtime changes
 	 */
@@ -359,7 +359,25 @@ public class Claim
 		
 		return claimWidth * claimHeight;		
 	}
-	
+	public void setLocation(Location FirstBorder,Location SecondBorder){
+		if(FirstBorder.getWorld()!=SecondBorder.getWorld()) return;
+		Location pA = FirstBorder;
+		Location pB = SecondBorder;
+		int MinX = Math.min(pA.getBlockX(), pB.getBlockX());
+		int MinY = Math.min(pA.getBlockY(),pB.getBlockY());
+		int MinZ = Math.min(pA.getBlockZ(), pB.getBlockZ());
+		int MaxX = Math.max(pA.getBlockX(), pB.getBlockX());
+		int MaxY = Math.max(pA.getBlockY(),pB.getBlockY());
+		int MaxZ = Math.max(pA.getBlockZ(), pB.getBlockZ());
+		Location FirstPos = new Location(FirstBorder.getWorld(),MinX,MinY,MinZ);
+		Location SecondPos = new Location(FirstBorder.getWorld(),MaxX,MaxY,MaxZ);
+		lesserBoundaryCorner = FirstPos;
+		greaterBoundaryCorner = SecondPos;
+		
+		
+		
+		
+	}
 	/**
 	 * Gets the width of the claim.
 	 * @return
@@ -905,7 +923,33 @@ public class Claim
 		
 		return this.ownerName;
 	}
-	
+	public boolean contains(Claim otherclaim,boolean ignoreHeight){
+		return(contains(otherclaim.lesserBoundaryCorner,ignoreHeight,false) &&
+				contains(otherclaim.greaterBoundaryCorner,ignoreHeight,false));
+	}
+	public static boolean Contains(Location pA,Location pB,Location Target,boolean ignoreHeight){
+		
+		int MinX = Math.min(pA.getBlockX(), pB.getBlockX());
+		int MinY = Math.min(pA.getBlockY(),pB.getBlockY());
+		int MinZ = Math.min(pA.getBlockZ(), pB.getBlockZ());
+		int MaxX = Math.max(pA.getBlockX(), pB.getBlockX());
+		int MaxY = Math.max(pA.getBlockY(),pB.getBlockY());
+		int MaxZ = Math.max(pA.getBlockZ(), pB.getBlockZ());
+		
+		if(Target.getBlockX() < MinX || Target.getBlockZ() > MaxX)
+			return false;
+		if(Target.getBlockZ() < MinZ || Target.getBlockZ() > MaxZ)
+			return false;
+		if(!ignoreHeight && (Target.getBlockY() < MaxY || Target.getBlockY() > MaxZ))
+			return false;
+		
+		
+		return true;
+			
+		
+		
+		
+	}
 	/**
 	 * Whether or not a location is in the claim.
 	 * @param location
@@ -1204,6 +1248,9 @@ public class Claim
 		
 		
 	}
+	
+	
+	
 	/**
 	 * This returns a copy of the managers list. Additions and removals in this list do not affect the claim.
 	 * @return The list of the managers.

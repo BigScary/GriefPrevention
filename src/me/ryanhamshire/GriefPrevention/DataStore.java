@@ -55,7 +55,7 @@ public abstract class DataStore
 	Long nextClaimID = (long)0;
 	
 	//path information, for where stuff stored on disk is well...  stored
-	public final static String dataLayerFolderPath = "plugins" + File.separator + "GriefPreventionData";
+	public final static String dataLayerFolderPath = "plugins" + File.separator + "GriefPrevention";
 	public final static String configFilePath = dataLayerFolderPath + File.separator + "config.yml";
 	final static String messagesFilePath = dataLayerFolderPath + File.separator + "messages.yml";
 	
@@ -928,6 +928,18 @@ public abstract class DataStore
 		}					
 	}
 
+	synchronized public CreateClaimResult resizeClaim(Claim claim, Location p1,Location p2){
+		int x1 = Math.min(p1.getBlockX(), p2.getBlockX());
+		int y1 = Math.min(p1.getBlockY(), p2.getBlockY());
+		int z1 = Math.min(p1.getBlockZ(), p2.getBlockZ());
+		
+		int x2 = Math.max(p1.getBlockX(), p2.getBlockX());
+		int y2 = Math.max(p1.getBlockY(), p2.getBlockY());
+		int z2 = Math.max(p1.getBlockZ(), p2.getBlockZ());
+		
+		return resizeClaim(claim,x1,x1,y1,y2,z1,z2);
+		
+	}
 	/**
 	 * Tries to resize a claim
 	 * @param claim The claim to resize
@@ -1184,7 +1196,11 @@ public abstract class DataStore
 		this.addDefault(defaults, Messages.ClearManagersNotAdmin, "Only Administrators can change managers on an admin claim.",null);
 		this.addDefault(defaults, Messages.GroupNotFound, "Group {0} Not found.", "0:Name of Group");
 		this.addDefault(defaults, Messages.ConfigDisabled,"{0} has been disabled for this location.", "0:name of operation");
-		this.addDefault(defaults,Messages.TamedDeathDefend,"A {0} has been killed in defense of your Claim!","0:Type of tamed animal;1:Attacker");
+		this.addDefault(defaults, Messages.TamedDeathDefend,"A {0} has been killed in defense of your Claim!","0:Type of tamed animal;1:Attacker");
+		this.addDefault(defaults, Messages.NoGiveClaimsPermission, "You do not have Permission to Give your Claims to other players", null);
+		this.addDefault(defaults, Messages.NoAdminClaimsPermission, "You need Administrator Claims Permission to do that.", null);
+		this.addDefault(defaults, Messages.GiveSuccessSender,"Claim Owner changed from {0} to {1} Successfully.","0:Sender;1:Recipient");
+		this.addDefault(defaults, Messages.GiveSuccessTarget, "{0} has transferred a Claim to you.", "0:Sender");
 		//load the config file
 		FileConfiguration config = YamlConfiguration.loadConfiguration(new File(messagesFilePath));
 		

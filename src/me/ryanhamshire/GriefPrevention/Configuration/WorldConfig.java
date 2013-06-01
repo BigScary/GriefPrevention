@@ -81,6 +81,18 @@ public class WorldConfig {
 	private ClaimBehaviourData ZombieDoorBreaking;
 	public ClaimBehaviourData getZombieDoorBreaking(){ return ZombieDoorBreaking;}
 	
+	
+	private ClaimBehaviourData SheepShearingRules;
+	public ClaimBehaviourData getShearingRules(){ return SheepShearingRules;}
+	
+	private ClaimBehaviourData SheepDyeing;
+	public ClaimBehaviourData getSheepDyeingRules(){ return SheepDyeing;}
+	
+	private ClaimBehaviourData BonemealGrass;
+	public ClaimBehaviourData getBonemealGrassRules(){ return BonemealGrass;}
+	
+	private ClaimBehaviourData PlayerTrampleRules;
+	public ClaimBehaviourData getPlayerTrampleRules(){ return PlayerTrampleRules;}
 	//private members followed by their read-only accessor.
 	private boolean claims_Seige_Enabled;
 	/**
@@ -162,6 +174,24 @@ public class WorldConfig {
 	public int getMinClaimSize(){ return config_claims_minSize;}
 	
 	
+	private int config_SpamDelayThreshold;
+	private int config_SpamCapsMinLength;
+	private int config_SpamAlphaNumMinLength;
+	private int config_SpamASCIIArtMinLength;
+	private int config_SpamShortMessageMaxLength;
+	private int config_SpamShortMessageTimeout;
+	private int config_SpamBanThreshold;
+	private int config_SpamMuteThreshold;
+	
+	
+	public int getSpamDelayThreshold(){ return config_SpamDelayThreshold;}
+	public int getSpamCapsMinLength(){ return config_SpamCapsMinLength;}
+	public int getSpamAlphaNumMinLength(){ return config_SpamAlphaNumMinLength;}
+	public int getSpamASCIIArtMinLength(){ return config_SpamASCIIArtMinLength;}
+	public int getSpamShortMessageMaxLength(){ return config_SpamShortMessageMaxLength;}
+	public int getSpamShortMessageTimeout(){ return config_SpamShortMessageTimeout;}
+	public int getSpamBanThreshold(){ return config_SpamBanThreshold;}
+	public int getSpamMuteThreshold(){ return config_SpamMuteThreshold;}
 	
 	
 	
@@ -377,6 +407,18 @@ public class WorldConfig {
 		this.ZombieDoorBreaking = new ClaimBehaviourData("Zombie Door Breaking",config,outConfig,"GriefPrevention.ZombieDoorBreaking",
 				ClaimBehaviourData.getNone("Zombie Door Breaking"));
 		
+		SheepShearingRules = new ClaimBehaviourData("Sheep Shearing",config,outConfig,"GriefPrevention.SheepShearing",
+				ClaimBehaviourData.getInsideClaims("Sheep Shearing"));
+		
+		SheepDyeing = new ClaimBehaviourData("Sheep Dyeing",config,outConfig,"GriefPrevention.SheepDyeing",
+				ClaimBehaviourData.getInsideClaims("Sheep Dyeing"));
+		
+		this.BonemealGrass = new ClaimBehaviourData("Bonemeal",config,outConfig,"GriefPrevention.BonemealGrass",
+				ClaimBehaviourData.getInsideClaims("Bonemeal"));
+		
+		this.PlayerTrampleRules = new ClaimBehaviourData("Crop Trampling",config,outConfig,"GriefPrevention.PlayerCropTrample",
+				ClaimBehaviourData.getInsideClaims("Crop Trampling"));
+		
 		//read trash blocks.
 		//Cobblestone,Torch,Dirt,Sapling,Gravel,Sand,TNT,Workbench
 		this.config_trash_blocks = new ArrayList<Material>();
@@ -412,6 +454,30 @@ public class WorldConfig {
 			}
 		}
 
+		//SpamDelayThreshold=1500
+				//SpamCapsMinLength=4
+				//SpamAlphaNumMinLength=5
+				//SpamASCIIArtLengthMinLength=15
+				//SpamShortMessageMaxLength=5
+				//SpamShortMessageTimeout=3000
+				//SpamBanThreshold=8
+				//SpamMuteThreshold=4
+		this.config_SpamDelayThreshold = config.getInt("GriefPrevention.Spam.DelayThreshold",1500);
+		outConfig.set("GriefPrevention.Spam.DelayThreshold", config_SpamDelayThreshold);
+		this.config_SpamCapsMinLength = config.getInt("GriefPrevention.Spam.CapsMinLength",4);
+		outConfig.set("GriefPrevention.Spam.CapsMinLength",config_SpamCapsMinLength);
+		this.config_SpamAlphaNumMinLength = config.getInt("GriefPrevention.Spam.AlphaNumMinLength",5);
+		outConfig.set("GriefPrevention.Spam.AlphaNumMinLength",config_SpamAlphaNumMinLength);
+		this.config_SpamASCIIArtMinLength = config.getInt("GriefPrevention.Spam.ASCIIArtMinLength",15);
+		outConfig.set("GriefPrevention.Spam.ASCIIArtMinLength",config_SpamASCIIArtMinLength);
+		this.config_SpamShortMessageMaxLength = config.getInt("GriefPrevention.Spam.ShortMessageMaxLength",5);
+		outConfig.set("GriefPrevention.Spam.ShortMessageMaxLength",config_SpamShortMessageMaxLength);
+		this.config_SpamBanThreshold = config.getInt("GriefPrevention.Spam.BanThreshold",8);
+		outConfig.set("GriefPrevention.Spam.BanThreshold", config_SpamBanThreshold);
+		this.config_SpamMuteThreshold = config.getInt("GriefPrevention.Spam.MuteThreshold",4);
+		outConfig.set("GriefPrevention.Spam.MuteThreshold", config_SpamMuteThreshold);
+		
+		
 		this.claims_Seige_Enabled = config.getBoolean("GriefPrevention.Siege.Enabled",true);
 		outConfig.set("GriefPrevention.Siege.Enabled", claims_Seige_Enabled);
 		

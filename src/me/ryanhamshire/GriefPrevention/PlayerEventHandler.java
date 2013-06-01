@@ -44,7 +44,9 @@ import org.bukkit.entity.Animals;
 import org.bukkit.entity.Boat;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Hanging;
+import org.bukkit.entity.MushroomCow;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Sheep;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.entity.Villager;
 import org.bukkit.entity.minecart.HopperMinecart;
@@ -205,7 +207,7 @@ class PlayerEventHandler implements Listener
 		long millisecondsSinceLastMessage = (new Date()).getTime() - playerData.lastMessageTimestamp.getTime();
 		
 		//if the message came too close to the last one
-		if(millisecondsSinceLastMessage < 1500)
+		if(millisecondsSinceLastMessage < wc.getSpamDelayThreshold())
 		{
 			//increment the spam counter
 			playerData.spamCount++;
@@ -246,7 +248,7 @@ class PlayerEventHandler implements Listener
 		}
 		
 		//if the message was mostly non-alpha-numerics or doesn't include much whitespace, consider it a spam (probably ansi art or random text gibberish) 
-		if(!muted && message.length() > 5)
+		if(!muted && message.length() > wc.getSpamAlphaNumMinLength())
 		{
 			int symbolsCount = 0;
 			int whitespaceCount = 0;
@@ -264,7 +266,7 @@ class PlayerEventHandler implements Listener
 				}
 			}
 			
-			if(symbolsCount > message.length() / 2 || (message.length() > 15 && whitespaceCount < message.length() / 10))
+			if(symbolsCount > message.length() / 2 || (message.length() > wc.getSpamASCIIArtMinLength() && whitespaceCount < message.length() / 10))
 			{
 				spam = true;
 				if(playerData.spamCount > 0) muted = true;
@@ -273,7 +275,7 @@ class PlayerEventHandler implements Listener
 		}
 		
 		//very short messages close together are spam
-		if(!muted && message.length() < 5 && millisecondsSinceLastMessage < 3000)
+		if(!muted && message.length() < wc.getSpamShortMessageMaxLength() && millisecondsSinceLastMessage < wc.getSpamShortMessageTimeout())
 		{
 			spam = true;
 			playerData.spamCount++;
@@ -283,7 +285,7 @@ class PlayerEventHandler implements Listener
 		if(spam)
 		{		
 			//anything above level 8 for a player which has received a warning...  kick or if enabled, ban 
-			if(playerData.spamCount > 8 && playerData.spamWarned)
+			if(playerData.spamCount > wc.getSpamBanThreshold() && playerData.spamWarned)
 			{
 				if(wc.getSpamBanOffenders())
 				{
@@ -309,7 +311,7 @@ class PlayerEventHandler implements Listener
 			
 			//cancel any messages while at or above the third spam level and issue warnings
 			//anything above level 2, mute and warn
-			if(playerData.spamCount >= 4)
+			if(playerData.spamCount >= wc.getSpamMuteThreshold())
 			{
 				muted = true;
 				if(!playerData.spamWarned)
@@ -519,12 +521,13 @@ class PlayerEventHandler implements Listener
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
 	void onPlayerJoin(PlayerJoinEvent event)
 	{
+		
 		Player player = event.getPlayer();
 		String playerName = player.getName();
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(player.getWorld());
 		//note login time
 		long now = Calendar.getInstance().getTimeInMillis();
-		PlayerData playerData = this.dataStore.getPlayerData(playerName);
+		final PlayerData playerData = this.dataStore.getPlayerData(playerName);
 		playerData.lastSpawn = now;
 		playerData.lastLogin = new Date();
 		this.dataStore.savePlayerData(playerName, playerData);
@@ -533,6 +536,21 @@ class PlayerEventHandler implements Listener
 		if(!player.hasPlayedBefore())
 		{
 			GriefPrevention.instance.checkPvpProtectionNeeded(player);
+			//also flip their spam
+			playerData.spamCount=4; //start them off at 4.
+			playerData.spamWarned=true; //don't give them a warning if they want to misbehave, either.
+			//start a delayed Runnable to reset this after 30 seconds.
+			Bukkit.getScheduler().runTaskLater(GriefPrevention.instance, 
+					new Runnable(){
+				public void run(){
+					playerData.spamCount=0;
+				}
+			}
+					
+					,20*30);
+			
+			
+			
 		}
 		
 		//silence notifications when they're coming too fast
@@ -789,17 +807,14 @@ class PlayerEventHandler implements Listener
 	@EventHandler(priority=EventPriority.LOWEST)
 	public void onPlayerShearEntity(PlayerShearEntityEvent event){
 		
+		WorldConfig wc = GriefPrevention.instance.getWorldCfg(event.getEntity().getWorld());
 		Player player = event.getPlayer();
 		Entity entity = event.getEntity();
-		Claim c = this.dataStore.getClaimAt(entity.getLocation(), true, null);
-		if(c!=null){
-			String noAccessReason = c.allowContainers(player);
-			if(noAccessReason!=null){
-				//if no Container trust, don't allow shearing.
-				GriefPrevention.sendMessage(player, TextMode.Err, noAccessReason);
-				event.setCancelled(true);
-			}
+		if(wc.getShearingRules().Allowed(entity.getLocation(), player).Denied())
+		{
+			event.setCancelled(true);
 		}
+		
 	}
 	
 	
@@ -828,7 +843,17 @@ class PlayerEventHandler implements Listener
 			    	
 			    	event.setCancelled(true);
 			    	return;
-			    }
+		}
+		if((entity instanceof Sheep && event.getPlayer().getItemInHand().getType()==Material.INK_SACK)){
+			//apply dyeing rules.
+			if(wc.getSheepDyeingRules().Allowed(entity.getLocation(), event.getPlayer()).Denied()){
+				event.setCancelled(true);
+				return;
+			}
+			
+			
+			
+		}
 	
 			
 		
@@ -1279,8 +1304,10 @@ class PlayerEventHandler implements Listener
 		//NOTE: that this event applies only to players.  monsters and animals can still trample.
 		else if(event.getAction() == Action.PHYSICAL && clickedBlockType == Material.SOIL)
 		{
+			if(wc.getPlayerTrampleRules().Allowed(event.getPlayer().getLocation(),event.getPlayer()).Denied()){
 			event.setCancelled(true);
 			return;
+			}
 		}
 		
 		//apply rule for note blocks and repeaters
@@ -1313,14 +1340,9 @@ class PlayerEventHandler implements Listener
 			//if it's bonemeal, check for build permission (ink sac == bone meal, must be a Bukkit bug?)
 			if(materialInHand == Material.INK_SACK)
 			{
-				String noBuildReason = GriefPrevention.instance.allowBuild(player, clickedBlock.getLocation());
-				if(noBuildReason != null)
-				{
-					
-					GriefPrevention.sendMessage(player, TextMode.Err, noBuildReason);
-					event.setCancelled(true);
+				if(wc.getBonemealGrassRules().Allowed(event.getClickedBlock().getLocation(), event.getPlayer()).Denied()){
+				    event.setCancelled(true);
 				}
-				
 				return;
 			}
 			
@@ -1973,6 +1995,35 @@ class PlayerEventHandler implements Listener
 				//if it didn't succeed, tell the player why
 				if(result.succeeded == CreateClaimResult.Result.ClaimOverlap)
 				{
+					//if the claim it overlaps is owned by the player...
+					System.out.println("Claim owned by:" + result.claim.getOwnerName());
+					if(result.claim.getOwnerName().equalsIgnoreCase(playerName)){
+						//owned by the player.
+						//make sure our larger claim entirely contains
+						//the smaller one.
+						
+						if((Claim.Contains(lastShovelLocation, clickedBlock.getLocation(), result.claim.getLesserBoundaryCorner(), true) &&
+								(Claim.Contains(lastShovelLocation, clickedBlock.getLocation(), result.claim.getGreaterBoundaryCorner(), true)))){
+						//Claim tempclaim = new Claim();
+						//tempclaim.lesserBoundaryCorner=lastShovelLocation;
+						//tempclaim.greaterBoundaryCorner=clickedBlock.getLocation();
+						
+							//it contains it
+							//resize the other claim
+							
+								result.claim.setLocation(lastShovelLocation, clickedBlock.getLocation());
+							
+								//msg, and show visualization.
+								GriefPrevention.sendMessage(player, TextMode.Success, Messages.ClaimResizeSuccess,String.valueOf(playerData.getRemainingClaimBlocks()));
+								Visualization visualization = Visualization.FromClaim(result.claim, clickedBlock.getY(), VisualizationType.Claim, player.getLocation());
+								Visualization.Apply(player, visualization);
+								return;
+							
+						}
+						
+						
+						
+					}
 					GriefPrevention.sendMessage(player, TextMode.Err, Messages.CreateClaimFailOverlapShort);
 					
 					Visualization visualization = Visualization.FromClaim(result.claim, clickedBlock.getY(), VisualizationType.ErrorClaim, player.getLocation());

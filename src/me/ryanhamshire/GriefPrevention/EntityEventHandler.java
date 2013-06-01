@@ -36,6 +36,7 @@ import org.bukkit.entity.Enderman;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fireball;
+import org.bukkit.entity.Hanging;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Ocelot;
@@ -71,6 +72,9 @@ import org.bukkit.event.hanging.HangingBreakEvent;
 import org.bukkit.event.hanging.HangingPlaceEvent;
 import org.bukkit.event.vehicle.VehicleDamageEvent;
 import org.bukkit.inventory.ItemStack;
+
+import com.gmail.nossr50.mcMMO;
+import com.gmail.nossr50.runnables.skills.BleedTimerTask;
 
 //handles events related to entities
 class EntityEventHandler implements Listener
@@ -133,6 +137,7 @@ class EntityEventHandler implements Listener
 	public void onEntityExplode(EntityExplodeEvent explodeEvent)
 	{		
 		
+		//System.out.println("EntityExplode:" + explodeEvent.getEntity().getClass().getName());
 		List<Block> blocks = explodeEvent.blockList();
 		Location location = explodeEvent.getLocation();
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(location.getWorld());
@@ -557,12 +562,31 @@ class EntityEventHandler implements Listener
 			}
 		}
 	}
-	
+	private void CancelMMO(LivingEntity e){
+		if(GriefPrevention.MinecraftMMO!=null){
+			BleedTimerTask.remove(e);
+		}
+		
+		
+	}
 	//when an entity is damaged
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
 	public void onEntityDamage (EntityDamageEvent event)
 	{
-		//only actually interested in entities damaging entities (ignoring environmental damage)
+		//environmental damage
+		if(event.getEntity() instanceof Hanging){
+			Claim claimatpos = dataStore.getClaimAt(event.getEntity().getLocation(), false, null);
+			if(claimatpos!=null){
+				if(!claimatpos.areExplosivesAllowed){
+					event.setCancelled(true);
+				}
+			}
+			
+			
+			
+		}
+		
+		
 		if(!(event instanceof EntityDamageByEntityEvent)) return;
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(event.getEntity().getWorld());
 		//monsters are never protected
@@ -639,6 +663,7 @@ class EntityEventHandler implements Listener
 				if(defenderData.pvpImmune)
 				{
 					event.setCancelled(true);
+					CancelMMO((LivingEntity)event.getEntity());
 					GriefPrevention.sendMessage(attacker, TextMode.Err, Messages.ThatPlayerPvPImmune);
 					return;
 				}
@@ -646,6 +671,7 @@ class EntityEventHandler implements Listener
 				if(attackerData.pvpImmune)
 				{
 					event.setCancelled(true);
+					CancelMMO((LivingEntity)event.getEntity());
 					GriefPrevention.sendMessage(attacker, TextMode.Err, Messages.CantFightWhileImmune);
 					return;
 				}		
@@ -672,6 +698,7 @@ class EntityEventHandler implements Listener
 				{
 					defenderData.lastClaim = defenderClaim;
 					event.setCancelled(true);
+					CancelMMO((LivingEntity)event.getEntity());
 					GriefPrevention.sendMessage(attacker, TextMode.Err, Messages.PlayerInPvPSafeZone);
 					return;
 				}
@@ -729,6 +756,8 @@ class EntityEventHandler implements Listener
 						else
 						{
 							event.setCancelled(true);
+							CancelMMO((LivingEntity)event.getEntity());
+							
 						}						
 					}
 					
@@ -748,6 +777,7 @@ class EntityEventHandler implements Listener
 								//if the player attacking this entity is within 15 blocks, don't cancel.
 								if(attacker.getLocation().distance(defender.getLocation()) < wc.getSiegeTamedAnimalDistance()){
 									event.setCancelled(false);
+									CancelMMO((LivingEntity)event.getEntity());
 									return;
 								}
 								
@@ -763,7 +793,7 @@ class EntityEventHandler implements Listener
 						if(noContainersReason != null)
 						{
 							event.setCancelled(true);
-							
+							CancelMMO((LivingEntity)event.getEntity());
 							//kill the arrow to avoid infinite bounce between crowded together animals
 							if(arrow != null) arrow.remove();
 							
