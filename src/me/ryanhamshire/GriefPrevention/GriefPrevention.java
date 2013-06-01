@@ -62,7 +62,7 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.gmail.nossr50.mcMMO;
+//import com.gmail.nossr50.mcMMO;
 
 public class GriefPrevention extends JavaPlugin
 {
@@ -84,7 +84,7 @@ public class GriefPrevention extends JavaPlugin
 	//reference to the economy plugin, if economy integration is enabled
 	public static Economy economy = null;	
 	//private ArrayList<World> config_siege_enabledWorlds;				//whether or not /siege is enabled on this server
-	public static mcMMO MinecraftMMO = null; 
+	//public static mcMMO MinecraftMMO = null; 
 	private double config_economy_claimBlocksPurchaseCost;			//cost to purchase a claim block.  set to zero to disable purchase.
 	
 	private double config_economy_claimBlocksSellValue;				//return on a sold claim block.  set to zero to disable sale.
@@ -140,7 +140,7 @@ public class GriefPrevention extends JavaPlugin
 		AddLogEntry("Grief Prevention enabled.");
 		
 		instance = this;
-		MinecraftMMO = (mcMMO) Bukkit.getPluginManager().getPlugin("mcMMO");
+		//MinecraftMMO = (mcMMO) Bukkit.getPluginManager().getPlugin("mcMMO");
 		
 		//load the config if it exists
 		FileConfiguration config = YamlConfiguration.loadConfiguration(new File(DataStore.configFilePath));

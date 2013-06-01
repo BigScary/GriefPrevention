@@ -73,8 +73,8 @@ import org.bukkit.event.hanging.HangingPlaceEvent;
 import org.bukkit.event.vehicle.VehicleDamageEvent;
 import org.bukkit.inventory.ItemStack;
 
-import com.gmail.nossr50.mcMMO;
-import com.gmail.nossr50.runnables.skills.BleedTimerTask;
+//import com.gmail.nossr50.mcMMO;
+//import com.gmail.nossr50.runnables.skills.BleedTimerTask;
 
 //handles events related to entities
 class EntityEventHandler implements Listener
@@ -563,10 +563,10 @@ class EntityEventHandler implements Listener
 		}
 	}
 	private void CancelMMO(LivingEntity e){
-		if(GriefPrevention.MinecraftMMO!=null){
+		/*if(GriefPrevention.MinecraftMMO!=null){
 			BleedTimerTask.remove(e);
 		}
-		
+		*/
 		
 	}
 	//when an entity is damaged
@@ -574,15 +574,13 @@ class EntityEventHandler implements Listener
 	public void onEntityDamage (EntityDamageEvent event)
 	{
 		//environmental damage
-		if(event.getEntity() instanceof Hanging){
+		if(event.getEntity() instanceof Hanging){ //hanging objects are not destroyed by explosions inside claims.
 			Claim claimatpos = dataStore.getClaimAt(event.getEntity().getLocation(), false, null);
 			if(claimatpos!=null){
 				if(!claimatpos.areExplosivesAllowed){
 					event.setCancelled(true);
 				}
 			}
-			
-			
 			
 		}
 		
