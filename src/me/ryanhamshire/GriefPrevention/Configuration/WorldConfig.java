@@ -253,6 +253,9 @@ public class WorldConfig {
 	public boolean getPvPPunishLogout() { return config_pvp_punishLogout;}
 	private int config_pvp_combatTimeoutSeconds;						//how long combat is considered to continue after the most recent damage
 	public int getPvPCombatTimeoutSeconds(){ return config_pvp_combatTimeoutSeconds;}
+	
+	private boolean config_pvp_blockContainers;
+	public boolean getPvPBlockContainers(){ return config_pvp_blockContainers;}
 	private boolean config_pvp_allowCombatItemDrop;					//whether a player can drop items during combat to hide them
 	public boolean getAllowCombatItemDrop(){ return config_pvp_allowCombatItemDrop;}
 	
@@ -419,6 +422,7 @@ public class WorldConfig {
 		
 		this.PlayerTrampleRules = new ClaimBehaviourData("Crop Trampling",config,outConfig,"GriefPrevention.PlayerCropTrample",
 				ClaimBehaviourData.getInsideClaims("Crop Trampling"));
+		
 		
 		this.SiegeBlockRevert = config.getBoolean("GriefPrevention.Siege.BlockRevert",false);
 		outConfig.set("GriefPrevention.Siege.BlockRevert", SiegeBlockRevert);
@@ -587,11 +591,12 @@ public class WorldConfig {
 		this.config_pvp_punishLogout = config.getBoolean("GriefPrevention.PvP.PunishLogout", true);
 		this.config_pvp_combatTimeoutSeconds = config.getInt("GriefPrevention.PvP.CombatTimeoutSeconds", 15);
 		this.config_pvp_allowCombatItemDrop = config.getBoolean("GriefPrevention.PvP.AllowCombatItemDrop", false);
+		this.config_pvp_blockContainers = config.getBoolean("GriefPrevention.PvP.BlockContainers",true);
 		String bannedPvPCommandsList = config.getString("GriefPrevention.PvP.BlockedSlashCommands", "/home;/vanish;/spawn;/tpa");
 		
 		this.config_trees_removeFloatingTreetops = config.getBoolean("GriefPrevention.Trees.RemoveFloatingTreetops", true);
 		this.config_trees_regrowGriefedTrees = config.getBoolean("GriefPrevention.Trees.RegrowGriefedTrees", true);
-		
+		outConfig.set("GriefPrevention.PvP.BlockContainers", config_pvp_blockContainers);
 		
 		
 		

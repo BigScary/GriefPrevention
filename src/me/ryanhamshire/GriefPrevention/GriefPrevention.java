@@ -180,31 +180,7 @@ public class GriefPrevention extends JavaPlugin
 		outConfig.set("GriefPrevention.Economy.ClaimBlocksPurchaseCost", this.config_economy_claimBlocksPurchaseCost);
 		outConfig.set("GriefPrevention.Economy.ClaimBlocksSellValue", this.config_economy_claimBlocksSellValue);
 		outConfig.set("GriefPrevention.Claims.InitialBlocks",config_claims_initialBlocks);
-		//try to parse the list of commands which should be monitored for spam
-		/*
-		this.config_spam_monitorSlashCommands = new ArrayList<String>();
-		String [] commands = slashCommandsToMonitor.split(";");
-		for(int i = 0; i < commands.length; i++)
-		{
-			this.config_spam_monitorSlashCommands.add(commands[i].trim());
-		}
 		
-		//try to parse the list of commands which should be included in eavesdropping
-		this.config_eavesdrop_whisperCommands  = new ArrayList<String>();
-		commands = whisperCommandsToMonitor.split(";");
-		for(int i = 0; i < commands.length; i++)
-		{
-			this.config_eavesdrop_whisperCommands.add(commands[i].trim());
-		}		
-		
-		//try to parse the list of commands which should be banned during pvp combat
-		this.config_pvp_blockedCommands = new ArrayList<String>();
-		commands = bannedPvPCommandsList.split(";");
-		for(int i = 0; i < commands.length; i++)
-		{
-			this.config_pvp_blockedCommands.add(commands[i].trim());
-		}
-		*/
 		//when datastore initializes, it loads player and claim data, and posts some stats to the log
 		if(databaseUrl.length() > 0)
 		{

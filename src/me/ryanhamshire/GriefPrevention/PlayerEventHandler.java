@@ -1228,7 +1228,7 @@ class PlayerEventHandler implements Listener
 			
 			
 			//block container use during pvp combat, same reason
-			if(playerData.inPvpCombat())
+			if(playerData.inPvpCombat() && wc.getPvPBlockContainers())
 			{
 				GriefPrevention.sendMessage(player, TextMode.Err, Messages.PvPNoContainers);
 				event.setCancelled(true);
