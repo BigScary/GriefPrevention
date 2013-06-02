@@ -2455,13 +2455,21 @@ public class GriefPrevention extends JavaPlugin
 		if(message==null || message.equals("")) return;
 		sendMessage(player, color, message, delayInTicks);
 	}
-	
+	private static String removeColors(String source){
+		
+		for(ChatColor cc:ChatColor.values()){
+			source=source.replace(cc.toString(), "");
+		}
+		return source;
+		
+		
+	}
 	//sends a color-coded message to a player
 	public static void sendMessage(Player player, ChatColor color, String message)
 	{
 		if(player == null)
 		{
-			GriefPrevention.AddLogEntry(color + message);
+			GriefPrevention.AddLogEntry(removeColors(message));
 		}
 		else
 		{
@@ -2570,7 +2578,7 @@ public class GriefPrevention extends JavaPlugin
 			playerData.lastClaim = claim;
 		
 			//if not in the wilderness, then apply claim rules (permissions, etc)
-			return claim.allowBreak(player, location.getBlock().getType());
+			return claim.allowBreak(player, location.getBlock());
 		}
 	}
 

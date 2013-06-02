@@ -644,6 +644,7 @@ class PlayerEventHandler implements Listener
 	@EventHandler(priority = EventPriority.HIGHEST)
 	void onPlayerQuit(PlayerQuitEvent event)
 	{
+		
 		Player player = event.getPlayer();
 		//WorldConfig wc = GriefPrevention.instance.getWorldCfg(player.getWorld());
 		PlayerData playerData = this.dataStore.getPlayerData(player.getName());

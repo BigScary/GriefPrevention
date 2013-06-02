@@ -74,17 +74,7 @@ public class BlockEventHandler implements Listener
 	{
 		this.dataStore = dataStore;
 		
-		//create the list of blocks which will not trigger a warning when they're placed outside of land claims
-		//this.trashBlocks = new ArrayList<Material>(GriefPrevention.instance.config_trash_blocks);
-		/*this.trashBlocks = new ArrayList<Material>();
-		this.trashBlocks.add(Material.COBBLESTONE);
-		this.trashBlocks.add(Material.TORCH);
-		this.trashBlocks.add(Material.DIRT);
-		this.trashBlocks.add(Material.SAPLING);
-		this.trashBlocks.add(Material.GRAVEL);
-		this.trashBlocks.add(Material.SAND);
-		this.trashBlocks.add(Material.TNT);
-		this.trashBlocks.add(Material.WORKBENCH);*/
+	
 	}
 	
 	//when a block is damaged...
@@ -233,10 +223,9 @@ public class BlockEventHandler implements Listener
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(event.getPlayer().getWorld());
 		StringBuilder lines = new StringBuilder();
 		boolean notEmpty = false;
-		for(int i = 0; i < event.getLines().length; i++)
-		{
-			if(event.getLine(i).length() != 0) notEmpty = true;
-			lines.append(event.getLine(i) + ";");
+		for(String iterateLine:event.getLines()){
+			if(iterateLine.length() != 0) notEmpty = true;
+			lines.append(iterateLine).append(";");
 		}
 		
 		String signMessage = lines.toString();

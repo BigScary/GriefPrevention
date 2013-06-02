@@ -338,7 +338,8 @@ public class WorldConfig {
 
 	
 	
-	
+	private boolean SiegeBlockRevert=false;
+	public boolean getSiegeBlockRevert(){ return SiegeBlockRevert;}
 	
 	private String WorldName;
 	private boolean config_siege_enabled;
@@ -419,6 +420,8 @@ public class WorldConfig {
 		this.PlayerTrampleRules = new ClaimBehaviourData("Crop Trampling",config,outConfig,"GriefPrevention.PlayerCropTrample",
 				ClaimBehaviourData.getInsideClaims("Crop Trampling"));
 		
+		this.SiegeBlockRevert = config.getBoolean("GriefPrevention.Siege.BlockRevert",false);
+		outConfig.set("GriefPrevention.Siege.BlockRevert", SiegeBlockRevert);
 		//read trash blocks.
 		//Cobblestone,Torch,Dirt,Sapling,Gravel,Sand,TNT,Workbench
 		this.config_trash_blocks = new ArrayList<Material>();

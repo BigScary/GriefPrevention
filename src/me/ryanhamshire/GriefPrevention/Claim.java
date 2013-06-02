@@ -584,15 +584,18 @@ public class Claim
 		
 		return false;			
 	}
-	
+	public String allowBreak(Player player, Location l){
+		return allowBreak(player,l.getBlock());
+	}
 	/**
 	 * Break permission check
 	 * @param player
-	 * @param material
+	 * @param BlocktoCheck
 	 * @return
 	 */
-	public String allowBreak(Player player, Material material)
+	public String allowBreak(Player player, Block BlocktoCheck)
 	{
+		Material material = BlocktoCheck.getType();
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(player.getWorld());
 		//if under siege, some blocks will be breakable
 		if(this.siegeData != null)
@@ -609,7 +612,7 @@ public class Claim
 					break;
 				}
 			}
-			
+			breakable|=BrokenBlockInfo.canBreak(BlocktoCheck.getLocation());
 			//custom error messages for siege mode
 			if(!breakable)
 			{
@@ -621,6 +624,9 @@ public class Claim
 			}
 			else
 			{
+				if(wc.getSiegeBlockRevert()){
+				siegeData.SiegedBlocks.add(new BrokenBlockInfo(BlocktoCheck.getLocation()));
+				}
 				return null;
 			}
 		}
