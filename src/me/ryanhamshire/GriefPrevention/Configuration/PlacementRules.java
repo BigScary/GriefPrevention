@@ -1,6 +1,7 @@
 package me.ryanhamshire.GriefPrevention.Configuration;
 
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
+import me.ryanhamshire.GriefPrevention.Configuration.ClaimBehaviourData.ClaimAllowanceConstants;
 
 import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -12,23 +13,56 @@ import org.bukkit.configuration.file.FileConfiguration;
  */
 public class PlacementRules {
 //above and below placement rules.
-	private boolean AboveSeaLevel;
-	private boolean BelowSeaLevel;
+	
+	public enum BasicPermissionConstants{
+		Deny,
+		Allow;
+		
+		public boolean Allowed(){ return this==Allow;}
+		public boolean Denied(){ return  !Allowed();}
+		public static BasicPermissionConstants fromBoolean(boolean value){
+			return value?Allow:Deny;
+		}
+		public static BasicPermissionConstants fromString(String Source){
+			if(Source.equalsIgnoreCase(Boolean.TRUE.toString())) return Allow;
+			if(Source.equalsIgnoreCase(Boolean.FALSE.toString())) return Deny;
+			for(BasicPermissionConstants iterate:values()){
+				if(iterate.name().equalsIgnoreCase(Source.trim())){
+					return iterate;
+				}
+			}
+			return null;
+		}
+	}
+	
+	private BasicPermissionConstants AboveSeaLevel;
+	private BasicPermissionConstants BelowSeaLevel;
 	/**
 	 * returns whether this placement rule allows Action above sea level.
 	 * @return
 	 */
-	public boolean getAboveSeaLevel(){ return AboveSeaLevel;}
+	public BasicPermissionConstants getAboveSeaLevel(){ return AboveSeaLevel;}
 	/**
 	 * returns whether this placement rule allows Action below sea level.
 	 * @return
 	 */
-	public boolean getBelowSeaLevel(){ return BelowSeaLevel;}
+	public BasicPermissionConstants getBelowSeaLevel(){ return BelowSeaLevel;}
 	public static PlacementRules AboveOnly = new PlacementRules(true,false);
 	public static PlacementRules BelowOnly = new PlacementRules(false,true);
 	public static PlacementRules Both = new PlacementRules(true,true);
 	public static PlacementRules Neither = new PlacementRules(false,false);
+	@Override
+	public String toString(){
+		if(AboveSeaLevel.Allowed() && BelowSeaLevel.Denied()) return "Only Above Sea Level";
+		if(AboveSeaLevel.Denied() && BelowSeaLevel.Allowed()) return "Only Below Sea Level";
+		if(AboveSeaLevel.Allowed() && BelowSeaLevel.Allowed()) return "Anywhere";
+		return "Nowhere";
+	}
 	public PlacementRules(boolean Above,boolean Below){
+		AboveSeaLevel = BasicPermissionConstants.fromBoolean(Above);
+		BelowSeaLevel = BasicPermissionConstants.fromBoolean(Below);
+	}
+	public PlacementRules(BasicPermissionConstants Above,BasicPermissionConstants Below){
 		AboveSeaLevel = Above;
 		BelowSeaLevel = Below;
 	}
@@ -42,11 +76,14 @@ public class PlacementRules {
 	 */
 	public PlacementRules(FileConfiguration Source,FileConfiguration Target,String NodePath,PlacementRules Defaults){
 		
-		AboveSeaLevel = Source.getBoolean(NodePath + ".AboveSeaLevel",Defaults.AboveSeaLevel);
-		BelowSeaLevel = Source.getBoolean(NodePath + ".BelowSeaLevel",Defaults.BelowSeaLevel);
-		
-		Target.set(NodePath + ".AboveSeaLevel", AboveSeaLevel);
-		Target.set(NodePath + ".BelowSeaLevel", BelowSeaLevel);
+		String sAboveSeaLevel = Source.getString(NodePath + ".AboveSeaLevel",Defaults.AboveSeaLevel.name());
+		String sBelowSeaLevel = Source.getString(NodePath + ".BelowSeaLevel",Defaults.BelowSeaLevel.name());
+		AboveSeaLevel = BasicPermissionConstants.fromString(sAboveSeaLevel);
+		BelowSeaLevel = BasicPermissionConstants.fromString(sBelowSeaLevel);
+		if(AboveSeaLevel==null) AboveSeaLevel = Defaults.AboveSeaLevel;
+		if(BelowSeaLevel==null) BelowSeaLevel = Defaults.BelowSeaLevel;
+		Target.set(NodePath + ".AboveSeaLevel", AboveSeaLevel.name());
+		Target.set(NodePath + ".BelowSeaLevel", BelowSeaLevel.name());
 		
 		
 		
@@ -58,8 +95,8 @@ public class PlacementRules {
 	 */
 	public boolean Allow(Location Target){
 		int SeaLevelofWorld = GriefPrevention.instance.getSeaLevel(Target.getWorld());
-		boolean result =  (AboveSeaLevel && (Target.getBlockY() >= SeaLevelofWorld)) ||
-				(BelowSeaLevel && (Target.getBlockY() < SeaLevelofWorld));
+		boolean result =  (AboveSeaLevel.Allowed() && (Target.getBlockY() >= SeaLevelofWorld)) ||
+				(BelowSeaLevel.Allowed() && (Target.getBlockY() < SeaLevelofWorld));
 		//System.out.println("Block:" + Target.getBlockY() + " SeaLevel:" + SeaLevelofWorld + " Allow:" + result);
 		return result;
 		
