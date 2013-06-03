@@ -380,6 +380,9 @@ public class WorldConfig {
 		this.TNTExplosionBehaviour = new ClaimBehaviourData("TNT Explosions",config,outConfig,"GriefPrevention.TNTExplosions",
 				ClaimBehaviourData.getOutsideClaims("TNTExplosions"));
 		
+		this.OtherExplosionBehaviour = new ClaimBehaviourData("Other Explosions",config,outConfig,"GriefPrevention.OtherExplosions",
+				ClaimBehaviourData.getOutsideClaims("Other Explosions"));
+		
 		this.WaterBucketBehaviour = new ClaimBehaviourData("Water Placement",config,outConfig,"GriefPrevention.WaterBuckets",
 		ClaimBehaviourData.getAboveSeaLevel("Water Placement"));
 		
