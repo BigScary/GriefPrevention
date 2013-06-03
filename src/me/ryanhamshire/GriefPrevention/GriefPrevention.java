@@ -444,6 +444,12 @@ public class GriefPrevention extends JavaPlugin
 				//there is a claim, show all sorts of pointless info about it.
 				//we do not show trust, since that can be shown with /trustlist.
 				//first, get the upper and lower boundary.
+				//see that it has Children.
+				if(claimatpos.children.size()>0){
+					
+				}
+				
+				
 				String lowerboundary = GriefPrevention.getfriendlyLocationString(claimatpos.getLesserBoundaryCorner());
 				String upperboundary = GriefPrevention.getfriendlyLocationString(claimatpos.getGreaterBoundaryCorner()) ;
 				String SizeString = "(" +String.valueOf(claimatpos.getWidth()) + "," + String.valueOf(claimatpos.getHeight()) + ")";
@@ -463,7 +469,7 @@ public class GriefPrevention extends JavaPlugin
 					childinfo = claimatpos.children.size() + " (";
 					
 					for(Claim childclaim:claimatpos.children){
-					    childinfo+=String.valueOf(childclaim.getID()) + ",";	
+					    childinfo+=String.valueOf(childclaim.getSubClaimID()) + ",";	
 					}
 					//remove the last character since it is a comma we do not want.
 					childinfo = childinfo.substring(0,childinfo.length()-1);

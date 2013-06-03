@@ -192,6 +192,10 @@ public abstract class DataStore
 		//subdivisions are easy
 		if(newClaim.parent != null)
 		{
+			if(newClaim.subClaimid==null){
+				GriefPrevention.AddLogEntry("Setting Subclaim ID to:" + String.valueOf(1+newClaim.parent.children.size()));
+				newClaim.subClaimid= (long) (newClaim.parent.children.size()+1);
+			}
 			newClaim.parent.children.add(newClaim);
 			newClaim.inDataStore = true;
 			this.saveClaim(newClaim);
@@ -250,7 +254,7 @@ public abstract class DataStore
 		//expect four elements - world name, X, Y, and Z, respectively
 		if(elements.length != 4)
 		{
-			throw new Exception("Expected four distinct parts to the location string.");
+			throw new Exception("Expected four distinct parts to the location string:{" + string + "}");
 		}
 		
 		String worldName = elements[0];
@@ -742,6 +746,17 @@ public abstract class DataStore
 		Long cooldownEnd = now + 1000 * 60 * 60;  //one hour from now
 		this.siegeCooldownRemaining.put(siegeData.attacker.getName() + "_" + siegeData.defender.getName(), cooldownEnd);
 		
+		//if there are blocks queued up to revert, do so.
+		int revertedCount=0;
+		if(!siegeData.SiegedBlocks.isEmpty()){
+			
+			
+			while(!siegeData.SiegedBlocks.isEmpty()){
+				siegeData.SiegedBlocks.poll().reset();
+			}
+			GriefPrevention.AddLogEntry("reverted " + revertedCount + " Sieged Blocks.");
+			
+		}
 		//start cooldowns for every attacker/involved claim pair
 		for(int i = 0; i < siegeData.claims.size(); i++)
 		{

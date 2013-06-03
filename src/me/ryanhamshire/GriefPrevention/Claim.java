@@ -137,6 +137,15 @@ public class Claim
 		}
 		return -1;
 	}
+	public Claim getChildAt(Location testlocation){
+		
+		for(Claim iterate:children){
+			if(iterate.contains(testlocation, false, false))
+				return iterate;
+		}
+		return null;
+		
+	}
 	public Claim getChildAt(int Index){
 		if(Index > children.size()-1 || Index < 0)
 			return null;

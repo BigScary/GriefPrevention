@@ -157,6 +157,11 @@ public class FlatFileDataStore extends DataStore
 					
 					while(line != null)
 					{
+						Long usesubclaimid = null;
+						if(line.toUpperCase().startsWith("SUB:")){
+							usesubclaimid = Long.parseLong(line.substring(4));
+							line = inStream.readLine(); //read to the next line.
+						}
 						//first line is lesser boundary corner location
 						Location lesserBoundaryCorner = this.locationFromString(line);
 						
@@ -233,30 +238,20 @@ public class FlatFileDataStore extends DataStore
 						//otherwise there's already a top level claim, so this must be a subdivision of that top level claim
 						else
 						{
-							Long usesubid = 0l;
-							inStream.mark(512); //mark current position, in case this is an older file.
-							String nextline = inStream.readLine();
+							
+							
+							
 							//if it starts with "sub:" then it is a subid.
-							if(nextline!=null && nextline.toUpperCase().startsWith("SUB:")){
-							     try {
-							    	 usesubid = (long) Integer.parseInt(nextline.substring(4));
-							    	// System.out.println("Current file: SubID:" + usesubid +" with Parent claim:" + topLevelClaim);
-							     }
-							     catch(NumberFormatException ex){
-							    	 usesubid = (long) topLevelClaim.children.size();
-							     }
-							}
-							else {
-								
+							if(usesubclaimid==null){
+															
 								//otherwise, must be older file without subclaim ID. default to current count of children.
-								usesubid = (long) topLevelClaim.children.size();
+								usesubclaimid = (long) topLevelClaim.children.size();
 							//	System.out.println("Older file: Assigned SubID:" + usesubid +" with Parent claim:" + topLevelClaim);
 								//reset...
-								inStream.reset();
 							}
 							//as such, try to read in the subclaim ID.
 							Claim subdivision = new Claim(lesserBoundaryCorner, greaterBoundaryCorner, "--subdivision--", builderNames, containerNames, accessorNames, managerNames, null, neverdelete);
-							subdivision.subClaimid= usesubid;
+							subdivision.subClaimid= usesubclaimid;
 							subdivision.modifiedDate = new Date(files[i].lastModified());
 							subdivision.parent = topLevelClaim;
 							topLevelClaim.children.add(subdivision);
@@ -316,10 +311,12 @@ public class FlatFileDataStore extends DataStore
 				//write the subdivision's data to the file
 				//write it's unique ID.
 				Claim childclaim = claim.children.get(i);
-				Long childid = childclaim.getSubClaimID();
+				//Long childid = childclaim.getSubClaimID();
+				//childid = childid==null?childclaim.getID():childid;
 				//System.out.println("Attempting to write child claim: SubID: " + childid);
+				
 				this.writeClaimData(childclaim, outStream);
-				outStream.write("Sub:" + String.valueOf(childid));
+				//outStream.write("Sub:" + String.valueOf(childid));
 			}
 		}		
 		
@@ -340,6 +337,12 @@ public class FlatFileDataStore extends DataStore
 	//actually writes claim data to an output stream
 	synchronized private void writeClaimData(Claim claim, BufferedWriter outStream) throws IOException
 	{
+		if(claim.parent!=null) {
+			Long ChildID = claim.getSubClaimID()==null?claim.getID():claim.getSubClaimID();
+			outStream.write("sub:" + String.valueOf(ChildID));
+			outStream.newLine();
+			
+		}
 		//first line is lesser boundary corner location
 		outStream.write(this.locationToString(claim.getLesserBoundaryCorner()));
 		outStream.newLine();

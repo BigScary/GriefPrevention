@@ -26,6 +26,8 @@ import me.ryanhamshire.GriefPrevention.SiegeData;
 import me.ryanhamshire.GriefPrevention.TextMode;
 
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.player.PlayerInteractEvent;
 
 //secures a claim after a siege looting window has closed
 public class SecureClaimTask implements Runnable 
@@ -36,6 +38,9 @@ public class SecureClaimTask implements Runnable
 	{
 		this.siegeData = siegeData;
 	}
+	
+	
+	
 	
 	@Override
 	public void run()
