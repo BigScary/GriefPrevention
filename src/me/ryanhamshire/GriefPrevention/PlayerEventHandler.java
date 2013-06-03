@@ -1201,7 +1201,14 @@ class PlayerEventHandler implements Listener
 						clickedBlockType == Material.HOPPER ||
 						
 						wc.getModsContainerTrustIds().Contains(new MaterialInfo(clickedBlock.getTypeId(), clickedBlock.getData(), null)))))
-		{			
+		{		
+			
+			//block container access when they cannot see it.
+			if(!(clickedBlock==player.getTargetBlock(null, 100))){
+				event.setCancelled(true);
+				GriefPrevention.AddLogEntry("Cancelled non-visible Target container access.");
+			}
+			
 			//block container use while under siege, so players can't hide items from attackers
 			if(playerData.siegeData != null)
 			{
