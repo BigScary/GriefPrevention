@@ -2,6 +2,7 @@ package me.ryanhamshire.GriefPrevention.events;
 
 import me.ryanhamshire.GriefPrevention.Claim;
 
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
@@ -25,30 +26,30 @@ public class ClaimResizeEvent extends Event implements Cancellable {
         return handlers;
     }
     
-    private Claim oldclaim;
-    private Claim newclaim;
+    private Claim claim;
+    private Location newLesserBoundaryCorner;
+    private Location newGreaterBoundaryCorner;
+    
+    public Location getNewLesserBoundaryCorner(){ return newLesserBoundaryCorner;}
+    public Location getNewGreaterBoundaryCorner(){ return newGreaterBoundaryCorner;}
     private Player resizer;
   
-    public ClaimResizeEvent(Claim oldclaim, Claim newclaim,Player Resizer) {
-    	this.oldclaim = oldclaim;
-    	this.newclaim = newclaim;
+    public ClaimResizeEvent(Claim oldclaim, Location newLesserBoundary,Location newGreaterBoundary,Player Resizer) {
+    	this.claim = oldclaim;
+    	newLesserBoundaryCorner = newLesserBoundary;
+    	newGreaterBoundaryCorner=newGreaterBoundary;
+    	this.resizer = Resizer;
     }
     
     /**
-     * Gets the existing claim.
+     * Gets the claim being resized.
      * @return
      */
-    public Claim getOldClaim() {
-    	return oldclaim;
-    }
+    public Claim getClaim(){ return claim;}
     
-    /**
-     * How the claim will look after the resize.
-     * @return
-     */
-    public Claim getNewClaim() {
-    	return newclaim;
-    }
+    
+    
+    
     /**
      * retrieves the Player performing this resize.
      * @return

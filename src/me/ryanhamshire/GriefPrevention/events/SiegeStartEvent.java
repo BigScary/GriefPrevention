@@ -1,18 +1,14 @@
 package me.ryanhamshire.GriefPrevention.events;
 
 import me.ryanhamshire.GriefPrevention.Claim;
+import me.ryanhamshire.GriefPrevention.SiegeData;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-/**
- * This event gets called whenever a claim is going to be deleted.
- * @author Tux2
- *
- */
-public class ClaimDeletedEvent extends Event implements Cancellable {
+public class SiegeStartEvent extends Event implements Cancellable{
 
 	// Custom Event Requirements
     private static final HandlerList handlers = new HandlerList();
@@ -25,27 +21,13 @@ public class ClaimDeletedEvent extends Event implements Cancellable {
         return handlers;
     }
     
-    private Claim claim;
-    private Player player;
-    public ClaimDeletedEvent(Claim claim,Player player) {
-    	this.claim = claim;
-    	this.player=player;
+    SiegeData SiegeInfo;
+    public SiegeData getSiegeData(){ return SiegeInfo;}
+    public SiegeStartEvent(SiegeData sd) {
+    	SiegeInfo = sd;
     }
     
-    /**
-     * Gets the claim to be deleted.
-     * @return
-     */
-    public Claim getClaim() {
-    	return claim;
-    }
-    
-    /**
-     * returns the player deleting the Claim.
-     * @return
-     */
-    public Player getPlayer(){ return player;}
-    
+  
     boolean canceled = false;
 
 	@Override
@@ -58,5 +40,4 @@ public class ClaimDeletedEvent extends Event implements Cancellable {
 		canceled = iscancelled;
 	}
 	
-
 }

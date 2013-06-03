@@ -24,8 +24,12 @@ import java.util.concurrent.ConcurrentHashMap;
 
 
 import me.ryanhamshire.GriefPrevention.Configuration.WorldConfig;
+import me.ryanhamshire.GriefPrevention.events.ClaimCreatedEvent;
+import me.ryanhamshire.GriefPrevention.events.ClaimDeletedEvent;
 import me.ryanhamshire.GriefPrevention.events.ClaimResizeEvent;
-import me.ryanhamshire.GriefPrevention.events.NewClaimCreated;
+import me.ryanhamshire.GriefPrevention.events.SiegeEndEvent;
+import me.ryanhamshire.GriefPrevention.events.SiegeStartEvent;
+
 import me.ryanhamshire.GriefPrevention.exceptions.WorldNotFoundException;
 import me.ryanhamshire.GriefPrevention.tasks.SecureClaimTask;
 import me.ryanhamshire.GriefPrevention.tasks.SiegeCheckupTask;
@@ -189,6 +193,15 @@ public abstract class DataStore
 	 */
 	synchronized void addClaim(Claim newClaim)
 	{
+		//ClaimCreatedEvent createevent = new ClaimCreatedEvent();
+		//ClaimCreatedEvent ev 
+		
+		try {
+			throw new Exception();
+		}
+		catch(Exception exx){
+			exx.printStackTrace();
+		}
 		//subdivisions are easy
 		if(newClaim.parent != null)
 		{
@@ -225,6 +238,9 @@ public abstract class DataStore
 			ownerData.claims.add(newClaim);
 			this.savePlayerData(newClaim.getOwnerName(), ownerData);
 		}
+		
+		
+		
 		
 		//make sure the claim is saved to disk
 		this.saveClaim(newClaim);
@@ -343,27 +359,36 @@ public abstract class DataStore
 	
 	abstract PlayerData getPlayerDataFromStorage(String playerName);
 	
-	synchronized public void deleteClaim(Claim claim){
-		deleteClaim(claim,null);
+	synchronized public boolean deleteClaim(Claim claim){
+		return deleteClaim(claim,null);
 	}
 	/**
 	 * Deletes a claim or subdivision
 	 * @param claim
 	 */
-	synchronized public void deleteClaim(Claim claim,Player p) {
-		deleteClaim(claim, true,p);
+	synchronized public boolean deleteClaim(Claim claim,Player p) {
+		return deleteClaim(claim, true,p);
 	}
 	
 	//deletes a claim or subdivision
-	synchronized private void deleteClaim(Claim claim, boolean sendevent,Player p)
+	synchronized private boolean deleteClaim(Claim claim, boolean sendevent,Player p)
 	{
+		//fire the delete Claim event.
+		if(sendevent){
+			ClaimDeletedEvent ev = new ClaimDeletedEvent(claim,p);
+			Bukkit.getPluginManager().callEvent(ev);
+			if(ev.isCancelled())
+				return false;
+			
+		}
+		
 		//subdivisions are simple - just remove them from their parent claim and save that claim
 		if(claim.parent != null)
 		{
 			Claim parentClaim = claim.parent;
 			parentClaim.children.remove(claim);
 			this.saveClaim(parentClaim);
-			return;
+			return true;
 		}
 		
 		//remove from memory
@@ -391,6 +416,7 @@ public abstract class DataStore
 			}
 			this.savePlayerData(claim.getOwnerName(), ownerData);
 		}
+		return true;
 	}
 	
 	abstract void deleteClaimFromSecondaryStorage(Claim claim);
@@ -467,7 +493,9 @@ public abstract class DataStore
 	synchronized public ClaimArray getClaimArray() {
 		return claims;
 	}
-	
+	synchronized public CreateClaimResult createClaim(World world, int x1, int x2, int y1, int y2, int z1, int z2, String ownerName, Claim parent, Long id, boolean neverdelete,Player creator) {
+		return createClaim(world,x1,x2,y1,y2,z1,z2,ownerName,parent,id,neverdelete,creator,true);
+	}
 	/**
 	 * Creates a claim.
 	 * If the new claim would overlap an existing claim, returns a failure along with a reference to the existing claim
@@ -491,13 +519,13 @@ public abstract class DataStore
 	 * @param neverdelete Should this claim be locked against accidental deletion?
 	 * @return
 	 */
-	synchronized public CreateClaimResult createClaim(World world, int x1, int x2, int y1, int y2, int z1, int z2, String ownerName, Claim parent, Long id, boolean neverdelete) {
-		return createClaim(world, x1, x2, y1, y2, z1, z2, ownerName, parent, id, false, null);
+	synchronized public CreateClaimResult createClaim(World world, int x1, int x2, int y1, int y2, int z1, int z2, String ownerName, Claim parent, Long id, boolean neverdelete,Player creator,boolean doRaiseEvent) {
+		return createClaim(world, x1, x2, y1, y2, z1, z2, ownerName, parent, id, false, null,creator,doRaiseEvent);
 	}
 	
 	@Deprecated
 	synchronized public CreateClaimResult createClaim(World world, int x1, int x2, int y1, int y2, int z1, int z2, String ownerName, Claim parent, Long id) {
-		return createClaim(world, x1, x2, y1, y2, z1, z2, ownerName, parent, id, false);
+		return createClaim(world, x1, x2, y1, y2, z1, z2, ownerName, parent, id, false,null);
 	}
 	
 	//creates a claim.
@@ -509,7 +537,7 @@ public abstract class DataStore
 	//does NOT check a player has permission to create a claim, or enough claim blocks.
 	//does NOT check minimum claim size constraints
 	//does NOT visualize the new claim for any players	
-	synchronized private CreateClaimResult createClaim(World world, int x1, int x2, int y1, int y2, int z1, int z2, String ownerName, Claim parent, Long id, boolean neverdelete, Claim oldclaim)
+	synchronized private CreateClaimResult createClaim(World world, int x1, int x2, int y1, int y2, int z1, int z2, String ownerName, Claim parent, Long id, boolean neverdelete, Claim oldclaim,Player claimcreator,boolean doRaiseEvent)
 	{
 		CreateClaimResult result = new CreateClaimResult();
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(world);
@@ -606,19 +634,21 @@ public abstract class DataStore
 			}
 		}
 		if(oldclaim == null) {
-			NewClaimCreated claimevent = new NewClaimCreated(newClaim,gotplayer);
+			if(doRaiseEvent){
+			ClaimCreatedEvent claimevent = new ClaimCreatedEvent(newClaim,claimcreator);
 			Bukkit.getServer().getPluginManager().callEvent(claimevent);
 			if(claimevent.isCancelled()) {
 				result.succeeded = CreateClaimResult.Result.Canceled;
 				return result;
+			}
 			}
 		}else {
-			ClaimResizeEvent claimevent = new ClaimResizeEvent(oldclaim, newClaim,gotplayer);
+			/*ClaimResizeEvent claimevent = new ClaimResizeEvent(oldclaim, newClaim.lesserBoundaryCorner,newClaim.greaterBoundaryCorner,gotplayer);
 			Bukkit.getServer().getPluginManager().callEvent(claimevent);
 			if(claimevent.isCancelled()) {
 				result.succeeded = CreateClaimResult.Result.Canceled;
 				return result;
-			}
+			}*/
 		}
 		//otherwise add this new claim to the data store to make it effective
 		this.addClaim(newClaim);
@@ -687,6 +717,11 @@ public abstract class DataStore
 		defenderData.siegeData = siegeData;
 		defenderClaim.siegeData = siegeData;
 		
+		//Raise the event, and cancel if necessary.
+		SiegeStartEvent startevent = new SiegeStartEvent(siegeData);
+		Bukkit.getPluginManager().callEvent(startevent);
+		if(startevent.isCancelled()) return;
+		
 		//start a task to monitor the siege
 		//why isn't this a "repeating" task?
 		//because depending on the status of the siege at the time the task runs, there may or may not be a reason to run the task again
@@ -704,7 +739,8 @@ public abstract class DataStore
 	synchronized public void endSiege(SiegeData siegeData, String winnerName, String loserName, boolean death)
 	{
 		boolean grantAccess = false;
-		
+		SiegeEndEvent event = new SiegeEndEvent(siegeData);
+		Bukkit.getPluginManager().callEvent(event);
 		//determine winner and loser
 		if(winnerName == null && loserName != null)
 		{
@@ -943,7 +979,7 @@ public abstract class DataStore
 		}					
 	}
 
-	synchronized public CreateClaimResult resizeClaim(Claim claim, Location p1,Location p2){
+	synchronized public CreateClaimResult resizeClaim(Claim claim, Location p1,Location p2,Player resizer){
 		int x1 = Math.min(p1.getBlockX(), p2.getBlockX());
 		int y1 = Math.min(p1.getBlockY(), p2.getBlockY());
 		int z1 = Math.min(p1.getBlockZ(), p2.getBlockZ());
@@ -952,7 +988,7 @@ public abstract class DataStore
 		int y2 = Math.max(p1.getBlockY(), p2.getBlockY());
 		int z2 = Math.max(p1.getBlockZ(), p2.getBlockZ());
 		
-		return resizeClaim(claim,x1,x1,y1,y2,z1,z2);
+		return resizeClaim(claim,x1,x1,y1,y2,z1,z2,resizer);
 		
 	}
 	/**
@@ -966,13 +1002,32 @@ public abstract class DataStore
 	 * @param newz2 corner 2 z
 	 * @return
 	 */
-	synchronized public CreateClaimResult resizeClaim(Claim claim, int newx1, int newx2, int newy1, int newy2, int newz1, int newz2)
+	synchronized public CreateClaimResult resizeClaim(Claim claim, int newx1, int newx2, int newy1, int newy2, int newz1, int newz2,Player claimcreator)
 	{
-		//remove old claim
-		this.deleteClaim(claim);					
+		
+		Location newLesser = new Location(claim.getLesserBoundaryCorner().getWorld(),
+		newx1,newy1,newz1);
+		Location newGreater = new Location(claim.getLesserBoundaryCorner().getWorld(),
+				newx2,newy2,newz2);
+		
+		ClaimResizeEvent cre = new ClaimResizeEvent(claim,newLesser,newGreater,claimcreator);
+		Bukkit.getPluginManager().callEvent(cre);
+		if(cre.isCancelled()) {
+			CreateClaimResult res = new CreateClaimResult();
+			res.claim=claim;
+			res.succeeded= CreateClaimResult.Result.Canceled;
+			return res;
+		}
+		
+			
+		
+		
+		
+		//remove old claim. We don't raise an event for this!
+		this.deleteClaim(claim,false,claimcreator);					
 		
 		//try to create this new claim, ignoring the original when checking for overlap
-		CreateClaimResult result = this.createClaim(claim.getLesserBoundaryCorner().getWorld(), newx1, newx2, newy1, newy2, newz1, newz2, claim.ownerName, claim.parent, claim.id, claim.neverdelete, claim);
+		CreateClaimResult result = this.createClaim(claim.getLesserBoundaryCorner().getWorld(), newx1, newx2, newy1, newy2, newz1, newz2, claim.ownerName, claim.parent, claim.id, claim.neverdelete, claim,claimcreator,false);
 		
 		//if succeeded
 		if(result.succeeded == CreateClaimResult.Result.Success)

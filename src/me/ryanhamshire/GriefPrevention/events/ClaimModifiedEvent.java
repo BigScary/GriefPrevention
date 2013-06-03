@@ -46,6 +46,7 @@ public class ClaimModifiedEvent extends Event implements Cancellable {
     public ClaimModifiedEvent(Claim claim, String player, Type type) {
     	this.claim = claim;
     	this.player = player;
+    	this.type = type;
     }
     
     public Claim getClaim() {

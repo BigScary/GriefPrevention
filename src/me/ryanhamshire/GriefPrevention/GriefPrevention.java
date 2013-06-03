@@ -1882,7 +1882,11 @@ public class GriefPrevention extends JavaPlugin
 			//retrieve area of this claim...
 			
 			
-			this.dataStore.deleteClaim(claim,player);
+			if(!this.dataStore.deleteClaim(claim,player)){
+				//cancelled!
+				//assume the event called will show an appropriate message...
+				return false;
+			}
 			
 			//if in a creative mode world, restore the claim area
 			//CHANGE: option is now determined by configuration options.

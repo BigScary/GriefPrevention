@@ -1767,7 +1767,7 @@ class PlayerEventHandler implements Listener
 				}
 				
 				//ask the datastore to try and resize the claim, this checks for conflicts with other claims
-				CreateClaimResult result = GriefPrevention.instance.dataStore.resizeClaim(playerData.claimResizing, newx1, newx2, newy1, newy2, newz1, newz2);
+				CreateClaimResult result = GriefPrevention.instance.dataStore.resizeClaim(playerData.claimResizing, newx1, newx2, newy1, newy2, newz1, newz2,player);
 				
 				if(result.succeeded == CreateClaimResult.Result.Success)
 				{
@@ -1868,7 +1868,7 @@ class PlayerEventHandler implements Listener
 									playerData.lastShovelLocation.getBlockZ(), clickedBlock.getZ(), 
 									"--subdivision--",  //owner name is not used for subdivisions
 									playerData.claimSubdividing,
-									null, false);
+									null, false,player,true);
 							
 							//if it didn't succeed, tell the player why
 							if(result.succeeded == CreateClaimResult.Result.ClaimOverlap)
@@ -1998,7 +1998,7 @@ class PlayerEventHandler implements Listener
 						lastShovelLocation.getBlockY() - wc.getClaimsExtendIntoGroundDistance(), clickedBlock.getY() - wc.getClaimsExtendIntoGroundDistance(), 
 						lastShovelLocation.getBlockZ(), clickedBlock.getZ(), 
 						playerName,
-						null, null, false);
+						null, null, false,player,true);
 				
 				//if it didn't succeed, tell the player why
 				if(result.succeeded == CreateClaimResult.Result.ClaimOverlap)
