@@ -5,7 +5,11 @@ import me.ryanhamshire.GriefPrevention.SiegeData;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
-
+/**
+ * Event notification for when Sieges finish. This event cannot be cancelled.
+ * @author BC_Programming
+ *
+ */
 public class SiegeEndEvent extends Event{
 
 	// Custom Event Requirements
