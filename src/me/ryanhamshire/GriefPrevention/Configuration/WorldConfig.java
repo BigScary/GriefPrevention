@@ -858,14 +858,7 @@ public class WorldConfig {
 		outConfig.set("GriefPrevention.Mods.BlockIdsRequiringContainerTrust", containerTrustStrings);
 		outConfig.set("GriefPrevention.Mods.BlockIdsExplodable", explodableStrings);
 		
-		try
-		{
-			outConfig.save(DataStore.configFilePath);
-		}
-		catch(IOException exception)
-		{
-			GriefPrevention.AddLogEntry("Unable to write to the configuration file at \"" + DataStore.configFilePath + "\"");
-		}
+		
 		
 		
 		

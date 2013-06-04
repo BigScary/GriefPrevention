@@ -426,7 +426,7 @@ public abstract class DataStore
 	 * @param location
 	 * @param ignoreHeight TRUE means that a location UNDER an existing claim will return the claim
 	 * @param cachedClaim can be NULL, but will help performance if you have a reasonable guess about which claim the location is in
-	 * @return
+	 * @return claim in the given location. Null, if no Claim at the given location.
 	 */
 	synchronized public Claim getClaimAt(Location location, boolean ignoreHeight, Claim cachedClaim)
 	{

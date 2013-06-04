@@ -141,18 +141,14 @@ public class GriefPrevention extends JavaPlugin
 		
 		instance = this;
 		//MinecraftMMO = (mcMMO) Bukkit.getPluginManager().getPlugin("mcMMO");
-		
+		GriefPrevention.AddLogEntry(new File(DataStore.configFilePath).getAbsolutePath());
+		GriefPrevention.AddLogEntry("File Exists:" + new File(DataStore.configFilePath).exists());
 		//load the config if it exists
 		FileConfiguration config = YamlConfiguration.loadConfiguration(new File(DataStore.configFilePath));
 		FileConfiguration outConfig = new YamlConfiguration();
 		Configuration = new ConfigData(config,outConfig);
 		//read configuration settings (note defaults)
-		try {
-			outConfig.save(DataStore.configFilePath);
-		}
-		catch(IOException exx){
-			this.log.log(Level.SEVERE, "Failed to save primary configuration file:" + DataStore.configFilePath);
-		}
+		
 		
 		
 		//load player groups.
@@ -180,6 +176,9 @@ public class GriefPrevention extends JavaPlugin
 		outConfig.set("GriefPrevention.Economy.ClaimBlocksPurchaseCost", this.config_economy_claimBlocksPurchaseCost);
 		outConfig.set("GriefPrevention.Economy.ClaimBlocksSellValue", this.config_economy_claimBlocksSellValue);
 		outConfig.set("GriefPrevention.Claims.InitialBlocks",config_claims_initialBlocks);
+		
+		
+
 		
 		//when datastore initializes, it loads player and claim data, and posts some stats to the log
 		if(databaseUrl.length() > 0)
@@ -277,12 +276,7 @@ public class GriefPrevention extends JavaPlugin
 			EntityEventHandler entityEventHandler = new EntityEventHandler(this.dataStore);
 			pluginManager.registerEvents(entityEventHandler, this);
 			}
-		try {
-			outConfig.save(new File(DataStore.configFilePath));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		
 		//if economy is enabled
 		if(this.config_economy_claimBlocksPurchaseCost > 0 || this.config_economy_claimBlocksSellValue > 0)
 		{
@@ -319,6 +313,13 @@ public class GriefPrevention extends JavaPlugin
 			}
 		}
 		MetaHandler = new ClaimMetaHandler();
+		try {
+			new File(DataStore.configFilePath).delete();
+			outConfig.save(new File(DataStore.configFilePath).getAbsolutePath());
+		}
+		catch(IOException exx){
+			this.log.log(Level.SEVERE, "Failed to save primary configuration file:" + DataStore.configFilePath);
+		}
 	}
 	private void HandleClaimClean(Claim c,MaterialInfo source,MaterialInfo target,Player player){
 		Location lesser = c.getLesserBoundaryCorner();
@@ -2436,7 +2437,7 @@ public class GriefPrevention extends JavaPlugin
 	//sends a color-coded message to a player
 	static void sendMessage(Player player, ChatColor color, Messages messageID, long delayInTicks, String... args)
 	{
-		if(player!=null) System.out.println("sending " + messageID + " to player:" + player.getName());
+		
 		String message = GriefPrevention.instance.dataStore.getMessage(messageID, args);
 		if(message==null || message.equals("")) return;
 		sendMessage(player, color, message, delayInTicks);

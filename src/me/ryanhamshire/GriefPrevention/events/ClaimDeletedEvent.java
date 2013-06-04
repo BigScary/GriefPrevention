@@ -9,6 +9,7 @@ import org.bukkit.event.HandlerList;
 
 /**
  * This event gets called whenever a claim is going to be deleted.
+ * This event is not called when a claim is resized.
  * @author Tux2
  *
  */

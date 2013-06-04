@@ -186,6 +186,7 @@ public class ConfigData {
 						GriefPrevention.instance.getLogger().log(Level.INFO, "World " + baseName + " Configuration found.");
 					}
 					//read it in...
+					GriefPrevention.AddLogEntry(lookfile.getAbsolutePath());
 					FileConfiguration Source = YamlConfiguration.loadConfiguration(new File(lookfile.getAbsolutePath()));
 					FileConfiguration Target = new YamlConfiguration();
 					//load in the WorldConfig...
