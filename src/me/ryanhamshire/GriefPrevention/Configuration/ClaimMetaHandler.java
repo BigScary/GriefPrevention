@@ -2,6 +2,7 @@ package me.ryanhamshire.GriefPrevention.Configuration;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
@@ -68,14 +69,14 @@ public class ClaimMetaHandler {
 	 * registered.
 	 * @return
 	 */
-	public List<String> getMetaPluginKeys(){
+	/*private List<String> getMetaPluginKeys(){
 		String LookFolder = MetaFolder +"/";
 		//retrieve all Directories in this folder.
 		File di = new File(LookFolder);
 		if(!di.exists()){
 			return new ArrayList<String>(); //return empty list.
 		}
-	}
+	}*/
 	//retrieves the name of the appropriate claim file, making sure that the path exists.
 	private String getClaimMetaFile(String PluginKey,String ClaimKey){
 		String PluginFolder = MetaFolder + "/" + PluginKey;
