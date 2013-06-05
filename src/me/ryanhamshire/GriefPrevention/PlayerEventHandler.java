@@ -399,8 +399,9 @@ class PlayerEventHandler implements Listener
 		String [] args = event.getMessage().split(" ");
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(event.getPlayer().getWorld());
 		//if eavesdrop enabled, eavesdrop
+		List<String> WhisperCommands = wc.eavesdrop_whisperCommands();
 		String command = args[0].toLowerCase();
-		if(wc.getEavesDrop() && wc.eavesdrop_whisperCommands().contains(command) && args.length > 1)
+		if(wc.getEavesDrop() && WhisperCommands.contains(command) && args.length > 1)
 		{			
 			StringBuilder logMessageBuilder = new StringBuilder();
 			logMessageBuilder.append("[[").append(event.getPlayer().getName()).append("]] ");

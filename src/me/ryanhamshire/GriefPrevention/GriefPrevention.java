@@ -1822,8 +1822,8 @@ public class GriefPrevention extends JavaPlugin
 		if(claim == null)
 		{
 			GriefPrevention.sendMessage(player, TextMode.Instr, Messages.AbandonClaimMissing);
+			return false;
 		}
-
 		int claimarea = claim.getArea();
 		//retrieve (1-abandonclaimration)*totalarea to get amount to subtract from the accrued claim blocks
 		//after we delete the claim.

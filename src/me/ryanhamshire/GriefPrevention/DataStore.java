@@ -196,12 +196,7 @@ public abstract class DataStore
 		//ClaimCreatedEvent createevent = new ClaimCreatedEvent();
 		//ClaimCreatedEvent ev 
 		
-		try {
-			throw new Exception();
-		}
-		catch(Exception exx){
-			exx.printStackTrace();
-		}
+		
 		//subdivisions are easy
 		if(newClaim.parent != null)
 		{

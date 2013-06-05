@@ -3,6 +3,7 @@ package me.ryanhamshire.GriefPrevention.Configuration;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.logging.Level;
 
 import org.bukkit.configuration.file.FileConfiguration;
@@ -61,6 +62,19 @@ public class ClaimMetaHandler {
 		if(c.parent==null) useclaimkey = String.valueOf(c.getID());
 		if(c.parent!=null) useclaimkey = String.valueOf(c.parent.getID()) + "-" + String.valueOf(c.getSubClaimID());
 		return getClaimMeta(PluginKey,useclaimkey);
+	}
+	/**
+	 * retrieves a list of All Meta Keys currently
+	 * registered.
+	 * @return
+	 */
+	public List<String> getMetaPluginKeys(){
+		String LookFolder = MetaFolder +"/";
+		//retrieve all Directories in this folder.
+		File di = new File(LookFolder);
+		if(!di.exists()){
+			return new ArrayList<String>(); //return empty list.
+		}
 	}
 	//retrieves the name of the appropriate claim file, making sure that the path exists.
 	private String getClaimMetaFile(String PluginKey,String ClaimKey){
