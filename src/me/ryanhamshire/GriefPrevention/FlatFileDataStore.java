@@ -48,10 +48,11 @@ public class FlatFileDataStore extends DataStore
 	{
 		this.initialize();
 	}
-	
+
 	@Override
 	void initialize() throws Exception
 	{
+			
 		//ensure data folders exist
 		new File(playerDataFolderPath).mkdirs();
 		new File(claimDataFolderPath).mkdirs();
@@ -150,6 +151,7 @@ public class FlatFileDataStore extends DataStore
 				BufferedReader inStream = null;
 				try
 				{		
+					int topLevelID=-1; 
 					Claim topLevelClaim = null;
 					FileReader fr = new FileReader(files[i].getAbsolutePath());
 					inStream = new BufferedReader(fr);
@@ -157,17 +159,36 @@ public class FlatFileDataStore extends DataStore
 					
 					while(line != null)
 					{
+						boolean usedeferred = false;
 						Long usesubclaimid = null;
 						if(line.toUpperCase().startsWith("SUB:")){
 							usesubclaimid = Long.parseLong(line.substring(4));
 							line = inStream.readLine(); //read to the next line.
 						}
 						//first line is lesser boundary corner location
-						Location lesserBoundaryCorner = this.locationFromString(line);
+						String splitentry = line.split(";")[0];
+						//if the world doesn't exist yet, we need to create a DeferredWorldClaim instance and
+						//add it to the dataStore hashMap.
+						Location lesserBoundaryCorner=null;
+						Location greaterBoundaryCorner=null;
+						String DeferredLesser;
+						String DeferredGreater;
+						if(Bukkit.getWorld(splitentry)==null){
+							DeferredLesser = line;
+							DeferredGreater = inStream.readLine();
+							usedeferred=true;
+							
+						}
+						else {
+						
+						lesserBoundaryCorner = this.locationFromString(line);
+						
+						
 						
 						//second line is greater boundary corner location
 						line = inStream.readLine();
-						Location greaterBoundaryCorner = this.locationFromString(line);
+						greaterBoundaryCorner = this.locationFromString(line);
+						}
 						
 						//third line is owner name
 						line = inStream.readLine();						
@@ -204,6 +225,9 @@ public class FlatFileDataStore extends DataStore
 						
 						//build a claim instance from those data
 						//if this is the first claim loaded from this file, it's the top level claim
+						
+						
+						
 						if(topLevelClaim == null)
 						{
 							//instantiate

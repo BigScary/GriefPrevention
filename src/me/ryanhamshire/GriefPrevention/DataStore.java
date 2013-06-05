@@ -262,7 +262,7 @@ public abstract class DataStore
 	}
 	
 	//turns a location string back into a location
-	Location locationFromString(String string) throws Exception
+	public Location locationFromString(String string) throws Exception
 	{
 		//split the input string on the space
 		String [] elements = string.split(locationStringDelimiter);
@@ -282,7 +282,11 @@ public abstract class DataStore
 		World world = GriefPrevention.instance.getServer().getWorld(worldName);
 		if(world == null)
 		{
-			throw new WorldNotFoundException("World not found: \"" + worldName + "\"");
+			//try to load it...
+			world = Bukkit.createWorld(new WorldCreator(worldName));
+			if(world==null){ //well... we tried!
+				throw new WorldNotFoundException("World not found: \"" + worldName + "\"");
+			}
 		}
 		
 		//convert those numerical strings to integer values
