@@ -107,12 +107,7 @@ public class ConfigData {
 				}
 				
 				}
-				
-			
 			//save target
-			
-			
-			
 			}
 		//after the above logic, we know it's in the hashmap, so return that.
 		return WorldCfg.get(worldName);

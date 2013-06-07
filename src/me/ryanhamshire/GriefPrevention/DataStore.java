@@ -706,7 +706,7 @@ public abstract class DataStore
 	 * @param defenderClaim The claim being attacked
 	 * @see #onCooldown()
 	 */
-	synchronized public void startSiege(Player attacker, Player defender, Claim defenderClaim)
+	synchronized public boolean startSiege(Player attacker, Player defender, Claim defenderClaim)
 	{
 		//fill-in the necessary SiegeData instance
 		SiegeData siegeData = new SiegeData(attacker, defender, defenderClaim);
@@ -719,13 +719,14 @@ public abstract class DataStore
 		//Raise the event, and cancel if necessary.
 		SiegeStartEvent startevent = new SiegeStartEvent(siegeData);
 		Bukkit.getPluginManager().callEvent(startevent);
-		if(startevent.isCancelled()) return;
+		if(startevent.isCancelled()) return false;
 		
 		//start a task to monitor the siege
 		//why isn't this a "repeating" task?
 		//because depending on the status of the siege at the time the task runs, there may or may not be a reason to run the task again
 		SiegeCheckupTask task = new SiegeCheckupTask(siegeData);
 		siegeData.checkupTaskID = GriefPrevention.instance.getServer().getScheduler().scheduleSyncDelayedTask(GriefPrevention.instance, task, 20L * 30);
+		return true;
 	}
 	
 	/**

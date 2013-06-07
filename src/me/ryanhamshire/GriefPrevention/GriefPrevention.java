@@ -1769,11 +1769,12 @@ public class GriefPrevention extends JavaPlugin
 			}
 			
 			//start the siege
-			dataStore.startSiege(attacker, defender, defenderClaim);			
+			if(dataStore.startSiege(attacker, defender, defenderClaim)){			
 
-			//confirmation message for attacker, warning message for defender
-			GriefPrevention.sendMessage(defender, TextMode.Warn, Messages.SiegeAlert, attacker.getName());
-			GriefPrevention.sendMessage(player, TextMode.Success, Messages.SiegeConfirmed, defender.getName());			
+			   //confirmation message for attacker, warning message for defender
+			   GriefPrevention.sendMessage(defender, TextMode.Warn, Messages.SiegeAlert, attacker.getName());
+			   GriefPrevention.sendMessage(player, TextMode.Success, Messages.SiegeConfirmed, defender.getName());
+			}
 		}
 		
 		return false; 
