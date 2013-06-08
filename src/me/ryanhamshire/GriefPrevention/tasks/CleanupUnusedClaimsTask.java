@@ -43,23 +43,29 @@ public class CleanupUnusedClaimsTask implements Runnable
 	
 	public CleanupUnusedClaimsTask()
 	{
-		//start scanning in a random spot
-		if(GriefPrevention.instance.dataStore.getClaimsSize() == 0)
-		{
-			this.nextClaimIndex = 0;
-		}
-		else
-		{
-			Random randomNumberGenerator = new Random();
-			this.nextClaimIndex = randomNumberGenerator.nextInt(GriefPrevention.instance.dataStore.getClaimsSize());
-		}
+		
 	}
-	
+	private boolean flInitialized=false;
 	@Override
 	public void run()
 	{
 		//don't do anything when there are no claims
 		if(GriefPrevention.instance.dataStore.getClaimsSize() == 0) return;
+		
+		if(!flInitialized){
+			if(GriefPrevention.instance==null || GriefPrevention.instance.dataStore==null) return;
+			//start scanning in a random spot
+			if(GriefPrevention.instance.dataStore.getClaimsSize() == 0)
+			{
+				this.nextClaimIndex = 0;
+			}
+			else
+			{
+				Random randomNumberGenerator = new Random();
+				this.nextClaimIndex = randomNumberGenerator.nextInt(GriefPrevention.instance.dataStore.getClaimsSize());
+			}
+			flInitialized=true;
+		}
 		
 		//wrap search around to beginning
 		if(this.nextClaimIndex >= GriefPrevention.instance.dataStore.getClaimsSize()) this.nextClaimIndex = 0;

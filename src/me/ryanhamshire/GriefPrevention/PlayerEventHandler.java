@@ -1153,6 +1153,8 @@ class PlayerEventHandler implements Listener
 			return;
 		}
 	}
+	private static HashSet<Byte> transparentMaterials = null;
+	private static HashSet<Material> GPTools = null;
 	
 	//when a player interacts with the world
 	@EventHandler(priority = EventPriority.LOWEST)
@@ -1162,28 +1164,43 @@ class PlayerEventHandler implements Listener
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(player.getWorld());
 		//determine target block.  FEATURE: shovel and stick can be used from a distance away
 		Block clickedBlock = null;
-		
-		try
-		{
-			clickedBlock = event.getClickedBlock();  //null returned here means interacting with air			
-			if(clickedBlock == null || clickedBlock.getType() == Material.SNOW)
+		//if null, initialize.
+		if(GPTools==null){
+			GPTools = new HashSet<Material>();
+			GPTools.add(wc.getClaimsInvestigationTool());
+			GPTools.add(wc.getClaimsModificationTool());
+		}
+		//get material of the item that was used...
+		Material inhand = event.getItem()==null?null:event.getItem().getType();
+		if(GPTools.contains(inhand)){
+			//if the Tools HashSet contains the item used, apply 'selection extension' logic of interacting with air.
+			try
 			{
-				//try to find a far away non-air block along line of sight
-				HashSet<Byte> transparentMaterials = new HashSet<Byte>();
-				transparentMaterials.add(Byte.valueOf((byte)Material.AIR.getId()));
-				transparentMaterials.add(Byte.valueOf((byte)Material.SNOW.getId()));
-				transparentMaterials.add(Byte.valueOf((byte)Material.LONG_GRASS.getId()));
-				transparentMaterials.add(Byte.valueOf((byte)Material.WOOD_BUTTON.getId()));
-				transparentMaterials.add(Byte.valueOf((byte)Material.STONE_BUTTON.getId()));
-				transparentMaterials.add(Byte.valueOf((byte)Material.LEVER.getId()));
-				clickedBlock = player.getTargetBlock(transparentMaterials, 250);
-			}			
+				clickedBlock = event.getClickedBlock();  //null returned here means interacting with air			
+				if(clickedBlock == null || clickedBlock.getType() == Material.SNOW)
+				{
+					//try to find a far away non-air block along line of sight
+					if(transparentMaterials==null){
+						transparentMaterials = new HashSet<Byte>();
+						transparentMaterials.add(Byte.valueOf((byte)Material.AIR.getId()));
+						transparentMaterials.add(Byte.valueOf((byte)Material.SNOW.getId()));
+						transparentMaterials.add(Byte.valueOf((byte)Material.LONG_GRASS.getId()));
+						transparentMaterials.add(Byte.valueOf((byte)Material.WOOD_BUTTON.getId()));
+						transparentMaterials.add(Byte.valueOf((byte)Material.STONE_BUTTON.getId()));
+						transparentMaterials.add(Byte.valueOf((byte)Material.STONE_PLATE.getId()));
+						transparentMaterials.add(Byte.valueOf((byte)Material.WOOD_PLATE.getId()));
+						transparentMaterials.add(Byte.valueOf((byte)Material.IRON_PLATE.getId()));
+						transparentMaterials.add(Byte.valueOf((byte)Material.GOLD_PLATE.getId()));
+						transparentMaterials.add(Byte.valueOf((byte)Material.LEVER.getId()));
+					}
+					clickedBlock = player.getTargetBlock(transparentMaterials, 250);
+				}			
+			}
+			catch(Exception e)  //an exception intermittently comes from getTargetBlock().  when it does, just ignore the event
+			{
+				return;
+			}
 		}
-		catch(Exception e)  //an exception intermittently comes from getTargetBlock().  when it does, just ignore the event
-		{
-			return;
-		}
-		
 		//if no block, stop here
 		if(clickedBlock == null)
 		{
