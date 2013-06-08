@@ -12,6 +12,8 @@ import me.ryanhamshire.GriefPrevention.DataStore;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import me.ryanhamshire.GriefPrevention.MaterialCollection;
 import me.ryanhamshire.GriefPrevention.MaterialInfo;
+import me.ryanhamshire.GriefPrevention.tasks.CleanupUnusedClaimsTask;
+import me.ryanhamshire.GriefPrevention.tasks.DeliverClaimBlocksTask;
 import net.milkbowl.vault.economy.Economy;
 
 import org.bukkit.Bukkit;
@@ -152,8 +154,8 @@ public class WorldConfig {
 	public boolean getEnderPearlsRequireAccessTrust(){ return config_claims_enderPearlsRequireAccessTrust;}
 	
 	
-	private int config_claims_blocksAccruedPerHour;					//how many additional blocks players get each hour of play (can be zero)
-	public int getClaimBlocksAccruedPerHour(){ return config_claims_blocksAccruedPerHour;}
+	private float config_claims_blocksAccruedPerHour;					//how many additional blocks players get each hour of play (can be zero)
+	public float getClaimBlocksAccruedPerHour(){ return config_claims_blocksAccruedPerHour;}
 	
 	private int Siege_TamedAnimalDistance;
 	public int getSiegeTamedAnimalDistance(){ return Siege_TamedAnimalDistance;}
@@ -506,6 +508,9 @@ public class WorldConfig {
 				config.getInt("GriefPrevention.ClaimCleanup.MaxInvestmentScore",isCreative?400:100);
 		
 		config_claims_blocksAccruedPerHour = config.getInt("GriefPrevention.Claims.BlocksAccruedPerHour",100);
+		
+		
+		
 		outConfig.set("GriefPrevention.Claims.BlocksAccruedPerHour",config_claims_blocksAccruedPerHour);
 		outConfig.set("GriefPrevention.ClaimCleanup.MaximumSize", config_claimcleanup_maximumsize);
 		outConfig.set("GriefPrevention.ClaimCleanup.MaxInvestmentScore", this.config_claimcleanup_maxinvestmentscore);
@@ -858,8 +863,23 @@ public class WorldConfig {
 		outConfig.set("GriefPrevention.Mods.BlockIdsRequiringContainerTrust", containerTrustStrings);
 		outConfig.set("GriefPrevention.Mods.BlockIdsExplodable", explodableStrings);
 		
+		//Task startup.
+		//if we have a blockaccrued value and the ClaimTask for delivering claim blocks is null,
+		//create and schedule it to run.
+		if(config_claims_blocksAccruedPerHour>0 && GriefPrevention.instance.ClaimTask==null)
+		{
+			
+				GriefPrevention.instance.ClaimTask = new DeliverClaimBlocksTask();
+			GriefPrevention.instance.getServer().getScheduler().scheduleSyncRepeatingTask(GriefPrevention.instance,
+					GriefPrevention.instance.ClaimTask, 60L*20*2, 60L*20*5);			
+		}
+		//similar logic for ClaimCleanup: if claim cleanup is enabled and there isn't a cleanup task, start it.
+		if(this.getClaimCleanupEnabled() && GriefPrevention.instance.CleanupTask==null){
+			CleanupUnusedClaimsTask task2 = new CleanupUnusedClaimsTask();
+			GriefPrevention.instance.getServer().getScheduler().scheduleSyncRepeatingTask(GriefPrevention.instance,
+					task2, 20L * 60 * 2, 20L * 60 * 5);
 		
-		
+	    }
 		
 		
 	}

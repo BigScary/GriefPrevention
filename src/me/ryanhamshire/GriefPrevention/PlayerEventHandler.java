@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import me.ryanhamshire.GriefPrevention.Configuration.ClaimBehaviourData.ClaimAllowanceConstants;
 import me.ryanhamshire.GriefPrevention.Configuration.WorldConfig;
 import me.ryanhamshire.GriefPrevention.tasks.EquipShovelProcessingTask;
 import me.ryanhamshire.GriefPrevention.tasks.PlayerKickBanTask;
@@ -1024,6 +1025,31 @@ class PlayerEventHandler implements Listener
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(block.getWorld());
 		int minLavaDistance = 10;
 		
+		if(bucketEvent.getBucket()==Material.LAVA_BUCKET){
+			switch(wc.getLavaBucketBehaviour().Allowed(block.getLocation(), player)) 
+			 {
+			 case Allow_Forced:
+			     return; //force allow.
+			 case Deny_Forced:
+			     bucketEvent.setCancelled(true);
+			     return;
+			 default: 
+				 //nothin.
+			}
+		}
+		else if(bucketEvent.getBucket()==Material.WATER_BUCKET){
+			 switch(wc.getWaterBucketBehaviour().Allowed(block.getLocation(), player)) 
+			 {
+			 case Allow_Forced:
+			     return; //force allow.
+			 case Deny_Forced:
+			     bucketEvent.setCancelled(true);
+			     return;
+			 default: 
+				 //nothin.
+			}
+		}
+		
 		//make sure the player is allowed to build at the location
 		String noBuildReason = GriefPrevention.instance.allowBuild(player, block.getLocation());
 		if(noBuildReason != null)
@@ -1051,6 +1077,7 @@ class PlayerEventHandler implements Listener
 				bucketEvent.setCancelled(true);
 				return;
 			}
+			
 		}
 		
 		
@@ -1146,6 +1173,9 @@ class PlayerEventHandler implements Listener
 				transparentMaterials.add(Byte.valueOf((byte)Material.AIR.getId()));
 				transparentMaterials.add(Byte.valueOf((byte)Material.SNOW.getId()));
 				transparentMaterials.add(Byte.valueOf((byte)Material.LONG_GRASS.getId()));
+				transparentMaterials.add(Byte.valueOf((byte)Material.WOOD_BUTTON.getId()));
+				transparentMaterials.add(Byte.valueOf((byte)Material.STONE_BUTTON.getId()));
+				transparentMaterials.add(Byte.valueOf((byte)Material.LEVER.getId()));
 				clickedBlock = player.getTargetBlock(transparentMaterials, 250);
 			}			
 		}

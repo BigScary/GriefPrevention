@@ -133,6 +133,8 @@ public class GriefPrevention extends JavaPlugin
 	public ClaimMetaHandler getMetaHandler(){
 		return MetaHandler;
 	}
+	public DeliverClaimBlocksTask ClaimTask = null;
+	public CleanupUnusedClaimsTask CleanupTask = null;
 	private static boolean eventsRegistered = false;
 	//initializes well...   everything
 	public void onEnable()
@@ -220,20 +222,7 @@ public class GriefPrevention extends JavaPlugin
 				GriefPrevention.AddLogEntry(e.getMessage());
 			}
 		}
-		boolean claimblockaccrual = false;
-		for(WorldConfig wconfig:this.Configuration.getWorldConfigs().values()){
-			if(wconfig.getClaimBlocksAccruedPerHour()>0){
-				claimblockaccrual=true;
-				break;
-			}
-		}
-		//unless claim block accrual is disabled, start the recurring per 5 minute event to give claim blocks to online players
-		//20L ~ 1 second
-		if(claimblockaccrual)
-		{
-			DeliverClaimBlocksTask task = new DeliverClaimBlocksTask();
-			this.getServer().getScheduler().scheduleSyncRepeatingTask(this, task, 20L * 60 * 5, 20L * 60 * 5);
-		}
+		
 		
 		//start the recurring cleanup event for entities in creative worlds, if enabled.
 		
@@ -242,22 +231,13 @@ public class GriefPrevention extends JavaPlugin
 		//look through all world configurations.
 		boolean claimcleanupOn=false;
 		boolean entitycleanupEnabled=false;
-		for(WorldConfig wconfig:Configuration.getWorldConfigs().values()){
-			if(wconfig.getClaimCleanupEnabled())
-				claimcleanupOn=true;
-			if(wconfig.getEntityCleanupEnabled())
-				entitycleanupEnabled=true;
-		}
 		
 		if(entitycleanupEnabled){
 			EntityCleanupTask task = new EntityCleanupTask(0);
 			this.getServer().getScheduler().scheduleSyncDelayedTask(GriefPrevention.instance, task, 20L);
 			}
 		
-		if(claimcleanupOn){
-		CleanupUnusedClaimsTask task2 = new CleanupUnusedClaimsTask();
-		this.getServer().getScheduler().scheduleSyncRepeatingTask(this, task2, 20L * 60 * 2, 20L * 60 * 5);
-		}
+		
 		
 			//register for events
 			if(!eventsRegistered){

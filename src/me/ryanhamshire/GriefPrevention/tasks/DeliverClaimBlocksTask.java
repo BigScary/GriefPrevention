@@ -46,8 +46,8 @@ public class DeliverClaimBlocksTask implements Runnable
 			Player player = players[i];
 			WorldConfig wc = GriefPrevention.instance.getWorldCfg(player.getWorld());
 			
-			int accruedBlocks = wc.getClaimBlocksAccruedPerHour() / 12;
-			if(accruedBlocks < 0) accruedBlocks = 1;
+			int accruedBlocks = Math.max(1, (int)(wc.getClaimBlocksAccruedPerHour() / 12));
+			
 			
 			
 			DataStore dataStore = GriefPrevention.instance.dataStore;
