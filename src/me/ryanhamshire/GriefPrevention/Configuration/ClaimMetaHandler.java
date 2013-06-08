@@ -1,6 +1,7 @@
 package me.ryanhamshire.GriefPrevention.Configuration;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -51,6 +52,28 @@ public class ClaimMetaHandler {
 	public ClaimMetaHandler(String SourcePath){
 		MetaFolder = SourcePath;
 	}
+	public String getClaimTag(Claim c){
+		if(c.parent!=null)
+			return c.parent.getID() + "-" + String.valueOf(c.getSubClaimID());
+		else 
+		    return String.valueOf(c.getID());
+	}
+	public Claim getClaimFromTag(String tag){
+		String[] splitval = tag.split("-");
+		if(splitval.length==1)
+			return GriefPrevention.instance.dataStore.getClaim(Long.parseLong(splitval[0]));
+		else {
+			
+			long parentID = Long.parseLong(splitval[0]);
+			long subid = Long.parseLong(splitval[1]);
+			Claim parentclaim = GriefPrevention.instance.dataStore.getClaim(parentID);
+			if(parentclaim==null) return null;
+			
+			return parentclaim.getSubClaim(subid);
+			
+		}
+		
+	}
 	/**
 	 * retrieves the metadata for the given claim for the given Plugin Key.
 	 * @param PluginKey Unique key for your Plugin. The Plugin Name is usually sufficient.
@@ -61,7 +84,7 @@ public class ClaimMetaHandler {
 	public FileConfiguration getClaimMeta(String PluginKey,Claim c){
 		String useclaimkey=null;
 		if(c.parent==null) useclaimkey = String.valueOf(c.getID());
-		if(c.parent!=null) useclaimkey = String.valueOf(c.parent.getID()) + "-" + String.valueOf(c.getSubClaimID());
+		if(c.parent!=null) useclaimkey = String.valueOf(getClaimTag(c));
 		return getClaimMeta(PluginKey,useclaimkey);
 	}
 	/**
@@ -69,14 +92,53 @@ public class ClaimMetaHandler {
 	 * registered.
 	 * @return
 	 */
-	/*private List<String> getMetaPluginKeys(){
+	public List<String> getMetaPluginKeys(){
 		String LookFolder = MetaFolder +"/";
 		//retrieve all Directories in this folder.
 		File di = new File(LookFolder);
 		if(!di.exists()){
 			return new ArrayList<String>(); //return empty list.
 		}
-	}*/
+		else {
+			ArrayList<String> resultkeys = new ArrayList<String>();
+			//directory does exist. Each plugin meta is a folder.
+			for(File iterate:di.listFiles()){
+				if(iterate.isDirectory()){
+					String pluginname = iterate.getName();
+					//it's a plugin key.
+					resultkeys.add(pluginname);
+					
+				}
+			}
+			
+			return resultkeys;	
+		}
+	}
+	public List<Claim> getClaimsForKey(String PluginKey){
+		
+		File PluginFolder = new File(MetaFolder + "/" + PluginKey + "/");
+		if(!PluginFolder.exists()) return new ArrayList<Claim>();
+		else {
+			ArrayList<Claim> resultvalue = new ArrayList<Claim>();
+			//if the folder does exist, read each one. return it as a list.
+			if(PluginFolder.isDirectory()){
+				for(File iteratefile:PluginFolder.listFiles()){
+					if(iteratefile.getName().toUpperCase().endsWith(".YML")){
+						String basename = iteratefile.getName().substring(0, iteratefile.getName().lastIndexOf(".")+1);
+						Claim gotfromtag = getClaimFromTag(basename);
+						if(gotfromtag!=null){resultvalue.add(gotfromtag);}
+					}
+				}
+				
+				
+			}
+			return resultvalue;
+		}
+		
+		
+		
+		
+	}
 	//retrieves the name of the appropriate claim file, making sure that the path exists.
 	private String getClaimMetaFile(String PluginKey,String ClaimKey){
 		String PluginFolder = MetaFolder + "/" + PluginKey;
