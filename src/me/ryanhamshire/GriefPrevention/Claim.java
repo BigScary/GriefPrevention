@@ -964,7 +964,7 @@ public class Claim
 			return false;
 		if(Target.getBlockZ() < MinZ || Target.getBlockZ() > MaxZ)
 			return false;
-		if(!ignoreHeight && (Target.getBlockY() < MaxY || Target.getBlockY() > MaxZ))
+		if(!ignoreHeight && (Target.getBlockY() < MaxY || Target.getBlockY() > MaxY))
 			return false;
 		
 		
