@@ -2,6 +2,7 @@ package me.ryanhamshire.GriefPrevention.Configuration;
 
 import me.ryanhamshire.GriefPrevention.Claim;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
+import me.ryanhamshire.GriefPrevention.Messages;
 import me.ryanhamshire.GriefPrevention.TextMode;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -34,7 +35,7 @@ public class ClaimBehaviourData {
 		public static ClaimBehaviourMode parseMode(String name){
 			//System.out.println("Looking for " + name);
 			for(ClaimBehaviourMode cb:ClaimBehaviourMode.values()){
-				//System.out.println(cb.name());
+				System.out.println("Comparing " + cb.name() + " to " + name);
 				if(cb.name().equalsIgnoreCase(name))
 					return cb;
 			}
@@ -49,9 +50,12 @@ public class ClaimBehaviourData {
 	
 	public ClaimBehaviourMode getClaimBehaviour(){ return ClaimBehaviour;}
 	
-	
 	public ClaimAllowanceConstants Allowed(Location position,Player RelevantPlayer){
+		return Allowed(position,RelevantPlayer,true);	
+	}
+	public ClaimAllowanceConstants Allowed(Location position,Player RelevantPlayer,boolean ShowMessages){
 		
+		System.out.println("ClaimBehaviour");
 		//System.out.println("Testing Allowed," + BehaviourName);
 		String result=null;
 		Claim testclaim = GriefPrevention.instance.dataStore.getClaimAt(position, true, null);
@@ -66,6 +70,8 @@ public class ClaimBehaviourData {
 				//if the passed player is null, then we assume the operation has no relevant player, so allow it in this case.
 				if(RelevantPlayer!=null){
 					if(!testclaim.getOwnerName().equalsIgnoreCase(RelevantPlayer.getName())){
+						if(ShowMessages)
+							GriefPrevention.sendMessage(RelevantPlayer, TextMode.Err, Messages.NoOwnerTrust,testclaim.getOwnerName());
 						//they aren't the owner, so fail the test.
 						return ClaimAllowanceConstants.Deny;
 					}
@@ -75,7 +81,8 @@ public class ClaimBehaviourData {
 			else if(ClaimBehaviour == ClaimBehaviourMode.RequireAccess){
 				if(RelevantPlayer!=null){
 					if(null!=(result =testclaim.allowAccess(RelevantPlayer))){
-						GriefPrevention.sendMessage(RelevantPlayer, TextMode.Err, result);
+						if(ShowMessages)
+							GriefPrevention.sendMessage(RelevantPlayer, TextMode.Err, result);
 						return ClaimAllowanceConstants.Deny;
 					}
 				}
@@ -83,7 +90,8 @@ public class ClaimBehaviourData {
 			else if(ClaimBehaviour == ClaimBehaviourMode.RequireContainer){
 				if(RelevantPlayer!=null){
 					if(null!=(result = testclaim.allowContainers(RelevantPlayer))){
-						GriefPrevention.sendMessage(RelevantPlayer, TextMode.Err, result);
+						if(ShowMessages)
+							GriefPrevention.sendMessage(RelevantPlayer, TextMode.Err, result);
 						return ClaimAllowanceConstants.Deny;
 					}
 				}
@@ -91,6 +99,8 @@ public class ClaimBehaviourData {
 			else if(ClaimBehaviour == ClaimBehaviourMode.RequireManager){
 				if(RelevantPlayer!=null){
 					if(!testclaim.isManager(RelevantPlayer.getName())){
+						if(ShowMessages)
+							GriefPrevention.sendMessage(RelevantPlayer, TextMode.Err, "You need Manager Permissions to do that here.");
 						return ClaimAllowanceConstants.Deny;
 					}
 				}
@@ -105,17 +115,25 @@ public class ClaimBehaviourData {
 		if(testclaim==null){
 			//we aren't inside a claim.
 			//System.out.println(BehaviourName + "Wilderness test...");
-			return Wilderness.Allow(position)?ClaimAllowanceConstants.Allow:ClaimAllowanceConstants.Deny;
-			
+			ClaimAllowanceConstants wildernessresult = Wilderness.Allow(position)?ClaimAllowanceConstants.Allow:ClaimAllowanceConstants.Deny;
+			if(!wildernessresult.Denied() && ShowMessages){
+				GriefPrevention.sendMessage(RelevantPlayer, TextMode.Err, Messages.ConfigDisabled,this.BehaviourName);
+			}
+			return wildernessresult;
 			
 		}
 		else{
 			//we are inside a claim.
 			//System.out.println(BehaviourName + "Claim test...");
-			return Claims.Allow(position)?ClaimAllowanceConstants.Allow:ClaimAllowanceConstants.Deny;
+			ClaimAllowanceConstants claimresult = Claims.Allow(position)?ClaimAllowanceConstants.Allow:ClaimAllowanceConstants.Deny;
+			if(claimresult.Denied() && ShowMessages)
+			{
+				GriefPrevention.sendMessage(RelevantPlayer, TextMode.Err, Messages.ConfigDisabled,this.BehaviourName);
+				return claimresult;
+			}
 		}
 		
-		
+		return ClaimAllowanceConstants.Allow;
 		
 	}
 	public PlacementRules getWildernessRules() { return Wilderness;}

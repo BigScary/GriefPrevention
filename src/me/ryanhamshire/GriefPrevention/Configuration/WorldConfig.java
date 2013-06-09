@@ -95,6 +95,11 @@ public class WorldConfig {
 	
 	private ClaimBehaviourData PlayerTrampleRules;
 	public ClaimBehaviourData getPlayerTrampleRules(){ return PlayerTrampleRules;}
+	
+	
+	private ClaimBehaviourData ArrowWoodenButtonRules;
+	public ClaimBehaviourData getArrowWoodenButtonRules() { return ArrowWoodenButtonRules;}
+	
 	//private members followed by their read-only accessor.
 	private boolean claims_Seige_Enabled;
 	/**
@@ -224,6 +229,9 @@ public class WorldConfig {
 	public Material getClaimsInvestigationTool(){ return config_claims_investigationTool;}
 	private Material config_claims_modificationTool;	  				//which material will be used to create/resize claims with a right click
 	public Material getClaimsModificationTool(){ return config_claims_modificationTool;}
+	
+	
+	private ArrayList<Material> BreakableArrowMaterials;
 	
 	
 	private ArrayList<Material> config_siege_blocks;					//which blocks will be breakable in siege mode
@@ -428,6 +436,8 @@ public class WorldConfig {
 		this.PlayerTrampleRules = new ClaimBehaviourData("Crop Trampling",config,outConfig,"GriefPrevention.PlayerCropTrample",
 				ClaimBehaviourData.getInsideClaims("Crop Trampling"));
 		
+		this.ArrowWoodenButtonRules = new ClaimBehaviourData("Arrows Trigger Wood Buttons",config,outConfig,"GriefPrevention.ArrowsHitWoodButtons",
+				ClaimBehaviourData.getAll("Arrows Trigger Wood Buttons"));
 		
 		this.SiegeBlockRevert = config.getBoolean("GriefPrevention.Siege.BlockRevert",false);
 		outConfig.set("GriefPrevention.Siege.BlockRevert", SiegeBlockRevert);

@@ -26,6 +26,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import me.ryanhamshire.GriefPrevention.Configuration.ClaimBehaviourData.ClaimAllowanceConstants;
+import me.ryanhamshire.GriefPrevention.Configuration.ClaimBehaviourData;
 import me.ryanhamshire.GriefPrevention.Configuration.WorldConfig;
 import me.ryanhamshire.GriefPrevention.tasks.EquipShovelProcessingTask;
 import me.ryanhamshire.GriefPrevention.tasks.PlayerKickBanTask;
@@ -1155,15 +1156,16 @@ class PlayerEventHandler implements Listener
 	}
 	private static HashSet<Byte> transparentMaterials = null;
 	private static HashSet<Material> GPTools = null;
-	
+	private static HashSet<Material> ContainerMaterials = null;
 	//when a player interacts with the world
 	@EventHandler(priority = EventPriority.LOWEST)
 	void onPlayerInteract(PlayerInteractEvent event)
 	{
+		
 		Player player = event.getPlayer();
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(player.getWorld());
 		//determine target block.  FEATURE: shovel and stick can be used from a distance away
-		Block clickedBlock = null;
+		Block clickedBlock = event.getClickedBlock();
 		//if null, initialize.
 		if(GPTools==null){
 			GPTools = new HashSet<Material>();
@@ -1172,7 +1174,7 @@ class PlayerEventHandler implements Listener
 		}
 		//get material of the item that was used...
 		Material inhand = event.getItem()==null?null:event.getItem().getType();
-		if(GPTools.contains(inhand)){
+		if(inhand!=null && GPTools.contains(inhand)){
 			//if the Tools HashSet contains the item used, apply 'selection extension' logic of interacting with air.
 			try
 			{
@@ -1198,12 +1200,14 @@ class PlayerEventHandler implements Listener
 			}
 			catch(Exception e)  //an exception intermittently comes from getTargetBlock().  when it does, just ignore the event
 			{
+				
 				return;
 			}
 		}
 		//if no block, stop here
 		if(clickedBlock == null)
 		{
+			
 			return;
 		}
 		
@@ -1232,21 +1236,25 @@ class PlayerEventHandler implements Listener
 				}
 			}
 		}
-		
+		if(ContainerMaterials==null){
+			ContainerMaterials = new HashSet<Material>();
+			ContainerMaterials.add(Material.WORKBENCH);
+			ContainerMaterials.add(Material.ENDER_CHEST);
+			ContainerMaterials.add(Material.ANVIL);
+			ContainerMaterials.add(Material.BREWING_STAND);
+			ContainerMaterials.add(Material.ENCHANTMENT_TABLE);
+			ContainerMaterials.add(Material.CAKE_BLOCK);
+			ContainerMaterials.add(Material.JUKEBOX);
+			ContainerMaterials.add(Material.DISPENSER);
+			ContainerMaterials.add(Material.DROPPER);
+			ContainerMaterials.add(Material.HOPPER);
+			
+		}
 		//apply rules for containers and crafting blocks
 		if(	wc.getClaimsPreventTheft() && (
 						event.getAction() == Action.RIGHT_CLICK_BLOCK && (
 						clickedBlock.getState() instanceof InventoryHolder ||
-						clickedBlockType == Material.WORKBENCH || 
-						clickedBlockType == Material.ENDER_CHEST ||
-						clickedBlockType == Material.DISPENSER ||
-						clickedBlockType == Material.ANVIL ||
-						clickedBlockType == Material.BREWING_STAND || 
-						clickedBlockType == Material.JUKEBOX || 
-						clickedBlockType == Material.ENCHANTMENT_TABLE ||
-						clickedBlockType == Material.CAKE_BLOCK ||
-						clickedBlockType == Material.DROPPER ||
-						clickedBlockType == Material.HOPPER ||
+						ContainerMaterials.contains(clickedBlock) || 
 						
 						wc.getModsContainerTrustIds().Contains(new MaterialInfo(clickedBlock.getTypeId(), clickedBlock.getData(), null)))))
 		{		
@@ -1360,7 +1368,9 @@ class PlayerEventHandler implements Listener
 		//NOTE: that this event applies only to players.  monsters and animals can still trample.
 		else if(event.getAction() == Action.PHYSICAL && clickedBlockType == Material.SOIL)
 		{
-			if(wc.getPlayerTrampleRules().Allowed(event.getPlayer().getLocation(),event.getPlayer()).Denied()){
+			ClaimBehaviourData.ClaimAllowanceConstants trampleresult = wc.getPlayerTrampleRules().Allowed(event.getPlayer().getLocation(),event.getPlayer());
+			if(trampleresult==ClaimAllowanceConstants.Allow_Forced) return; //Force it to be allowed.
+			if(trampleresult.Denied()){
 			event.setCancelled(true);
 			return;
 			}
@@ -2052,7 +2062,7 @@ class PlayerEventHandler implements Listener
 				if(result.succeeded == CreateClaimResult.Result.ClaimOverlap)
 				{
 					//if the claim it overlaps is owned by the player...
-					System.out.println("Claim owned by:" + result.claim.getOwnerName());
+					
 					if(result.claim.getOwnerName().equalsIgnoreCase(playerName)){
 						//owned by the player.
 						//make sure our larger claim entirely contains

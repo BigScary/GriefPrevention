@@ -22,6 +22,8 @@ import java.util.Calendar;
 import java.util.List;
 
 import me.ryanhamshire.GriefPrevention.Configuration.ClaimBehaviourData;
+import me.ryanhamshire.GriefPrevention.Configuration.ClaimBehaviourData.ClaimAllowanceConstants;
+import me.ryanhamshire.GriefPrevention.Configuration.PlacementRules.BasicPermissionConstants;
 import me.ryanhamshire.GriefPrevention.Configuration.WorldConfig;
 
 import org.bukkit.Location;
@@ -41,6 +43,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Ocelot;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Snowball;
 import org.bukkit.entity.Snowman;
 import org.bukkit.entity.TNTPrimed;
@@ -65,13 +68,18 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityInteractEvent;
+import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.ExpBottleEvent;
 import org.bukkit.event.entity.ItemSpawnEvent;
+import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
+import org.bukkit.event.entity.SheepDyeWoolEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.hanging.HangingBreakEvent;
 import org.bukkit.event.hanging.HangingPlaceEvent;
 import org.bukkit.event.vehicle.VehicleDamageEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Vector;
 
 //import com.gmail.nossr50.mcMMO;
 //import com.gmail.nossr50.runnables.skills.BleedTimerTask;
@@ -122,12 +130,76 @@ class EntityEventHandler implements Listener
 		if(!wc.getZombieDoorBreaking().Allowed(event.getEntity().getLocation(), null).Allowed()) 
 			event.setCancelled(true);
 	}
+	@EventHandler
+	public void onShootBow(EntityShootBowEvent event){
+		//if shot by a player, cache it for onProjectileHit.
+		
+	}
+	
+	//@EventHandler
+	/*public void onProjectileHit(ProjectileHitEvent event){
+		//currently we only deal with arrows.
+		Player Shooter=null;
+		
+		
+		Projectile proj = event.getEntity();
+		if(proj.getShooter() instanceof Player) Shooter = (Player)(proj.getShooter());
+		if(event.getEntityType()==EntityType.ARROW){
+		    //get the block at the position of the arrow.
+			Location projectilelocation = proj.getLocation();
+			Vector vel = proj.getVelocity();
+		    Block atpos = event.getEntity().getWorld().getBlockAt(projectilelocation);
+		    Block secondblock;
+		    Location secondpos = projectilelocation.add(new Vector(0,0,0).subtract(vel));
+		    secondblock = proj.getWorld().getBlockAt(secondpos);
+		    
+		    
+			if((atpos !=null && atpos.getType()==Material.WOOD_BUTTON) || 
+					(secondblock!=null && secondblock.getType()==Material.WOOD_BUTTON)){
+                WorldConfig wc = GriefPrevention.instance.getWorldCfg(proj.getWorld());
+                if(wc.getArrowWoodenButtonRules().Allowed(proj.getLocation(), Shooter).Denied()){
+                	proj.remove();
+                	
+                }
+                
+			}
+			
+			
+			
+		}
+	}
+	*/
 	
 	//don't allow entities to trample crops
+	/**
+	 * @param event
+	 */
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
 	public void onEntityInteract(EntityInteractEvent event)
 	{
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(event.getEntity().getWorld());
+		if(event.getEntity() instanceof Arrow)
+		{
+			Arrow proj = (Arrow)event.getEntity();
+			Player source = null;
+			if(proj.getShooter() instanceof Player)
+				source = (Player)proj.getShooter();
+				
+			if(event.getBlock().getType()==Material.WOOD_BUTTON){
+				if(wc.getArrowWoodenButtonRules().Allowed(event.getBlock().getLocation(), source).Denied()){
+					event.setCancelled(true);
+					//remove the arrow also.
+					proj.remove();
+					//send them a message.
+					
+					return;
+				}
+				
+				
+			}
+			
+			
+		}
 		if(!wc.creaturesTrampleCrops() && event.getBlock().getType() == Material.SOIL)
 		{
 			event.setCancelled(true);
