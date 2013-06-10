@@ -97,19 +97,40 @@ class EntityEventHandler implements Listener
 	private Claim ChangeBlockClaimCache = null;
 	//don't allow endermen to change blocks
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
-	public void onEntityChangeBLock(EntityChangeBlockEvent event)
+	public void onEntityChangeBlock(EntityChangeBlockEvent event)
 	{
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(event.getEntity().getWorld());
 		
 		
-		if(!wc.endermenMoveBlocks() && event.getEntityType() == EntityType.ENDERMAN)
+		if(event.getEntityType() == EntityType.ENDERMAN)
 		{
-			event.setCancelled(true);
+			
+			//if the enderman is holding something, this is a placement.
+			Enderman theenderman = (Enderman)event.getEntity();
+			if(theenderman.getCarriedMaterial()==null || theenderman.getCarriedMaterial().getItemType()==Material.AIR){
+				//carrying nothing, so picking up. This could be reversed depending on when this event is
+				//actually called...
+				ClaimAllowanceConstants cac = wc.getEndermanPickupRules().Allowed(event.getBlock().getLocation(), null);
+				if(cac.Allowed()) return;
+				
+				//DENY!
+				event.setCancelled(true);
+				
+			}
+			else {
+				//otherwise, putting it down.
+				ClaimAllowanceConstants cac = wc.getEndermanPlacementRules().Allowed(event.getBlock().getLocation(), null);
+				if(cac.Allowed()) return;
+				event.setCancelled(true);
+			}
+			
+			
 		}
 		
-		else if(!wc.getSilverfishBreakBlocks() && event.getEntityType() == EntityType.SILVERFISH)
+		else if(event.getEntityType() == EntityType.SILVERFISH)
 		{
-			event.setCancelled(true);
+			if(wc.getSilverfishBreakRules().Allowed(event.getBlock().getLocation(), null).Denied())
+				event.setCancelled(true);
 		}
 		
 		
@@ -793,8 +814,10 @@ class EntityEventHandler implements Listener
 		{
 			//if the entity is an non-monster creature (remember monsters disqualified above), or a vehicle
 			//
-			if ((subEvent.getEntity() instanceof Creature && wc.getClaimsProtectCreatures()))
+			if (subEvent.getEntity() instanceof Creature)
 			{
+				
+				
 				
 				Claim cachedClaim = null;
 				PlayerData playerData = null;
@@ -888,7 +911,7 @@ class EntityEventHandler implements Listener
 		WorldConfig wc = new WorldConfig(event.getVehicle().getWorld());
 		
 		//all of this is anti theft code
-		if(!wc.getClaimsPreventTheft()) return;		
+				
 		
 		//determine which player is attacking, if any
 		Player attacker = null;
@@ -914,7 +937,7 @@ class EntityEventHandler implements Listener
 			}
 		}
 		//if Damage source is unspecified and we allow environmental damage, don't cancel the event.
-		else if(damageSource ==null && wc.getEnvironmentalVehicleDamage().Allowed(event.getVehicle().getLocation(),attacker).Allowed()){
+		else if(damageSource ==null && wc.getEnvironmentalVehicleDamage().Allowed(event.getVehicle().getLocation(),attacker,false).Allowed()){
 			return;
 		}
 		//NOTE: vehicles can be pushed around.

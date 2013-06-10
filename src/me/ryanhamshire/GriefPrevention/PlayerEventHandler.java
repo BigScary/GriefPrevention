@@ -769,19 +769,21 @@ class PlayerEventHandler implements Listener
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(player.getWorld());
 		PlayerData playerData = this.dataStore.getPlayerData(player.getName());
 		
+		
 		//FEATURE: prevent players from using ender pearls to gain access to secured claims
-		if(event.getCause() == TeleportCause.ENDER_PEARL && wc.getEnderPearlsRequireAccessTrust())
+		if(event.getCause() == TeleportCause.ENDER_PEARL)
 		{
-			Claim toClaim = this.dataStore.getClaimAt(player.getLocation(), false, playerData.lastClaim);
-			if(toClaim != null)
-			{
-				playerData.lastClaim = toClaim;
-				String noAccessReason = toClaim.allowAccess(player);
-				if(noAccessReason != null)
-				{
-					GriefPrevention.sendMessage(player, TextMode.Err, noAccessReason);
-					event.setCancelled(true);
-				}
+			if(wc.getEnderPearlOrigins().Allowed(event.getFrom(), player).Denied()){
+				player.getInventory().addItem(new ItemStack(Material.ENDER_PEARL,1));
+				event.setCancelled(true);
+				return;
+			}
+			
+			
+			else if(wc.getEnderPearlTargets().Allowed(event.getTo(), player).Denied()){
+				player.getInventory().addItem(new ItemStack(Material.ENDER_PEARL,1));
+				event.setCancelled(true);
+				return;
 			}
 		}
 		
@@ -882,7 +884,7 @@ class PlayerEventHandler implements Listener
 		}
 		
 		//if the entity is a vehicle and we're preventing theft in claims		
-		if(wc.getClaimsPreventTheft() && entity instanceof Vehicle)
+		if(wc.getContainerTheft().Allowed(entity.getLocation(),player,false).Denied() && entity instanceof Vehicle)
 		{
 			//if the entity is in a claim
 			Claim claim = this.dataStore.getClaimAt(entity.getLocation(), false, null);
@@ -1002,18 +1004,16 @@ class PlayerEventHandler implements Listener
 		Player player = bedEvent.getPlayer();
 		Block block = bedEvent.getBed();
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(block.getWorld());
+		ClaimAllowanceConstants resultdata = wc.getBeds().Allowed(block.getLocation(),bedEvent.getPlayer(),false);
 		
-		if(!wc.getClaimsPreventButtonsSwitches()) return;
-		//if the bed is in a claim 
-		Claim claim = this.dataStore.getClaimAt(block.getLocation(), false, null);
-		if(claim != null)
-		{
-			//if the player doesn't have access in that claim, tell him so and prevent him from sleeping in the bed
-			if(claim.allowAccess(player) != null)
-			{
+		if(resultdata== ClaimAllowanceConstants.Allow_Forced) return;
+		//if the bed is in a claim
+		else if(resultdata.Denied()){
+			
+		        Claim grabclaim = GriefPrevention.instance.dataStore.getClaimAt(block.getLocation(), true, null);
 				bedEvent.setCancelled(true);
-				GriefPrevention.sendMessage(player, TextMode.Err, Messages.NoBedPermission, claim.getOwnerName());
-			}
+				GriefPrevention.sendMessage(player, TextMode.Err, Messages.NoBedPermission, grabclaim.getOwnerName());
+			
 		}		
 	}
 	
@@ -1039,7 +1039,7 @@ class PlayerEventHandler implements Listener
 			}
 		}
 		else if(bucketEvent.getBucket()==Material.WATER_BUCKET){
-			 switch(wc.getWaterBucketBehaviour().Allowed(block.getLocation(), player)) 
+			 switch(wc.getWaterBucketBehaviour().Allowed(block.getLocation(), player,false)) 
 			 {
 			 case Allow_Forced:
 			     return; //force allow.
@@ -1067,14 +1067,14 @@ class PlayerEventHandler implements Listener
 		//checks for Behaviour perms.
 		if(bucketEvent.getBucket() == Material.LAVA_BUCKET){
 			if(wc.getLavaBucketBehaviour().Allowed(block.getLocation(),player).Denied()){
-				GriefPrevention.sendMessage(player, TextMode.Err, Messages.ConfigDisabled,"Lava placement ");
+				//GriefPrevention.sendMessage(player, TextMode.Err, Messages.ConfigDisabled,"Lava placement ");
 				bucketEvent.setCancelled(true);
 				return;
 			}
 		}
 		else if(bucketEvent.getBucket() == Material.WATER_BUCKET){
 			if(wc.getWaterBucketBehaviour().Allowed(block.getLocation(),player).Denied()){
-				GriefPrevention.sendMessage(player, TextMode.Err, Messages.ConfigDisabled,"Water placement ");
+				//GriefPrevention.sendMessage(player, TextMode.Err, Messages.ConfigDisabled,"Water placement ");
 				bucketEvent.setCancelled(true);
 				return;
 			}
@@ -1098,7 +1098,7 @@ class PlayerEventHandler implements Listener
 						GriefPrevention.sendMessage(player, TextMode.Err, Messages.NoWildernessBuckets);
 						bucketEvent.setCancelled(true);
 						return;
-				}
+				}}
 			 if(bucketEvent.getBucket() == Material.WATER_BUCKET){
 				
 				if(wc.getWaterBucketBehaviour().Allowed(block.getLocation(), player).Denied()){
@@ -1106,7 +1106,7 @@ class PlayerEventHandler implements Listener
 					bucketEvent.setCancelled(true);
 					return;
 				}
-			}
+			
 			
 		}
 		}
@@ -1251,12 +1251,12 @@ class PlayerEventHandler implements Listener
 			
 		}
 		//apply rules for containers and crafting blocks
-		if(	wc.getClaimsPreventTheft() && (
-						event.getAction() == Action.RIGHT_CLICK_BLOCK && (
-						clickedBlock.getState() instanceof InventoryHolder ||
+		if(	(event.getAction() == Action.RIGHT_CLICK_BLOCK && 
+				(clickedBlock.getState() instanceof InventoryHolder ||
 						ContainerMaterials.contains(clickedBlock) || 
 						
-						wc.getModsContainerTrustIds().Contains(new MaterialInfo(clickedBlock.getTypeId(), clickedBlock.getData(), null)))))
+						wc.getModsContainerTrustIds().Contains(new MaterialInfo(clickedBlock.getTypeId(), clickedBlock.getData(), null)))
+						))
 		{		
 			
 			//block container access when they cannot see it.
@@ -1299,20 +1299,14 @@ class PlayerEventHandler implements Listener
 			}
 			
 			//otherwise check permissions for the claim the player is in
-			Claim claim = this.dataStore.getClaimAt(clickedBlock.getLocation(), false, playerData.lastClaim);
-			if(claim != null)
-			{
-				playerData.lastClaim = claim;
-				
-				String noContainersReason = claim.allowContainers(player);
-				if(noContainersReason != null)
-				{
-					
+			if(wc.getContainerTheft().Allowed(clickedBlock.getLocation(), player).Denied()){
+					//message will be sent by the above. noContainersReason won't be used anymore
+				    //this will require some thought :/
 					event.setCancelled(true);
-					GriefPrevention.sendMessage(player, TextMode.Err, noContainersReason);
+					//GriefPrevention.sendMessage(player, TextMode.Err, noContainersReason);
 					return;
 				}
-			}
+			
 			
 			//if the event hasn't been cancelled, then the player is allowed to use the container
 			//so drop any pvp protection
@@ -1322,7 +1316,38 @@ class PlayerEventHandler implements Listener
 				GriefPrevention.sendMessage(player, TextMode.Warn, Messages.PvPImmunityEnd);
 			}
 		}
+		//apply rules for applicable element.
+		ClaimBehaviourData useRule = null;
+		if(clickedBlockType==Material.WOODEN_DOOR){
+			useRule = wc.getWoodenDoors();
+		}else if(clickedBlockType==Material.TRAP_DOOR){
+			useRule = wc.getTrapDoors();
+		}else if(clickedBlockType==Material.FENCE_GATE){
+			useRule = wc.getFenceGates();
+		}else if(clickedBlockType==Material.STONE_BUTTON){
+			useRule = wc.getStoneButton();
+		}else if(clickedBlockType ==Material.WOOD_BUTTON){
+			useRule = wc.getWoodenButton();
+		}else if(clickedBlockType == Material.WOOD_PLATE){
+			useRule = wc.getWoodPressurePlates();
+		}else if(clickedBlockType ==Material.STONE_PLATE){
+			useRule = wc.getStonePressurePlates();
+		} else if(clickedBlockType == Material.LEVER){
+			useRule = wc.getLevers();
+		}
 		
+		if(useRule!=null){
+			
+			if(useRule.Allowed(clickedBlock.getLocation(), player).Denied())
+			{
+				event.setCancelled(true);
+				return;
+			}
+			
+			
+			
+		}
+		/*//older code here for now...
 		//otherwise apply rules for doors, if configured that way
 		else if((wc.getClaimsLockWoodenDoors() && clickedBlockType == Material.WOODEN_DOOR) ||
 				(wc.getClaimsLockTrapDoors() && clickedBlockType == Material.TRAP_DOOR) ||
@@ -1363,7 +1388,7 @@ class PlayerEventHandler implements Listener
 				}
 			}			
 		}
-		
+		*/
 		//apply rule for players trampling tilled soil back to dirt (never allow it)
 		//NOTE: that this event applies only to players.  monsters and animals can still trample.
 		else if(event.getAction() == Action.PHYSICAL && clickedBlockType == Material.SOIL)
@@ -1377,19 +1402,17 @@ class PlayerEventHandler implements Listener
 		}
 		
 		//apply rule for note blocks and repeaters
-		else if(clickedBlockType == Material.NOTE_BLOCK || clickedBlockType == Material.DIODE_BLOCK_ON || clickedBlockType == Material.DIODE_BLOCK_OFF)
+		else if(clickedBlockType == Material.NOTE_BLOCK || 
+				clickedBlockType == Material.DIODE_BLOCK_ON || 
+				clickedBlockType == Material.DIODE_BLOCK_OFF ||
+				clickedBlockType == Material.REDSTONE_COMPARATOR_OFF ||
+				clickedBlockType == Material.REDSTONE_COMPARATOR_ON)
 		{
-			Claim claim = this.dataStore.getClaimAt(clickedBlock.getLocation(), false, playerData.lastClaim);
-			if(claim != null)
-			{
-				String noBuildReason = claim.allowBuild(player);
-				if(noBuildReason != null)
-				{
-					
-					event.setCancelled(true);
-					GriefPrevention.sendMessage(player, TextMode.Err, noBuildReason);
-					return;
-				}
+			ClaimAllowanceConstants tweakallow = wc.getBlockTweakRules().Allowed(clickedBlock.getLocation(), event.getPlayer());
+			if(tweakallow == ClaimAllowanceConstants.Allow_Forced) return;
+			else if(tweakallow.Denied()){
+				event.setCancelled(true);
+				return;
 			}
 		}
 		

@@ -511,10 +511,71 @@ public class GriefPrevention extends JavaPlugin
 			
 		}
 		if(cmd.getName().equalsIgnoreCase("setclaimblocks") && player !=null){
-			
+			if(args.length != 2) return false;
+			//find the specified player
+            OfflinePlayer targetPlayer = this.resolvePlayer(args[0]);
+            if(targetPlayer == null)
+            {
+                    GriefPrevention.sendMessage(player, TextMode.Err, "Player \"" + args[0] + "\" not found.");
+                    return true;
+            }
+
+            //parse the adjustment amount
+            int adjustment;
+            try
+            {
+                    adjustment = Integer.parseInt(args[1]);
+            }
+            catch(NumberFormatException numberFormatException)
+            {
+                    return false;  //causes usage to be displayed
+            }
+            //give blocks to player
+            PlayerData playerData = this.dataStore.getPlayerData(targetPlayer.getName());
+            playerData.accruedClaimBlocks = adjustment;
+            this.dataStore.savePlayerData(targetPlayer.getName(), playerData);
+
+            GriefPrevention.sendMessage(player, TextMode.Success, "Set " + targetPlayer.getName() + "'s bonus claim blocks to " + adjustment + ".  New total bonus blocks: " + playerData.bonusClaimBlocks + ".");
+            GriefPrevention.AddLogEntry(player.getName() + " Set " + targetPlayer.getName() + "'s bonus claim blocks to "  + adjustment + ".");
+
+            return true;      
 			
 			
 		}
+		 //setblockbank <player> <amount>
+        else if(cmd.getName().equalsIgnoreCase("setblockbank"))
+        {
+                //requires exactly two parameters, the other player's name and the adjustment
+                if(args.length != 2) return false;
+
+                //find the specified player
+                OfflinePlayer targetPlayer = this.resolvePlayer(args[0]);
+                if(targetPlayer == null)
+                {
+                        GriefPrevention.sendMessage(player, TextMode.Err, "Player \"" + args[0] + "\" not found.");
+                        return true;
+                }
+
+                //parse the adjustment amount
+                int adjustment;
+                try
+                {
+                        adjustment = Integer.parseInt(args[1]);
+                }
+                catch(NumberFormatException numberFormatException)
+                {
+                        return false;  //causes usage to be displayed
+                }
+                //give blocks to player
+                PlayerData playerData = this.dataStore.getPlayerData(targetPlayer.getName());
+                playerData.accruedClaimBlocks += adjustment;
+                this.dataStore.savePlayerData(targetPlayer.getName(), playerData);
+
+                GriefPrevention.sendMessage(player, TextMode.Success, "Adjusted " + targetPlayer.getName() + "'s bonus claim blocks by " + adjustment + ".  New total bonus blocks: " + playerData.bonusClaimBlocks + ".");
+                GriefPrevention.AddLogEntry(player.getName() + " adjusted " + targetPlayer.getName() + "'s bonus claim blocks by "  + adjustment + ".");
+
+                return true;      
+        } 
 		if(cmd.getName().equalsIgnoreCase("clearmanagers") && player!=null){
 			Claim claimatpos = dataStore.getClaimAt(player.getLocation(), true, null);
 			PlayerData pdata = dataStore.getPlayerData(player.getName());

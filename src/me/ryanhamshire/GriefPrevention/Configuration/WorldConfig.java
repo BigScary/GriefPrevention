@@ -12,6 +12,7 @@ import me.ryanhamshire.GriefPrevention.DataStore;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import me.ryanhamshire.GriefPrevention.MaterialCollection;
 import me.ryanhamshire.GriefPrevention.MaterialInfo;
+import me.ryanhamshire.GriefPrevention.Configuration.ClaimBehaviourData.ClaimBehaviourMode;
 import me.ryanhamshire.GriefPrevention.tasks.CleanupUnusedClaimsTask;
 import me.ryanhamshire.GriefPrevention.tasks.DeliverClaimBlocksTask;
 import net.milkbowl.vault.economy.Economy;
@@ -96,6 +97,21 @@ public class WorldConfig {
 	private ClaimBehaviourData PlayerTrampleRules;
 	public ClaimBehaviourData getPlayerTrampleRules(){ return PlayerTrampleRules;}
 	
+	private ClaimBehaviourData EndermanPickupRules; //rules for enderman picking up blocks.
+	public ClaimBehaviourData getEndermanPickupRules(){ return EndermanPickupRules;}
+	
+	private ClaimBehaviourData EndermanPlacementRules;
+	public ClaimBehaviourData getEndermanPlacementRules(){ return EndermanPlacementRules;}
+	
+	private ClaimBehaviourData SilverfishBreakRules;
+	public ClaimBehaviourData getSilverfishBreakRules(){ return SilverfishBreakRules;}
+	
+	private ClaimBehaviourData BlockTweakRules; //rules  for Noteblocks, redstone repeaters, and comparators.
+	
+	public ClaimBehaviourData getBlockTweakRules(){ return BlockTweakRules;}
+	
+	
+	
 	
 	private ClaimBehaviourData ArrowWoodenButtonRules;
 	public ClaimBehaviourData getArrowWoodenButtonRules() { return ArrowWoodenButtonRules;}
@@ -143,6 +159,42 @@ public class WorldConfig {
 	//public boolean claims_AllowEnvironmentalVehicleDamage(){return config_claims_AllowEnvironmentalVehicleDamage;}
 	private double  config_claims_AbandonReturnRatio;                //return ratio when abandoning a claim- .80 will result in players getting 80% of the used claim blocks back.
 	public double getClaimsAbandonReturnRatio(){ return config_claims_AbandonReturnRatio;}
+	
+	private ClaimBehaviourData ContainerTheft;
+	/**
+	 * Returns Behaviour Information on Containers. This defaults to requiring Container trust inside claims, and is disabled outside claims.
+	 * This 
+	 * @return
+	 */
+	public ClaimBehaviourData getContainerTheft(){ return ContainerTheft;}
+	private ClaimBehaviourData CreatureDamage;
+	public ClaimBehaviourData getCreatureDamage(){return CreatureDamage;}
+	private ClaimBehaviourData WoodenDoors;
+	public ClaimBehaviourData getWoodenDoors(){ return WoodenDoors;}
+	private ClaimBehaviourData TrapDoors;
+	public ClaimBehaviourData getTrapDoors(){ return TrapDoors;}
+	private ClaimBehaviourData FenceGates;
+	public ClaimBehaviourData getFenceGates(){ return FenceGates;}
+	private ClaimBehaviourData EnderPearlOrigins;
+	public ClaimBehaviourData getEnderPearlOrigins(){ return EnderPearlOrigins;}
+	private ClaimBehaviourData EnderPearlTargets;
+	public ClaimBehaviourData getEnderPearlTargets(){return EnderPearlTargets;}
+	private ClaimBehaviourData StonePressurePlates;
+	public ClaimBehaviourData getStonePressurePlates(){ return StonePressurePlates;}
+	private ClaimBehaviourData WoodPressurePlates;
+	public ClaimBehaviourData getWoodPressurePlates(){ return WoodPressurePlates;}
+	private ClaimBehaviourData WoodenButton;
+	public ClaimBehaviourData getWoodenButton(){ return WoodenButton;}
+	private ClaimBehaviourData StoneButton;
+	public ClaimBehaviourData getStoneButton(){ return StoneButton;}
+	private ClaimBehaviourData Levers;
+	public ClaimBehaviourData getLevers(){ return Levers;}
+	private ClaimBehaviourData Beds;
+	public ClaimBehaviourData getBeds(){ return Beds;}
+	private ClaimBehaviourData ModInteractables;
+	public ClaimBehaviourData getModInteractables(){ return ModInteractables;}
+	
+	/*
 	private boolean config_claims_preventTheft;						//whether containers and crafting blocks are protectable
 	public boolean getClaimsPreventTheft(){ return config_claims_preventTheft;}
 	private boolean config_claims_protectCreatures;					//whether claimed animals may be injured by players without permission
@@ -157,7 +209,7 @@ public class WorldConfig {
 	public boolean getClaimsLockFenceGates(){ return config_claims_lockFenceGates;}
 	private boolean config_claims_enderPearlsRequireAccessTrust;		//whether teleporting into a claim with a pearl requires access trust
 	public boolean getEnderPearlsRequireAccessTrust(){ return config_claims_enderPearlsRequireAccessTrust;}
-	
+	*/
 	
 	private float config_claims_blocksAccruedPerHour;					//how many additional blocks players get each hour of play (can be zero)
 	public float getClaimBlocksAccruedPerHour(){ return config_claims_blocksAccruedPerHour;}
@@ -314,10 +366,7 @@ public class WorldConfig {
 	private boolean config_smartBan;									//whether to ban accounts which very likely owned by a banned player
 	public boolean getSmartBan(){ return config_smartBan;}
 	
-	private boolean config_endermenMoveBlocks;						//whether or not endermen may move blocks around
-	public boolean endermenMoveBlocks(){ return config_endermenMoveBlocks;}
-	private boolean config_silverfishBreakBlocks;					//whether silverfish may break blocks
-	public boolean getSilverfishBreakBlocks(){ return config_silverfishBreakBlocks;}
+	
 	private boolean config_creaturesTrampleCrops;					//whether or not non-player entities may trample crops
 	public boolean creaturesTrampleCrops(){ return config_creaturesTrampleCrops;}
 
@@ -378,13 +427,13 @@ public class WorldConfig {
 		//read in the data for TNT explosions and Golem/Wither placements.
 		
 		this.CreeperExplosionBehaviour = new ClaimBehaviourData("Creeper Explosions",config,outConfig,"GriefPrevention.CreeperExplosions",
-				ClaimBehaviourData.getOutsideClaims("Creeper Explosions"));
+				new ClaimBehaviourData("Creeper Explosions",PlacementRules.Both,PlacementRules.BelowOnly,ClaimBehaviourMode.Disabled));
 		
 		this.WitherExplosionBehaviour= new ClaimBehaviourData("Wither Explosions",config,outConfig,"GriefPrevention.WitherExplosions",
-				ClaimBehaviourData.getOutsideClaims("Wither Explosions"));
+				new ClaimBehaviourData("Creeper Explosions",PlacementRules.Both,PlacementRules.BelowOnly,ClaimBehaviourMode.Disabled));
 		
 		this.WitherEatBehaviour = new ClaimBehaviourData("Wither Eating",config,outConfig,"GriefPrevention.WitherEating",
-				ClaimBehaviourData.getOutsideClaims("Wither Eating"));
+				new ClaimBehaviourData("Creeper Explosions",PlacementRules.Both,PlacementRules.BelowOnly,ClaimBehaviourMode.Disabled));
 		
 		
 		this.TNTExplosionBehaviour = new ClaimBehaviourData("TNT Explosions",config,outConfig,"GriefPrevention.TNTExplosions",
@@ -425,19 +474,91 @@ public class WorldConfig {
 				ClaimBehaviourData.getNone("Zombie Door Breaking"));
 		
 		SheepShearingRules = new ClaimBehaviourData("Sheep Shearing",config,outConfig,"GriefPrevention.SheepShearing",
-				ClaimBehaviourData.getInsideClaims("Sheep Shearing"));
+				ClaimBehaviourData.getAll("Sheep Shearing").setBehaviourMode(ClaimBehaviourMode.RequireContainer));
 		
 		SheepDyeing = new ClaimBehaviourData("Sheep Dyeing",config,outConfig,"GriefPrevention.SheepDyeing",
-				ClaimBehaviourData.getInsideClaims("Sheep Dyeing"));
+				ClaimBehaviourData.getAll("Sheep Dyeing").setBehaviourMode(ClaimBehaviourMode.RequireContainer));
 		
 		this.BonemealGrass = new ClaimBehaviourData("Bonemeal",config,outConfig,"GriefPrevention.BonemealGrass",
-				ClaimBehaviourData.getInsideClaims("Bonemeal"));
+				ClaimBehaviourData.getAll("Bonemeal").setBehaviourMode(ClaimBehaviourMode.RequireBuild));
 		
 		this.PlayerTrampleRules = new ClaimBehaviourData("Crop Trampling",config,outConfig,"GriefPrevention.PlayerCropTrample",
-				ClaimBehaviourData.getInsideClaims("Crop Trampling"));
+				ClaimBehaviourData.getAll("Crop Trampling").setBehaviourMode(ClaimBehaviourMode.RequireBuild));
+		
+		this.EndermanPickupRules = new ClaimBehaviourData("Enderman Pickup",config,outConfig,"GriefPrevention.EndermanPickup",
+				ClaimBehaviourData.getNone("Enderman Pickup"));
+		
+		this.EndermanPlacementRules = new ClaimBehaviourData("Enderman Placement",config,outConfig,"GriefPrevention.EndermanPlacement",
+				ClaimBehaviourData.getNone("Enderman Placement"));
 		
 		this.ArrowWoodenButtonRules = new ClaimBehaviourData("Arrows Trigger Wood Buttons",config,outConfig,"GriefPrevention.ArrowsHitWoodButtons",
-				ClaimBehaviourData.getAll("Arrows Trigger Wood Buttons"));
+				ClaimBehaviourData.getAll("Arrows Trigger Wood Buttons").setBehaviourMode(ClaimBehaviourMode.RequireAccess));
+		
+		this.BlockTweakRules = new ClaimBehaviourData("Block Tweaking",config,outConfig,"GriefPrevention.BlockTweaking",
+				ClaimBehaviourData.getAll("Block Tweaking").setBehaviourMode(ClaimBehaviourMode.RequireAccess));
+		
+		
+		this.ContainerTheft = new ClaimBehaviourData("Container Theft",config,outConfig,"GriefPrevention.ContainerTheft",
+				ClaimBehaviourData.getOutsideClaims("Container Theft").setBehaviourMode(ClaimBehaviourMode.RequireContainer));
+		
+		this.CreatureDamage = new ClaimBehaviourData("Creature Damage",config,outConfig,"GriefPrevention.CreatureDamage",
+				ClaimBehaviourData.getAll("Creature Damage").setBehaviourMode(ClaimBehaviourMode.RequireContainer));
+
+		this.WoodenDoors = new ClaimBehaviourData("Wooden Doors",config,outConfig,"GriefPrevention.WoodenDoors",
+				ClaimBehaviourData.getAll("Wooden Doors").setBehaviourMode(ClaimBehaviourMode.RequireNone));
+		
+		this.TrapDoors= new ClaimBehaviourData("TrapDoors",config,outConfig,"GriefPrevention.TrapDoors",
+				ClaimBehaviourData.getAll("TrapDoors").setBehaviourMode(ClaimBehaviourMode.RequireNone));
+		
+		this.FenceGates = new ClaimBehaviourData("Fence Gates",config,outConfig,"GriefPrevention.FenceGates",
+				ClaimBehaviourData.getAll("Fence Gates").setBehaviourMode(ClaimBehaviourMode.RequireNone));
+		
+		this.EnderPearlOrigins = new ClaimBehaviourData("EnderPearl Origins",config,outConfig,"GriefPrevention.EnderPearlOrigin",
+				ClaimBehaviourData.getAll("EnderPearl Origins").setBehaviourMode(ClaimBehaviourMode.RequireAccess));
+		
+		this.EnderPearlTargets = new ClaimBehaviourData("EnderPearl Targets",config,outConfig,"GriefPrevention.EnderPearlTarget",
+				ClaimBehaviourData.getAll("EnderPearl Targets").setBehaviourMode(ClaimBehaviourMode.RequireAccess));
+		
+		this.StonePressurePlates = new ClaimBehaviourData("Stone Pressure Plates",config,outConfig,"GriefPrevention.StonePressurePlates",
+				ClaimBehaviourData.getAll("Stone Pressure Plates").setBehaviourMode(ClaimBehaviourMode.RequireNone));
+		
+		this.WoodPressurePlates = new ClaimBehaviourData("Wooden Pressure Plates",config,outConfig,"GriefPrevention.WoodenPressurePlates",
+				ClaimBehaviourData.getAll("Wooden Pressure Plates").setBehaviourMode(ClaimBehaviourMode.RequireNone));
+		
+		this.StoneButton = new ClaimBehaviourData("Stone Button",config,outConfig,"GriefPrevention.StoneButton",
+				ClaimBehaviourData.getAll("Stone Button").setBehaviourMode(ClaimBehaviourMode.RequireAccess));
+		
+		this.WoodenButton = new ClaimBehaviourData("Wooden Button",config,outConfig,"GriefPrevention.WoodenButton",
+				ClaimBehaviourData.getAll("Wooden Button").setBehaviourMode(ClaimBehaviourMode.RequireAccess));
+		
+		this.Levers = new ClaimBehaviourData("Levers",config,outConfig,"GriefPrevention.Levers",
+				ClaimBehaviourData.getAll("Levers").setBehaviourMode(ClaimBehaviourMode.RequireAccess));
+		/*private ClaimBehaviourData ContainerTheft;
+	public ClaimBehaviourData getContainerTheft(){ return ContainerTheft;}
+	private ClaimBehaviourData CreatureDamage;
+	public ClaimBehaviourData getCreatureDamage(){return CreatureDamage;}
+	private ClaimBehaviourData WoodenDoors;
+	public ClaimBehaviourData getWoodenDoors(){ return WoodenDoors;}
+	private ClaimBehaviourData TrapDoors;
+	public ClaimBehaviourData getTrapDoors(){ return TrapDoors;}
+	private ClaimBehaviourData FenceGates;
+	public ClaimBehaviourData getFenceGates(){ return FenceGates;}
+	private ClaimBehaviourData EnderPearlOrigins;
+	public ClaimBehaviourData getEnderPearlOrigins(){ return EnderPearlOrigins;}
+	private ClaimBehaviourData EnderPearlTargets;
+	public ClaimBehaviourData getEnderPearlTargets(){return EnderPearlTargets;}
+	private ClaimBehaviourData StonePressurePlates;
+	public ClaimBehaviourData getStonePressurePlates(){ return StonePressurePlates;}
+	private ClaimBehaviourData WoodPressurePlates;
+	public ClaimBehaviourData getWoodPressurePlates(){ return WoodPressurePlates;}
+	private ClaimBehaviourData WoodenButton;
+	public ClaimBehaviourData getWoodenButton(){ return WoodenButton;}
+	private ClaimBehaviourData StoneButton;
+	public ClaimBehaviourData getStoneButton(){ return StoneButton;}*/
+		
+		
+		
+		
 		
 		this.SiegeBlockRevert = config.getBoolean("GriefPrevention.Siege.BlockRevert",false);
 		outConfig.set("GriefPrevention.Siege.BlockRevert", SiegeBlockRevert);
@@ -550,14 +671,7 @@ public class WorldConfig {
 	
 		this.config_pvp_Seige_Loot_Chests = config.getInt("GriefPrevention.Claims.SeigeLootChests",0);
 		outConfig.set("GriefPrevention.Claims.SeigeLootChests", config_pvp_Seige_Loot_Chests);
-		this.config_claims_preventTheft = config.getBoolean("GriefPrevention.Claims.PreventTheft", true);
-		this.config_claims_protectCreatures = config.getBoolean("GriefPrevention.Claims.ProtectCreatures", true);
-		this.config_claims_preventButtonsSwitches = config.getBoolean("GriefPrevention.Claims.PreventButtonsSwitches", true);
-		this.config_claims_lockWoodenDoors = config.getBoolean("GriefPrevention.Claims.LockWoodenDoors", false);
-		this.config_claims_lockTrapDoors = config.getBoolean("GriefPrevention.Claims.LockTrapDoors", false);
-		this.config_claims_lockFenceGates = config.getBoolean("GriefPrevention.Claims.LockFenceGates", true);
-		this.config_claims_enderPearlsRequireAccessTrust = config.getBoolean("GriefPrevention.Claims.EnderPearlsRequireAccessTrust", true);
-
+		
 		this.config_claims_automaticClaimsForNewPlayersRadius = config.getInt("GriefPrevention.Claims.AutomaticNewPlayerClaimsRadius", 4);
 		this.config_claims_claimsExtendIntoGroundDistance = config.getInt("GriefPrevention.Claims.ExtendIntoGroundDistance", 5);
 		this.config_claims_creationRequiresPermission = config.getBoolean("GriefPrevention.Claims.CreationRequiresPermission", false);
@@ -630,8 +744,8 @@ public class WorldConfig {
 		
 		this.config_smartBan = config.getBoolean("GriefPrevention.SmartBan", true);
 		
-		this.config_endermenMoveBlocks = config.getBoolean("GriefPrevention.EndermenMoveBlocks", false);
-		this.config_silverfishBreakBlocks = config.getBoolean("GriefPrevention.SilverfishBreakBlocks", false);
+		//this.config_endermenMoveBlocks = config.getBoolean("GriefPrevention.EndermenMoveBlocks", false);
+		//this.config_silverfishBreakBlocks = config.getBoolean("GriefPrevention.SilverfishBreakBlocks", false);
 		this.config_creaturesTrampleCrops = config.getBoolean("GriefPrevention.CreaturesTrampleCrops", false);
 		this.config_mods_ignoreClaimsAccounts = config.getStringList("GriefPrevention.Mods.PlayersIgnoringAllClaims");
 		
@@ -788,13 +902,6 @@ public class WorldConfig {
 		
 		//outConfig.set("GriefPrevention.Claims.Worlds", claimsEnabledWorldNames);
 		//outConfig.set("GriefPrevention.Claims.CreativeRulesWorlds", creativeClaimsEnabledWorldNames);
-		outConfig.set("GriefPrevention.Claims.PreventTheft", this.config_claims_preventTheft);
-		outConfig.set("GriefPrevention.Claims.ProtectCreatures", this.config_claims_protectCreatures);
-		outConfig.set("GriefPrevention.Claims.PreventButtonsSwitches", this.config_claims_preventButtonsSwitches);
-		outConfig.set("GriefPrevention.Claims.LockWoodenDoors", this.config_claims_lockWoodenDoors);
-		outConfig.set("GriefPrevention.Claims.LockTrapDoors", this.config_claims_lockTrapDoors);
-		outConfig.set("GriefPrevention.Claims.LockFenceGates", this.config_claims_lockFenceGates);
-		outConfig.set("GriefPrevention.Claims.EnderPearlsRequireAccessTrust", this.config_claims_enderPearlsRequireAccessTrust);
 		
 		
 		
@@ -858,8 +965,7 @@ public class WorldConfig {
 		//outConfig.set("GriefPrevention.Siege.Worlds", siegeEnabledWorldNames);
 		outConfig.set("GriefPrevention.Siege.BreakableBlocks", breakableBlocksList);
 		
-		outConfig.set("GriefPrevention.EndermenMoveBlocks", this.config_endermenMoveBlocks);
-		outConfig.set("GriefPrevention.SilverfishBreakBlocks", this.config_silverfishBreakBlocks);		
+				
 		outConfig.set("GriefPrevention.CreaturesTrampleCrops", this.config_creaturesTrampleCrops);
 				
 		

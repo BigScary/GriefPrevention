@@ -224,7 +224,7 @@ public class Claim
 		//don't do it for very large claims
 		if(this.getArea() > 10000) return;
 		
-		//don't do it when surface fluids are allowed to be dumped
+		//don't do it when surface fluids aren't allowed to be dumped
 		if(wc.getWaterBucketBehaviour().Allowed(getLesserBoundaryCorner(),null).Denied())
 			return;
 		
@@ -558,7 +558,7 @@ public class Claim
 	private boolean hasExplicitPermission(Player player, ClaimPermission level)
 	{
 		
-		System.out.println("hasExplicitPermission, " + player.getName() + " in claim of " + this.getOwnerName());
+		
 		
 		String playerName = player.getName();
 		Set<String> keys = this.playerNameToClaimPermissionMap.keySet();

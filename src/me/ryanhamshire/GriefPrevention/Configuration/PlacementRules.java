@@ -5,13 +5,14 @@ import me.ryanhamshire.GriefPrevention.Configuration.ClaimBehaviourData.ClaimAll
 
 import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
 /**
  * represents the placement rules for a particular Claim Behaviour 'packet'. This is designed to allow for unneeded
  * flexibility later, or something.
  * @author BC_Programming
  *
  */
-public class PlacementRules {
+public class PlacementRules implements PermissionTest{
 //above and below placement rules.
 	
 	public enum BasicPermissionConstants{
@@ -58,6 +59,10 @@ public class PlacementRules {
 		if(AboveSeaLevel.Allowed() && BelowSeaLevel.Allowed()) return "Anywhere";
 		return "Nowhere";
 	}
+	public PlacementRules(PlacementRules CopySource){
+		this.AboveSeaLevel = CopySource.AboveSeaLevel;
+		this.BelowSeaLevel = CopySource.BelowSeaLevel;
+	}
 	public PlacementRules(boolean Above,boolean Below){
 		AboveSeaLevel = BasicPermissionConstants.fromBoolean(Above);
 		BelowSeaLevel = BasicPermissionConstants.fromBoolean(Below);
@@ -65,6 +70,9 @@ public class PlacementRules {
 	public PlacementRules(BasicPermissionConstants Above,BasicPermissionConstants Below){
 		AboveSeaLevel = Above;
 		BelowSeaLevel = Below;
+	}
+	public Object clone(){
+		return new PlacementRules(this);
 	}
 	/**
 	 * constructs a new PlacementRules based on the settings in the given configuration file at the given Node, using specific defaults and
@@ -93,7 +101,7 @@ public class PlacementRules {
 	 * @param Target
 	 * @return
 	 */
-	public boolean Allow(Location Target){
+	public boolean Allow(Location Target,Player p,boolean ShowMessages){
 		int SeaLevelofWorld = GriefPrevention.instance.getSeaLevel(Target.getWorld());
 		boolean result =  (AboveSeaLevel.Allowed() && (Target.getBlockY() >= SeaLevelofWorld)) ||
 				(BelowSeaLevel.Allowed() && (Target.getBlockY() < SeaLevelofWorld));

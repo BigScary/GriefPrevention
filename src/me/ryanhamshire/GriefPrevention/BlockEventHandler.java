@@ -174,7 +174,7 @@ public class BlockEventHandler implements Listener
 		//if the block is a trash block....
 		if(wc.getTrashBlocks().contains(breakEvent.getBlock().getType())){
 			// and if this location is applicable for trash block placement...
-			if(wc.getTrashBlockPlacementBehaviour().Allowed(breakEvent.getBlock().getLocation(),player).Allowed());
+			if(wc.getTrashBlockPlacementBehaviour().Allowed(breakEvent.getBlock().getLocation(),player,false).Allowed());
 			//allow it with abandon...
 			return;
 			
@@ -259,11 +259,12 @@ public class BlockEventHandler implements Listener
 		Player player = placeEvent.getPlayer();
 		Block block = placeEvent.getBlock();
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(block.getWorld());
+		boolean theftallowed = wc.getContainerTheft().Allowed(block.getLocation(), player,false).Allowed();
 		if(wc.getApplyTrashBlockRules()){
 			//if set, then we only allow Trash Blocks to be placed, and only in the allowed places.
 			Claim testclaim = GriefPrevention.instance.dataStore.getClaimAt(block.getLocation(), true, null);
 			if(testclaim==null){
-				if(wc.getTrashBlockPlacementBehaviour().Allowed(block.getLocation(),player).Allowed()){
+				if(wc.getTrashBlockPlacementBehaviour().Allowed(block.getLocation(),player,false).Allowed()){
 					if(wc.getTrashBlocks().contains(block.getType())){
 					return;	
 					}
@@ -331,7 +332,7 @@ public class BlockEventHandler implements Listener
 				GriefPrevention.instance.claimsEnabledForWorld(block.getWorld()))
 		{			
 			//if the chest is too deep underground, don't create the claim and explain why
-			if(wc.getClaimsPreventTheft() && block.getY() < wc.getClaimsMaxDepth())
+			if(theftallowed && block.getY() < wc.getClaimsMaxDepth())
 			{
 				GriefPrevention.sendMessage(player, TextMode.Warn, Messages.TooDeepToClaim);
 				return;
@@ -385,7 +386,7 @@ public class BlockEventHandler implements Listener
 			
 			//check to see if this chest is in a claim, and warn when it isn't
 			
-			if(GriefPrevention.instance.getWorldCfg(player.getWorld()).getClaimsPreventTheft() && this.dataStore.getClaimAt(block.getLocation(), false, playerData.lastClaim) == null)
+			if(theftallowed && this.dataStore.getClaimAt(block.getLocation(), false, playerData.lastClaim) == null)
 			{
 				GriefPrevention.sendMessage(player, TextMode.Warn, Messages.UnprotectedChestWarning);				
 			}
