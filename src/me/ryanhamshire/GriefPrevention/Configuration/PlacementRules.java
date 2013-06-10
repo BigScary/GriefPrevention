@@ -12,7 +12,7 @@ import org.bukkit.entity.Player;
  * @author BC_Programming
  *
  */
-public class PlacementRules implements PermissionTest{
+public class PlacementRules {
 //above and below placement rules.
 	
 	public enum BasicPermissionConstants{
