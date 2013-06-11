@@ -830,6 +830,17 @@ class PlayerEventHandler implements Listener
 	{
 		Player player = event.getPlayer();
 		Entity entity = event.getRightClicked();
+		
+		//Note: if the player is currently riding that entity, then we allow with abandon the right-click operation.
+		//I can imagine there might need to be additional logic to determine ownership of certain things such as horses, donkeys, and mules
+		//once 1.6 rolls around, too.
+		if(player.isInsideVehicle()){
+			if(entity.getPassenger()==player){
+				//allow.
+				return;
+			}
+		}
+		
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(player.getWorld());
 		PlayerData playerData = this.dataStore.getPlayerData(player.getName());
 		//don't allow interaction with item frames in claimed areas without build permission
@@ -1161,7 +1172,7 @@ class PlayerEventHandler implements Listener
 	@EventHandler(priority = EventPriority.LOWEST)
 	void onPlayerInteract(PlayerInteractEvent event)
 	{
-		
+		System.out.println(event.getMaterial().name());
 		Player player = event.getPlayer();
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(player.getWorld());
 		//determine target block.  FEATURE: shovel and stick can be used from a distance away
@@ -2062,6 +2073,11 @@ class PlayerEventHandler implements Listener
 					int remainingBlocks = playerData.getRemainingClaimBlocks();
 					if(newClaimArea > remainingBlocks)
 					{
+						if(newClaimArea-remainingBlocks>wc.getInsufficientSneakResetBound() && wc.getInsufficientSneakResetBound() > 0){
+							GriefPrevention.sendMessage(player, TextMode.Instr, "First Point Abandoned!");
+							playerData.lastShovelLocation= null;
+							Visualization.Revert(player);
+						}
 						GriefPrevention.sendMessage(player, TextMode.Err, Messages.CreateClaimInsufficientBlocks, String.valueOf(newClaimArea - remainingBlocks));
 						GriefPrevention.sendMessage(player, TextMode.Instr, Messages.AbandonClaimAdvertisement);
 						return;

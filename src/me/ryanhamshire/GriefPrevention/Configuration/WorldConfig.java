@@ -274,7 +274,10 @@ public class WorldConfig {
 	public boolean getClaimsAutoNatureRestoration(){ return config_claims_AutoNatureRestoration;}
 	private boolean config_claims_Abandon_NatureRestoration; //whether survival claims will be automatically restored to nature when abandoned.
 	public boolean getClaimsAbandonNatureRestoration(){ return config_claims_Abandon_NatureRestoration;}
-	
+	private int InsufficientSneakResetBound; //when sneaking and trying to finish a claim, if it requires more
+	//than this many more claim blocks, the first corner will be reset. This is a "hack" for 
+	//modded servers where some events don't fire properly.
+	public int getInsufficientSneakResetBound(){ return InsufficientSneakResetBound;}
 	private int config_claims_trappedCooldownHours;					//number of hours between uses of the /trapped command
 	public int getClaimsTrappedCooldownHours(){ return config_claims_trappedCooldownHours;}
 	
@@ -622,7 +625,8 @@ public class WorldConfig {
 		this.config_SpamMuteThreshold = config.getInt("GriefPrevention.Spam.MuteThreshold",4);
 		outConfig.set("GriefPrevention.Spam.MuteThreshold", config_SpamMuteThreshold);
 		
-		
+		this.InsufficientSneakResetBound = config.getInt("GriefPrevention.Claims.InsufficientSneakResetBound",0);
+		outConfig.set("GriefPrevention.Claims.InsufficientSneakResetBound", this.InsufficientSneakResetBound);
 		this.claims_Seige_Enabled = config.getBoolean("GriefPrevention.Siege.Enabled",true);
 		outConfig.set("GriefPrevention.Siege.Enabled", claims_Seige_Enabled);
 		

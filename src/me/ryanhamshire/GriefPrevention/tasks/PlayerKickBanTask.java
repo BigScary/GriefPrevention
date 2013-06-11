@@ -49,7 +49,7 @@ public class PlayerKickBanTask implements Runnable
 			int i=0;
 			for(String replacement:replacements){
 				String substitution = "{" + i + "}";
-				cmd.replace(substitution, replacement);
+				cmd = cmd.replace(substitution, replacement);
 				i++;
 				
 			}

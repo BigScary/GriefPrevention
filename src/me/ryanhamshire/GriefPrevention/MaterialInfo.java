@@ -26,6 +26,10 @@ public class MaterialInfo
 	boolean allDataValues;
 	String description;
 	
+	public int getTypeID(){ return typeID;}
+	public byte getData(){ return data;}
+	public boolean getallDataValues(){ return allDataValues;}
+	public String getDescription(){ return description;}
 	public MaterialInfo(int typeID, byte data, String description)
 	{
 		this.typeID = typeID;
@@ -58,7 +62,16 @@ public class MaterialInfo
 		
 		return returnValue;
 	}
-	
+	@Override
+	public boolean equals(Object other){
+		if(other instanceof MaterialInfo){
+			MaterialInfo castedelement = (MaterialInfo)other;
+			return this.typeID == castedelement.typeID &&
+					((this.allDataValues || castedelement.allDataValues) ||
+							this.data == castedelement.data);
+		}
+		return super.equals(other);
+	}
 	public static MaterialInfo fromString(String string)
 	{
 		if(string == null || string.isEmpty()) return null;
