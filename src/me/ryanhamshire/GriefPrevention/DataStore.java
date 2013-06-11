@@ -836,12 +836,14 @@ public abstract class DataStore
 		}
 		
 		//if the siege ended due to death, transfer inventory to winner
-		if(death)
+		if(death )
 		{
 			Player winner = GriefPrevention.instance.getServer().getPlayer(winnerName);
 			Player loser = GriefPrevention.instance.getServer().getPlayer(loserName);
 			if(winner != null && loser != null)
 			{
+				WorldConfig wc = GriefPrevention.instance.getWorldCfg(winner.getWorld());
+						if(!wc.getSiegeAutoTransfer())  return;
 				//get loser's inventory, then clear it
 				ItemStack [] loserItems = loser.getInventory().getContents();
 				loser.getInventory().clear();
@@ -856,9 +858,8 @@ public abstract class DataStore
 					//drop any remainder on the ground at his feet
 					Object [] keys = wontFitItems.keySet().toArray();
 					Location winnerLocation = winner.getLocation(); 
-					for(int i = 0; i < keys.length; i++)
+					for(Object key:keys)
 					{
-						Integer key = (Integer)keys[i];
 						winnerLocation.getWorld().dropItemNaturally(winnerLocation, wontFitItems.get(key));
 					}
 				}

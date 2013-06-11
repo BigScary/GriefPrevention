@@ -111,7 +111,8 @@ public class WorldConfig {
 	public ClaimBehaviourData getBlockTweakRules(){ return BlockTweakRules;}
 	
 	
-	
+	private boolean SiegeAutoTransfer;
+	public boolean getSiegeAutoTransfer(){ return SiegeAutoTransfer;}
 	
 	private ClaimBehaviourData ArrowWoodenButtonRules;
 	public ClaimBehaviourData getArrowWoodenButtonRules() { return ArrowWoodenButtonRules;}
@@ -557,7 +558,8 @@ public class WorldConfig {
 	public ClaimBehaviourData getStoneButton(){ return StoneButton;}*/
 		
 		
-		
+		this.SiegeAutoTransfer = config.getBoolean("GriefPrevention.Siege.ItemTransfer",true);
+		outConfig.set("GriefPrevention.Siege.ItemTransfer", this.SiegeAutoTransfer);
 		
 		
 		this.SiegeBlockRevert = config.getBoolean("GriefPrevention.Siege.BlockRevert",false);

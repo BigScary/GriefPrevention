@@ -514,12 +514,12 @@ class EntityEventHandler implements Listener
 		
 		Player player = (Player)entity;
 		PlayerData playerData = this.dataStore.getPlayerData(player.getName());
-		
+		WorldConfig wc = GriefPrevention.instance.getWorldCfg(player.getWorld());
 		//if involved in a siege
 		if(playerData.siegeData != null)
 		{
 			//don't drop items as usual, they will be sent to the siege winner
-			event.getDrops().clear();
+			if(wc.getSiegeAutoTransfer()) event.getDrops().clear();
 			
 			//end it, with the dieing player being the loser
 			this.dataStore.endSiege(playerData.siegeData, null, player.getName(), true /*ended due to death*/);
