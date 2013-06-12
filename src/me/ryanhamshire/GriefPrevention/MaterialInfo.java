@@ -18,6 +18,10 @@
 
 package me.ryanhamshire.GriefPrevention;
 
+import java.util.regex.Pattern;
+
+import org.bukkit.Material;
+
 //represents a material or collection of materials
 public class MaterialInfo
 {
@@ -25,7 +29,7 @@ public class MaterialInfo
 	byte data;
 	boolean allDataValues;
 	String description;
-	
+	private Pattern re;
 	public int getTypeID(){ return typeID;}
 	public byte getData(){ return data;}
 	public boolean getallDataValues(){ return allDataValues;}
@@ -43,6 +47,9 @@ public class MaterialInfo
 		this.typeID = typeID;
 		this.data = 0;
 		this.allDataValues = true;
+		if(description==null || description.length()==0){
+			description = Material.getMaterial(typeID).name();
+		}
 		this.description = description;
 	}
 	
@@ -51,6 +58,9 @@ public class MaterialInfo
 		this.typeID = typeID;
 		this.data = data;
 		this.allDataValues = allDataValues;
+		if(description.startsWith("//")){
+			re = Pattern.compile(description.substring(1));
+		}
 		this.description = description;
 	}
 	
@@ -63,12 +73,21 @@ public class MaterialInfo
 		return returnValue;
 	}
 	@Override
+	public int hashCode(){
+		return (typeID*data)/(typeID+data)^data;
+	}
+	@Override
 	public boolean equals(Object other){
 		if(other instanceof MaterialInfo){
 			MaterialInfo castedelement = (MaterialInfo)other;
-			return this.typeID == castedelement.typeID &&
+			if (this.typeID == castedelement.typeID &&
 					((this.allDataValues || castedelement.allDataValues) ||
-							this.data == castedelement.data);
+							this.data == castedelement.data)){
+				if(re!=null){
+					return re.matcher(castedelement.getDescription()).matches();
+				}
+				return true;
+			}
 		}
 		return super.equals(other);
 	}

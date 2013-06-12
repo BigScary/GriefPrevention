@@ -20,24 +20,28 @@ package me.ryanhamshire.GriefPrevention;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 //ordered list of material info objects, for fast searching
 public class MaterialCollection
 {
-	HashMap<Integer,MaterialInfo> materials = new HashMap<Integer,MaterialInfo>();
+	HashMap<Integer,List<MaterialInfo>> materials = new HashMap<Integer,List<MaterialInfo>>();
 	
 	void Add(MaterialInfo material)
 	{
-		int i;
-		this.materials.put(material.typeID, material);
+		if(!materials.containsKey(material.getTypeID())){
+			materials.put(material.getTypeID(),new ArrayList<MaterialInfo>());
+		}
+		List<MaterialInfo> mlist = this.materials.get(material.typeID);
+		mlist.add(material);
+		
 	}
 	
 	boolean Contains(MaterialInfo material)
 	{
 		if(this.materials.containsKey(material.typeID))
 		{
-			return this.materials.get(material.typeID).allDataValues ||
-					this.materials.get(material.typeID).data==material.data;
+			return 	this.materials.get(material.typeID).contains(material);
 		}
 		
 		
@@ -48,9 +52,11 @@ public class MaterialCollection
 	public String toString()
 	{
 		StringBuilder stringBuilder = new StringBuilder();
-		for(int i = 0; i < this.materials.size(); i++)
-		{
-			stringBuilder.append(this.materials.get(i).toString() + " ");
+		for(List<MaterialInfo> iteratelist:materials.values()){
+			
+			for(MaterialInfo iteratemat:iteratelist){
+			stringBuilder.append(iteratemat.toString() + " ");
+			}
 		}
 		
 		return stringBuilder.toString();
