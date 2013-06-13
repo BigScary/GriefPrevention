@@ -1172,11 +1172,35 @@ class PlayerEventHandler implements Listener
 	@EventHandler(priority = EventPriority.LOWEST)
 	void onPlayerInteract(PlayerInteractEvent event)
 	{
-		System.out.println(event.getMaterial().name());
+		if(event==null) return;
+		if(event.getPlayer()==null) return; //MCPC seems to sometimes fire events with a null player...
 		Player player = event.getPlayer();
+		
+		
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(player.getWorld());
 		//determine target block.  FEATURE: shovel and stick can be used from a distance away
 		Block clickedBlock = event.getClickedBlock();
+		
+		//this block shows some debug info...
+		StringBuffer sb = new StringBuffer();
+		sb.append("Clicked:");
+		if(clickedBlock!=null)
+		{
+			sb.append(clickedBlock.getType().name());
+			sb.append("State:" + clickedBlock.getState()==null);
+			if(clickedBlock.getState()!=null)
+				sb.append(" " + clickedBlock.getState().getClass().getName());
+		}
+		sb.append(",");
+		if(event!=null){
+			if(event.getItem()!=null){
+				sb.append("Item:" + event.getItem().getType().name() + " ts:" + event.getItem().toString());
+				
+			}
+		}
+		System.out.println(sb.toString());
+		
+		
 		//if null, initialize.
 		if(GPTools==null){
 			GPTools = new HashSet<Material>();
@@ -1471,7 +1495,7 @@ class PlayerEventHandler implements Listener
 				if(noBuildReason != null)
 				{
 					GriefPrevention.sendMessage(player, TextMode.Err, noBuildReason);
-					System.out.println("CANCELLING Container Access.");
+					
 					event.setCancelled(true);
 					return;
 				}
@@ -1863,7 +1887,6 @@ class PlayerEventHandler implements Listener
 				
 				if(result.succeeded == CreateClaimResult.Result.Success)
 				{
-					//TODO: Raise a ClaimResizeEvent here.
 					
 					//inform and show the player
 					GriefPrevention.sendMessage(player, TextMode.Success, Messages.ClaimResizeSuccess, String.valueOf(playerData.getRemainingClaimBlocks()));
@@ -1890,7 +1913,12 @@ class PlayerEventHandler implements Listener
 				}else if(result.succeeded == CreateClaimResult.Result.ClaimOverlap)
 				{
 					//inform player
-					GriefPrevention.sendMessage(player, TextMode.Err, Messages.ResizeFailOverlap);
+					if(playerData.claimResizing.parent!=null && playerData.claimResizing.parent == result.claim){
+					    GriefPrevention.sendMessage(player, TextMode.Err, Messages.ResizeFailOutsideParent);
+					}
+					else {
+					    GriefPrevention.sendMessage(player, TextMode.Err, Messages.ResizeFailOverlap);
+					}
 					
 					//show the player the conflicting claim
 					Visualization visualization = Visualization.FromClaim(result.claim, clickedBlock.getY(), VisualizationType.ErrorClaim, player.getLocation());
@@ -2043,6 +2071,7 @@ class PlayerEventHandler implements Listener
 				//show him where he's working
 				Visualization visualization = Visualization.FromClaim(new Claim(clickedBlock.getLocation(), clickedBlock.getLocation(), "", new String[]{}, new String[]{}, new String[]{}, new String[]{}, null, false), clickedBlock.getY(), VisualizationType.RestoreNature, player.getLocation());
 				Visualization.Apply(player, visualization);
+				
 			}
 			
 			//otherwise, he's trying to finish creating a claim by setting the other boundary corner
@@ -2062,6 +2091,7 @@ class PlayerEventHandler implements Listener
 				
 				if(playerData.shovelMode != ShovelMode.Admin && (newClaimWidth < wc.getMinClaimSize() || newClaimHeight < wc.getMinClaimSize()))
 				{
+					
 					GriefPrevention.sendMessage(player, TextMode.Err, Messages.NewClaimTooSmall, String.valueOf(wc.getMinClaimSize()));
 					return;
 				}
@@ -2073,13 +2103,18 @@ class PlayerEventHandler implements Listener
 					int remainingBlocks = playerData.getRemainingClaimBlocks();
 					if(newClaimArea > remainingBlocks)
 					{
-						if(newClaimArea-remainingBlocks>wc.getInsufficientSneakResetBound() && wc.getInsufficientSneakResetBound() > 0){
+						
+						
+						 
+						if(player.isSneaking() &&  newClaimArea-remainingBlocks>wc.getInsufficientSneakResetBound() && wc.getInsufficientSneakResetBound() > 0){
 							GriefPrevention.sendMessage(player, TextMode.Instr, "First Point Abandoned!");
 							playerData.lastShovelLocation= null;
 							Visualization.Revert(player);
 						}
+						else {
 						GriefPrevention.sendMessage(player, TextMode.Err, Messages.CreateClaimInsufficientBlocks, String.valueOf(newClaimArea - remainingBlocks));
 						GriefPrevention.sendMessage(player, TextMode.Instr, Messages.AbandonClaimAdvertisement);
+						}
 						return;
 					}
 				}					

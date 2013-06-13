@@ -27,7 +27,7 @@ public class MaterialInfo
 {
 	int typeID;
 	byte data;
-	boolean allDataValues;
+	public boolean allDataValues;
 	String description;
 	private Pattern re;
 	public int getTypeID(){ return typeID;}

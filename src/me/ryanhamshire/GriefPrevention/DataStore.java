@@ -451,7 +451,7 @@ public abstract class DataStore
 		for(int i = 0; i < aclaims.size(); i++)
 		{
 			Claim claim = aclaims.get(i);
-			
+			if(claim.parent!=null) continue;
 			//if we reach a claim which is greater than the temp claim created above, there's definitely no claim
 			//in the collection which includes our location
 			if(claim.greaterThan(tempClaim)) return null;
@@ -1010,7 +1010,16 @@ public abstract class DataStore
 		newx1,newy1,newz1);
 		Location newGreater = new Location(claim.getLesserBoundaryCorner().getWorld(),
 				newx2,newy2,newz2);
-		
+		if(claim.parent!=null){
+			//make sure both borders are within our parent claim.
+			if(!(claim.parent.contains(newLesser, true,false) || claim.contains(newGreater,true,false))){
+				//not within the parent claim.
+				CreateClaimResult res = new CreateClaimResult();
+				res.succeeded=CreateClaimResult.Result.ClaimOverlap;
+				res.claim = claim.parent;
+				return res;
+			}
+		}
 		ClaimResizeEvent cre = new ClaimResizeEvent(claim,newLesser,newGreater,claimcreator);
 		Bukkit.getPluginManager().callEvent(cre);
 		if(cre.isCancelled()) {
@@ -1273,6 +1282,7 @@ public abstract class DataStore
 		this.addDefault(defaults, Messages.NoAdminClaimsPermission, "You need Administrator Claims Permission to do that.", null);
 		this.addDefault(defaults, Messages.GiveSuccessSender,"Claim Owner changed from {0} to {1} Successfully.","0:Sender;1:Recipient");
 		this.addDefault(defaults, Messages.GiveSuccessTarget, "{0} has transferred a Claim to you.", "0:Sender");
+		this.addDefault(defaults,Messages.ResizeFailOutsideParent,"Cannot resize subdivision as it would extend outside the containing claim.",null);
 		//load the config file
 		FileConfiguration config = YamlConfiguration.loadConfiguration(new File(messagesFilePath));
 		

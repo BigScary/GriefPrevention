@@ -30,6 +30,8 @@ import java.util.logging.Logger;
 
 import me.ryanhamshire.GriefPrevention.Configuration.ClaimMetaHandler;
 import me.ryanhamshire.GriefPrevention.Configuration.ConfigData;
+import me.ryanhamshire.GriefPrevention.Configuration.ModBlockHelper;
+import me.ryanhamshire.GriefPrevention.Configuration.ModdedBlocksSearchResults;
 import me.ryanhamshire.GriefPrevention.Configuration.WorldConfig;
 import me.ryanhamshire.GriefPrevention.tasks.CleanupUnusedClaimsTask;
 import me.ryanhamshire.GriefPrevention.tasks.DeliverClaimBlocksTask;
@@ -80,6 +82,10 @@ public class GriefPrevention extends JavaPlugin
 	//public ArrayList<String> config_claims_enabledCreativeWorlds;	//list of worlds where additional creative mode anti-grief rules apply
 	public int config_claims_initialBlocks;							//the number of claim blocks a new player starts with
 	public int config_claims_maxAccruedBlocks;						//the limit on accrued blocks (over time).  doesn't limit purchased or admin-gifted blocks
+	public String ModdedBlockRegexPattern;
+	public String OreBlockRegexPattern;
+	public String AccessRegexPattern;
+	public boolean config_mod_config_search;
 	//start removal....
 	//reference to the economy plugin, if economy integration is enabled
 	public static Economy economy = null;	
@@ -94,7 +100,7 @@ public class GriefPrevention extends JavaPlugin
 	
 	//how long to wait before deciding a player is staying online or staying offline, for notication messages
 	public static final int NOTIFICATION_SECONDS = 20;
-	
+	public ModdedBlocksSearchResults ModdedBlocks = null; 
 	//adds a server log entry
 	public static void AddLogEntry(String entry)
 	{
@@ -135,6 +141,8 @@ public class GriefPrevention extends JavaPlugin
 	}
 	public DeliverClaimBlocksTask ClaimTask = null;
 	public CleanupUnusedClaimsTask CleanupTask = null;
+
+	
 	private static boolean eventsRegistered = false;
 	//initializes well...   everything
 	public void onEnable()
@@ -148,7 +156,7 @@ public class GriefPrevention extends JavaPlugin
 		//load the config if it exists
 		FileConfiguration config = YamlConfiguration.loadConfiguration(new File(DataStore.configFilePath));
 		FileConfiguration outConfig = new YamlConfiguration();
-		Configuration = new ConfigData(config,outConfig);
+		
 		//read configuration settings (note defaults)
 		
 		
@@ -174,14 +182,22 @@ public class GriefPrevention extends JavaPlugin
 		outConfig.set("GriefPrevention.Claims.MaxAccruedBlocks", config_claims_maxAccruedBlocks);
 		
 		this.config_claims_initialBlocks = config.getInt("GriefPrevention.Claims.InitialBlocks",100);
-		
+		this.ModdedBlockRegexPattern = config.getString("GriefPrevention.Mods.ContainerPattern","\\schest\\s|\\schests\\s|\\sfurnace\\s|\\sgrinder\\s|\\sextruder\\s|\\smachine\\s");
+		this.OreBlockRegexPattern = config.getString("GriefPrevention.Mods.OrePattern","\\sOre\\s");
+		this.AccessRegexPattern = config.getString("GriefPrevention.Mods.AccessPattern","\\sbutton\\s|\\sswitch\\s|\\sDoor\\s|\\sTrapdoor\\s");
+		this.config_mod_config_search = config.getBoolean("GriefPrevention.Mods.PerformConfigSearch",false);
+		outConfig.set("GriefPrevention.Mods.ContainerPattern",this.ModdedBlockRegexPattern);
+		outConfig.set("GriefPrevention.Mods.OrePattern",this.OreBlockRegexPattern);
 		outConfig.set("GriefPrevention.Economy.ClaimBlocksPurchaseCost", this.config_economy_claimBlocksPurchaseCost);
 		outConfig.set("GriefPrevention.Economy.ClaimBlocksSellValue", this.config_economy_claimBlocksSellValue);
 		outConfig.set("GriefPrevention.Claims.InitialBlocks",config_claims_initialBlocks);
+		outConfig.set("GriefPrevention.Mods.PerformConfigSearch", config_mod_config_search);
 		
-		
-
-		
+		if(config_mod_config_search){
+			this.ModdedBlocks= new ModdedBlocksSearchResults();
+			this.ModdedBlocks = ModBlockHelper.ScanCfgs();
+		}
+		Configuration = new ConfigData(config,outConfig);
 		//when datastore initializes, it loads player and claim data, and posts some stats to the log
 		if(databaseUrl.length() > 0)
 		{
@@ -304,7 +320,7 @@ public class GriefPrevention extends JavaPlugin
 	private void HandleClaimClean(Claim c,MaterialInfo source,MaterialInfo target,Player player){
 		Location lesser = c.getLesserBoundaryCorner();
 		Location upper = c.getGreaterBoundaryCorner();
-		System.out.println("HandleClaimClean:" + source.typeID + " to " + target.typeID);
+		//System.out.println("HandleClaimClean:" + source.typeID + " to " + target.typeID);
 		
 		for(int x =lesser.getBlockX();x<=upper.getBlockX();x++){
 			for(int y = 0;y<=255;y++){
@@ -498,7 +514,7 @@ public class GriefPrevention extends JavaPlugin
 		    	}
 		    
 		    }
-		    System.out.println(source.typeID + " " +target.typeID);
+		    //System.out.println(source.typeID + " " +target.typeID);
 		    PlayerData pd = dataStore.getPlayerData(player.getName());
 		    Claim retrieveclaim = dataStore.getClaimAt(player.getLocation(), true, null);
 		    if(retrieveclaim!=null){
@@ -974,7 +990,7 @@ public class GriefPrevention extends JavaPlugin
 			//determine whether a single player or clearing permissions entirely
 			boolean clearPermissions = false;
 			OfflinePlayer otherPlayer = null;
-			System.out.println("clearing perms for name:" + args[0]);
+			//System.out.println("clearing perms for name:" + args[0]);
 			if(args[0].equals("all"))				
 			{
 				if(claim == null || claim.allowEdit(player) == null)
@@ -1870,7 +1886,7 @@ public class GriefPrevention extends JavaPlugin
 		//retrieve (1-abandonclaimration)*totalarea to get amount to subtract from the accrued claim blocks
 		//after we delete the claim.
 		int costoverhead =(int)Math.floor((double)claimarea*(1-wc.getClaimsAbandonReturnRatio()));
-		System.out.println("costoverhead:" + costoverhead);
+		//System.out.println("costoverhead:" + costoverhead);
 		
 		
 		//verify ownership

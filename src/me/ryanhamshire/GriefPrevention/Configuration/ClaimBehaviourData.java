@@ -161,7 +161,7 @@ public class ClaimBehaviourData {
 	 */
 	public ClaimAllowanceConstants Allowed(Location position,Player RelevantPlayer,boolean ShowMessages){
 		
-		System.out.println("ClaimBehaviour");
+		//System.out.println("ClaimBehaviour:" + this.getBehaviourName());
 		//System.out.println("Testing Allowed," + BehaviourName);
 		String result=null;
 		PlayerData pd = null;

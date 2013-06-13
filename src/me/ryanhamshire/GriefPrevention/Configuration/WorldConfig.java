@@ -265,7 +265,8 @@ public class WorldConfig {
 	public boolean getAutoRestoreUnclaimed(){ return config_claims_autoRestoreUnclaimed;}
 	private boolean config_claims_ApplyTrashBlockRules;				//whether players can build in survival worlds outside their claimed areas
 	public boolean getApplyTrashBlockRules(){ return config_claims_ApplyTrashBlockRules;}
-	
+	private boolean config_claims_TrashBlocksWithoutPermission; //whether players can place/break trashblocks inside claims for which they do not have perms.
+	public boolean getTrashBlocksWithoutPermission(){ return config_claims_TrashBlocksWithoutPermission;}
 	private int config_claims_chestClaimExpirationDays;				//number of days of inactivity before an automatic chest claim will be deleted
 	public int getChestClaimExpirationDays(){ return config_claims_chestClaimExpirationDays;}
 	private int config_claims_unusedClaimExpirationDays;				//number of days of inactivity before an unused (nothing build) claim will be deleted
@@ -465,7 +466,7 @@ public class WorldConfig {
 				ClaimBehaviourData.getInsideClaims("Wither Spawning"));
 		
 		TrashBlockPlacementBehaviour = new ClaimBehaviourData("Trash Block Placement",config,outConfig,"GriefPrevention.TrashBlockPlacementRules",
-				ClaimBehaviourData.getOutsideClaims("Trash Block Placement"));
+				ClaimBehaviourData.getOutsideClaims("Trash Block Placement").setBehaviourMode(ClaimBehaviourMode.RequireBuild));
 		
 		VillagerTrades = new ClaimBehaviourData("Villager Trading",config,outConfig,"GriefPrevention.Claims.VillagerTrading",
 				ClaimBehaviourData.getInsideClaims("Villager Trading"));
@@ -765,6 +766,14 @@ public class WorldConfig {
 		{
 			//none by default
 		}
+		//add found items if applicable.
+		if(GriefPrevention.instance.ModdedBlocks!=null){
+			for(MaterialInfo mi:GriefPrevention.instance.ModdedBlocks.FoundAccess){
+				accessTrustStrings.add(mi.toString());
+			}
+		}
+		
+		
 		
 		GriefPrevention.instance.parseMaterialListFromConfig(accessTrustStrings, this.config_mods_accessTrustIds);
 		
@@ -808,7 +817,11 @@ public class WorldConfig {
 		
 		//parse the strings from the config file
 		GriefPrevention.instance.parseMaterialListFromConfig(containerTrustStrings, this.config_mods_containerTrustIds);
-		
+		if(GriefPrevention.instance.ModdedBlocks!=null){
+			for(MaterialInfo mi:GriefPrevention.instance.ModdedBlocks.FoundContainers){
+				containerTrustStrings.add(mi.toString());
+			}
+		}
 		this.config_mods_explodableIds = new MaterialCollection();
 		List<String> explodableStrings = config.getStringList("GriefPrevention.Mods.BlockIdsExplodable");
 		

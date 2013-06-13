@@ -660,7 +660,7 @@ public class Claim
 	 */
 	public String allowAccess(Player player)
 	{
-		System.out.println("AllowAccess in claim of " + this.ownerName + " For player:" + player.getName());
+		
 		
 		
 		//following a siege where the defender lost, the claim will allow everyone access for a time
@@ -702,7 +702,7 @@ public class Claim
 	 */
 	public String allowContainers(Player player)
 	{		
-		System.out.println("AllowContainers:" + player.getName());
+		
 		//if we don't know who's asking, always say no (i've been told some mods can make this happen somehow)
 		if(player == null) return "";
 		
@@ -961,7 +961,7 @@ public class Claim
 		int MaxY = Math.max(pA.getBlockY(),pB.getBlockY());
 		int MaxZ = Math.max(pA.getBlockZ(), pB.getBlockZ());
 		
-		if(Target.getBlockX() < MinX || Target.getBlockZ() > MaxX)
+		if(Target.getBlockX() < MinX || Target.getBlockX() > MaxX)
 			return false;
 		if(Target.getBlockZ() < MinZ || Target.getBlockZ() > MaxZ)
 			return false;
