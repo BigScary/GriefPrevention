@@ -76,6 +76,7 @@ public class CleanupUnusedClaimsTask implements Runnable
 		//skip administrative claims
 		if(claim.isAdminClaim()) return;
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(claim.getLesserBoundaryCorner().getWorld());
+		if(wc==null) return;
 		//track whether we do any important work which would require cleanup afterward
 		boolean cleanupChunks = false;
 		
@@ -207,20 +208,14 @@ public class CleanupUnusedClaimsTask implements Runnable
 		{
 			World world = claim.getLesserBoundaryCorner().getWorld();
 			Chunk [] chunks = world.getLoadedChunks();
-			for(int i = 0; i < chunks.length; i++)
+			for(int i = chunks.length-1; i > 0; i--)
 			{
 				Chunk chunk = chunks[i];
 				chunk.unload(true, true);
 			}
 		}
 		
-		//unfortunately, java/minecraft don't do a good job of clearing unused memory, leading to out of memory errors from this type of world scanning
-		//if(this.nextClaimIndex % 5 == 0)
-		//{		
-		//	System.gc();
-		//}
-		//usage of System.gc() indicates either broken code or crappy code. Let's try to avoid both.
-		//JVM knows more about what to allocate and deallocate here. 
+		
 		
 	}
 }

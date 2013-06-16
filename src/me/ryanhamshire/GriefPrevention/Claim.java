@@ -51,7 +51,8 @@ public class Claim
 	private String LesserCorner;
 	private String GreaterCorner;
 	private boolean WasDeferred=false;
-	
+	private String ClaimWorldName;
+	public String getClaimWorldName(){ return ClaimWorldName;}
 	//two locations, which together define the boundaries of the claim
 	//note that the upper Y value is always ignored, because claims ALWAYS extend up to the sky
 	Location lesserBoundaryCorner;
@@ -313,9 +314,10 @@ public class Claim
 	 */
 	public Claim(Location lesserBoundaryCorner, Location greaterBoundaryCorner, String ownerName, String [] builderNames, String [] containerNames, String [] accessorNames, String [] managerNames, Long id, boolean neverdelete)
 	{
+		
 		//modification date
 		this.modifiedDate = Calendar.getInstance().getTime();
-		
+		this.ClaimWorldName = lesserBoundaryCorner.getWorld().getName();
 		//id
 		this.id = id;
 		
@@ -973,6 +975,10 @@ public class Claim
 			
 		
 		
+		
+	}
+	private void ensureValid(){
+		//makes sure our two Locations point to a valid world.
 		
 	}
 	/**

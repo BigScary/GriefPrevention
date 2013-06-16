@@ -170,7 +170,7 @@ public class BlockEventHandler implements Listener
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
 	public void onBlockBreak(BlockBreakEvent breakEvent)
 	{
-		
+		Debugger.Write("onBlockBreak",DebugLevel.Verbose);
 		Debugger.Write("Block broken:" + breakEvent.getBlock().getType().name(), DebugLevel.Verbose);
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(breakEvent.getBlock().getWorld());
 		Player player = breakEvent.getPlayer();
@@ -265,7 +265,7 @@ public class BlockEventHandler implements Listener
 		Player player = placeEvent.getPlayer();
 		Block block = placeEvent.getBlock();
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(block.getWorld());
-		boolean theftallowed = wc.getContainerTheft().Allowed(block.getLocation(), player,false).Allowed();
+		boolean theftallowed = wc.getContainersRules().Allowed(block.getLocation(), player,false).Allowed();
 		if(wc.getApplyTrashBlockRules()){
 			//if set, then we only allow Trash Blocks to be placed, and only in the allowed places.
 			Claim testclaim = GriefPrevention.instance.dataStore.getClaimAt(block.getLocation(), true, null);
@@ -666,6 +666,8 @@ public class BlockEventHandler implements Listener
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
 	public void onBlockFromTo (BlockFromToEvent spreadEvent)
 	{
+		Debugger.Write("onBlockFromTo.",DebugLevel.Verbose);
+		if(spreadEvent==null || spreadEvent.getBlock()==null || spreadEvent.getBlock().getWorld()==null) return;
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(spreadEvent.getBlock().getWorld());
 		//don't track fluid movement in worlds where claims are not enabled
 		if(!wc.getClaimsEnabled()) return;

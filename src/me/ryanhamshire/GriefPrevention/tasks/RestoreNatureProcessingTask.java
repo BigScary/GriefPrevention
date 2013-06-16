@@ -113,6 +113,7 @@ public class RestoreNatureProcessingTask implements Runnable
 		//order is important!
 		
 		//remove sandstone which appears to be unnatural
+		try {
 		this.removeSandstone();
 		
 		//remove any blocks which are definitely player placed
@@ -150,7 +151,10 @@ public class RestoreNatureProcessingTask implements Runnable
 		
 		//remove any player-placed leaves
 		this.removePlayerLeaves();
-		
+		}
+		catch(Exception ex){
+			ex.printStackTrace();
+		}
 		//schedule main thread task to apply the result to the world
 		RestoreNatureExecutionTask task = new RestoreNatureExecutionTask(this.snapshots, this.miny, this.lesserBoundaryCorner, this.greaterBoundaryCorner, this.player);
 		GriefPrevention.instance.getServer().getScheduler().scheduleSyncDelayedTask(GriefPrevention.instance, task);

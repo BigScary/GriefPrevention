@@ -158,10 +158,10 @@ public class DatabaseDataStore extends DataStore
 				long claimID = results.getLong("id");
 					
 				String lesserCornerString = results.getString("lessercorner");
-				Location lesserBoundaryCorner = this.locationFromString(lesserCornerString);
+				
 				
 				String greaterCornerString = results.getString("greatercorner");
-				Location greaterBoundaryCorner = this.locationFromString(greaterCornerString);
+				
 				
 				String ownerName = results.getString("owner");
 	
@@ -178,6 +178,10 @@ public class DatabaseDataStore extends DataStore
 				String [] managerNames = managersString.split(";");
 				
 				boolean neverdelete = results.getBoolean("neverdelete");
+				
+				Location lesserBoundaryCorner = this.locationFromString(lesserCornerString);
+				Location greaterBoundaryCorner = this.locationFromString(greaterCornerString);
+				
 				
 				Claim topLevelClaim = new Claim(lesserBoundaryCorner, greaterBoundaryCorner, ownerName, builderNames, containerNames, accessorNames, managerNames, claimID, neverdelete);
 				

@@ -8,7 +8,7 @@ public class ClaimArray implements Iterable {
 	
 	private ArrayList<Claim> claims = new ArrayList<Claim>();
 	ConcurrentHashMap<Long, Claim> claimmap = new ConcurrentHashMap<Long, Claim>();
-	
+	ConcurrentHashMap<String,ArrayList<Claim>> claimworldmap = new ConcurrentHashMap<String,ArrayList<Claim>>();
 	ConcurrentHashMap<String, ArrayList<Claim>> chunkmap = new ConcurrentHashMap<String, ArrayList<Claim>>();
 
 	public int size() {
@@ -37,7 +37,26 @@ public class ClaimArray implements Iterable {
 		
 		
 	}
+	private void addClaimWorld(Claim c){
+		String usekey = c.getLesserBoundaryCorner().getWorld().getName();
+		 if(!claimworldmap.contains(usekey))
+		     claimworldmap.put(usekey, new ArrayList<Claim>());
+		 
+		 if(!claimworldmap.get(usekey).contains(c))
+			 claimworldmap.get(usekey).add(c);
+		 
+		 System.out.println("Claim added to world mapping, owned by " + c.getOwnerName());
+				 
+	}
+	private void removeClaimWorld(Claim c){
+		String usekey = c.getLesserBoundaryCorner().getWorld().getName();
+		if(claimworldmap.contains(usekey)){
+			claimworldmap.get(usekey).remove(c);
+		}
+			
+	}
 	public void add(int j, Claim newClaim) {
+		addClaimWorld(newClaim);
 		claims.add(j, newClaim);
 		claimmap.put(newClaim.getID(), newClaim);
 		ArrayList<String> chunks = getChunks(newClaim);
@@ -60,6 +79,7 @@ public class ClaimArray implements Iterable {
 	
 	public void removeID(Long i) {
 		Claim claim = claimmap.remove(i);
+		this.removeClaimWorld(claim);
 		ArrayList<String> chunks = getChunks(claim);
 		claims.remove(claim);
 		for(String chunk : chunks) {

@@ -45,41 +45,44 @@ public class ClaimBehaviourData {
 			
 		}
 		public boolean PerformTest(Location testLocation,Player testPlayer,boolean ShowMessages){
+			boolean testresult = false;
+			try {
 			WorldConfig wc = GriefPrevention.instance.getWorldCfg(testLocation.getWorld());
 			PlayerData pd = null;
-			if(testPlayer==null) return true;
+			//System.out.println("PerformTest:" + this.name());
+			if(testPlayer==null) return testresult=true;
 			if(testPlayer!=null) pd = GriefPrevention.instance.dataStore.getPlayerData(testPlayer.getName());
 			if((pd!=null)&&pd.ignoreClaims || this==RequireNone) return true;
 			String result = null;
 			Claim atposition  = GriefPrevention.instance.dataStore.getClaimAt(testLocation, false, null);
-			if(atposition==null) return true; //unexpected...
+			if(atposition==null) return testresult=true; //unexpected...
 			switch(this){
 			case Disabled:
 				GriefPrevention.sendMessage(testPlayer, TextMode.Err, Messages.ConfigDisabled);
-				return false;
+				return testresult=false;
 			case RequireNone:
-				return true;	
+				return testresult=true;	
 			case RequireOwner:
 				if(atposition.ownerName.equalsIgnoreCase(testPlayer.getName())){
-					return true;
+					return testresult=true;
 					
 				}else {
 					if(ShowMessages)
 						GriefPrevention.sendMessage(testPlayer, 
 								TextMode.Err, "You need to Own the claim to do that.");
-					return false;
+					return testresult=false;
 				}
 			case RequireManager:
 				
 				if(atposition.isManager(testPlayer.getName())){
-					return true; //success
+					return testresult=true; //success
 				}
 				else {
 					//failed! if showmessages is on, show that message.
 					if(ShowMessages)
 						GriefPrevention.sendMessage(testPlayer, 
 								TextMode.Err, "You need to have Manager trust to do that.");
-					return false;
+					return testresult=false;
 				}
 			case RequireBuild:
 				
@@ -91,36 +94,41 @@ public class ClaimBehaviourData {
 					if(ShowMessages)
 						GriefPrevention.sendMessage(testPlayer, 
 								TextMode.Err, result);
-					return false;
+					return testresult=false;
 				}
 			case RequireAccess:
 				
 				if(null==(result=atposition.allowAccess(testPlayer))){
-					return true; //success
+					return testresult=true; //success
 				}
 				else {
 					//failed! if showmessages is on, show that message.
 					if(ShowMessages)
 						GriefPrevention.sendMessage(testPlayer, 
 								TextMode.Err, result);
-					return false;
+					return testresult=false;
 				}
 			case RequireContainer:
 				
 				if(null==(result=atposition.allowContainers(testPlayer))){
-					return true; //success
+					return testresult=true; //success
 				}
 				else {
 					//failed! if showmessages is on, show that message.
 					if(ShowMessages)
 						GriefPrevention.sendMessage(testPlayer, 
 								TextMode.Err,result);
-					return false;
+					return testresult=false;
 				}
 			default:
-				return false;
+				//System.out.println("defaulting on " + name());
+				return testresult=false;
 			}
-			
+			}
+			finally
+			{
+				//System.out.println("ClaimBehaviour returning " + testresult);
+			}
 			
 			
 			
@@ -160,27 +168,28 @@ public class ClaimBehaviourData {
 	 * @return whether this behaviour is Allowed or Denied in this claim.
 	 */
 	public ClaimAllowanceConstants Allowed(Location position,Player RelevantPlayer,boolean ShowMessages){
-		
+		ClaimAllowanceConstants returned = ClaimAllowanceConstants.Allow;
+		try {
 		//System.out.println("ClaimBehaviour:" + this.getBehaviourName());
-		//System.out.println("Testing Allowed," + BehaviourName);
-		String result=null;
+		//System.out.println("Testing Allowed," + BehaviourName + " Messages:" + ShowMessages);
+		//String result=null;
 		PlayerData pd = null;
 		boolean ignoringclaims = false;
 		if(RelevantPlayer!=null) pd = GriefPrevention.instance.dataStore.getPlayerData(RelevantPlayer.getName());
 		if(pd!=null) ignoringclaims = pd.ignoreClaims;
-		if(ignoringclaims) return ClaimAllowanceConstants.Allow;
+		
 		Claim testclaim = GriefPrevention.instance.dataStore.getClaimAt(position, true, null);
 		if(testclaim!=null){
-			
+			if(ignoringclaims) return ClaimAllowanceConstants.Allow;
 			if(!this.ClaimBehaviour.PerformTest(position, RelevantPlayer, ShowMessages))
-				return ClaimAllowanceConstants.Deny;
+				return returned=ClaimAllowanceConstants.Deny;
 			
 			
 			boolean varresult =  this.Claims.Allow(position, RelevantPlayer, ShowMessages);
 			
 			
 			
-			return varresult?ClaimAllowanceConstants.Allow:ClaimAllowanceConstants.Deny;
+			return returned = (varresult?ClaimAllowanceConstants.Allow:ClaimAllowanceConstants.Deny);
 		}
 
 		
@@ -195,13 +204,16 @@ public class ClaimBehaviourData {
 			if(wildernessresult.Denied() && ShowMessages){
 				GriefPrevention.sendMessage(RelevantPlayer, TextMode.Err, Messages.ConfigDisabled,this.BehaviourName);
 			}
-			return wildernessresult;
+			return (returned=wildernessresult);
 			
 		}
 		
 		
-		return ClaimAllowanceConstants.Allow;
-		
+		return (returned=ClaimAllowanceConstants.Allow);
+		}
+		finally {
+			System.out.println("ClaimBehaviourData returning:\"" + returned.name()  + "\"" + " For " + BehaviourName);
+		}
 	}
 	/**
 	 * retrieves the placement rules for this Behaviour outside claims (in the 'wilderness')

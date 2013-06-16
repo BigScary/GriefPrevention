@@ -399,7 +399,9 @@ class PlayerEventHandler implements Listener
 	synchronized void onPlayerCommandPreprocess (PlayerCommandPreprocessEvent event)
 	{
 		String [] args = event.getMessage().split(" ");
+		if(event.getPlayer()==null) return;
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(event.getPlayer().getWorld());
+		if(wc==null) return;
 		//if eavesdrop enabled, eavesdrop
 		List<String> WhisperCommands = wc.eavesdrop_whisperCommands();
 		String command = args[0].toLowerCase();
@@ -895,7 +897,7 @@ class PlayerEventHandler implements Listener
 		}
 		
 		//if the entity is a vehicle and we're preventing theft in claims		
-		if(wc.getContainerTheft().Allowed(entity.getLocation(),player,false).Denied() && entity instanceof Vehicle)
+		if(wc.getContainersRules().Allowed(entity.getLocation(),player,false).Denied() && entity instanceof Vehicle)
 		{
 			//if the entity is in a claim
 			Claim claim = this.dataStore.getClaimAt(entity.getLocation(), false, null);
@@ -1003,6 +1005,15 @@ class PlayerEventHandler implements Listener
 				EquipShovelProcessingTask task = new EquipShovelProcessingTask(player);
 				GriefPrevention.instance.getServer().getScheduler().scheduleSyncDelayedTask(GriefPrevention.instance, task, 15L);  //15L is approx. 3/4 of a second
 			}
+		}
+		else if(newItemStack.getType()== wc.getAdministrationTool()){
+			//make sure they have permission.
+			if(player.hasPermission("GriefPrevention.Administration")){
+			    GriefPrevention.sendMessage(player, TextMode.Info, "GriefPrevention Admin tool selected. Right-Click to add to container list. Shift Right-click to add to All container lists.");
+			}
+			
+			
+			
 		}
 //		else if(newItemStack.getType() == wc.getClaimsAccessTrustTool()){
 //			//access trust
@@ -1242,7 +1253,7 @@ class PlayerEventHandler implements Listener
 			}
 			catch(Exception e)  //an exception intermittently comes from getTargetBlock().  when it does, just ignore the event
 			{
-				
+				System.out.println("getTarget Exception");
 				return;
 			}
 		}
@@ -1278,6 +1289,24 @@ class PlayerEventHandler implements Listener
 				}
 			}
 		}
+		else if(event.getClickedBlock()!=null && event.getClickedBlock().getType()!=Material.AIR && event.getItem()!=null && 
+				wc.getAdministrationTool()==event.getItem().getType()){
+		
+			if(player.hasPermission("GriefPrevention.Administration")){
+				//if shifting, add to all worlds...
+				if(event.getAction()==Action.RIGHT_CLICK_BLOCK){
+					if (player.isSneaking()) {
+					GriefPrevention.instance.Configuration.AddContainerID(player, player.getWorld(), new MaterialInfo(event.getClickedBlock().getType()));
+					event.setCancelled(true);
+				} else {
+					GriefPrevention.instance.Configuration.AddContainerID(player, null, new MaterialInfo(event.getClickedBlock().getType()));
+					event.setCancelled(true);
+				}
+				
+			}
+			}
+			
+		}
 		if(ContainerMaterials==null){
 			ContainerMaterials = new HashSet<Material>();
 			ContainerMaterials.add(Material.WORKBENCH);
@@ -1295,7 +1324,7 @@ class PlayerEventHandler implements Listener
 		//apply rules for containers and crafting blocks
 		if(	(event.getAction() == Action.RIGHT_CLICK_BLOCK && 
 				(clickedBlock.getState() instanceof InventoryHolder ||
-						ContainerMaterials.contains(clickedBlock) || 
+						ContainerMaterials.contains(clickedBlock.getType()) || 
 						
 						wc.getModsContainerTrustIds().contains(new MaterialInfo(clickedBlock.getTypeId(), clickedBlock.getData(), null)))
 						))
@@ -1341,7 +1370,7 @@ class PlayerEventHandler implements Listener
 			}
 			
 			//otherwise check permissions for the claim the player is in
-			if(wc.getContainerTheft().Allowed(clickedBlock.getLocation(), player).Denied()){
+			if(wc.getContainersRules().Allowed(clickedBlock.getLocation(), player,true).Denied()){
 					//message will be sent by the above. noContainersReason won't be used anymore
 				    //this will require some thought :/
 					event.setCancelled(true);
@@ -1377,6 +1406,7 @@ class PlayerEventHandler implements Listener
 		} else if(clickedBlockType == Material.LEVER){
 			useRule = wc.getLevers();
 		}
+		
 		
 		if(useRule!=null){
 			

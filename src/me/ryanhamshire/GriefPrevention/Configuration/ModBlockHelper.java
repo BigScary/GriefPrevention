@@ -72,7 +72,7 @@ public class ModBlockHelper {
 
 		boolean inblocksection = false;
 
-		GriefPrevention.AddLogEntry("Searching Mod Config:" + CfgFile);
+		//GriefPrevention.AddLogEntry("Searching Mod Config:" + CfgFile);
 	
 		// open this file. Well, if it doesn't exist, give up.
 		File grabfile = new File(CfgFile);
@@ -98,13 +98,14 @@ public class ModBlockHelper {
 				{
 					//end of the block section.
 					inblocksection=false;
-					continue;
+					break;
 				} else if (inblocksection) {
 					// I:idBlockTieredTreasureChest=3381
 					// I:BlockChestHungry=2410
 					// if there is a colon, strip off everything up to the char
 					// after it.
 					if(lineread.contains("I:")) lineread = lineread.substring(lineread.indexOf("I:")+2);
+					if(lineread.contains("B:")) lineread = lineread.substring(lineread.indexOf("B:")+2);
 					if (lineread.contains(":")) {
 						lineread.substring(lineread.indexOf(":") + 1);
 					}
@@ -158,9 +159,7 @@ public class ModBlockHelper {
 								+ ItemName + " With ID:" + useID);
 					}
 				}
-				else if(lineread.startsWith("}") && inblocksection){
-					break;
-				}
+			
 
 			}
 			

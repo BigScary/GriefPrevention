@@ -272,12 +272,15 @@ public abstract class DataStore
 		String xString = elements[1];
 		String yString = elements[2];
 		String zString = elements[3];
-	    
+		World world ;
 		//identify world the claim is in
-		World world = GriefPrevention.instance.getServer().getWorld(worldName);
+		try {
+		world = GriefPrevention.instance.getServer().getWorld(worldName);
+		}catch(Exception exx) { world=null;}
 		if(world == null)
 		{
 			//try to load it...
+			
 			world = Bukkit.createWorld(new WorldCreator(worldName));
 			if(world==null){ //well... we tried!
 				throw new WorldNotFoundException("World not found: \"" + worldName + "\"");

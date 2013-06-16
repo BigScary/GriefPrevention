@@ -87,7 +87,7 @@ public class GriefPrevention extends JavaPlugin
 	public RegExTestHelper ModdedBlockRegexHelper;
 	public RegExTestHelper OreBlockRegexHelper;
 	public RegExTestHelper AccessRegexPattern;
-	
+	public WorldWatcher ww = new WorldWatcher();
 
 	public boolean config_mod_config_search;
 	public Debugger.DebugLevel DebuggingLevel;
@@ -198,17 +198,31 @@ public class GriefPrevention extends JavaPlugin
 		outConfig.set("GriefPrevention.Economy.ClaimBlocksSellValue", this.config_economy_claimBlocksSellValue);
 		outConfig.set("GriefPrevention.Claims.InitialBlocks",config_claims_initialBlocks);
 		outConfig.set("GriefPrevention.Mods.PerformConfigSearch", false);
-		
+		this.ModdedBlocks= new ModdedBlocksSearchResults();
 		if(config_mod_config_search){
 			//Show message indicating what will happen. With mod_config_search enabled, we will search for configs and find
 			//IDs according to a regular expression, but for this entire session all World Configuration loads will
 			//change the configured values for modded containers and access blocks, so mention that.
 			AddLogEntry("Performing Configuration Search.");
 			AddLogEntry("World Configurations Loaded during this session will have their current Container and Access IDs Overwritten!");
-			this.ModdedBlocks= new ModdedBlocksSearchResults();
+			
 			this.ModdedBlocks = ModBlockHelper.ScanCfgs();
+			
+			//save these to _template.
+		
+			
 		}
 		Configuration = new ConfigData(config,outConfig);
+		
+		if(config_mod_config_search){ //if specified, to search, save the results to the template file.
+			//WorldConfig's will save the ModdedBlock Contents when they are created,
+			//therefore we will set the template in this manner. Otherwise, this setting (ModdedBlock search results)
+			//will only be valid for this one server session.
+			WorldConfig templatefile = WorldConfig.fromFile(Configuration.getTemplateFile());
+			//we don't actually need to do anything with the variable, all the work was done in fromFile() and the WorldConfig constructors.
+			
+		}
+		
 		//when datastore initializes, it loads player and claim data, and posts some stats to the log
 		if(databaseUrl.length() > 0)
 		{
@@ -327,6 +341,8 @@ public class GriefPrevention extends JavaPlugin
 		catch(IOException exx){
 			this.log.log(Level.SEVERE, "Failed to save primary configuration file:" + DataStore.configFilePath);
 		}
+		ww = new WorldWatcher();
+		Bukkit.getPluginManager().registerEvents(ww, this);
 	}
 	private void HandleClaimClean(Claim c,MaterialInfo source,MaterialInfo target,Player player){
 		Location lesser = c.getLesserBoundaryCorner();
@@ -414,7 +430,6 @@ public class GriefPrevention extends JavaPlugin
 		{
 			player = (Player) sender;
 			wc = getWorldCfg(player.getWorld());
-			
 		}
 		
 		//abandonclaim
@@ -2198,6 +2213,7 @@ public class GriefPrevention extends JavaPlugin
 
 	public void onDisable()
 	{ 
+		ww=null;
 		//save data for any online players
 		Player [] players = this.getServer().getOnlinePlayers();
 		for(int i = 0; i < players.length; i++)
@@ -2714,7 +2730,7 @@ public class GriefPrevention extends JavaPlugin
 			
 			//otherwise store the valid entry in config data
 			//but only if not currently in the list. 
-			else if(!materialCollection.contains(materialInfo))
+			else
 			{
 				materialCollection.add(materialInfo);
 			}

@@ -162,13 +162,13 @@ public class WorldConfig {
 	private double  config_claims_AbandonReturnRatio;                //return ratio when abandoning a claim- .80 will result in players getting 80% of the used claim blocks back.
 	public double getClaimsAbandonReturnRatio(){ return config_claims_AbandonReturnRatio;}
 	
-	private ClaimBehaviourData ContainerTheft;
+	private ClaimBehaviourData ContainersRules;
 	/**
 	 * Returns Behaviour Information on Containers. This defaults to requiring Container trust inside claims, and is disabled outside claims.
 	 * This 
 	 * @return
 	 */
-	public ClaimBehaviourData getContainerTheft(){ return ContainerTheft;}
+	public ClaimBehaviourData getContainersRules(){ return ContainersRules;}
 	private ClaimBehaviourData CreatureDamage;
 	public ClaimBehaviourData getCreatureDamage(){return CreatureDamage;}
 	private ClaimBehaviourData WoodenDoors;
@@ -299,6 +299,10 @@ public class WorldConfig {
 	private Material config_claims_giveTrustTool;
 	public Material getClaimsGiveTrustTool(){ return config_claims_giveTrustTool;}
 	*/
+	
+	
+	private Material config_administration_tool;
+	public Material getAdministrationTool(){ return config_administration_tool;}
 	private ArrayList<Material> BreakableArrowMaterials;
 	
 	
@@ -520,8 +524,8 @@ public class WorldConfig {
 				ClaimBehaviourData.getAll("Block Tweaking").setBehaviourMode(ClaimBehaviourMode.RequireAccess));
 		
 		
-		this.ContainerTheft = new ClaimBehaviourData("Container Theft",config,outConfig,"GriefPrevention.ContainerTheft",
-				ClaimBehaviourData.getOutsideClaims("Container Theft").setBehaviourMode(ClaimBehaviourMode.RequireContainer));
+		this.ContainersRules = new ClaimBehaviourData("Containers",config,outConfig,"GriefPrevention.Containers",
+				ClaimBehaviourData.getAll("Containers").setBehaviourMode(ClaimBehaviourMode.RequireContainer)); //defaults to only allowing theft outside claims.
 		
 		this.CreatureDamage = new ClaimBehaviourData("Creature Damage",config,outConfig,"GriefPrevention.CreatureDamage",
 				ClaimBehaviourData.getAll("Creature Damage").setBehaviourMode(ClaimBehaviourMode.RequireContainer));
@@ -756,7 +760,7 @@ public class WorldConfig {
 		List<String> accessTrustStrings = config.getStringList("GriefPrevention.Mods.BlockIdsRequiringAccessTrust");
 		//add found items if applicable.
 		if(GriefPrevention.instance.ModdedBlocks!=null){
-			for(MaterialInfo mi:GriefPrevention.instance.ModdedBlocks.FoundAccess){
+			for(MaterialInfo mi:GriefPrevention.instance.ModdedBlocks.FoundAccess.getMaterials()){
 				accessTrustStrings.add(mi.toString());
 			}
 		}
@@ -774,7 +778,7 @@ public class WorldConfig {
 		this.config_trash_blocks = new MaterialCollection();
 		List<String> trashblockStrings = config.getStringList("GriefPrevention.TrashBlocks");
 		if(GriefPrevention.instance.ModdedBlocks!=null){
-			for(MaterialInfo mi:GriefPrevention.instance.ModdedBlocks.FoundOres){
+			for(MaterialInfo mi:GriefPrevention.instance.ModdedBlocks.FoundOres.getMaterials()){
 				trashblockStrings.add(mi.toString());
 			}
 		}
@@ -794,7 +798,7 @@ public class WorldConfig {
 		
 		if(GriefPrevention.instance.ModdedBlocks!=null){
 			
-			for(MaterialInfo mi:GriefPrevention.instance.ModdedBlocks.FoundContainers){
+			for(MaterialInfo mi:GriefPrevention.instance.ModdedBlocks.FoundContainers.getMaterials()){
 				containerTrustStrings.add(mi.toString());
 			}
 		}
@@ -840,9 +844,18 @@ public class WorldConfig {
 		this.config_claims_modificationTool = Material.getMaterial(modificationToolMaterialName);
 		if(this.config_claims_modificationTool == null)
 		{
-			GriefPrevention.AddLogEntry("ERROR: Material " + modificationToolMaterialName + " not found.  Defaulting to the golden shovel.  Please update your config.yml.");
+			GriefPrevention.AddLogEntry("ERROR: Material " + modificationToolMaterialName + " not found.  Defaulting to the golden shovel. ");
 			this.config_claims_modificationTool = Material.GOLD_SPADE;
 		}
+		config_administration_tool = Material.CHAINMAIL_HELMET;
+	    String admintoolName = config.getString("GriefPrevention.AdministrationTool",config_administration_tool.name());
+	    config_administration_tool = Material.getMaterial(admintoolName);
+	    if(config_administration_tool==null){
+	    	GriefPrevention.AddLogEntry("ERROR: Material " + modificationToolMaterialName + " not found.  Defaulting to the chainmail helm.");
+	    	this.config_claims_modificationTool = Material.CHAINMAIL_HELMET;
+	    }
+	    		
+		
 		/*// Removed this segment. It supports Access, Container, and Trust config settings for being able to hit 
 		 other players with certain items to add them to a claim. It was removed because it "doesn't fit" and "should be in another plugin".
 		 That makes a change since usually that line is just a cop out to avoid adding a new feature. 
@@ -1042,6 +1055,20 @@ public class WorldConfig {
 		//we construct a default FileConfiguration and call ourselves...
 		this(grabfor.getName());
 
+	}
+	
+	public static WorldConfig fromFile(String templateFile) {
+		// TODO Auto-generated method stub
+		File grabfile = new File(templateFile);
+		if(!grabfile.exists()) return null;
+		YamlConfiguration Source = YamlConfiguration.loadConfiguration(new File(templateFile));
+		YamlConfiguration Target = new YamlConfiguration();
+		WorldConfig created = new WorldConfig(grabfile.getName(),Source,Target);
+        try {
+		Target.save(grabfile.getPath());
+        }
+        catch(Exception exx){}
+		return created;
 	}
 	
 	

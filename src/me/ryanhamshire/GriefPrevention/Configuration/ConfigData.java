@@ -62,6 +62,9 @@ public class ConfigData {
 	public List<String> GetWorldConfigurationFiles(){
 		List<String> ActFiles = new ArrayList<String>();
 		File SourceFolder = new File(WorldConfigLocation);
+		
+		ActFiles.add(getTemplateFile());
+		
 		//iterate through each file.
 		for(File iterate:SourceFolder.listFiles()){
 			if(iterate.getName().startsWith("_")) continue;
@@ -102,11 +105,14 @@ public class ConfigData {
 		else {
 			//if TargetWorld is null, we want to do this to <all configuration files>
 			ActFiles = GetWorldConfigurationFiles();
+			//System.out.println("Files:" + ActFiles.size());
 			WorldTarget = "All Worlds";
 		}
 		
 		for(String iterate:ActFiles){
 			//open this configuration...
+			
+			
 			YamlConfiguration yml = YamlConfiguration.loadConfiguration(new File(iterate));
 			//GriefPrevention.Mods.BlockIdsRequiringContainerTrust
 			List<String> StringResult = yml.getStringList(NodePath);
@@ -120,9 +126,18 @@ public class ConfigData {
 			mc.add(mi);
 			yml.set("GriefPrevention.Mods.BlockIdsRequiringContainerTrust", mc.GetList());
 			//add to the end of this list.
+			//save the changed config.
+			try {
+			yml.save(iterate);
+			}
+			catch(IOException exx){
+				
+			}
 			if(Invoker!=null){
 				Invoker.sendMessage(ChatColor.ITALIC + TextMode.Instr.toString() + "Block ID:" + mi.getTypeID() + " added to " + NodePath + " in " + WorldTarget  );
 			}
+			
+			
 		}
 		
 	}
@@ -178,7 +193,7 @@ public class ConfigData {
 		if((grabfor = Bukkit.getWorld(worldName))==null){
 			GriefPrevention.instance.getLogger().log(Level.SEVERE, "invalid World:" + worldName);
 		}
-		
+		if(grabfor==null) return null;
 		
 		//if it's not in the hashmap...
 		if(!WorldCfg.containsKey(worldName)){
