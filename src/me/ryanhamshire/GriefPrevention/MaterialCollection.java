@@ -22,12 +22,41 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.bukkit.Material;
+
 //ordered list of material info objects, for fast searching
 public class MaterialCollection
 {
 	HashMap<Integer,List<MaterialInfo>> materials = new HashMap<Integer,List<MaterialInfo>>();
 	
-	void Add(MaterialInfo material)
+	public List<MaterialInfo> getMaterials(){
+		
+		List<MaterialInfo> Result = new ArrayList<MaterialInfo>();
+		for(List<MaterialInfo> listiterate:materials.values()){
+			Result.addAll(listiterate);
+		}
+		return Result;
+		
+		
+	}
+	
+	
+	public void add(Material m){
+		add(new MaterialInfo(m));
+	}
+	public void remove(MaterialInfo mi) {
+		if(!materials.containsKey(mi.getTypeID())){
+			return; //nothing to remove, since the id isn't even here.
+		}
+		List<MaterialInfo> mlist = this.materials.get(mi.typeID);
+		for(int i=0;i<mlist.size();i++){
+			if(mlist.get(i).equals(mi)){
+				mlist.remove(i);
+			}
+		}
+		
+	}
+	public void add(MaterialInfo material)
 	{
 		if(!materials.containsKey(material.getTypeID())){
 			materials.put(material.getTypeID(),new ArrayList<MaterialInfo>());
@@ -36,8 +65,10 @@ public class MaterialCollection
 		mlist.add(material);
 		
 	}
-	
-	boolean Contains(MaterialInfo material)
+	public boolean contains(Material m){
+		return contains(new MaterialInfo(m));
+	}
+	public boolean contains(MaterialInfo material)
 	{
 		if(this.materials.containsKey(material.typeID))
 		{
@@ -46,6 +77,26 @@ public class MaterialCollection
 		
 		
 		return false;
+	}
+	public MaterialCollection(){
+		
+	}
+	public List<String> GetList(){
+		ArrayList<String> buildresult = new ArrayList<String>();
+		for(MaterialInfo mi:getMaterials()){
+			buildresult.add(mi.toString());
+		}
+		return buildresult;
+	}
+	public MaterialCollection(MaterialCollection Source){
+		for(MaterialInfo iterate:Source.getMaterials()){
+			this.add((MaterialInfo)(iterate.clone()));
+		}
+	}
+	public MaterialCollection(List<MaterialInfo> materialsAdd){
+		for(MaterialInfo iterate:materialsAdd){
+			add(iterate);
+		}
 	}
 	
 	@Override
@@ -71,4 +122,8 @@ public class MaterialCollection
 	{
 		this.materials.clear();
 	}
+	public Object clone(){
+		return new MaterialCollection(this);
+	}
+	
 }

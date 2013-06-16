@@ -1185,6 +1185,10 @@ public abstract class DataStore
 		this.addDefault(defaults, Messages.NoDamageClaimedEntity, "That belongs to {0}.", "0: owner name");
 		this.addDefault(defaults, Messages.ShovelBasicClaimMode, "Shovel returned to basic claims mode.", null);
 		this.addDefault(defaults, Messages.RemainingBlocks, "You may claim up to {0} more blocks.", "0: remaining blocks");
+		this.addDefault(defaults, Messages.InsufficientWorldBlocks, "You've used too many claim blocks in this world. You need to free up {0} to make that claim.", "0: required claim blocks");
+		this.addDefault(defaults, Messages.RemainingBlocksWorld, "You may claim up to {0} more blocks in this world.", "0: remaining blocks in world");
+		
+		this.addDefault(defaults, Messages.RemainingClaimsWorld, "You may make {0} more claims in this world.", "0: remaining claims in world.");
 		this.addDefault(defaults, Messages.CreativeBasicsDemoAdvertisement, "Land Claim Help:  http://tinyurl.com/c7bajb8", null);
 		this.addDefault(defaults, Messages.SurvivalBasicsDemoAdvertisement, "Land Claim Help:  http://tinyurl.com/6nkwegj", null);
 		this.addDefault(defaults, Messages.TrappedChatKeyword, "trapped", "When mentioned in chat, players get information about the /trapped command.");

@@ -53,7 +53,13 @@ public class PlayerData
 		
 		
 	}
-	
+	public int getTotalClaimBlocksinWorld(World p){
+		int accum = 0;
+		for(Claim iterate:getWorldClaims(p)){
+			accum+=iterate.getArea();
+		}
+		return accum;
+	}
 	//how many claim blocks the player has earned via play time
 	public int accruedClaimBlocks = GriefPrevention.instance.config_claims_initialBlocks;
 	
@@ -164,7 +170,19 @@ public class PlayerData
 		
 		return true;
 	}
-	
+	public int getRemainingClaimBlocks(World p){
+		
+		WorldConfig wc = GriefPrevention.instance.getWorldCfg(p);
+		if(wc.getClaims_maxBlocks()==0) return Integer.MAX_VALUE; //easy break...
+		if(wc==null) return 0;
+		//get the total claim blocks this player has in this world.
+		int WorldClaimBlocks = this.getTotalClaimBlocksinWorld(p);
+		//return the maximum sans what they have.
+		return wc.getClaims_maxBlocks() - WorldClaimBlocks;
+		
+		
+		
+	}
 	//the number of claim blocks a player has available for claiming land
 	public int getRemainingClaimBlocks()
 	{

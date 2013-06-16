@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import me.ryanhamshire.GriefPrevention.Configuration.WorldConfig;
+import me.ryanhamshire.GriefPrevention.Debugger.DebugLevel;
 import me.ryanhamshire.GriefPrevention.visualization.Visualization;
 import me.ryanhamshire.GriefPrevention.visualization.VisualizationType;
 
@@ -162,10 +163,15 @@ public class BlockEventHandler implements Listener
 		}
 	}
 	
+	
+	
+	
 	//when a player breaks a block...
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
 	public void onBlockBreak(BlockBreakEvent breakEvent)
 	{
+		
+		Debugger.Write("Block broken:" + breakEvent.getBlock().getType().name(), DebugLevel.Verbose);
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(breakEvent.getBlock().getWorld());
 		Player player = breakEvent.getPlayer();
 		Block block = breakEvent.getBlock();		

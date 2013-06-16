@@ -1,5 +1,6 @@
 package me.ryanhamshire.GriefPrevention.Configuration;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -132,13 +133,13 @@ public class WorldConfig {
 	public boolean getClaimsEnabled(){ return claims_enabled;}
 	private boolean claims_creative_rules;
 	
-	private List<Material> config_trash_blocks=null;
+	private MaterialCollection config_trash_blocks=null;
 	/**
 	 * returns the List of Trash block materials for this world. These are Materials that can be 
 	 * -placed in survival
 	 * @return
 	 */
-	public List<Material> getTrashBlocks() { return config_trash_blocks;}
+	public MaterialCollection getTrashBlocks() { return config_trash_blocks;}
 	private int config_message_cooldown_claims = 0; //claims cooldown. 0= no cooldown.
 	public int getMessageCooldownClaims(){ return config_message_cooldown_claims;}
 	private int config_message_cooldown_stuck = 0; //stuck cooldown. 0= no cooldown.
@@ -232,7 +233,9 @@ public class WorldConfig {
 	public int getClaimsExtendIntoGroundDistance(){ return config_claims_claimsExtendIntoGroundDistance;}
 	private int config_claims_minSize;								//minimum width and height for non-admin claims
 	public int getMinClaimSize(){ return config_claims_minSize;}
-	
+	private int config_claims_maxblocks; //maximum blocks a player can claim in this world. This does not change and is essentially a cap to keep a player
+	//from 'taking over' an entire world. 0 indicates there is no limit.
+	public int getClaims_maxBlocks(){ return config_claims_maxblocks;}
 	
 	private int config_SpamDelayThreshold;
 	private int config_SpamCapsMinLength;
@@ -286,8 +289,16 @@ public class WorldConfig {
 	public Material getClaimsInvestigationTool(){ return config_claims_investigationTool;}
 	private Material config_claims_modificationTool;	  				//which material will be used to create/resize claims with a right click
 	public Material getClaimsModificationTool(){ return config_claims_modificationTool;}
+	/*
+	private Material config_claims_giveAccessTrustTool;
+	public Material getClaimsAccessTrustTool(){ return config_claims_giveAccessTrustTool;}
 	
+	private Material config_claims_giveContainerTrustTool;
+	public Material getClaimsContainerTrustTool(){ return config_claims_giveContainerTrustTool;}
 	
+	private Material config_claims_giveTrustTool;
+	public Material getClaimsGiveTrustTool(){ return config_claims_giveTrustTool;}
+	*/
 	private ArrayList<Material> BreakableArrowMaterials;
 	
 	
@@ -383,7 +394,7 @@ public class WorldConfig {
 	private List<String> config_mods_ignoreClaimsAccounts;			//list of player names which ALWAYS ignore claims
 	public List<String> getModsIgnoreClaimsAccounts(){ return config_mods_ignoreClaimsAccounts;}
 	private MaterialCollection config_mods_explodableIds;			//list of block IDs which can be destroyed by explosions, even in claimed areas
-	public MaterialCollection getModsExplodableIds() {return config_mods_explodableIds;}
+	//public MaterialCollection getModsExplodableIds() {return config_mods_explodableIds;}
 
 	private boolean config_claims_warnOnBuildOutside;				//whether players should be warned when they're building in an unclaimed area
 	public boolean claims_warnOnBuildOutside(){ return config_claims_warnOnBuildOutside;}
@@ -411,6 +422,12 @@ public class WorldConfig {
 	private String WorldName;
 	private boolean config_siege_enabled;
 	public String getWorldName(){ return WorldName;}
+	
+	
+	
+	public static String getWorldConfig(String forWorld){
+		return DataStore.dataLayerFolderPath + File.separator + "WorldConfigs/" + forWorld + ".yml";
+	}
 	
 	//constructor accepts a Name and a FileConfiguration.
 	public WorldConfig(String pName,FileConfiguration config,FileConfiguration outConfig){
@@ -570,38 +587,8 @@ public class WorldConfig {
 		outConfig.set("GriefPrevention.Siege.BlockRevert", SiegeBlockRevert);
 		//read trash blocks.
 		//Cobblestone,Torch,Dirt,Sapling,Gravel,Sand,TNT,Workbench
-		this.config_trash_blocks = new ArrayList<Material>();
-		for(Material trashblock:new Material[]{Material.COBBLESTONE,
-				Material.TORCH,Material.DIRT,Material.SAPLING,Material.GRAVEL,Material.SAND,Material.TNT,Material.WORKBENCH}){
-		this.config_trash_blocks.add(trashblock);
-		}
-		List<String> trashblocks= config.getStringList("GriefPrevention.Claims.TrashBlocks");
-		if(trashblocks==null || trashblocks.size()==0){
-		//go with the default, which we already set.	
-			trashblocks = new ArrayList<String>();
-			for(String iterate:new String[] {"COBBLESTONE","TORCH","DIRT","SAPLING","GRAVEL","SAND","TNT","WORKBENCH"}){
-				trashblocks.add(iterate);
-			}
-			//set trashblocks, since we save it to outConfig later, so save out this default. This makes it easier to 
-			//edit.
-			
-		}
-		else {
-			//reset...
-			this.config_trash_blocks=new ArrayList<Material>();
-			for(String trashmaterial:trashblocks){
-				 try {
-					 //replace spaces with underscores...
-					 trashmaterial = trashmaterial.replace(" ", "_");
-				Material parsed = Material.valueOf(trashmaterial.toUpperCase());
-				config_trash_blocks.add(parsed);
-				 }
-				 catch(IllegalArgumentException iae){
-					 //nothing special, log though.
-					 GriefPrevention.AddLogEntry("failed to parse trashmaterial Entry:" + trashmaterial.toUpperCase());
-				 }
-			}
-		}
+
+
 
 		//SpamDelayThreshold=1500
 				//SpamCapsMinLength=4
@@ -647,7 +634,8 @@ public class WorldConfig {
 		
 		config_claims_blocksAccruedPerHour = config.getInt("GriefPrevention.Claims.BlocksAccruedPerHour",100);
 		
-		
+		this.config_claims_maxblocks = config.getInt("GriefPrevention.Claims.MaxClaimBlocks",0);
+		outConfig.set("GriefPrevention.Claims.MaxClaimBlocks",this.config_claims_maxblocks);
 		
 		outConfig.set("GriefPrevention.Claims.BlocksAccruedPerHour",config_claims_blocksAccruedPerHour);
 		outConfig.set("GriefPrevention.ClaimCleanup.MaximumSize", config_claimcleanup_maximumsize);
@@ -756,84 +744,77 @@ public class WorldConfig {
 		this.config_creaturesTrampleCrops = config.getBoolean("GriefPrevention.CreaturesTrampleCrops", false);
 		this.config_mods_ignoreClaimsAccounts = config.getStringList("GriefPrevention.Mods.PlayersIgnoringAllClaims");
 		
+		
+		
+		
 		if(this.config_mods_ignoreClaimsAccounts == null) this.config_mods_ignoreClaimsAccounts = new ArrayList<String>();
-		
-		this.config_mods_accessTrustIds = new MaterialCollection();
+		//default the access trust IDs to found modded blocks, if any. Note that the constructor
+		//will ignore null parameters, so we shouldn't get a NullRef from MaterialCollection if a Search was not performed.
+		this.config_mods_accessTrustIds = new MaterialCollection(GriefPrevention.instance.ModdedBlocks.FoundAccess);
+		//build on that list with any configured items.
+		//
 		List<String> accessTrustStrings = config.getStringList("GriefPrevention.Mods.BlockIdsRequiringAccessTrust");
-		
-		//default values for access trust mod blocks
-		if(accessTrustStrings == null || accessTrustStrings.size() == 0)
-		{
-			//none by default
-		}
 		//add found items if applicable.
 		if(GriefPrevention.instance.ModdedBlocks!=null){
 			for(MaterialInfo mi:GriefPrevention.instance.ModdedBlocks.FoundAccess){
 				accessTrustStrings.add(mi.toString());
 			}
 		}
+		//parse the list we got from the cfg file. This will ADD to the list, but not remove existing items.
+		//it also will not add items that are already in the list.
+	    GriefPrevention.instance.parseMaterialListFromConfig(accessTrustStrings, this.config_mods_accessTrustIds);
+		
+		//
 		
 		
 		
-		GriefPrevention.instance.parseMaterialListFromConfig(accessTrustStrings, this.config_mods_accessTrustIds);
+		
+		
+		//trash blocks.
+		this.config_trash_blocks = new MaterialCollection();
+		List<String> trashblockStrings = config.getStringList("GriefPrevention.TrashBlocks");
+		if(GriefPrevention.instance.ModdedBlocks!=null){
+			for(MaterialInfo mi:GriefPrevention.instance.ModdedBlocks.FoundOres){
+				trashblockStrings.add(mi.toString());
+			}
+		}
+		GriefPrevention.instance.parseMaterialListFromConfig(trashblockStrings, this.config_trash_blocks);
+		
+		
+		
+		
+		
 		
 		this.config_mods_containerTrustIds = new MaterialCollection();
+		//Get the config setting....
 		List<String> containerTrustStrings = config.getStringList("GriefPrevention.Mods.BlockIdsRequiringContainerTrust");
 		
-		//default values for container trust mod blocks
-		if(containerTrustStrings == null || containerTrustStrings.size() == 0)
-		{
-			containerTrustStrings.add(new MaterialInfo(227, "Battery Box").toString());
-			containerTrustStrings.add(new MaterialInfo(130, "Transmutation Tablet").toString());
-			containerTrustStrings.add(new MaterialInfo(128, "Alchemical Chest and Energy Condenser").toString());
-			containerTrustStrings.add(new MaterialInfo(181, "Various Chests").toString());
-			containerTrustStrings.add(new MaterialInfo(178, "Ender Chest").toString());
-			containerTrustStrings.add(new MaterialInfo(150, "Various BuildCraft Gadgets").toString());
-			containerTrustStrings.add(new MaterialInfo(155, "Filler").toString());
-			containerTrustStrings.add(new MaterialInfo(157, "Builder").toString());
-			containerTrustStrings.add(new MaterialInfo(158, "Template Drawing Table").toString());
-			containerTrustStrings.add(new MaterialInfo(126, "Various EE Gadgets").toString());
-			containerTrustStrings.add(new MaterialInfo(138, "Various RedPower Gadgets").toString());
-			containerTrustStrings.add(new MaterialInfo(137, "BuildCraft Project Table and Furnaces").toString());
-			containerTrustStrings.add(new MaterialInfo(250, "Various IC2 Machines").toString());
-			containerTrustStrings.add(new MaterialInfo(161, "BuildCraft Engines").toString());
-			containerTrustStrings.add(new MaterialInfo(169, "Automatic Crafting Table").toString());
-			containerTrustStrings.add(new MaterialInfo(177, "Wireless Components").toString());
-			containerTrustStrings.add(new MaterialInfo(183, "Solar Arrays").toString());
-			containerTrustStrings.add(new MaterialInfo(187, "Charging Benches").toString());
-			containerTrustStrings.add(new MaterialInfo(188, "More IC2 Machines").toString());
-			containerTrustStrings.add(new MaterialInfo(190, "Generators, Fabricators, Strainers").toString());
-			containerTrustStrings.add(new MaterialInfo(194, "More Gadgets").toString());
-			containerTrustStrings.add(new MaterialInfo(207, "Computer").toString());
-			containerTrustStrings.add(new MaterialInfo(208, "Computer Peripherals").toString());
-			containerTrustStrings.add(new MaterialInfo(246, "IC2 Generators").toString());
-			containerTrustStrings.add(new MaterialInfo(24303, "Teleport Pipe").toString());
-			containerTrustStrings.add(new MaterialInfo(24304, "Waterproof Teleport Pipe").toString());
-			containerTrustStrings.add(new MaterialInfo(24305, "Power Teleport Pipe").toString());
-			containerTrustStrings.add(new MaterialInfo(4311, "Diamond Sorting Pipe").toString());
-			containerTrustStrings.add(new MaterialInfo(216, "Turtle").toString());
-			
-		}
 		
 		//parse the strings from the config file
-		GriefPrevention.instance.parseMaterialListFromConfig(containerTrustStrings, this.config_mods_containerTrustIds);
+		
 		if(GriefPrevention.instance.ModdedBlocks!=null){
+			
 			for(MaterialInfo mi:GriefPrevention.instance.ModdedBlocks.FoundContainers){
 				containerTrustStrings.add(mi.toString());
 			}
 		}
-		this.config_mods_explodableIds = new MaterialCollection();
-		List<String> explodableStrings = config.getStringList("GriefPrevention.Mods.BlockIdsExplodable");
+		GriefPrevention.instance.parseMaterialListFromConfig(containerTrustStrings, this.config_mods_containerTrustIds);
 		
-		//default values for explodable mod blocks
-		if(explodableStrings == null || explodableStrings.size() == 0)
-		{
-			explodableStrings.add(new MaterialInfo(161, "BuildCraft Engines").toString());			
-			explodableStrings.add(new MaterialInfo(246, (byte)5 ,"Nuclear Reactor").toString());
-		}
 		
+		
+		
+		
+		
+		
+		
+		
+		//default values for explodable mod blocks BC: Unneeded: Explosions cannot be sourced from a block in vanilla, so Explosion
+		//behaviour has been changed to allow the block at the epicenter of the explosion to be broken.
 		//parse the strings from the config file
-		GriefPrevention.instance.parseMaterialListFromConfig(explodableStrings, this.config_mods_explodableIds);
+		
+		
+		
+		
 		
 		//default for claim investigation tool
 		String investigationToolMaterialName = Material.STICK.name();
@@ -862,9 +843,42 @@ public class WorldConfig {
 			GriefPrevention.AddLogEntry("ERROR: Material " + modificationToolMaterialName + " not found.  Defaulting to the golden shovel.  Please update your config.yml.");
 			this.config_claims_modificationTool = Material.GOLD_SPADE;
 		}
+		/*// Removed this segment. It supports Access, Container, and Trust config settings for being able to hit 
+		 other players with certain items to add them to a claim. It was removed because it "doesn't fit" and "should be in another plugin".
+		 That makes a change since usually that line is just a cop out to avoid adding a new feature. 
+		 Because being able to change trust in a claim  without commands is totally not Grief Related. But then again, it's the same thing
+		 as being able to visualize claims and make them with a gold shovel. That's not grief prevention related either, and neither are sieges.
+		 
+		 
+		String AccessTrustTool = config.getString("GriefPrevention.Claims.AccessTrustTool",Material.FEATHER.name());
+		String ContainerTrustTool = config.getString("GriefPrevention.Claims.ContainerTrustTool",Material.STRING.name());
+		String TrustTool = config.getString("GriefPrevention.Claims.TrustTool",Material.GOLD_NUGGET.name());
 		
+		this.config_claims_giveAccessTrustTool = Material.getMaterial(AccessTrustTool);
+		this.config_claims_giveContainerTrustTool = Material.getMaterial(ContainerTrustTool);
+		this.config_claims_giveTrustTool = Material.getMaterial(TrustTool);
+		
+		
+		if(config_claims_giveAccessTrustTool==null){
+			GriefPrevention.AddLogEntry("Error: Access Trust Tool " + modificationToolMaterialName + " Not valid. Defaulting to Feather.");
+			config_claims_giveAccessTrustTool = Material.FEATHER;
+		}
+		if(config_claims_giveContainerTrustTool==null){
+			GriefPrevention.AddLogEntry("Error: Container Trust Tool " + modificationToolMaterialName + " Not valid. Defaulting to String.");
+			config_claims_giveContainerTrustTool = Material.STRING;
+		}
+		if(config_claims_giveTrustTool==null){
+			GriefPrevention.AddLogEntry("Error: Trust Tool " + modificationToolMaterialName + " Not valid. Defaulting to Gold Nugget");
+			config_claims_giveContainerTrustTool = Material.GOLD_NUGGET;
+		}
+		
+		//save the tools.
+		outConfig.set("GriefPrevention.Claims.AccessTrustTool", config_claims_giveAccessTrustTool);
+		outConfig.set("GriefPrevention.Claims.ContainerTrustTool", config_claims_giveContainerTrustTool);
+	    outConfig.set("GriefPrevention.Claims.TrustTool", config_claims_giveTrustTool);
+		*/
 		//default for siege worlds list
-		ArrayList<String> defaultSiegeWorldNames = new ArrayList<String>();
+		//ArrayList<String> defaultSiegeWorldNames = new ArrayList<String>();
 		this.config_siege_enabled = config.getBoolean("GriefPrevention.Siege.Enabled",isPvP);
 		//get siege world names from the config file
 				
@@ -937,7 +951,7 @@ public class WorldConfig {
 		outConfig.set("GriefPrevention.Claims.AllowUnclaimingLand", this.config_claims_allowUnclaim);
 		outConfig.set("GriefPrevention.Claims.AutoRestoreUnclaimedLand", this.config_claims_autoRestoreUnclaimed);
 		
-		outConfig.set("GriefPrevention.Claims.TrashBlocks",trashblocks);
+		//outConfig.set("GriefPrevention.Claims.TrashBlocks",trashblocks);
 		outConfig.set("GriefPrevention.Claims.WildernessWarningBlockCount", this.config_claims_wildernessBlocksDelay);
 		
 		outConfig.set("GriefPrevention.Spam.Enabled", this.config_spam_enabled);
@@ -996,7 +1010,8 @@ public class WorldConfig {
 		outConfig.set("GriefPrevention.Mods.PlayersIgnoringAllClaims", this.config_mods_ignoreClaimsAccounts);
 		outConfig.set("GriefPrevention.Mods.BlockIdsRequiringAccessTrust", accessTrustStrings);
 		outConfig.set("GriefPrevention.Mods.BlockIdsRequiringContainerTrust", containerTrustStrings);
-		outConfig.set("GriefPrevention.Mods.BlockIdsExplodable", explodableStrings);
+		
+		//outConfig.set("GriefPrevention.Mods.BlockIdsExplodable", explodableStrings);
 		
 		//Task startup.
 		//if we have a blockaccrued value and the ClaimTask for delivering claim blocks is null,
@@ -1018,6 +1033,7 @@ public class WorldConfig {
 		
 		
 	}
+	
 	public WorldConfig(String worldname){
 		this(worldname,new YamlConfiguration(),ConfigData.createTargetConfiguration(worldname) );
 	}

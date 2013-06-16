@@ -262,7 +262,10 @@ class EntityEventHandler implements Listener
 		////go through each block that was affected...
 		for(int i=0;i<blocks.size();i++){
 			Block block = blocks.get(i);
-			if(wc.getModsExplodableIds().Contains(new MaterialInfo(block.getTypeId(), block.getData(), null))) continue;
+			//if(wc.getModsExplodableIds().contains(new MaterialInfo(block.getTypeId(), block.getData(), null))) continue;
+			if(block.getX()==explodeEvent.getLocation().getBlockX() &&
+					block.getY()==explodeEvent.getLocation().getBlockY() &&
+					block.getZ()==explodeEvent.getLocation().getBlockZ()) continue;
 			//creative rules stop all explosions, regardless of the other settings.
 			if(wc.getCreativeRules() ||  (usebehaviour!=null && usebehaviour.Allowed(block.getLocation(),null).Denied())){
 				//if not allowed. remove it...

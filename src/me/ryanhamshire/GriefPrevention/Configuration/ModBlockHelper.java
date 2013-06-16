@@ -20,9 +20,7 @@ import me.ryanhamshire.GriefPrevention.MaterialInfo;
  */
 public class ModBlockHelper {
 	//search path for mod installation config folder.
-	public static Pattern ModBlockNamePattern = null;
-	public static Pattern OreBlockPattern = null;
-	public static Pattern AccessPattern = null;
+	
 	public final static String moddedConfigPath = "plugins" + File.separator + "../config/";
 	private static List<String> CachedConfigs = null;
 	private static HashMap<Integer,String> ModdedNameLookup = new HashMap<Integer,String>(); //lookup of Modded Item IDs to Modded Item Names where applicable. usually for blocks.
@@ -74,20 +72,15 @@ public class ModBlockHelper {
 
 		boolean inblocksection = false;
 
-		if (ModBlockNamePattern == null)
-			ModBlockNamePattern = Pattern
-					.compile(GriefPrevention.instance.ModdedBlockRegexPattern,Pattern.CASE_INSENSITIVE);
-		if (OreBlockPattern == null)
-			OreBlockPattern = Pattern
-					.compile(GriefPrevention.instance.OreBlockRegexPattern,Pattern.CASE_INSENSITIVE);
-		if(AccessPattern == null)
-			AccessPattern = Pattern.compile(GriefPrevention.instance.AccessRegexPattern,Pattern.CASE_INSENSITIVE);
+		GriefPrevention.AddLogEntry("Searching Mod Config:" + CfgFile);
+	
 		// open this file. Well, if it doesn't exist, give up.
 		File grabfile = new File(CfgFile);
 		if (!grabfile.exists())
 			return;
+		Scanner sc=null;
 		try {
-			Scanner sc = new Scanner(grabfile);
+			sc = new Scanner(grabfile);
 			while (sc.hasNext()) {
 				// read in a line.
 				String lineread = sc.nextLine();
@@ -99,11 +92,19 @@ public class ModBlockHelper {
 				if (lineread.startsWith("block") && lineread.endsWith("{")) {
 					// yep! activate inblocksection.
 					inblocksection = true;
+					continue;
+				}
+				else if (inblocksection && lineread.startsWith("}"))
+				{
+					//end of the block section.
+					inblocksection=false;
+					continue;
 				} else if (inblocksection) {
 					// I:idBlockTieredTreasureChest=3381
 					// I:BlockChestHungry=2410
 					// if there is a colon, strip off everything up to the char
 					// after it.
+					if(lineread.contains("I:")) lineread = lineread.substring(lineread.indexOf("I:")+2);
 					if (lineread.contains(":")) {
 						lineread.substring(lineread.indexOf(":") + 1);
 					}
@@ -123,12 +124,12 @@ public class ModBlockHelper {
 						continue;
 					}
 					
-					ItemName = SeparateCamelCase(ItemName);
+					ItemName = SeparateCamelCase(ItemName.replace(".", " ")) + " ";
 					//GriefPrevention.AddLogEntry("ItemName:" + ItemName + " ID:" + useID);
 					ModdedNameLookup.put(useID, ItemName);
 					// we want to tag Items that contain secret code words.
 					// specifically.
-					if (ModBlockNamePattern.matcher(ItemName).find()) {
+					if(GriefPrevention.instance.ModdedBlockRegexHelper.match(ItemName)) {
 						// we want to create a new MaterialInfo.
 						MaterialInfo mi = new MaterialInfo(useID, (byte) 0,
 								ItemName);
@@ -137,7 +138,8 @@ public class ModBlockHelper {
 						GriefPrevention.AddLogEntry("Found Container Match:"
 								+ ItemName + " With ID:" + useID);
 
-					} else if (OreBlockPattern.matcher(ItemName).find()) {
+					} 
+					else if (GriefPrevention.instance.OreBlockRegexHelper.match(ItemName)) {
 						MaterialInfo mi = new MaterialInfo(useID, (byte) 0,
 								ItemName);
 						mi.allDataValues = true;
@@ -146,7 +148,7 @@ public class ModBlockHelper {
 						GriefPrevention.AddLogEntry("Found Ore Match:"
 								+ ItemName + " With ID:" + useID);
 					}
-					else if(AccessPattern.matcher(ItemName).find()){
+					else if(GriefPrevention.instance.AccessRegexPattern.match(ItemName)){
 						MaterialInfo mi = new MaterialInfo(useID, (byte) 0,
 								ItemName);
 						mi.allDataValues = true;
@@ -156,12 +158,19 @@ public class ModBlockHelper {
 								+ ItemName + " With ID:" + useID);
 					}
 				}
+				else if(lineread.startsWith("}") && inblocksection){
+					break;
+				}
 
 			}
-			sc.close();
+			
 		} catch (IOException exx) {
-
+			
 		}
+		finally{
+			if(sc!=null) sc.close();
+		}
+		
 
 	}
 	
@@ -177,7 +186,8 @@ public class ModBlockHelper {
 					}
 					
 				}
-				else if(iterate.getName().endsWith(".cfg") || iterate.getName().endsWith(".conf")){
+				else if(iterate.getName().toLowerCase().endsWith(".cfg") || iterate.getName().toLowerCase().endsWith(".conf")){
+					GriefPrevention.AddLogEntry("Found cfg File:" + iterate.getAbsolutePath());
 					results.add(iterate.getAbsolutePath());
 				}
 				

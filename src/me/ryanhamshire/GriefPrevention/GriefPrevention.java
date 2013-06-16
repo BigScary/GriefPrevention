@@ -72,6 +72,7 @@ public class GriefPrevention extends JavaPlugin
 	public static GriefPrevention instance;
 	
 	//for logging to the console and log file
+	public Debugger debug = null;
 	private static Logger log = Logger.getLogger("Minecraft");
 	public ConfigData Configuration = null;
 	//this handles data storage, like player and region data
@@ -82,10 +83,14 @@ public class GriefPrevention extends JavaPlugin
 	//public ArrayList<String> config_claims_enabledCreativeWorlds;	//list of worlds where additional creative mode anti-grief rules apply
 	public int config_claims_initialBlocks;							//the number of claim blocks a new player starts with
 	public int config_claims_maxAccruedBlocks;						//the limit on accrued blocks (over time).  doesn't limit purchased or admin-gifted blocks
-	public String ModdedBlockRegexPattern;
-	public String OreBlockRegexPattern;
-	public String AccessRegexPattern;
+	
+	public RegExTestHelper ModdedBlockRegexHelper;
+	public RegExTestHelper OreBlockRegexHelper;
+	public RegExTestHelper AccessRegexPattern;
+	
+
 	public boolean config_mod_config_search;
+	public Debugger.DebugLevel DebuggingLevel;
 	//start removal....
 	//reference to the economy plugin, if economy integration is enabled
 	public static Economy economy = null;	
@@ -170,8 +175,10 @@ public class GriefPrevention extends JavaPlugin
 		String databaseUserName = config.getString("GriefPrevention.Database.UserName", "");
 		String databasePassword = config.getString("GriefPrevention.Database.Password", "");
 		//sea level
-		
-		
+		String AcquiredLevel = config.getString("GriefPrevention.DebugLevel","None");
+		this.DebuggingLevel= Debugger.DebugLevel.valueOf(AcquiredLevel);
+		config.set("GriefPrevention.DebugLevel", DebuggingLevel.name());
+		this.debug = new Debugger(DebuggingLevel);
 		outConfig.set("GriefPrevention.Database.URL", databaseUrl);
 		outConfig.set("GriefPrevention.Database.UserName",databaseUserName);
 		outConfig.set("GriefPrevention.Database.Password",databasePassword);
@@ -181,19 +188,23 @@ public class GriefPrevention extends JavaPlugin
 		this.config_claims_maxAccruedBlocks = config.getInt("GriefPrevention.Claims.MaxAccruedBlocks",5000);
 		outConfig.set("GriefPrevention.Claims.MaxAccruedBlocks", config_claims_maxAccruedBlocks);
 		
+		this.ModdedBlockRegexHelper = new RegExTestHelper(config,outConfig,"GriefPrevention.Mods.Containers",RegExTestHelper.DefaultContainers);
+		this.AccessRegexPattern = new RegExTestHelper(config,outConfig,"GriefPrevention.Mods.Access",RegExTestHelper.DefaultAccess);
+		this.OreBlockRegexHelper = new RegExTestHelper(config,outConfig,"GriefPrevention.Mods.Trash",RegExTestHelper.DefaultTrash);
+		
 		this.config_claims_initialBlocks = config.getInt("GriefPrevention.Claims.InitialBlocks",100);
-		this.ModdedBlockRegexPattern = config.getString("GriefPrevention.Mods.ContainerPattern","\\schest\\s|\\schests\\s|\\sfurnace\\s|\\sgrinder\\s|\\sextruder\\s|\\smachine\\s");
-		this.OreBlockRegexPattern = config.getString("GriefPrevention.Mods.OrePattern","\\sOre\\s");
-		this.AccessRegexPattern = config.getString("GriefPrevention.Mods.AccessPattern","\\sbutton\\s|\\sswitch\\s|\\sDoor\\s|\\sTrapdoor\\s");
-		this.config_mod_config_search = config.getBoolean("GriefPrevention.Mods.PerformConfigSearch",false);
-		outConfig.set("GriefPrevention.Mods.ContainerPattern",this.ModdedBlockRegexPattern);
-		outConfig.set("GriefPrevention.Mods.OrePattern",this.OreBlockRegexPattern);
+	    this.config_mod_config_search = config.getBoolean("GriefPrevention.Mods.PerformConfigSearch",true);
 		outConfig.set("GriefPrevention.Economy.ClaimBlocksPurchaseCost", this.config_economy_claimBlocksPurchaseCost);
 		outConfig.set("GriefPrevention.Economy.ClaimBlocksSellValue", this.config_economy_claimBlocksSellValue);
 		outConfig.set("GriefPrevention.Claims.InitialBlocks",config_claims_initialBlocks);
-		outConfig.set("GriefPrevention.Mods.PerformConfigSearch", config_mod_config_search);
+		outConfig.set("GriefPrevention.Mods.PerformConfigSearch", false);
 		
 		if(config_mod_config_search){
+			//Show message indicating what will happen. With mod_config_search enabled, we will search for configs and find
+			//IDs according to a regular expression, but for this entire session all World Configuration loads will
+			//change the configured values for modded containers and access blocks, so mention that.
+			AddLogEntry("Performing Configuration Search.");
+			AddLogEntry("World Configurations Loaded during this session will have their current Container and Access IDs Overwritten!");
 			this.ModdedBlocks= new ModdedBlocksSearchResults();
 			this.ModdedBlocks = ModBlockHelper.ScanCfgs();
 		}
@@ -2702,9 +2713,10 @@ public class GriefPrevention extends JavaPlugin
 			}
 			
 			//otherwise store the valid entry in config data
-			else
+			//but only if not currently in the list. 
+			else if(!materialCollection.contains(materialInfo))
 			{
-				materialCollection.Add(materialInfo);
+				materialCollection.add(materialInfo);
 			}
 		}		
 	}

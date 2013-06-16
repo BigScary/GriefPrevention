@@ -981,7 +981,8 @@ class PlayerEventHandler implements Listener
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(player.getWorld());
 		//if he's switching to the golden shovel
 		ItemStack newItemStack = player.getInventory().getItem(event.getNewSlot());
-		if(newItemStack != null && newItemStack.getType() == wc.getClaimsModificationTool())
+		if(newItemStack == null) return;
+		if(newItemStack.getType() == wc.getClaimsModificationTool())
 		{
 			PlayerData playerData = GriefPrevention.instance.dataStore.getPlayerData(player.getName());
 		
@@ -1003,6 +1004,12 @@ class PlayerEventHandler implements Listener
 				GriefPrevention.instance.getServer().getScheduler().scheduleSyncDelayedTask(GriefPrevention.instance, task, 15L);  //15L is approx. 3/4 of a second
 			}
 		}
+//		else if(newItemStack.getType() == wc.getClaimsAccessTrustTool()){
+//			//access trust
+//		}
+//		else if(newItemStack.getType() == wc.getClaimsContainerTrustTool()){
+//			
+//		}
 	}
 	
 	//block players from entering beds they don't have permission for
@@ -1290,7 +1297,7 @@ class PlayerEventHandler implements Listener
 				(clickedBlock.getState() instanceof InventoryHolder ||
 						ContainerMaterials.contains(clickedBlock) || 
 						
-						wc.getModsContainerTrustIds().Contains(new MaterialInfo(clickedBlock.getTypeId(), clickedBlock.getData(), null)))
+						wc.getModsContainerTrustIds().contains(new MaterialInfo(clickedBlock.getTypeId(), clickedBlock.getData(), null)))
 						))
 		{		
 			
@@ -1849,6 +1856,13 @@ class PlayerEventHandler implements Listener
 							GriefPrevention.sendMessage(player, TextMode.Err, Messages.ResizeNeedMoreBlocks, String.valueOf(Math.abs(blocksRemainingAfter)));
 							return;
 						}
+						else if(wc.getClaims_maxBlocks()>0){ //or if there is a maximum block setting on the world...
+							int worldblocksafter = playerData.getTotalClaimBlocksinWorld(player.getWorld())+playerData.claimResizing.getArea() - newArea;
+							if(worldblocksafter < 0){
+								GriefPrevention.sendMessage(player, TextMode.Err, Messages.InsufficientWorldBlocks, String.valueOf(Math.abs(worldblocksafter)));
+								return;
+							}
+						}
 					}
 				}
 				
@@ -2099,7 +2113,19 @@ class PlayerEventHandler implements Listener
 				//if not an administrative claim, verify the player has enough claim blocks for this new claim
 				if(playerData.shovelMode != ShovelMode.Admin)
 				{					
-					int newClaimArea = newClaimWidth * newClaimHeight; 
+					int newClaimArea = newClaimWidth * newClaimHeight;
+					
+					if(wc.getClaims_maxBlocks()>0){
+					
+						int currentworldclaim = playerData.getTotalClaimBlocksinWorld(player.getWorld());
+						int diff = currentworldclaim+newClaimArea-wc.getClaims_maxBlocks();
+						if(diff <0){
+							GriefPrevention.sendMessage(player,TextMode.Err,Messages.InsufficientWorldBlocks,Math.abs(diff));
+						}
+						
+						
+					}
+					
 					int remainingBlocks = playerData.getRemainingClaimBlocks();
 					if(newClaimArea > remainingBlocks)
 					{
@@ -2111,10 +2137,12 @@ class PlayerEventHandler implements Listener
 							playerData.lastShovelLocation= null;
 							Visualization.Revert(player);
 						}
-						else {
+						else
+						{
 						GriefPrevention.sendMessage(player, TextMode.Err, Messages.CreateClaimInsufficientBlocks, String.valueOf(newClaimArea - remainingBlocks));
 						GriefPrevention.sendMessage(player, TextMode.Instr, Messages.AbandonClaimAdvertisement);
 						}
+						
 						return;
 					}
 				}					
@@ -2155,6 +2183,13 @@ class PlayerEventHandler implements Listener
 							
 								//msg, and show visualization.
 								GriefPrevention.sendMessage(player, TextMode.Success, Messages.ClaimResizeSuccess,String.valueOf(playerData.getRemainingClaimBlocks()));
+								//show message if world-based claim block limit is in effect for this world.
+								if(wc.getClaims_maxBlocks()>0){
+									int worldblocksremaining = playerData.getRemainingClaimBlocks(player.getWorld());
+									GriefPrevention.sendMessage(player, TextMode.Success, Messages.RemainingBlocksWorld,worldblocksremaining);
+								}
+								
+								
 								Visualization visualization = Visualization.FromClaim(result.claim, clickedBlock.getY(), VisualizationType.Claim, player.getLocation());
 								Visualization.Apply(player, visualization);
 								return;
@@ -2179,6 +2214,19 @@ class PlayerEventHandler implements Listener
 				else
 				{					
 					GriefPrevention.sendMessage(player, TextMode.Success, Messages.CreateClaimSuccess);
+					
+					if(wc.getClaims_maxBlocks()>0){
+						int worldblocksremaining = playerData.getRemainingClaimBlocks(player.getWorld());
+						GriefPrevention.sendMessage(player, TextMode.Success, Messages.RemainingBlocksWorld,worldblocksremaining);
+					}
+					//if there is also a claim # limit, show the number they can still make.
+					if(wc.getClaimsPerPlayerLimit()>0){
+						int numclaims = playerData.getWorldClaims(player.getWorld()).size();
+						int remaining = wc.getClaimsPerPlayerLimit()-numclaims;
+						GriefPrevention.sendMessage(player, TextMode.Success, Messages.RemainingClaimsWorld,remaining);
+						
+					}
+					
 					Visualization visualization = Visualization.FromClaim(result.claim, clickedBlock.getY(), VisualizationType.Claim, player.getLocation());
 					Visualization.Apply(player, visualization);
 					playerData.lastShovelLocation = null;

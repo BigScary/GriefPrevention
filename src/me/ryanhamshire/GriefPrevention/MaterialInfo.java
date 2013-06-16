@@ -41,7 +41,19 @@ public class MaterialInfo
 		this.allDataValues = false;
 		this.description = description;
 	}
-	
+	public MaterialInfo(Material Source){
+		this.typeID = Source.getId();
+		this.data = 0;
+		this.allDataValues=true;
+		description = Source.name();
+	}
+	public MaterialInfo(MaterialInfo Source){
+		this.typeID = Source.getTypeID();
+		this.data = Source.getData();
+		this.allDataValues= Source.getallDataValues();
+		this.description = Source.getDescription();
+		
+	}
 	public MaterialInfo(int typeID, String description)
 	{
 		this.typeID = typeID;
@@ -63,7 +75,9 @@ public class MaterialInfo
 		}
 		this.description = description;
 	}
-	
+	public Object clone(){
+		return new MaterialInfo(this);
+	}
 	@Override
 	public String toString()
 	{
@@ -96,7 +110,7 @@ public class MaterialInfo
 		if(string == null || string.isEmpty()) return null;
 		
 		String [] parts = string.split(":");
-		if(parts.length < 3) return null;
+		if(parts.length < 2) return null;
 		
 		try
 		{
@@ -114,8 +128,8 @@ public class MaterialInfo
 				allDataValues = false;
 				data = Byte.parseByte(parts[1]);
 			}
-			
-			return new MaterialInfo(typeID, data, allDataValues, parts[2]);
+			String Name = parts.length<2?parts[2]:"X" + String.valueOf(typeID) + "$" + String.valueOf(data);
+			return new MaterialInfo(typeID, data, allDataValues, Name);
 		}
 		catch(NumberFormatException exception)
 		{
