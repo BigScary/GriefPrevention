@@ -12,6 +12,7 @@ import org.bukkit.World;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.WorldLoadEvent;
+import org.bukkit.event.world.WorldUnloadEvent;
 
 public class WorldWatcher implements Listener {
 	
@@ -34,12 +35,13 @@ public class WorldWatcher implements Listener {
 	}
 	
 	HashSet<World> storedloaded = new HashSet<World>(); //temp debugger...
-   //we need to watch world unload and load events; the latter, mostly.
-   //this is because when a world is unloaded and loaded again, it will be another world instance.
-   //this is an issue because the claims generally "index" themselves based on their location, and
-	//they will be holding a Location reference to a world that does not exist anymore. Thus we need to update
-	//all loaded claims. Hopefully the Location object references
-	//will still be valid for unloaded worlds at least in terms of their coordinates.
+	
+	@EventHandler
+	public void WorldUnload(WorldUnloadEvent event){
+		GriefPrevention.instance.dataStore.WorldUnloaded(event.getWorld());
+	}
+	
+
 	@EventHandler
 	public void WorldLoad(WorldLoadEvent event){
 		if(event.getWorld()==null) return;
@@ -49,34 +51,9 @@ public class WorldWatcher implements Listener {
 			while(null!=(r= WorldLoadDelegates.get(event.getWorld()).poll())){
 				r.run();
 			}
-			
-			
-			
 		}
 		
-		if(storedloaded.contains(event.getWorld())){
-			System.out.println("WorldLoad: World named " + event.getWorld().getName() + " Already exists!");
-		}
-		else {
-			storedloaded.add(event.getWorld());
-		}
-		System.out.println("stored Worlds:");
-		for(World iterate:storedloaded){
-			System.out.println("world:" + iterate.getName());
-		}
-		
-		
-		String searchWorld  = event.getWorld().getName();
-		System.out.println("World Load detected:" + event.getWorld().getName() + " applying reference fix-ups...");
-		if(GriefPrevention.instance ==null || GriefPrevention.instance.dataStore == null) return;
-		if(!GriefPrevention.instance.dataStore.getClaimArray().claimworldmap.contains(searchWorld)) return;
-		ArrayList<Claim> grablist = GriefPrevention.instance.dataStore.getClaimArray().claimworldmap.get(searchWorld);
-		//we need to fix-up All the claims.
-		for(Claim fixit:grablist){
-			System.out.println("fixed up claim owned by:" + fixit.ownerName + " in world:" + event.getWorld().getName());
-			fixit.lesserBoundaryCorner = Correspond(fixit.lesserBoundaryCorner,event.getWorld());
-			fixit.greaterBoundaryCorner = Correspond(fixit.greaterBoundaryCorner,event.getWorld());
-		}
+		GriefPrevention.instance.dataStore.WorldLoaded(event.getWorld());
 		//that should do it, simple enough.
 	}
 	

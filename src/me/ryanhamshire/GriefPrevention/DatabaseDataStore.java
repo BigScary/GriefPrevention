@@ -47,104 +47,14 @@ public class DatabaseDataStore extends DataStore
 		
 		this.initialize();
 	}
+
 	
 	@Override
-	void initialize() throws Exception
-	{
-		try
-		{
-			//load the java driver for mySQL
-			Class.forName("com.mysql.jdbc.Driver");
-		}
-		catch(Exception e)
-		{
-			GriefPrevention.AddLogEntry("ERROR: Unable to load Java's mySQL database driver.  Check to make sure you've installed it properly.");
-			throw e;
-		}
-		
-		try
-		{
-			this.refreshDataConnection();
-		}
-		catch(Exception e2)
-		{
-			GriefPrevention.AddLogEntry("ERROR: Unable to connect to database.  Check your config file settings.");
-			throw e2;
-		}
-		
-		try
-		{
-			//ensure the data tables exist
-			Statement statement = databaseConnection.createStatement();
-			
-			if (this.databaseUrl.startsWith("jdbc:postgresql"))
-			{
-				statement.execute("CREATE TABLE IF NOT EXISTS griefprevention_nextclaimid (nextid INTEGER);");
-
-				statement.execute("CREATE TABLE IF NOT EXISTS griefprevention_claimdata (id INTEGER, owner VARCHAR(50), lessercorner VARCHAR(100), greatercorner VARCHAR(100), builders TEXT, containers TEXT, accessors TEXT, managers TEXT, parentid INTEGER, neverdelete BOOLEAN NOT NULL DEFAULT false);");
-
-				statement.execute("CREATE TABLE IF NOT EXISTS griefprevention_playerdata (name VARCHAR(50), lastlogin TIMESTAMP WITH TIME ZONE, accruedblocks INTEGER, bonusblocks INTEGER);");
-			}
-			else
-			{
-				statement.execute("CREATE TABLE IF NOT EXISTS griefprevention_nextclaimid (nextid INT(15));");
-
-				statement.execute("CREATE TABLE IF NOT EXISTS griefprevention_claimdata (id INT(15), owner VARCHAR(50), lessercorner VARCHAR(100), greatercorner VARCHAR(100), builders VARCHAR(1000), containers VARCHAR(1000), accessors VARCHAR(1000), managers VARCHAR(1000), parentid INT(15), neverdelete BOOLEAN NOT NULL DEFAULT 0);");
-
-				statement.execute("CREATE TABLE IF NOT EXISTS griefprevention_playerdata (name VARCHAR(50), lastlogin DATETIME, accruedblocks INT(15), bonusblocks INT(15));");
-
-				ResultSet tempresult = statement.executeQuery("SHOW COLUMNS FROM griefprevention_claimdata LIKE 'neverdelete';");
-				if (!tempresult.next()) {
-					statement.execute("ALTER TABLE griefprevention_claimdata ADD neverdelete BOOLEAN NOT NULL DEFAULT 0;");
-				}
-			}
-		}
-		catch(Exception e3)
-		{
-			GriefPrevention.AddLogEntry("ERROR: Unable to create the necessary database table.  Details:");
-			GriefPrevention.AddLogEntry(e3.getMessage());
-			throw e3;
-		}
-		
-		//load group data into memory
+	void WorldLoaded(World loading){
+		try {
 		Statement statement = databaseConnection.createStatement();
-		ResultSet results = statement.executeQuery("SELECT * FROM griefprevention_playerdata;");
-		
-		while(results.next())
-		{
-			String name = results.getString("name");
-			
-			//ignore non-groups.  all group names start with a dollar sign.
-			if(!name.startsWith("$")) continue;
-			
-			String groupName = name.substring(1);
-			if(groupName == null || groupName.isEmpty()) continue;  //defensive coding, avoid unlikely cases
-			
-			int groupBonusBlocks = results.getInt("bonusblocks");
-				
-			this.permissionToBonusBlocksMap.put(groupName, groupBonusBlocks);			
-		}
-		
-		//load next claim number into memory
-		results = statement.executeQuery("SELECT * FROM griefprevention_nextclaimid;");
-		
-		//if there's nothing yet, add it
-		if(!results.next())
-		{
-			statement.execute("INSERT INTO griefprevention_nextclaimid VALUES(0);");
-			this.nextClaimID = (long)0;
-		}
-
-		//otherwise load it
-		else
-		{
-			this.nextClaimID = results.getLong("nextid");
-		}
-		
-		//load claims data into memory		
-		results = statement.executeQuery("SELECT * FROM griefprevention_claimdata;");
-		
-		ArrayList<Claim> claimsToRemove = new ArrayList<Claim>();
+		ResultSet results = statement.executeQuery("SELECT * FROM griefprevention_claimdata where lessercorner LIKE \"" + loading.getName() + ";%\";");
+ArrayList<Claim> claimsToRemove = new ArrayList<Claim>();
 		
 		while(results.next())
 		{
@@ -258,6 +168,110 @@ public class DatabaseDataStore extends DataStore
 		{
 			this.deleteClaimFromSecondaryStorage(claimsToRemove.get(i));
 		}
+		
+		}
+		catch(Exception exx){
+			
+		}
+		
+	}
+	@Override
+	void initialize() throws Exception
+	{
+		try
+		{
+			//load the java driver for mySQL
+			Class.forName("com.mysql.jdbc.Driver");
+		}
+		catch(Exception e)
+		{
+			GriefPrevention.AddLogEntry("ERROR: Unable to load Java's mySQL database driver.  Check to make sure you've installed it properly.");
+			throw e;
+		}
+		
+		try
+		{
+			this.refreshDataConnection();
+		}
+		catch(Exception e2)
+		{
+			GriefPrevention.AddLogEntry("ERROR: Unable to connect to database.  Check your config file settings.");
+			throw e2;
+		}
+		
+		try
+		{
+			//ensure the data tables exist
+			Statement statement = databaseConnection.createStatement();
+			
+			if (this.databaseUrl.startsWith("jdbc:postgresql"))
+			{
+				statement.execute("CREATE TABLE IF NOT EXISTS griefprevention_nextclaimid (nextid INTEGER);");
+
+				statement.execute("CREATE TABLE IF NOT EXISTS griefprevention_claimdata (id INTEGER, owner VARCHAR(50), lessercorner VARCHAR(100), greatercorner VARCHAR(100), builders TEXT, containers TEXT, accessors TEXT, managers TEXT, parentid INTEGER, neverdelete BOOLEAN NOT NULL DEFAULT false);");
+
+				statement.execute("CREATE TABLE IF NOT EXISTS griefprevention_playerdata (name VARCHAR(50), lastlogin TIMESTAMP WITH TIME ZONE, accruedblocks INTEGER, bonusblocks INTEGER);");
+			}
+			else
+			{
+				statement.execute("CREATE TABLE IF NOT EXISTS griefprevention_nextclaimid (nextid INT(15));");
+
+				statement.execute("CREATE TABLE IF NOT EXISTS griefprevention_claimdata (id INT(15), owner VARCHAR(50), lessercorner VARCHAR(100), greatercorner VARCHAR(100), builders VARCHAR(1000), containers VARCHAR(1000), accessors VARCHAR(1000), managers VARCHAR(1000), parentid INT(15), neverdelete BOOLEAN NOT NULL DEFAULT 0);");
+
+				statement.execute("CREATE TABLE IF NOT EXISTS griefprevention_playerdata (name VARCHAR(50), lastlogin DATETIME, accruedblocks INT(15), bonusblocks INT(15));");
+
+				ResultSet tempresult = statement.executeQuery("SHOW COLUMNS FROM griefprevention_claimdata LIKE 'neverdelete';");
+				if (!tempresult.next()) {
+					statement.execute("ALTER TABLE griefprevention_claimdata ADD neverdelete BOOLEAN NOT NULL DEFAULT 0;");
+				}
+			}
+		}
+		catch(Exception e3)
+		{
+			GriefPrevention.AddLogEntry("ERROR: Unable to create the necessary database table.  Details:");
+			GriefPrevention.AddLogEntry(e3.getMessage());
+			throw e3;
+		}
+		
+		//load group data into memory
+		Statement statement = databaseConnection.createStatement();
+		ResultSet results = statement.executeQuery("SELECT * FROM griefprevention_playerdata;");
+		
+		while(results.next())
+		{
+			String name = results.getString("name");
+			
+			//ignore non-groups.  all group names start with a dollar sign.
+			if(!name.startsWith("$")) continue;
+			
+			String groupName = name.substring(1);
+			if(groupName == null || groupName.isEmpty()) continue;  //defensive coding, avoid unlikely cases
+			
+			int groupBonusBlocks = results.getInt("bonusblocks");
+				
+			this.permissionToBonusBlocksMap.put(groupName, groupBonusBlocks);			
+		}
+		
+		//load next claim number into memory
+		results = statement.executeQuery("SELECT * FROM griefprevention_nextclaimid;");
+		
+		//if there's nothing yet, add it
+		if(!results.next())
+		{
+			statement.execute("INSERT INTO griefprevention_nextclaimid VALUES(0);");
+			this.nextClaimID = (long)0;
+		}
+
+		//otherwise load it
+		else
+		{
+			this.nextClaimID = results.getLong("nextid");
+		}
+		
+		//load claims data into memory		
+		results = statement.executeQuery("SELECT * FROM griefprevention_claimdata;");
+		
+		
 		
 		super.initialize();
 	}

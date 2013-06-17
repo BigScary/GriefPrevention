@@ -24,6 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 
 import me.ryanhamshire.GriefPrevention.Configuration.WorldConfig;
+import me.ryanhamshire.GriefPrevention.Debugger.DebugLevel;
 import me.ryanhamshire.GriefPrevention.events.ClaimCreatedEvent;
 import me.ryanhamshire.GriefPrevention.events.ClaimDeletedEvent;
 import me.ryanhamshire.GriefPrevention.events.ClaimResizeEvent;
@@ -66,7 +67,7 @@ public abstract class DataStore
 	//initialization!
 	void initialize() throws Exception
 	{
-		GriefPrevention.AddLogEntry(this.claims.size() + " total claims loaded.");
+		/*GriefPrevention.AddLogEntry(this.claims.size() + " total claims loaded.");
 		
 		//make a list of players who own claims
 		Vector<String> playerNames = new Vector<String>();
@@ -82,7 +83,7 @@ public abstract class DataStore
 		}
 		
 		GriefPrevention.AddLogEntry(playerNames.size() + " players have staked claims.");
-		
+		*/
 		//load up all the messages from messages.yml
 		this.loadMessages();
 		
@@ -360,7 +361,21 @@ public abstract class DataStore
 	}
 	
 	abstract PlayerData getPlayerDataFromStorage(String playerName);
-	
+	void WorldUnloaded(World worldunload)
+	{
+		Debugger.Write("World " + worldunload + " is unloading. Saving claims...",DebugLevel.Verbose);
+		int accum =0;
+		try {
+		for(Claim c:this.getClaimArray().claimworldmap.get(worldunload.getName())){
+			this.saveClaim(c);
+			this.getClaimArray().removeID(c.getID()); //remove this claim.;
+			accum++;
+		}
+		}
+		catch(Exception exx){}
+		Debugger.Write("Saved and removed " + accum + " Claims.",DebugLevel.Verbose);
+	}
+	abstract void WorldLoaded(World worldload);
 	synchronized public boolean deleteClaim(Claim claim){
 		return deleteClaim(claim,null);
 	}

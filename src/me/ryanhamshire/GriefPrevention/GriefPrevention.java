@@ -58,6 +58,7 @@ import org.bukkit.command.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.PluginManager;
@@ -343,6 +344,14 @@ public class GriefPrevention extends JavaPlugin
 		}
 		ww = new WorldWatcher();
 		Bukkit.getPluginManager().registerEvents(ww, this);
+		//go through all available worlds, and fire a "world load" event for them.
+		for(World iterate:Bukkit.getWorlds()){
+			WorldLoadEvent wle = new WorldLoadEvent(iterate);
+			ww.WorldLoad(wle);
+		}
+		
+		
+		
 	}
 	private void HandleClaimClean(Claim c,MaterialInfo source,MaterialInfo target,Player player){
 		Location lesser = c.getLesserBoundaryCorner();
