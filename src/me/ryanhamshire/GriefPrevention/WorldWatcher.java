@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
 
+import me.ryanhamshire.GriefPrevention.Debugger.DebugLevel;
+
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.event.EventHandler;
@@ -21,7 +23,7 @@ public class WorldWatcher implements Listener {
 	
 	
 	private Location Correspond(Location Source,World Target){
-		System.out.println("Creating corresponding location, Source is in " + Source.getWorld().getName() + " And target is in " + Target.getName() + " Equal:" + Source.getWorld().equals(Target));
+		//System.out.println("Creating corresponding location, Source is in " + Source.getWorld().getName() + " And target is in " + Target.getName() + " Equal:" + Source.getWorld().equals(Target));
 		return new Location(Target,Source.getX(),Source.getY(),Source.getZ());
 	}
 	public HashMap<String,Queue<Runnable>> WorldLoadDelegates = new HashMap<String,Queue<Runnable>>();
@@ -47,9 +49,14 @@ public class WorldWatcher implements Listener {
 		if(event.getWorld()==null) return;
 		
 		if(WorldLoadDelegates.containsKey(event.getWorld().getName())){
+			int randelegates = 0;
 			Runnable r=null;
 			while(null!=(r= WorldLoadDelegates.get(event.getWorld()).poll())){
 				r.run();
+				randelegates++;
+			}
+			if(randelegates > 0 && GriefPrevention.instance.DebuggingLevel==DebugLevel.Verbose){
+				System.out.println("Ran " + randelegates + " WorldLoad Delegates.");
 			}
 		}
 		

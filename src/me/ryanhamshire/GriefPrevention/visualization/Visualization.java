@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import me.ryanhamshire.GriefPrevention.Claim;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import me.ryanhamshire.GriefPrevention.PlayerData;
+import me.ryanhamshire.GriefPrevention.Configuration.WorldConfig;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -218,6 +219,9 @@ public class Visualization
 	//helper method for above.  allows visualization blocks to sit underneath partly transparent blocks like grass and fence
 	private static boolean isTransparent(Block block)
 	{
+		WorldConfig applicableWorld = GriefPrevention.instance.getWorldCfg(block.getWorld());
+		if(applicableWorld.getModsContainerTrustIds().contains(block.getType())) return true;
+		if(applicableWorld.getModsAccessTrustIds().contains(block.getType())) return true;
 		return (	block.getType() == Material.AIR ||
 					block.getType() == Material.LONG_GRASS ||
 					block.getType() == Material.FENCE ||
@@ -226,6 +230,8 @@ public class Visualization
 					block.getType() == Material.CHEST ||
 					block.getType() == Material.TORCH ||
 					block.getType() == Material.VINE ||
-					block.getType() == Material.YELLOW_FLOWER );
+					block.getType() == Material.YELLOW_FLOWER ||
+					block.getType() == Material.CHEST ||
+					block.getType() == Material.ENDER_CHEST);
 	}
 }

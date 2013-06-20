@@ -41,9 +41,9 @@ public class DeliverClaimBlocksTask implements Runnable
 		
 		
 		//for each online player
-		for(int i = 0; i < players.length; i++)
+		for(Player player:players)
 		{
-			Player player = players[i];
+			
 			WorldConfig wc = GriefPrevention.instance.getWorldCfg(player.getWorld());
 			
 			int accruedBlocks = Math.max(1, (int)(wc.getClaimBlocksAccruedPerHour() / 12));
@@ -59,7 +59,7 @@ public class DeliverClaimBlocksTask implements Runnable
 				//if he's not in a vehicle and has moved at least three blocks since the last check
 				//and he's not being pushed around by fluids
 				if(!player.isInsideVehicle() && 
-				   (lastLocation == null || lastLocation.distanceSquared(player.getLocation()) >= 9) &&
+				   (lastLocation == null || lastLocation.distanceSquared(player.getLocation()) >= wc.getafkDistanceCheck()) &&
 				   !player.getLocation().getBlock().isLiquid())
 				{					
 					//if player is over accrued limit, accrued limit was probably reduced in config file AFTER he accrued

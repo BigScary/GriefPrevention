@@ -28,6 +28,7 @@ import java.util.regex.Pattern;
 import me.ryanhamshire.GriefPrevention.Configuration.ClaimBehaviourData.ClaimAllowanceConstants;
 import me.ryanhamshire.GriefPrevention.Configuration.ClaimBehaviourData;
 import me.ryanhamshire.GriefPrevention.Configuration.WorldConfig;
+import me.ryanhamshire.GriefPrevention.Debugger.DebugLevel;
 import me.ryanhamshire.GriefPrevention.tasks.EquipShovelProcessingTask;
 import me.ryanhamshire.GriefPrevention.tasks.PlayerKickBanTask;
 import me.ryanhamshire.GriefPrevention.visualization.Visualization;
@@ -1009,7 +1010,7 @@ class PlayerEventHandler implements Listener
 		else if(newItemStack.getType()== wc.getAdministrationTool()){
 			//make sure they have permission.
 			if(player.hasPermission("GriefPrevention.Administration")){
-			    GriefPrevention.sendMessage(player, TextMode.Info, "GriefPrevention Admin tool selected. Right-Click to add to container list. Shift Right-click to add to All container lists.");
+			    GriefPrevention.sendMessage(player, TextMode.Info, "GriefPrevention Admin tool selected. Left-Click to add to container list. Shift Left-click to add to only the current world.");
 			}
 			
 			
@@ -1199,25 +1200,26 @@ class PlayerEventHandler implements Listener
 		//determine target block.  FEATURE: shovel and stick can be used from a distance away
 		Block clickedBlock = event.getClickedBlock();
 		
-		//this block shows some debug info...
-		StringBuffer sb = new StringBuffer();
-		sb.append("Clicked:");
-		if(clickedBlock!=null)
-		{
-			sb.append(clickedBlock.getType().name());
-			sb.append("State:" + clickedBlock.getState()==null);
-			if(clickedBlock.getState()!=null)
-				sb.append(" " + clickedBlock.getState().getClass().getName());
-		}
-		sb.append(",");
-		if(event!=null){
-			if(event.getItem()!=null){
-				sb.append("Item:" + event.getItem().getType().name() + " ts:" + event.getItem().toString());
-				
+		//this block shows some debug info, but only when DebuggingLevel is set to verbose.
+		if(GriefPrevention.instance.DebuggingLevel==DebugLevel.Verbose){
+			StringBuffer sb = new StringBuffer();
+			sb.append("Clicked:");
+			if(clickedBlock!=null)
+			{
+				sb.append(clickedBlock.getType().name());
+				sb.append("State:" + clickedBlock.getState()==null);
+				if(clickedBlock.getState()!=null)
+					sb.append(" " + clickedBlock.getState().getClass().getName());
 			}
+			sb.append(",");
+			if(event!=null){
+				if(event.getItem()!=null){
+					sb.append("Item:" + event.getItem().getType().name() + " ts:" + event.getItem().toString());
+					
+				}
+			}
+			System.out.println(sb.toString());
 		}
-		System.out.println(sb.toString());
-		
 		
 		//if null, initialize.
 		if(GPTools==null){
@@ -1294,7 +1296,7 @@ class PlayerEventHandler implements Listener
 		
 			if(player.hasPermission("GriefPrevention.Administration")){
 				//if shifting, add to all worlds...
-				if(event.getAction()==Action.RIGHT_CLICK_BLOCK){
+				if(event.getAction()==Action.LEFT_CLICK_BLOCK){
 					if (player.isSneaking()) {
 					GriefPrevention.instance.Configuration.AddContainerID(player, player.getWorld(), new MaterialInfo(event.getClickedBlock().getType()));
 					event.setCancelled(true);

@@ -46,21 +46,30 @@ public class WorldConfig {
 	 */
 	public ClaimBehaviourData getTrashBlockPlacementBehaviour() { return TrashBlockPlacementBehaviour;}
 	
-	//data for Creeper Explosions. This indicates where they can occur.
-	private ClaimBehaviourData CreeperExplosionBehaviour;
-	public ClaimBehaviourData getCreeperExplosionBehaviour(){ return CreeperExplosionBehaviour;}
-	//data for TNT Explosions. this indicates where they can occur. Applies for both TNT and TNT minecarts.
-	private ClaimBehaviourData TNTExplosionBehaviour;
-	public ClaimBehaviourData getTNTExplosionBehaviour(){ return TNTExplosionBehaviour;}
 	
+	private ClaimBehaviourData CreeperExplosionsBehaviour;
+	public ClaimBehaviourData getCreeperExplosionBehaviour(){ return CreeperExplosionsBehaviour;}
+	private ClaimBehaviourData TNTExplosionsBehaviour;
+	public ClaimBehaviourData getTNTExplosionBehaviour(){ return TNTExplosionsBehaviour;}
 	private ClaimBehaviourData WitherExplosionBehaviour;
 	public ClaimBehaviourData getWitherExplosionBehaviour(){ return WitherExplosionBehaviour;}
+	private ClaimBehaviourData OtherExplosionBehaviour;
+	public ClaimBehaviourData getOtherExplosionBehaviour(){ return OtherExplosionBehaviour;}
+	//data for Creeper Explosions. This indicates where they can occur.
+	private ClaimBehaviourData CreeperExplosionBlockDamageBehaviour;
+	public ClaimBehaviourData getCreeperExplosionBlockDamageBehaviour(){ return CreeperExplosionBlockDamageBehaviour;}
+	//data for TNT Explosions. this indicates where they can occur. Applies for both TNT and TNT minecarts.
+	private ClaimBehaviourData TNTExplosionBlockDamageBehaviour;
+	public ClaimBehaviourData getTNTExplosionBlockDamageBehaviour(){ return TNTExplosionBlockDamageBehaviour;}
+	
+	private ClaimBehaviourData WitherExplosionBlockDamageBehaviour;
+	public ClaimBehaviourData getWitherExplosionBlockDamageBehaviour(){ return WitherExplosionBlockDamageBehaviour;}
 	
 	private ClaimBehaviourData WitherEatBehaviour;
 	public ClaimBehaviourData getWitherEatBehaviour() { return WitherEatBehaviour;}
 	
-	public ClaimBehaviourData OtherExplosionBehaviour;
-	public ClaimBehaviourData getOtherExplosionBehaviour(){ return OtherExplosionBehaviour;}
+	public ClaimBehaviourData OtherExplosionBlockDamageBehaviour;
+	public ClaimBehaviourData getOtherExplosionBlockDamageBehaviour(){ return OtherExplosionBlockDamageBehaviour;}
 	
 	private ClaimBehaviourData WitherSpawnBehaviour; //data for how Withers can be spawned.
 	public ClaimBehaviourData getWitherSpawnBehaviour(){ return WitherSpawnBehaviour;}
@@ -114,7 +123,8 @@ public class WorldConfig {
 	
 	private boolean SiegeAutoTransfer;
 	public boolean getSiegeAutoTransfer(){ return SiegeAutoTransfer;}
-	
+	private ClaimBehaviourData ArrowWoodenTouchplateRules;
+	public ClaimBehaviourData getArrowWoodenTouchPlateRules(){ return ArrowWoodenTouchplateRules;}
 	private ClaimBehaviourData ArrowWoodenButtonRules;
 	public ClaimBehaviourData getArrowWoodenButtonRules() { return ArrowWoodenButtonRules;}
 	
@@ -245,7 +255,14 @@ public class WorldConfig {
 	private int config_SpamShortMessageTimeout;
 	private int config_SpamBanThreshold;
 	private int config_SpamMuteThreshold;
-	
+	private int config_afkDistanceCheck;
+	private int afkDistanceSquared=-1;
+	public int getafkDistanceCheck(){ return config_afkDistanceCheck;}
+	public int getafkDistanceSquared(){
+		//if the distance squared variable is set, retrieve it. if it is the default, set it and return that assignment result.
+		
+	return afkDistanceSquared!=-1?afkDistanceSquared:(afkDistanceSquared=(config_afkDistanceCheck*config_afkDistanceCheck));
+	}
 	
 	public int getSpamDelayThreshold(){ return config_SpamDelayThreshold;}
 	public int getSpamCapsMinLength(){ return config_SpamCapsMinLength;}
@@ -282,8 +299,8 @@ public class WorldConfig {
 	//than this many more claim blocks, the first corner will be reset. This is a "hack" for 
 	//modded servers where some events don't fire properly.
 	public int getInsufficientSneakResetBound(){ return InsufficientSneakResetBound;}
-	private int config_claims_trappedCooldownHours;					//number of hours between uses of the /trapped command
-	public int getClaimsTrappedCooldownHours(){ return config_claims_trappedCooldownHours;}
+	private int config_claims_trappedCooldownMinutes;					//number of minutes between uses of the /trapped command
+	public int getClaimsTrappedCooldownMinutes(){ return config_claims_trappedCooldownMinutes;}
 	
 	private Material config_claims_investigationTool;				//which material will be used to investigate claims with a right click
 	public Material getClaimsInvestigationTool(){ return config_claims_investigationTool;}
@@ -451,113 +468,126 @@ public class WorldConfig {
 		
 		outConfig.set("GriefPrevention.SeaLevelOverride", config_seaLevelOverride);
 		//read in the data for TNT explosions and Golem/Wither placements.
+		this.config_afkDistanceCheck = config.getInt("GriefPrevention.AFKDistance",3);
+		this.CreeperExplosionsBehaviour = new ClaimBehaviourData("Creeper Explosions",config,outConfig,"GriefPrevention.Rules.CreeperExplosions",
+				new ClaimBehaviourData("Creeper Explosions",PlacementRules.Both,PlacementRules.Both,ClaimBehaviourMode.Disabled));
+		this.WitherExplosionBehaviour = new ClaimBehaviourData("Wither Explosions",config,outConfig,"GriefPrevention.Rules.WitherExplosions",
+				new ClaimBehaviourData("Wither Explosions",PlacementRules.Neither,PlacementRules.Neither,ClaimBehaviourMode.Disabled));
 		
-		this.CreeperExplosionBehaviour = new ClaimBehaviourData("Creeper Explosions",config,outConfig,"GriefPrevention.CreeperExplosions",
-				new ClaimBehaviourData("Creeper Explosions",PlacementRules.Both,PlacementRules.BelowOnly,ClaimBehaviourMode.Disabled));
+		this.TNTExplosionsBehaviour = new ClaimBehaviourData("TNT Explosions",config,outConfig,"GriefPrevention.Rules.TNTExplosions",
 		
-		this.WitherExplosionBehaviour= new ClaimBehaviourData("Wither Explosions",config,outConfig,"GriefPrevention.WitherExplosions",
-				new ClaimBehaviourData("Creeper Explosions",PlacementRules.Both,PlacementRules.BelowOnly,ClaimBehaviourMode.Disabled));
+				ClaimBehaviourData.getAll("TNT Explosions"));
 		
-		this.WitherEatBehaviour = new ClaimBehaviourData("Wither Eating",config,outConfig,"GriefPrevention.WitherEating",
-				new ClaimBehaviourData("Creeper Explosions",PlacementRules.Both,PlacementRules.BelowOnly,ClaimBehaviourMode.Disabled));
+		this.OtherExplosionBehaviour = new ClaimBehaviourData("Other Explosions",config,outConfig,"GriefPrevention.Rules.OtherExplosions",
+				ClaimBehaviourData.getAll("Other Explosions"));
+		
+		this.CreeperExplosionBlockDamageBehaviour = new ClaimBehaviourData("Creeper Explosion Damage",config,outConfig,"GriefPrevention.Rules.BlockDamageCreeperExplosion",
+				new ClaimBehaviourData("Creeper Explosion Damage",PlacementRules.Both,PlacementRules.Neither,ClaimBehaviourMode.Disabled));
+		
+		this.WitherExplosionBlockDamageBehaviour= new ClaimBehaviourData("Wither Explosion Damage",config,outConfig,"GriefPrevention.Rules.BlockDamageWitherExplosions",
+				new ClaimBehaviourData("Wither Explosion Damage",PlacementRules.Both,PlacementRules.Neither,ClaimBehaviourMode.Disabled));
+		
+		this.WitherEatBehaviour = new ClaimBehaviourData("Wither Eating",config,outConfig,"GriefPrevention.Rules.WitherEating",
+				new ClaimBehaviourData("Wither Eating",PlacementRules.Both,PlacementRules.Neither,ClaimBehaviourMode.Disabled));
 		
 		
-		this.TNTExplosionBehaviour = new ClaimBehaviourData("TNT Explosions",config,outConfig,"GriefPrevention.TNTExplosions",
-				ClaimBehaviourData.getOutsideClaims("TNTExplosions"));
+		this.TNTExplosionBlockDamageBehaviour = new ClaimBehaviourData("TNT Explosion Damage",config,outConfig,"GriefPrevention.Rules.BlockDamageTNTExplosions",
+				ClaimBehaviourData.getOutsideClaims("TNT Explosion Damage"));
 		
-		this.OtherExplosionBehaviour = new ClaimBehaviourData("Other Explosions",config,outConfig,"GriefPrevention.OtherExplosions",
-				ClaimBehaviourData.getOutsideClaims("Other Explosions"));
+		this.OtherExplosionBlockDamageBehaviour = new ClaimBehaviourData("Other Explosion Damage",config,outConfig,"GriefPrevention.Rules.BlockDamageOtherExplosions",
+				ClaimBehaviourData.getOutsideClaims("Other Explosion Damage"));
 		
-		this.WaterBucketBehaviour = new ClaimBehaviourData("Water Placement",config,outConfig,"GriefPrevention.WaterBuckets",
+		this.WaterBucketBehaviour = new ClaimBehaviourData("Water Placement",config,outConfig,"GriefPrevention.Rules.WaterBuckets",
 		ClaimBehaviourData.getAboveSeaLevel("Water Placement"));
 		
-		this.LavaBucketBehaviour = new ClaimBehaviourData("Lava Placement",config,outConfig,"GriefPrevention.LavaBuckets",
+		this.LavaBucketBehaviour = new ClaimBehaviourData("Lava Placement",config,outConfig,"GriefPrevention.Rules.LavaBuckets",
 				ClaimBehaviourData.getAboveSeaLevel("Lava Placement"));
 		
 		//Snow golem spawn rules.
 		
-		this.IronGolemSpawnBehaviour = new ClaimBehaviourData("Iron Golem Spawning",config,outConfig,"GriefPrevention.BuildIronGolem",
+		this.IronGolemSpawnBehaviour = new ClaimBehaviourData("Iron Golem Spawning",config,outConfig,"GriefPrevention.Rules.BuildIronGolem",
 				ClaimBehaviourData.getInsideClaims("Iron Golem Spawning"));
 		
-		this.SnowGolemSpawnBehaviour = new ClaimBehaviourData("Snow Golem Spawning",config,outConfig,"GriefPrevention.BuildSnowGolem",
+		this.SnowGolemSpawnBehaviour = new ClaimBehaviourData("Snow Golem Spawning",config,outConfig,"GriefPrevention.Rules.BuildSnowGolem",
 				ClaimBehaviourData.getInsideClaims("Snow Golem Spawning"));
 		
 		
-		this.WitherSpawnBehaviour = new ClaimBehaviourData("Wither Spawning",config,outConfig,"GriefPrevention.BuildWither",
+		this.WitherSpawnBehaviour = new ClaimBehaviourData("Wither Spawning",config,outConfig,"GriefPrevention.Rules.BuildWither",
 				ClaimBehaviourData.getInsideClaims("Wither Spawning"));
 		
-		TrashBlockPlacementBehaviour = new ClaimBehaviourData("Trash Block Placement",config,outConfig,"GriefPrevention.TrashBlockPlacementRules",
+		TrashBlockPlacementBehaviour = new ClaimBehaviourData("Trash Block Placement",config,outConfig,"GriefPrevention.Rules.TrashBlockPlacementRules",
 				ClaimBehaviourData.getOutsideClaims("Trash Block Placement").setBehaviourMode(ClaimBehaviourMode.RequireBuild));
 		
-		VillagerTrades = new ClaimBehaviourData("Villager Trading",config,outConfig,"GriefPrevention.Claims.VillagerTrading",
+		VillagerTrades = new ClaimBehaviourData("Villager Trading",config,outConfig,"GriefPrevention.Rules.VillagerTrading",
 				ClaimBehaviourData.getInsideClaims("Villager Trading"));
 	
-		this.EnvironmentalVehicleDamage = new ClaimBehaviourData("Environmental Vehicle Damage",config,outConfig,"GriefPrevention.Claims.EnvironmentalVehicleDamage",
+		this.EnvironmentalVehicleDamage = new ClaimBehaviourData("Environmental Vehicle Damage",config,outConfig,"GriefPrevention.Rules.EnvironmentalVehicleDamage",
 				ClaimBehaviourData.getOutsideClaims("Environmental Vehicle Damage"));
 		
 		
-		this.ZombieDoorBreaking = new ClaimBehaviourData("Zombie Door Breaking",config,outConfig,"GriefPrevention.ZombieDoorBreaking",
+		this.ZombieDoorBreaking = new ClaimBehaviourData("Zombie Door Breaking",config,outConfig,"GriefPrevention.Rules.ZombieDoorBreaking",
 				ClaimBehaviourData.getNone("Zombie Door Breaking"));
 		
-		SheepShearingRules = new ClaimBehaviourData("Sheep Shearing",config,outConfig,"GriefPrevention.SheepShearing",
+		SheepShearingRules = new ClaimBehaviourData("Sheep Shearing",config,outConfig,"GriefPrevention.Rules.SheepShearing",
 				ClaimBehaviourData.getAll("Sheep Shearing").setBehaviourMode(ClaimBehaviourMode.RequireContainer));
 		
-		SheepDyeing = new ClaimBehaviourData("Sheep Dyeing",config,outConfig,"GriefPrevention.SheepDyeing",
+		SheepDyeing = new ClaimBehaviourData("Sheep Dyeing",config,outConfig,"GriefPrevention.Rules.SheepDyeing",
 				ClaimBehaviourData.getAll("Sheep Dyeing").setBehaviourMode(ClaimBehaviourMode.RequireContainer));
 		
-		this.BonemealGrass = new ClaimBehaviourData("Bonemeal",config,outConfig,"GriefPrevention.BonemealGrass",
+		this.BonemealGrass = new ClaimBehaviourData("Bonemeal",config,outConfig,"GriefPrevention.Rules.BonemealGrass",
 				ClaimBehaviourData.getAll("Bonemeal").setBehaviourMode(ClaimBehaviourMode.RequireBuild));
 		
-		this.PlayerTrampleRules = new ClaimBehaviourData("Crop Trampling",config,outConfig,"GriefPrevention.PlayerCropTrample",
+		this.PlayerTrampleRules = new ClaimBehaviourData("Crop Trampling",config,outConfig,"GriefPrevention.Rules.PlayerCropTrample",
 				ClaimBehaviourData.getAll("Crop Trampling").setBehaviourMode(ClaimBehaviourMode.RequireBuild));
 		
-		this.EndermanPickupRules = new ClaimBehaviourData("Enderman Pickup",config,outConfig,"GriefPrevention.EndermanPickup",
+		this.EndermanPickupRules = new ClaimBehaviourData("Enderman Pickup",config,outConfig,"GriefPrevention.Rules.EndermanPickup",
 				ClaimBehaviourData.getNone("Enderman Pickup"));
 		
-		this.EndermanPlacementRules = new ClaimBehaviourData("Enderman Placement",config,outConfig,"GriefPrevention.EndermanPlacement",
+		this.EndermanPlacementRules = new ClaimBehaviourData("Enderman Placement",config,outConfig,"GriefPrevention.Rules.EndermanPlacement",
 				ClaimBehaviourData.getNone("Enderman Placement"));
 		
-		this.ArrowWoodenButtonRules = new ClaimBehaviourData("Arrows Trigger Wood Buttons",config,outConfig,"GriefPrevention.ArrowsHitWoodButtons",
+		this.ArrowWoodenButtonRules = new ClaimBehaviourData("Arrows Trigger Wood Buttons",config,outConfig,"GriefPrevention.Rules.ArrowsHitWoodButtons",
 				ClaimBehaviourData.getAll("Arrows Trigger Wood Buttons").setBehaviourMode(ClaimBehaviourMode.RequireAccess));
 		
-		this.BlockTweakRules = new ClaimBehaviourData("Block Tweaking",config,outConfig,"GriefPrevention.BlockTweaking",
+		this.BlockTweakRules = new ClaimBehaviourData("Block Tweaking",config,outConfig,"GriefPrevention.Rules.BlockTweaking",
 				ClaimBehaviourData.getAll("Block Tweaking").setBehaviourMode(ClaimBehaviourMode.RequireAccess));
 		
 		
-		this.ContainersRules = new ClaimBehaviourData("Containers",config,outConfig,"GriefPrevention.Containers",
+		this.ContainersRules = new ClaimBehaviourData("Containers",config,outConfig,"GriefPrevention.Rules.Containers",
 				ClaimBehaviourData.getAll("Containers").setBehaviourMode(ClaimBehaviourMode.RequireContainer)); //defaults to only allowing theft outside claims.
 		
-		this.CreatureDamage = new ClaimBehaviourData("Creature Damage",config,outConfig,"GriefPrevention.CreatureDamage",
+		this.CreatureDamage = new ClaimBehaviourData("Creature Damage",config,outConfig,"GriefPrevention.Rules.CreatureDamage",
 				ClaimBehaviourData.getAll("Creature Damage").setBehaviourMode(ClaimBehaviourMode.RequireContainer));
 
-		this.WoodenDoors = new ClaimBehaviourData("Wooden Doors",config,outConfig,"GriefPrevention.WoodenDoors",
+		this.WoodenDoors = new ClaimBehaviourData("Wooden Doors",config,outConfig,"GriefPrevention.Rules.WoodenDoors",
 				ClaimBehaviourData.getAll("Wooden Doors").setBehaviourMode(ClaimBehaviourMode.RequireNone));
 		
-		this.TrapDoors= new ClaimBehaviourData("TrapDoors",config,outConfig,"GriefPrevention.TrapDoors",
+		this.TrapDoors= new ClaimBehaviourData("TrapDoors",config,outConfig,"GriefPrevention.Rules.TrapDoors",
 				ClaimBehaviourData.getAll("TrapDoors").setBehaviourMode(ClaimBehaviourMode.RequireNone));
 		
-		this.FenceGates = new ClaimBehaviourData("Fence Gates",config,outConfig,"GriefPrevention.FenceGates",
+		this.FenceGates = new ClaimBehaviourData("Fence Gates",config,outConfig,"GriefPrevention.Rules.FenceGates",
 				ClaimBehaviourData.getAll("Fence Gates").setBehaviourMode(ClaimBehaviourMode.RequireNone));
 		
-		this.EnderPearlOrigins = new ClaimBehaviourData("EnderPearl Origins",config,outConfig,"GriefPrevention.EnderPearlOrigin",
+		this.EnderPearlOrigins = new ClaimBehaviourData("EnderPearl Origins",config,outConfig,"GriefPrevention.Rules.EnderPearlOrigin",
 				ClaimBehaviourData.getAll("EnderPearl Origins").setBehaviourMode(ClaimBehaviourMode.RequireAccess));
 		
-		this.EnderPearlTargets = new ClaimBehaviourData("EnderPearl Targets",config,outConfig,"GriefPrevention.EnderPearlTarget",
+		this.EnderPearlTargets = new ClaimBehaviourData("EnderPearl Targets",config,outConfig,"GriefPrevention.Rules.EnderPearlTarget",
 				ClaimBehaviourData.getAll("EnderPearl Targets").setBehaviourMode(ClaimBehaviourMode.RequireAccess));
 		
-		this.StonePressurePlates = new ClaimBehaviourData("Stone Pressure Plates",config,outConfig,"GriefPrevention.StonePressurePlates",
+		this.StonePressurePlates = new ClaimBehaviourData("Stone Pressure Plates",config,outConfig,"GriefPrevention.Rules.StonePressurePlates",
 				ClaimBehaviourData.getAll("Stone Pressure Plates").setBehaviourMode(ClaimBehaviourMode.RequireNone));
 		
-		this.WoodPressurePlates = new ClaimBehaviourData("Wooden Pressure Plates",config,outConfig,"GriefPrevention.WoodenPressurePlates",
+		this.WoodPressurePlates = new ClaimBehaviourData("Wooden Pressure Plates",config,outConfig,"GriefPrevention.Rules.WoodenPressurePlates",
 				ClaimBehaviourData.getAll("Wooden Pressure Plates").setBehaviourMode(ClaimBehaviourMode.RequireNone));
-		
-		this.StoneButton = new ClaimBehaviourData("Stone Button",config,outConfig,"GriefPrevention.StoneButton",
+		this.ArrowWoodenTouchplateRules = new ClaimBehaviourData("Wooden Touchplate",config,outConfig,"GriefPrevention.Rules.ArrowWoodenPressurePlate",
+				ClaimBehaviourData.getAll("Wooden Pressure Plates Arrows").setBehaviourMode(ClaimBehaviourMode.RequireNone));
+		this.StoneButton = new ClaimBehaviourData("Stone Button",config,outConfig,"GriefPrevention.Rules.StoneButton",
 				ClaimBehaviourData.getAll("Stone Button").setBehaviourMode(ClaimBehaviourMode.RequireAccess));
 		
-		this.WoodenButton = new ClaimBehaviourData("Wooden Button",config,outConfig,"GriefPrevention.WoodenButton",
+		this.WoodenButton = new ClaimBehaviourData("Wooden Button",config,outConfig,"GriefPrevention.Rules.WoodenButton",
 				ClaimBehaviourData.getAll("Wooden Button").setBehaviourMode(ClaimBehaviourMode.RequireAccess));
 		
-		this.Levers = new ClaimBehaviourData("Levers",config,outConfig,"GriefPrevention.Levers",
+		this.Levers = new ClaimBehaviourData("Levers",config,outConfig,"GriefPrevention.Rules.Levers",
 				ClaimBehaviourData.getAll("Levers").setBehaviourMode(ClaimBehaviourMode.RequireAccess));
 		/*private ClaimBehaviourData ContainerTheft;
 	public ClaimBehaviourData getContainerTheft(){ return ContainerTheft;}
@@ -676,7 +706,8 @@ public class WorldConfig {
 		this.config_claims_creationRequiresPermission = config.getBoolean("GriefPrevention.Claims.CreationRequiresPermission", false);
 		this.config_claims_minSize = config.getInt("GriefPrevention.Claims.MinimumSize", 10);
 		this.config_claims_maxDepth = config.getInt("GriefPrevention.Claims.MaximumDepth", 0);
-		this.config_claims_trappedCooldownHours = config.getInt("GriefPrevention.Claims.TrappedCommandCooldownHours", 8);
+		this.config_claims_trappedCooldownMinutes = config.getInt("GriefPrevention.Claims.TrappedCommandCooldownMinutes", 8*60);
+		 
 		this.config_claims_ApplyTrashBlockRules = config.getBoolean("GriefPrevention.Claims.NoSurvivalBuildingOutsideClaims", false);
 		this.config_claims_warnOnBuildOutside = config.getBoolean("GriefPrevention.Claims.WarnWhenBuildingOutsideClaims", true);
 		this.config_claims_allowUnclaim = config.getBoolean("GriefPrevention.Claims.AllowUnclaimingLand", true);
@@ -956,7 +987,7 @@ public class WorldConfig {
 		outConfig.set("GriefPrevention.Claims.CreationRequiresPermission", this.config_claims_creationRequiresPermission);
 		outConfig.set("GriefPrevention.Claims.MinimumSize", this.config_claims_minSize);
 		outConfig.set("GriefPrevention.Claims.MaximumDepth", this.config_claims_maxDepth);
-		outConfig.set("GriefPrevention.Claims.TrappedCommandCooldownHours", this.config_claims_trappedCooldownHours);
+		outConfig.set("GriefPrevention.Claims.TrappedCommandCooldownMinutes", this.config_claims_trappedCooldownMinutes);
 		outConfig.set("GriefPrevention.Claims.InvestigationTool", this.config_claims_investigationTool.name());
 		outConfig.set("GriefPrevention.Claims.ModificationTool", this.config_claims_modificationTool.name());
 		outConfig.set("GriefPrevention.Claims.NoSurvivalBuildingOutsideClaims", this.config_claims_ApplyTrashBlockRules);

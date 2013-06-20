@@ -218,9 +218,26 @@ class EntityEventHandler implements Listener
 				
 				
 			}
+			else if(event.getBlock().getType() == Material.WOOD_PLATE){
+				
+				if(wc.getArrowWoodenTouchPlateRules().Allowed(event.getBlock().getLocation(), source).Denied()){
+					event.setCancelled(true);
+					proj.remove();
+					return;
+				}
+			}
 			
 			
 		}
+		if(event.getBlock().getType()==Material.STONE_PLATE){
+			Player grabplayer = event.getEntity() instanceof Player?(Player)event.getEntity():null;
+			if(wc.getStonePressurePlates().Allowed(event.getBlock().getLocation(), grabplayer).Denied()){
+				event.setCancelled(true);
+			
+				return;
+			}
+		}
+		
 		if(!wc.creaturesTrampleCrops() && event.getBlock().getType() == Material.SOIL)
 		{
 			event.setCancelled(true);
@@ -249,15 +266,34 @@ class EntityEventHandler implements Listener
 		boolean isWither = explodingEntity !=null && (
 				explodingEntity instanceof WitherSkull || explodingEntity instanceof Wither);
 		
+		
+		ClaimBehaviourData preExplodeCheck = null;
+		
+		if(isCreeper)
+			preExplodeCheck = wc.getCreeperExplosionBehaviour();
+		else if(isWither)
+			preExplodeCheck = wc.getWitherExplosionBehaviour();
+		else if(isTNT)
+			preExplodeCheck = wc.getTNTExplosionBehaviour();
+		else
+			preExplodeCheck = wc.getOtherExplosionBehaviour();
+		
+		
+		if(preExplodeCheck.Allowed(explodeEvent.getLocation(), null).Denied()) {
+			explodeEvent.setCancelled(true);
+			return;
+		}
+		
+		
 		ClaimBehaviourData usebehaviour = null;
 		if(isCreeper) 
-			usebehaviour = wc.getCreeperExplosionBehaviour();
+			usebehaviour = wc.getCreeperExplosionBlockDamageBehaviour();
 		else if(isWither) 
-			usebehaviour = wc.getWitherExplosionBehaviour();
+			usebehaviour = wc.getWitherExplosionBlockDamageBehaviour();
 		else if(isTNT) 
-			usebehaviour = wc.getTNTExplosionBehaviour();
+			usebehaviour = wc.getTNTExplosionBlockDamageBehaviour();
 		else 
-			usebehaviour = wc.getOtherExplosionBehaviour();
+			usebehaviour = wc.getOtherExplosionBlockDamageBehaviour();
 		Claim claimpos = null;
 		////go through each block that was affected...
 		for(int i=0;i<blocks.size();i++){
@@ -750,7 +786,8 @@ class EntityEventHandler implements Listener
 			
 			PlayerData defenderData = this.dataStore.getPlayerData(((Player)event.getEntity()).getName());
 			PlayerData attackerData = this.dataStore.getPlayerData(attacker.getName());
-			
+			if(defender instanceof Player && attacker instanceof Player)
+				if(!defender.isOnline() || !attacker.isOnline()) return;
 			//otherwise if protecting spawning players
 			if(wc.getProtectFreshSpawns())
 			{

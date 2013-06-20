@@ -27,6 +27,7 @@ import java.util.*;
 import me.ryanhamshire.GriefPrevention.exceptions.WorldNotFoundException;
 
 import org.bukkit.*;
+import org.bukkit.entity.Player;
 
 //manages data stored in the file system
 public class FlatFileDataStore extends DataStore
@@ -504,8 +505,11 @@ public class FlatFileDataStore extends DataStore
 		//if it doesn't exist as a file
 		if(!playerFile.exists())
 		{
-			//create a file with defaults
-			this.savePlayerData(playerName, playerData);
+			//create a file with defaults, but only if the player has been online before.
+			Player playerobj = Bukkit.getPlayer(playerName);
+			if(playerobj.hasPlayedBefore() || playerobj.isOnline()){
+			    this.savePlayerData(playerName, playerData);
+			}
 		}
 		
 		//otherwise, read the file

@@ -69,10 +69,13 @@ public class RegExTestHelper {
 				"\\sTank\\s|\\sCrucible\\s|smelter\\s|\\sworkbench\\s|\\stable\\s|" + 
 		
 				
-				"//sAutoCrafter//s|//sCharger//s|//sIceGen//s|//sSawmill//s|//sTransposer//s|//sWaterGen//s","");
+				"//sAutoCrafter//s|//sCharger//s|//sIceGen//s|//sSawmill//s|//sTransposer//s|//sWaterGen//s" +
+				"//s.*Shelf//s|//s.*Case//s|//s.*Rack//s|//s.*Label//s|//s.*Desk//s|//s.*Stand//s","");
+	
+	
 	
 	public static RegExTestHelper DefaultAccess = new RegExTestHelper("\\sbutton\\s|\\sswitch\\s|\\sDoor\\s|\\sTrapdoor\\s","");
-	public static RegExTestHelper DefaultTrash = new RegExTestHelper("\\sOre\\z","");
+	public static RegExTestHelper DefaultTrash = new RegExTestHelper("\\sOre\\z|\\sdirt\\s","");
 	
 	public RegExTestHelper(FileConfiguration Source,FileConfiguration Target,String NodePath,RegExTestHelper Default){
 		//NodePath.IncludeRE

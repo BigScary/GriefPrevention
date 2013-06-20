@@ -5,6 +5,9 @@ import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import me.ryanhamshire.GriefPrevention.Messages;
 import me.ryanhamshire.GriefPrevention.PlayerData;
 import me.ryanhamshire.GriefPrevention.TextMode;
+import me.ryanhamshire.GriefPrevention.events.PermissionCheckEvent;
+
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 //this enum is used for some of the configuration options.
@@ -177,6 +180,13 @@ public class ClaimBehaviourData {
 		boolean ignoringclaims = false;
 		if(RelevantPlayer!=null) pd = GriefPrevention.instance.dataStore.getPlayerData(RelevantPlayer.getName());
 		if(pd!=null) ignoringclaims = pd.ignoreClaims;
+		
+		PermissionCheckEvent permcheck = new PermissionCheckEvent(this,RelevantPlayer);
+		Bukkit.getPluginManager().callEvent(permcheck);
+		if(permcheck.getResult()!=null){
+			return permcheck.getResult();
+		}
+		
 		
 		Claim testclaim = GriefPrevention.instance.dataStore.getClaimAt(position, true, null);
 		if(testclaim!=null){

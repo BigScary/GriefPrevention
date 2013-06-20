@@ -445,7 +445,7 @@ public class GriefPrevention extends JavaPlugin
 		if(cmd.getName().equalsIgnoreCase("gphelp") && player != null){
 		String topic="index";
 		if(args.length>0) topic = args[0];
-		handleHelp(player,topic);
+			handleHelp(player,topic);
 		
 			
 		}
@@ -1731,11 +1731,11 @@ public class GriefPrevention extends JavaPlugin
 			
 			//check cooldown
 			long lastTrappedUsage = playerData.lastTrappedUsage.getTime();
-			long nextTrappedUsage = lastTrappedUsage + 1000 * 60 * 60 * wc.getClaimsTrappedCooldownHours(); 
+			long nextTrappedUsage = lastTrappedUsage + 1000 * 60 * wc.getClaimsTrappedCooldownMinutes(); 
 			long now = Calendar.getInstance().getTimeInMillis();
 			if(now < nextTrappedUsage)
 			{
-				GriefPrevention.sendMessage(player, TextMode.Err, Messages.TrappedOnCooldown, String.valueOf(wc.getClaimsTrappedCooldownHours()), String.valueOf((nextTrappedUsage - now) / (1000 * 60) + 1));
+				GriefPrevention.sendMessage(player, TextMode.Err, Messages.TrappedOnCooldown, String.valueOf(wc.getClaimsTrappedCooldownMinutes()), String.valueOf((nextTrappedUsage - now) / (1000 * 60) + 1));
 				return true;
 			}
 			
