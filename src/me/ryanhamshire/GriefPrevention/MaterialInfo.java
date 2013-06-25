@@ -110,7 +110,15 @@ public class MaterialInfo
 		if(string == null || string.isEmpty()) return null;
 		
 		String [] parts = string.split(":");
-		if(parts.length < 2) return null;
+		//if only ID is specified, allow it.
+		if(parts.length==1){
+			try {
+				return new MaterialInfo(Integer.parseInt(parts[0]),null);
+			}
+			catch(NumberFormatException ex){
+				return null;
+			}
+		}
 		
 		try
 		{

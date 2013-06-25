@@ -1549,11 +1549,11 @@ public class GriefPrevention extends JavaPlugin
 			for(int i = 0; i < playerData.claims.size(); i++)
 			{
 				Claim claim = playerData.claims.get(i);
-				GriefPrevention.sendMessage(player, TextMode.Instr, "  (-" + claim.getArea() + ") " + getfriendlyLocationString(claim.getLesserBoundaryCorner()));
+				GriefPrevention.sendMessage(player, TextMode.Instr, "  (Area:" + claim.getArea() + ") " + getfriendlyLocationString(claim.getLesserBoundaryCorner()));
 			}
 			
 			if(playerData.claims.size() > 0)
-				GriefPrevention.sendMessage(player, TextMode.Instr, "   =" + playerData.getRemainingClaimBlocks());
+				GriefPrevention.sendMessage(player, TextMode.Instr, "  Remaining Blocks: =" + playerData.getRemainingClaimBlocks());
 			
 			//drop the data we just loaded, if the player isn't online
 			if(!otherPlayer.isOnline())

@@ -194,7 +194,7 @@ public class Claim
 	//see above declarations for other defaults
 	Claim()
 	{
-		this.modifiedDate = Calendar.getInstance().getTime();
+		this.modifiedDate = new Date();
 	}
 	
 	/**
@@ -316,7 +316,7 @@ public class Claim
 	{
 		
 		//modification date
-		this.modifiedDate = Calendar.getInstance().getTime();
+		this.modifiedDate = new Date();
 		this.ClaimWorldName = lesserBoundaryCorner.getWorld().getName();
 		//id
 		this.id = id;

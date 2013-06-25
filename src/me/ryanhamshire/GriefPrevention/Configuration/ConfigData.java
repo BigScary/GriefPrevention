@@ -12,6 +12,7 @@ import java.util.logging.Level;
 import javax.naming.ConfigurationException;
 
 import me.ryanhamshire.GriefPrevention.DataStore;
+import me.ryanhamshire.GriefPrevention.Debugger;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import me.ryanhamshire.GriefPrevention.MaterialCollection;
 import me.ryanhamshire.GriefPrevention.MaterialInfo;
@@ -191,7 +192,9 @@ public class ConfigData {
 		//print log message if the passed world is not currently loaded or present.
 		//it will still go ahead and try to load the configuration.
 		if((grabfor = Bukkit.getWorld(worldName))==null){
-			GriefPrevention.instance.getLogger().log(Level.SEVERE, "invalid World:" + worldName);
+			//GriefPrevention.instance.getLogger().log(Level.SEVERE, "invalid World:" + worldName);
+			
+			try {throw new Exception();} catch(Exception ex){ex.printStackTrace();}
 		}
 		if(grabfor==null) return null;
 		

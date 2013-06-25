@@ -92,6 +92,7 @@ class PlayerEventHandler implements Listener
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
 	synchronized void onPlayerChat (AsyncPlayerChatEvent event)
 	{		
+	
 		Player player = event.getPlayer();
 		if(!player.isOnline())
 		{
@@ -249,6 +250,25 @@ class PlayerEventHandler implements Listener
 				}
 			}
 		}
+		if(!muted && message.length() > wc.getSpamCapsMinLength()){
+		
+			//check for caps in lengths greater than the specified limit.
+			StringBuilder sbuffer = new StringBuilder();
+			for(int i=0;i<message.length()-wc.getSpamCapsMinLength();i++){
+				String teststr = message.substring(i,wc.getSpamCapsMinLength());
+				if(teststr.equals(teststr.toUpperCase())){
+					//gotcha!
+					sbuffer.append(teststr.toLowerCase());
+					i+=teststr.length();
+				}
+				else
+					sbuffer.append(message.charAt(i));
+				
+			}
+			
+			
+		}
+		
 		
 		//if the message was mostly non-alpha-numerics or doesn't include much whitespace, consider it a spam (probably ansi art or random text gibberish) 
 		if(!muted && message.length() > wc.getSpamAlphaNumMinLength())
@@ -356,6 +376,7 @@ class PlayerEventHandler implements Listener
 	//if two strings are 75% identical, they're too close to follow each other in the chat
 	private boolean stringsAreSimilar(String message, String lastMessage)
 	{
+		if(message==null||lastMessage==null) return false;
 		//determine which is shorter
 		String shorterString, longerString;
 		if(lastMessage.length() < message.length())
@@ -447,6 +468,7 @@ class PlayerEventHandler implements Listener
 			event.setCancelled(true);
 			GriefPrevention.sendMessage(event.getPlayer(), TextMode.Err, Messages.CommandBannedInPvP);
 			return;
+			
 		}
 		
 		//if anti spam enabled, check for spam
@@ -1218,7 +1240,7 @@ class PlayerEventHandler implements Listener
 					
 				}
 			}
-			System.out.println(sb.toString());
+			Debugger.Write(sb.toString(), DebugLevel.Verbose);
 		}
 		
 		//if null, initialize.

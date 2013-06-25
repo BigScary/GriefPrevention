@@ -220,8 +220,8 @@ public class Visualization
 	private static boolean isTransparent(Block block)
 	{
 		WorldConfig applicableWorld = GriefPrevention.instance.getWorldCfg(block.getWorld());
-		if(applicableWorld.getModsContainerTrustIds().contains(block.getType())) return true;
-		if(applicableWorld.getModsAccessTrustIds().contains(block.getType())) return true;
+		if(applicableWorld.getModsContainerTrustIds()!=null && applicableWorld.getModsContainerTrustIds().contains(block.getType())) return true;
+		if(applicableWorld.getModsAccessTrustIds()!=null && applicableWorld.getModsAccessTrustIds().contains(block.getType())) return true;
 		return (	block.getType() == Material.AIR ||
 					block.getType() == Material.LONG_GRASS ||
 					block.getType() == Material.FENCE ||

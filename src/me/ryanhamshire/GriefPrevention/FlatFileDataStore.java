@@ -36,6 +36,10 @@ public class FlatFileDataStore extends DataStore
 	private final static String claimDataFolderPath = dataLayerFolderPath + File.separator + "ClaimData";
 	private final static String nextClaimIdFilePath = claimDataFolderPath + File.separator + "_nextClaimID";
 
+	/**
+	 * determines whether there is Player or claims data available. This determines if the folder exists.
+	 * @return
+	 */
 	static boolean hasData()
 	{
 		File playerDataFolder = new File(playerDataFolderPath);
@@ -104,7 +108,6 @@ public class FlatFileDataStore extends DataStore
 		BufferedReader inStream = null;
 		try
 		{		
-			int topLevelID=-1; 
 			Claim topLevelClaim = null;
 			FileReader fr = new FileReader(SourceFile.getAbsolutePath());
 			inStream = new BufferedReader(fr);
@@ -112,7 +115,6 @@ public class FlatFileDataStore extends DataStore
 			
 			while(line != null)
 			{
-				boolean usedeferred = false;
 				Long usesubclaimid = null;
 				if(line.toUpperCase().startsWith("SUB:")){
 					usesubclaimid = Long.parseLong(line.substring(4));
@@ -124,24 +126,10 @@ public class FlatFileDataStore extends DataStore
 				//add it to the dataStore hashMap.
 				Location lesserBoundaryCorner=null;
 				Location greaterBoundaryCorner=null;
-				String DeferredLesser;
-				String DeferredGreater;
-				if(Bukkit.getWorld(splitentry)==null){
-					DeferredLesser = line;
-					DeferredGreater = inStream.readLine();
-					usedeferred=true;
-					
-				}
-				else {
-				
 				lesserBoundaryCorner = this.locationFromString(line);
-				
-				
-				
 				//second line is greater boundary corner location
 				line = inStream.readLine();
 				greaterBoundaryCorner = this.locationFromString(line);
-				}
 				
 				//third line is owner name
 				line = inStream.readLine();						
@@ -249,7 +237,7 @@ public class FlatFileDataStore extends DataStore
 		//if there's any problem with the file's content, log an error message and skip it
 		catch(Exception e)
 		{
-			 GriefPrevention.AddLogEntry("Unable to load data for claim \"" + SourceFile.getName() + "\": " + e.getClass().getName() + " " +  e.getMessage());
+			 GriefPrevention.AddLogEntry("Unable to load data for claim \"" + SourceFile.getName() + "\": " + e.getClass().getName() + "-" +  e.getMessage());
 			 e.printStackTrace();
 		}
 		

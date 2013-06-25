@@ -21,6 +21,8 @@ public class Debugger {
 		}
 	}
 	private DebugLevel CurrentLevel;
+	public DebugLevel getCurrentLevel(){ return CurrentLevel;}
+	public static DebugLevel getCurrentDebugLevel(){ return GriefPrevention.instance.debug.getCurrentLevel();}
 	public Debugger(DebugLevel DebuggingLevel){
 		GriefPrevention.AddLogEntry("Debug Message Granularity:" + DebuggingLevel.name());
 		CurrentLevel=DebuggingLevel;

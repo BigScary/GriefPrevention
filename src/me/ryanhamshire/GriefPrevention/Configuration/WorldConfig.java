@@ -246,7 +246,10 @@ public class WorldConfig {
 	private int config_claims_maxblocks; //maximum blocks a player can claim in this world. This does not change and is essentially a cap to keep a player
 	//from 'taking over' an entire world. 0 indicates there is no limit.
 	public int getClaims_maxBlocks(){ return config_claims_maxblocks;}
-	
+	private List<BlockPlacementRules> config_BlockPlacementRules;
+	public List<BlockPlacementRules> getBlockPlacementRules(){ return config_BlockPlacementRules;}
+	private List<BlockPlacementRules> config_BlockBreakRules;
+	public List<BlockPlacementRules> getBlockBreakRules(){ return config_BlockBreakRules;}
 	private int config_SpamDelayThreshold;
 	private int config_SpamCapsMinLength;
 	private int config_SpamAlphaNumMinLength;
@@ -519,7 +522,7 @@ public class WorldConfig {
 				ClaimBehaviourData.getOutsideClaims("Trash Block Placement").setBehaviourMode(ClaimBehaviourMode.RequireBuild));
 		
 		VillagerTrades = new ClaimBehaviourData("Villager Trading",config,outConfig,"GriefPrevention.Rules.VillagerTrading",
-				ClaimBehaviourData.getInsideClaims("Villager Trading"));
+				ClaimBehaviourData.getInsideClaims("Villager Trading").setBehaviourMode(ClaimBehaviourMode.RequireContainer));
 	
 		this.EnvironmentalVehicleDamage = new ClaimBehaviourData("Environmental Vehicle Damage",config,outConfig,"GriefPrevention.Rules.EnvironmentalVehicleDamage",
 				ClaimBehaviourData.getOutsideClaims("Environmental Vehicle Damage"));
@@ -685,8 +688,6 @@ public class WorldConfig {
 		this.config_claims_AbandonReturnRatio = config.getDouble("GriefPrevention.Claims.AbandonReturnRatio",1);
 		outConfig.set("GriefPrevention.Claims.AbandonReturnRatio", this.config_claims_AbandonReturnRatio);
 		outConfig.set("GriefPrevention.CreativeRules",config_claims_creativeRules);
-		this.config_sign_Eavesdrop = config.getBoolean("GriefPrevention.SignEavesDrop",true);
-		outConfig.set("GriefPrevention.SignEavesDrop", this.config_sign_Eavesdrop);
 		
 		
 						
@@ -769,8 +770,18 @@ public class WorldConfig {
 		this.config_fireDestroys = config.getBoolean("GriefPrevention.FireDestroys", false);
 		
 		this.config_addItemsToClaimedChests = config.getBoolean("GriefPrevention.AddItemsToClaimedChests", true);
-		this.config_eavesdrop = config.getBoolean("GriefPrevention.EavesdropEnabled", false);
-		String whisperCommandsToMonitor = config.getString("GriefPrevention.WhisperCommands", "/tell;/pm;/r");
+		this.config_eavesdrop = config.getBoolean("GriefPrevention.Eavesdrop.Enabled", false);
+		String whisperCommandsToMonitor = config.getString("GriefPrevention.Eavesdrop.WhisperCommands", "/tell;/pm;/r");
+		this.config_sign_Eavesdrop = config.getBoolean("GriefPrevention.Eavesdrop.Signs",true);
+		outConfig.set("GriefPrevention.SignEavesDrop", this.config_sign_Eavesdrop);
+		this.config_eavesdrop_whisperCommands = new ArrayList<String>();
+		for(String whispercommand:whisperCommandsToMonitor.split(";")){
+			config_eavesdrop_whisperCommands.add(whispercommand);
+		}
+		outConfig.set("GriefPrevention.Eavesdrop.Enabled", this.config_eavesdrop);
+		this.config_eavesdrop_bookdrop =  config.getBoolean("GriefPrevention.Eavesdrop.BookDrop",false);
+		
+		outConfig.set("GriefPrevention.Eavesdrop.WhisperCommands", whisperCommandsToMonitor);
 		
 		this.config_smartBan = config.getBoolean("GriefPrevention.SmartBan", true);
 		
@@ -1035,8 +1046,7 @@ public class WorldConfig {
 		
 		outConfig.set("GriefPrevention.AddItemsToClaimedChests", this.config_addItemsToClaimedChests);
 		
-		outConfig.set("GriefPrevention.EavesdropEnabled", this.config_eavesdrop);		
-		outConfig.set("GriefPrevention.WhisperCommands", whisperCommandsToMonitor);		
+				
 		outConfig.set("GriefPrevention.SmartBan", this.config_smartBan);
 		
 		//outConfig.set("GriefPrevention.Siege.Worlds", siegeEnabledWorldNames);
@@ -1055,6 +1065,9 @@ public class WorldConfig {
 		outConfig.set("GriefPrevention.Mods.BlockIdsRequiringAccessTrust", accessTrustStrings);
 		outConfig.set("GriefPrevention.Mods.BlockIdsRequiringContainerTrust", containerTrustStrings);
 		
+		
+		this.config_BlockPlacementRules = BlockPlacementRules.ParseRules(config, outConfig, "GriefPrevention.BlockPlacementRules");
+		this.config_BlockBreakRules = BlockPlacementRules.ParseRules(config, outConfig, "GriefPrevention.BlockBreakRules");
 		//outConfig.set("GriefPrevention.Mods.BlockIdsExplodable", explodableStrings);
 		
 		//Task startup.

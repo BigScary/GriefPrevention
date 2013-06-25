@@ -1,10 +1,12 @@
 package me.ryanhamshire.GriefPrevention.Configuration;
 
 import me.ryanhamshire.GriefPrevention.Claim;
+import me.ryanhamshire.GriefPrevention.Debugger;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import me.ryanhamshire.GriefPrevention.Messages;
 import me.ryanhamshire.GriefPrevention.PlayerData;
 import me.ryanhamshire.GriefPrevention.TextMode;
+import me.ryanhamshire.GriefPrevention.Debugger.DebugLevel;
 import me.ryanhamshire.GriefPrevention.events.PermissionCheckEvent;
 
 import org.bukkit.Bukkit;
@@ -171,6 +173,21 @@ public class ClaimBehaviourData {
 	 * @return whether this behaviour is Allowed or Denied in this claim.
 	 */
 	public ClaimAllowanceConstants Allowed(Location position,Player RelevantPlayer,boolean ShowMessages){
+		return Allowed(position,RelevantPlayer,ShowMessages,true);
+	}
+	
+	
+	/**
+	 * returns whether this Behaviour is allowed at the given location. if the passed player currently has
+	 * ignoreclaims on, this will return true no matter what.
+	 * @param position Position to test.
+	 * @param RelevantPlayer Player to test. Can be null for actions or behaviours that do not involve a player.
+	 * @param ShowMessages Whether a Denied result will display an appropriate message.
+	 * @param fireEvent Whether this call will fire the PermissionCheckEvent. This can be passed as false by plugins handling this event to get
+	 * the value that would be retrieved without it's interference.
+	 * @return whether this behaviour is Allowed or Denied in this claim.
+	 */
+	public ClaimAllowanceConstants Allowed(Location position,Player RelevantPlayer,boolean ShowMessages,boolean fireEvent){
 		ClaimAllowanceConstants returned = ClaimAllowanceConstants.Allow;
 		try {
 		//System.out.println("ClaimBehaviour:" + this.getBehaviourName());
@@ -180,11 +197,12 @@ public class ClaimBehaviourData {
 		boolean ignoringclaims = false;
 		if(RelevantPlayer!=null) pd = GriefPrevention.instance.dataStore.getPlayerData(RelevantPlayer.getName());
 		if(pd!=null) ignoringclaims = pd.ignoreClaims;
-		
-		PermissionCheckEvent permcheck = new PermissionCheckEvent(this,RelevantPlayer);
-		Bukkit.getPluginManager().callEvent(permcheck);
-		if(permcheck.getResult()!=null){
-			return permcheck.getResult();
+		if(fireEvent){
+			PermissionCheckEvent permcheck = new PermissionCheckEvent(this,RelevantPlayer);
+			Bukkit.getPluginManager().callEvent(permcheck);
+			if(permcheck.getResult()!=null){
+				return permcheck.getResult();
+		}
 		}
 		
 		
@@ -222,7 +240,8 @@ public class ClaimBehaviourData {
 		return (returned=ClaimAllowanceConstants.Allow);
 		}
 		finally {
-			System.out.println("ClaimBehaviourData returning:\"" + returned.name()  + "\"" + " For " + BehaviourName);
+			//System.out.println("ClaimBehaviourData returning:\"" + returned.name()  + "\"" + " For " + BehaviourName);
+			Debugger.Write("ClaimBehaviourData returning:\"" + returned.name()  + "\"" + " For " + BehaviourName, DebugLevel.Verbose);
 		}
 	}
 	/**
@@ -286,7 +305,7 @@ public class ClaimBehaviourData {
 	
 	
 	public static ClaimBehaviourData getOutsideClaims(String pName) { return new ClaimBehaviourData(pName,PlacementRules.Both,PlacementRules.Neither,ClaimBehaviourMode.RequireNone);}
-	public static ClaimBehaviourData getInsideClaims(String pName) {return new ClaimBehaviourData(pName,PlacementRules.Neither,PlacementRules.Neither,ClaimBehaviourMode.RequireAccess);}
+	public static ClaimBehaviourData getInsideClaims(String pName) {return new ClaimBehaviourData(pName,PlacementRules.Neither,PlacementRules.Both,ClaimBehaviourMode.RequireNone);}
 	public static ClaimBehaviourData getAboveSeaLevel(String pName){return new ClaimBehaviourData(pName,PlacementRules.AboveOnly,PlacementRules.AboveOnly,ClaimBehaviourMode.RequireNone);};
 	public static ClaimBehaviourData getBelowSeaLevel(String pName){return new ClaimBehaviourData(pName,PlacementRules.BelowOnly,PlacementRules.BelowOnly,ClaimBehaviourMode.RequireNone);};
 	public static ClaimBehaviourData getNone(String pName){ return new ClaimBehaviourData(pName,PlacementRules.Neither,PlacementRules.Neither,ClaimBehaviourMode.RequireNone);}

@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 
+import me.ryanhamshire.GriefPrevention.Debugger.DebugLevel;
+
 public class ClaimArray implements Iterable {
 	
 	private ArrayList<Claim> claims = new ArrayList<Claim>();
@@ -44,8 +46,8 @@ public class ClaimArray implements Iterable {
 		 
 		 if(!claimworldmap.get(usekey).contains(c))
 			 claimworldmap.get(usekey).add(c);
-		 
-		 System.out.println("Claim added to world mapping, owned by " + c.getOwnerName());
+		 Debugger.Write("Claim added to world mapping owned by " + c.getOwnerName() + " to world:" + c.getLesserBoundaryCorner().getWorld(),DebugLevel.Verbose);
+		
 				 
 	}
 	private void removeClaimWorld(Claim c){

@@ -438,6 +438,44 @@ public abstract class DataStore
 	
 	abstract void deleteClaimFromSecondaryStorage(Claim claim);
 	
+	
+	synchronized public ClaimDistanceResult getNearestClaim(Location testLocation,int MaxDistance){
+		
+		int XPos = testLocation.getBlockX();
+		int ZPos = testLocation.getBlockZ();
+		int[] signsuse = new int[]{-1,1};
+		for(int sign:signsuse){
+			
+			for(int xtest=0;xtest<MaxDistance;xtest++){
+				//calculate XPosition.
+				int useXPos = XPos + (xtest*sign);
+				for(int ztest=0;ztest<MaxDistance;ztest++){
+					int useZPos=ZPos+(ztest*sign);
+					Location corelocation = new Location(testLocation.getWorld(),useXPos,64,useZPos);
+					Claim grabclaim = getClaimAt(corelocation,true,null);
+					if(grabclaim!=null){
+						return new ClaimDistanceResult(grabclaim,Math.min(xtest, ztest));
+					}
+					
+				}
+				
+				
+				
+			}
+			
+			
+		}
+		
+		return null;
+		
+		
+		
+		
+		
+		
+		
+	}
+	
 	/**
 	 * Gets the claim at a specific location
 	 * @param location
@@ -447,6 +485,7 @@ public abstract class DataStore
 	 */
 	synchronized public Claim getClaimAt(Location location, boolean ignoreHeight, Claim cachedClaim)
 	{
+		Debugger.Write("Looking for Claim at:" + GriefPrevention.getfriendlyLocationString(location) + " Ignoreheight:" + ignoreHeight,DebugLevel.Verbose);
 		//check cachedClaim guess first.  if it's in the datastore and the location is inside it, we're done
 		if(cachedClaim != null && cachedClaim.inDataStore && cachedClaim.contains(location, ignoreHeight, true)) 
 			return cachedClaim;
@@ -458,7 +497,8 @@ public abstract class DataStore
 		tempClaim.lesserBoundaryCorner = location;
 		
 		//Let's get all the claims in this block's chunk
-		ArrayList<Claim> aclaims = claims.chunkmap.get(getChunk(location));
+		String chunkstr = getChunk(location);
+		ArrayList<Claim> aclaims = claims.chunkmap.get(chunkstr);
 		
 		//If there are no claims here, let's return null.
 		if(aclaims == null) {
@@ -1305,6 +1345,7 @@ public abstract class DataStore
 		this.addDefault(defaults, Messages.GiveSuccessSender,"Claim Owner changed from {0} to {1} Successfully.","0:Sender;1:Recipient");
 		this.addDefault(defaults, Messages.GiveSuccessTarget, "{0} has transferred a Claim to you.", "0:Sender");
 		this.addDefault(defaults,Messages.ResizeFailOutsideParent,"Cannot resize subdivision as it would extend outside the containing claim.",null);
+		this.addDefault(defaults,Messages.BlockPlacementTooClose,"You cannot place this within {0} Blocks of an existing claim.","0:Number of max blocks");
 		//load the config file
 		FileConfiguration config = YamlConfiguration.loadConfiguration(new File(messagesFilePath));
 		
