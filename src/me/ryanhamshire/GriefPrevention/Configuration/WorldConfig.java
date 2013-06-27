@@ -205,6 +205,9 @@ public class WorldConfig {
 	public ClaimBehaviourData getBeds(){ return Beds;}
 	private ClaimBehaviourData ModInteractables;
 	public ClaimBehaviourData getModInteractables(){ return ModInteractables;}
+	private List<ItemUsageRules> ItemRules;
+	public List<ItemUsageRules> getItemRules(){ return ItemRules;}
+	
 	
 	/*
 	private boolean config_claims_preventTheft;						//whether containers and crafting blocks are protectable
@@ -472,6 +475,9 @@ public class WorldConfig {
 		outConfig.set("GriefPrevention.SeaLevelOverride", config_seaLevelOverride);
 		//read in the data for TNT explosions and Golem/Wither placements.
 		this.config_afkDistanceCheck = config.getInt("GriefPrevention.AFKDistance",3);
+		this.SilverfishBreakRules = new ClaimBehaviourData("Silverfish Break",config,outConfig,"GriefPrevention.Rules.SilverfishBreak",
+				new ClaimBehaviourData("Silverfish Break",PlacementRules.Both,PlacementRules.Neither,ClaimBehaviourMode.Disabled));
+		
 		this.CreeperExplosionsBehaviour = new ClaimBehaviourData("Creeper Explosions",config,outConfig,"GriefPrevention.Rules.CreeperExplosions",
 				new ClaimBehaviourData("Creeper Explosions",PlacementRules.Both,PlacementRules.Both,ClaimBehaviourMode.Disabled));
 		this.WitherExplosionBehaviour = new ClaimBehaviourData("Wither Explosions",config,outConfig,"GriefPrevention.Rules.WitherExplosions",

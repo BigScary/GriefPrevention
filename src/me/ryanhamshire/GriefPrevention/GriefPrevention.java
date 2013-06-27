@@ -59,6 +59,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.world.WorldLoadEvent;
+import org.bukkit.event.world.WorldUnloadEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.PluginManager;
@@ -111,6 +112,12 @@ public class GriefPrevention extends JavaPlugin
 	public static void AddLogEntry(String entry)
 	{
 		log.info("GriefPrevention: " + entry);
+	}
+	public boolean checkPerm(Player p,World w,String Perm){
+		
+		return p.hasPermission(Perm) ||
+				p.hasPermission(Perm + "." + w.getName());
+		
 	}
 	/**
 	 * Retrieves a World Configuration given the World. if the World Configuration is not loaded,
@@ -654,6 +661,7 @@ public class GriefPrevention extends JavaPlugin
 			if(player==null || player.hasPermission("griefprevention.reload")){
 			this.onDisable();
 			this.onEnable();
+			return true;
 			}
 		}
 		//abandontoplevelclaim
@@ -887,17 +895,49 @@ public class GriefPrevention extends JavaPlugin
 		else if(cmd.getName().equalsIgnoreCase("transferclaim") && player != null)
 		{
 			//can take two parameters. Source Player and target player.
-			if(args.length == 0) return false;
+			if(args.length == 0){
+				if(!player.hasPermission("GriefPrevention.adminclaims")){
+					GriefPrevention.sendMessage(player, TextMode.Err, Messages.NoAdminClaimsPermission);
+					return true;
+				}
+				else {
+					
+					Claim claim = this.dataStore.getClaimAt(player.getLocation(), true, null);
+					if(claim == null)
+					{
+						GriefPrevention.sendMessage(player, TextMode.Instr, Messages.TransferClaimMissing);
+						return true;
+					}
+					else {
+						//make it an admin claim.
+						try {
+						this.dataStore.changeClaimOwner(claim,"");
+						GriefPrevention.sendMessage(player,TextMode.Instr,"This claim is now an Admin claim.");
+						return true;
+						}
+						catch(Exception exx){
+							GriefPrevention.sendMessage(player, TextMode.Instr, Messages.TransferTopLevel);
+							return true;
+						}
+					}
+					
+					
+				}
+			}
 			//one arg requires "GriefPrevention.transferclaims" or "GriefPrevention.adminclaims" permission.
 			//two args requires the latter.
 			if(args.length >0)
 			//check additional permission
-			if(!player.hasPermission("griefprevention.adminclaims"))
+			if(!(player.hasPermission("griefprevention.adminclaims") ))
 			{
+				GriefPrevention.sendMessage(player, TextMode.Err, Messages.NoAdminClaimsPermission);
+				return true;
+			}
+			else if(!player.hasPermission("griefprevention.transferclaims")){
 				GriefPrevention.sendMessage(player, TextMode.Err, Messages.TransferClaimPermission);
 				return true;
 			}
-			
+
 			//which claim is the user in?
 			Claim claim = this.dataStore.getClaimAt(player.getLocation(), true, null);
 			if(claim == null)
@@ -2222,6 +2262,12 @@ public class GriefPrevention extends JavaPlugin
 
 	public void onDisable()
 	{ 
+		//emulate each world unloading.
+		
+		
+		for(World iterate:Bukkit.getWorlds()){
+			ww.WorldUnload(new WorldUnloadEvent(iterate));
+		}
 		ww=null;
 		//save data for any online players
 		Player [] players = this.getServer().getOnlinePlayers();

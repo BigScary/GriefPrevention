@@ -27,6 +27,7 @@ import java.util.regex.Pattern;
 
 import me.ryanhamshire.GriefPrevention.Configuration.ClaimBehaviourData.ClaimAllowanceConstants;
 import me.ryanhamshire.GriefPrevention.Configuration.ClaimBehaviourData;
+import me.ryanhamshire.GriefPrevention.Configuration.ItemUsageRules;
 import me.ryanhamshire.GriefPrevention.Configuration.WorldConfig;
 import me.ryanhamshire.GriefPrevention.Debugger.DebugLevel;
 import me.ryanhamshire.GriefPrevention.tasks.EquipShovelProcessingTask;
@@ -868,6 +869,9 @@ class PlayerEventHandler implements Listener
 		
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(player.getWorld());
 		PlayerData playerData = this.dataStore.getPlayerData(player.getName());
+		
+		
+		
 		//don't allow interaction with item frames in claimed areas without build permission
 		if(entity instanceof Hanging)
 		{
@@ -1209,18 +1213,60 @@ class PlayerEventHandler implements Listener
 	private static HashSet<Byte> transparentMaterials = null;
 	private static HashSet<Material> GPTools = null;
 	private static HashSet<Material> ContainerMaterials = null;
+	private void getTransparentMaterials(){
+		if(transparentMaterials==null){
+			transparentMaterials = new HashSet<Byte>();
+			transparentMaterials.add(Byte.valueOf((byte)Material.AIR.getId()));
+			transparentMaterials.add(Byte.valueOf((byte)Material.SNOW.getId()));
+			transparentMaterials.add(Byte.valueOf((byte)Material.LONG_GRASS.getId()));
+			transparentMaterials.add(Byte.valueOf((byte)Material.WOOD_BUTTON.getId()));
+			transparentMaterials.add(Byte.valueOf((byte)Material.STONE_BUTTON.getId()));
+			transparentMaterials.add(Byte.valueOf((byte)Material.STONE_PLATE.getId()));
+			transparentMaterials.add(Byte.valueOf((byte)Material.WOOD_PLATE.getId()));
+			transparentMaterials.add(Byte.valueOf((byte)Material.IRON_PLATE.getId()));
+			transparentMaterials.add(Byte.valueOf((byte)Material.GOLD_PLATE.getId()));
+			transparentMaterials.add(Byte.valueOf((byte)Material.LEVER.getId()));
+		}
+	}
 	//when a player interacts with the world
 	@EventHandler(priority = EventPriority.LOWEST)
 	void onPlayerInteract(PlayerInteractEvent event)
 	{
+		
 		if(event==null) return;
 		if(event.getPlayer()==null) return; //MCPC seems to sometimes fire events with a null player...
 		Player player = event.getPlayer();
-		
+		String ItemName = event.getItem()==null?"null":"ID:" + String.valueOf(event.getItem().getTypeId());
+		Debugger.Write("onPlayerInteract: Item:" + ItemName,DebugLevel.Verbose);
 		
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(player.getWorld());
 		//determine target block.  FEATURE: shovel and stick can be used from a distance away
 		Block clickedBlock = event.getClickedBlock();
+		
+		if(wc.getItemRules()!=null){
+			getTransparentMaterials();
+			 try {
+			clickedBlock = player.getTargetBlock(transparentMaterials, 2500);
+			 }
+			 catch(Exception exx){
+				 clickedBlock=null;
+			 }
+			
+			 for(ItemUsageRules iur:wc.getItemRules()){
+				 if(iur.Applicable(event.getItem())){
+					 if(iur.TestPlayer(player, clickedBlock).Denied()){
+						 event.setCancelled(true);
+						 return;
+						 
+					 }
+					 
+					 
+				 }
+			 }
+			 
+			
+		}
+		
 		
 		//this block shows some debug info, but only when DebuggingLevel is set to verbose.
 		if(GriefPrevention.instance.DebuggingLevel==DebugLevel.Verbose){
@@ -1259,19 +1305,7 @@ class PlayerEventHandler implements Listener
 				if(clickedBlock == null || clickedBlock.getType() == Material.SNOW)
 				{
 					//try to find a far away non-air block along line of sight
-					if(transparentMaterials==null){
-						transparentMaterials = new HashSet<Byte>();
-						transparentMaterials.add(Byte.valueOf((byte)Material.AIR.getId()));
-						transparentMaterials.add(Byte.valueOf((byte)Material.SNOW.getId()));
-						transparentMaterials.add(Byte.valueOf((byte)Material.LONG_GRASS.getId()));
-						transparentMaterials.add(Byte.valueOf((byte)Material.WOOD_BUTTON.getId()));
-						transparentMaterials.add(Byte.valueOf((byte)Material.STONE_BUTTON.getId()));
-						transparentMaterials.add(Byte.valueOf((byte)Material.STONE_PLATE.getId()));
-						transparentMaterials.add(Byte.valueOf((byte)Material.WOOD_PLATE.getId()));
-						transparentMaterials.add(Byte.valueOf((byte)Material.IRON_PLATE.getId()));
-						transparentMaterials.add(Byte.valueOf((byte)Material.GOLD_PLATE.getId()));
-						transparentMaterials.add(Byte.valueOf((byte)Material.LEVER.getId()));
-					}
+					getTransparentMaterials();
 					clickedBlock = player.getTargetBlock(transparentMaterials, 250);
 				}			
 			}
