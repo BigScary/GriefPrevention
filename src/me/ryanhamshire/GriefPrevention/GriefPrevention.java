@@ -1847,6 +1847,12 @@ public class GriefPrevention extends JavaPlugin
 			{
 				return false;
 			}
+			//defender cannot be attacker.
+			if(defender.getName().equalsIgnoreCase(attacker.getName())){
+				GriefPrevention.sendMessage(player, TextMode.Err, Messages.CantSiegeYourself);
+				return true;
+			}
+			
 			
 			//victim must not be under siege already
 			PlayerData defenderData = this.dataStore.getPlayerData(defender.getName());
@@ -1906,6 +1912,7 @@ public class GriefPrevention extends JavaPlugin
 			   //confirmation message for attacker, warning message for defender
 			   GriefPrevention.sendMessage(defender, TextMode.Warn, Messages.SiegeAlert, attacker.getName());
 			   GriefPrevention.sendMessage(player, TextMode.Success, Messages.SiegeConfirmed, defender.getName());
+			   return true;
 			}
 		}
 		

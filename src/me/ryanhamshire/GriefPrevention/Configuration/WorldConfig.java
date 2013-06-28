@@ -226,6 +226,8 @@ public class WorldConfig {
 	public boolean getEnderPearlsRequireAccessTrust(){ return config_claims_enderPearlsRequireAccessTrust;}
 	*/
 	
+	
+	
 	private float config_claims_blocksAccruedPerHour;					//how many additional blocks players get each hour of play (can be zero)
 	public float getClaimBlocksAccruedPerHour(){ return config_claims_blocksAccruedPerHour;}
 	

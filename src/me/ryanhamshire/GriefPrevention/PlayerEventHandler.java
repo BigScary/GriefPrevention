@@ -1468,7 +1468,7 @@ class PlayerEventHandler implements Listener
 		
 		if(useRule!=null){
 			
-			if(useRule.Allowed(clickedBlock.getLocation(), player).Denied())
+			if(useRule.Allowed(clickedBlock.getLocation(), player,true).Denied())
 			{
 				event.setCancelled(true);
 				return;

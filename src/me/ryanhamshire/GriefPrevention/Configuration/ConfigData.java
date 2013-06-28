@@ -13,6 +13,7 @@ import javax.naming.ConfigurationException;
 
 import me.ryanhamshire.GriefPrevention.DataStore;
 import me.ryanhamshire.GriefPrevention.Debugger;
+import me.ryanhamshire.GriefPrevention.Debugger.DebugLevel;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import me.ryanhamshire.GriefPrevention.MaterialCollection;
 import me.ryanhamshire.GriefPrevention.MaterialInfo;
@@ -223,9 +224,17 @@ public class ConfigData {
 				//set the input Yaml to default to the template.
 				//if the template file exists, load it's configuration and use the result as useSource. 
 				//Otherwise, we create a blank configuration.
-				FileConfiguration useSource= (new File(TemplateFile).exists()?
-						YamlConfiguration.loadConfiguration(new File(TemplateFile)):
-							new YamlConfiguration());
+				Debugger.Write("Failed to find world configuration for World " + worldName, DebugLevel.Errors);
+				File TemplFile = new File(TemplateFile);
+				FileConfiguration useSource=null;
+				if(TemplFile.exists()){
+					useSource = YamlConfiguration.loadConfiguration(TemplFile);
+				}
+				else {
+					Debugger.Write("Template file \"" + TemplateFile + " \"Not Found.", DebugLevel.Errors);
+					useSource = new YamlConfiguration();
+				}
+				
 				//The target save location.
 				FileConfiguration Target = new YamlConfiguration();
 				//place it in the hashmap.

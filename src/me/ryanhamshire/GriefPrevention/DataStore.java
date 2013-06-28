@@ -1346,6 +1346,7 @@ public abstract class DataStore
 		this.addDefault(defaults, Messages.GiveSuccessTarget, "{0} has transferred a Claim to you.", "0:Sender");
 		this.addDefault(defaults,Messages.ResizeFailOutsideParent,"Cannot resize subdivision as it would extend outside the containing claim.",null);
 		this.addDefault(defaults,Messages.BlockPlacementTooClose,"You cannot place this within {0} Blocks of an existing claim.","0:Number of max blocks");
+		this.addDefault(defaults, Messages.CantSiegeYourself, "You cannot lay siege on yourself!", null);
 		//load the config file
 		FileConfiguration config = YamlConfiguration.loadConfiguration(new File(messagesFilePath));
 		
