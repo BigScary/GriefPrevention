@@ -11,7 +11,7 @@
         </repository>
 			<repository>
 				<id>vault-repo</id>
-				<url>http://ci.herocraftonline.com/plugin/repository/everything</url>
+				<url>http://maven.sk89q.com/repo/net/milkbowl/vault/Vault/</url>
 			</repository>
     </repositories>
     <build>
