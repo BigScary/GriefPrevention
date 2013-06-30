@@ -260,7 +260,7 @@ public class Claim
 	
 	//determines whether or not a claim has surface fluids (lots of water blocks, or any lava blocks)
 	//used to warn players when they abandon their claims about automatic fluid cleanup
-	boolean hasSurfaceFluids()
+	public boolean hasSurfaceFluids()
 	{
 		Location lesser = this.getLesserBoundaryCorner();
 		Location greater = this.getGreaterBoundaryCorner();

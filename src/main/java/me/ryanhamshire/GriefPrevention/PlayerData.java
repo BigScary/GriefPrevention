@@ -73,7 +73,7 @@ public class PlayerData
 	public ShovelMode shovelMode = ShovelMode.Basic;
 	
 	//radius for restore nature fill mode
-	int fillRadius = 0;
+	public int fillRadius = 0;
 	
 	//last place the player used the shovel, useful in creating and resizing claims, 
 	//because the player must use the shovel twice in those instances

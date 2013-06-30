@@ -105,7 +105,7 @@ public abstract class DataStore
 	 * @param playerName
 	 * @return
 	 */
-	synchronized int getGroupBonusBlocks(String playerName)
+	public synchronized int getGroupBonusBlocks(String playerName)
 	{
 		int bonusBlocks = 0;
 		Set<String> keys = permissionToBonusBlocksMap.keySet();

@@ -25,8 +25,8 @@ import org.bukkit.Material;
 //represents a material or collection of materials
 public class MaterialInfo
 {
-	int typeID;
-	byte data;
+	public int typeID;
+	public byte data;
 	public boolean allDataValues;
 	String description;
 	private Pattern re;
