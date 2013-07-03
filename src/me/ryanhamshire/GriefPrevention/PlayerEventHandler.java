@@ -266,9 +266,9 @@ class PlayerEventHandler implements Listener
 		
 			//check for caps in lengths greater than the specified limit.
 			StringBuilder sbuffer = new StringBuilder();
+			try {
 			for(int i=0;i<message.length()-wc.getSpamCapsMinLength();i++){
-				if(i<0) break;
-				String teststr = message.substring(i,wc.getSpamCapsMinLength());
+				String teststr = message.substring(i,i+wc.getSpamCapsMinLength());
 				if(teststr.equals(teststr.toUpperCase())){
 					//gotcha!
 					sbuffer.append(teststr.toLowerCase());
@@ -278,7 +278,8 @@ class PlayerEventHandler implements Listener
 					sbuffer.append(message.charAt(i));
 				
 			}
-			
+			}
+			finally{}
 			
 		}
 		

@@ -393,12 +393,13 @@ public class WorldConfig {
 	public boolean getPvPBlockContainers(){ return config_pvp_blockContainers;}
 	private boolean config_pvp_allowCombatItemDrop;					//whether a player can drop items during combat to hide them
 	public boolean getAllowCombatItemDrop(){ return config_pvp_allowCombatItemDrop;}
-	
+	private boolean config_pvp_enabled;
+	public boolean getPvPEnabled(){ return config_pvp_enabled;}
 	private int config_pvp_Seige_Loot_Chests; //defaults to 0, above zero means that a player is allowed to look into and take items from X chests on a claim they seige.
 	
 	public int getSeigeLootChests(){ return config_pvp_Seige_Loot_Chests;}
 	
-	private ArrayList<String> config_pvp_blockedCommands;			//list of commands which may not be used during pvp combat
+	private ArrayList<String> config_pvp_blockedCommands = new ArrayList<String>();			//list of commands which may not be used during pvp combat
 	public List<String> getPvPBlockedCommands(){ return config_pvp_blockedCommands;}
 	private boolean config_pvp_noCombatInPlayerLandClaims;			//whether players may fight in player-owned land claims
 	public boolean getPvPNoCombatinPlayerClaims(){ return config_pvp_noCombatInPlayerLandClaims;}
@@ -494,8 +495,11 @@ public class WorldConfig {
 		WorldName = pName;
 		World getworld = Bukkit.getWorld(pName);
 		if(getworld!=null){
+			
 			isCreative = Bukkit.getServer().getDefaultGameMode()==GameMode.CREATIVE;
 			isPvP = getworld.getPVP();
+			boolean gotpvp = config.getBoolean("GriefPrevention.PvP.Enabled",isPvP);
+			getworld.setPVP(isPvP = gotpvp);
 		}
 		
 		
@@ -744,7 +748,7 @@ public class WorldConfig {
 		
 		this.InsufficientSneakResetBound = config.getInt("GriefPrevention.Claims.InsufficientSneakResetBound",0);
 		outConfig.set("GriefPrevention.Claims.InsufficientSneakResetBound", this.InsufficientSneakResetBound);
-		this.claims_Seige_Enabled = config.getBoolean("GriefPrevention.Siege.Enabled",true);
+		this.claims_Seige_Enabled = config.getBoolean("GriefPrevention.Siege.Enabled",isPvP);
 		outConfig.set("GriefPrevention.Siege.Enabled", claims_Seige_Enabled);
 		
 		this.Siege_TamedAnimalDistance = config.getInt("GriefPrevention.Claims.SiegeTamedAnimalDistance",20);
