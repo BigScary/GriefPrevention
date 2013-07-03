@@ -583,7 +583,7 @@ public class BlockEventHandler implements Listener
 	public void onBlockIgnite (BlockIgniteEvent igniteEvent)
 	{
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(igniteEvent.getBlock().getWorld());
-		if(!wc.getFireSpreads() && igniteEvent.getCause() != IgniteCause.FLINT_AND_STEEL &&  igniteEvent.getCause() != IgniteCause.LIGHTNING)
+		if(!wc.getFireSpreads() && igniteEvent.getCause() != IgniteCause.FLINT_AND_STEEL &&  igniteEvent.getCause() != IgniteCause.FIREBALL && igniteEvent.getCause() != IgniteCause.LIGHTNING)
 		{	
 			igniteEvent.setCancelled(true);			
 		}
