@@ -1809,7 +1809,7 @@ class PlayerEventHandler implements Listener
 				if(claimsshow == null || claimsshow[0]==null)
 				{
 					GriefPrevention.sendMessage(player, TextMode.Info, Messages.BlockNotClaimed);
-					Visualization.Revert(player);
+					
 				}
 				
 				//claim case
@@ -1840,7 +1840,7 @@ class PlayerEventHandler implements Listener
 						
 						
 					}
-					
+					Visualization.Revert(player);
 					
 					
 					for(Claim claim:claimsshow){
