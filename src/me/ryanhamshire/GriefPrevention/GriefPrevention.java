@@ -239,8 +239,8 @@ public class GriefPrevention extends JavaPlugin
 		
 		
 		//MinecraftMMO = (mcMMO) Bukkit.getPluginManager().getPlugin("mcMMO");
-		GriefPrevention.AddLogEntry(new File(DataStore.configFilePath).getAbsolutePath());
-		GriefPrevention.AddLogEntry("File Exists:" + new File(DataStore.configFilePath).exists());
+		Debugger.Write(new File(DataStore.configFilePath).getAbsolutePath(),DebugLevel.Verbose);
+		Debugger.Write("File Exists:" + new File(DataStore.configFilePath).exists(),DebugLevel.Verbose);
 		//load the config if it exists
 		FileConfiguration config = YamlConfiguration.loadConfiguration(new File(DataStore.configFilePath));
 		FileConfiguration outConfig = new YamlConfiguration();

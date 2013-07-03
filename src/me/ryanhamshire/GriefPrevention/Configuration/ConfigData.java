@@ -305,6 +305,7 @@ public class ConfigData {
 			
 			
 		}
+		/*
 		GriefPrevention.instance.getLogger().log(Level.INFO, "Reading WorldConfigurations from " + ConfigLocation.getAbsolutePath());
 		if(ConfigLocation.exists() && ConfigLocation.isDirectory()){
 			for(File lookfile: ConfigLocation.listFiles()){
@@ -348,7 +349,7 @@ public class ConfigData {
 			
 		}
 		
-		
+		*/
 		
 		
 	}
