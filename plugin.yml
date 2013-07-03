@@ -4,6 +4,9 @@ softdepend: [Vault, Multiverse-Core, My Worlds, MystCraft, Transporter]
 dev-url: http://dev.bukkit.org/server-mods/grief-prevention
 version: 7.8
 commands:
+   gphelp:
+      description: GriefPrevention Advanced Help command
+      usage: /gp [topic]
    setclaimblocks:
       description: sets the claim blocks for a player to a specific value.
       usage: /SetClaimBlocks <player> <amount>
@@ -145,8 +148,12 @@ commands:
       permission: griefprevention.adminclaims
    transferclaim:
       description: Converts an administrative claim to a private claim.
-      usage: /TransferClaim <player>
+      usage: /TransferClaim <player> [targetplayer]
       permission: griefprevention.adjustclaimblocks
+   giveclaim:
+      description: Gives a claim to another player. Requires AdminClaims permission to give a claim that doesn't belong to the player.
+      usage: /GiveClaim <TargetPlayer>
+      permission: griefprevention.giveclaim
    deathblow:
       description: Kills a player, optionally giving his inventory to another player.
       usage: /DeathBlow <player> [recipientPlayer]
