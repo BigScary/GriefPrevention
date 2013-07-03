@@ -167,7 +167,7 @@ public class GriefPrevention extends JavaPlugin
 	//adds a server log entry
 	public static void AddLogEntry(String entry)
 	{
-		instance.getLogger().log(Level.INFO,"GriefPrevention: " + entry);
+		instance.getLogger().log(Level.INFO,entry);
 	}
 	public Player getNearestPlayer(Location l){
 		

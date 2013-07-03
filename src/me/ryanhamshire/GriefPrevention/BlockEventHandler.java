@@ -277,7 +277,13 @@ public class BlockEventHandler implements Listener
 				}
 			}
 		}
-		
+		//if placed block is fire, make sure FireSetting is allowed in that location.
+		if(block.getType()==Material.FIRE){
+			if(wc.getFireSetting().Allowed(block.getLocation(), player).Denied()){
+				placeEvent.setCancelled(true);
+				return;
+			}
+		}
 		
 		//FEATURE: limit fire placement, to prevent PvP-by-fire
 		

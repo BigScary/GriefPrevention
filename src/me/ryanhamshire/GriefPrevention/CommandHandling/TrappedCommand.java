@@ -1,6 +1,7 @@
 package me.ryanhamshire.GriefPrevention.CommandHandling;
 
 import java.util.Calendar;
+import java.util.Date;
 
 import me.ryanhamshire.GriefPrevention.Claim;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
@@ -58,7 +59,7 @@ public class TrappedCommand extends GriefPreventionCommand{
 		//check cooldown
 		long lastTrappedUsage = playerData.lastTrappedUsage.getTime();
 		long nextTrappedUsage = lastTrappedUsage + 1000 * 60 * wc.getClaimsTrappedCooldownMinutes(); 
-		long now = Calendar.getInstance().getTimeInMillis();
+		long now =  new Date().getTime();
 		if(now < nextTrappedUsage)
 		{
 			GriefPrevention.sendMessage(player, TextMode.Err, Messages.TrappedOnCooldown, String.valueOf(wc.getClaimsTrappedCooldownMinutes()), String.valueOf((nextTrappedUsage - now) / (1000 * 60) + 1));

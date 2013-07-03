@@ -22,6 +22,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -266,7 +267,7 @@ class PlayerEventHandler implements Listener
 			//check for caps in lengths greater than the specified limit.
 			StringBuilder sbuffer = new StringBuilder();
 			for(int i=0;i<message.length()-wc.getSpamCapsMinLength();i++){
-				if(i==-1) break;
+				if(i<0) break;
 				String teststr = message.substring(i,wc.getSpamCapsMinLength());
 				if(teststr.equals(teststr.toUpperCase())){
 					//gotcha!
@@ -526,7 +527,7 @@ class PlayerEventHandler implements Listener
 			}
 		}
 		
-		//remember the player's ip address
+		//remember the player's ip address 
 		PlayerData playerData = this.dataStore.getPlayerData(player.getName());
 		playerData.ipAddress = event.getAddress();
 	}
@@ -549,7 +550,7 @@ class PlayerEventHandler implements Listener
 		String playerName = player.getName();
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(player.getWorld());
 		//note login time
-		long now = Calendar.getInstance().getTimeInMillis();
+		long now = new Date().getTime();
 		final PlayerData playerData = this.dataStore.getPlayerData(playerName);
 		playerData.lastSpawn = now;
 		playerData.lastLogin = new Date();
@@ -1285,25 +1286,27 @@ class PlayerEventHandler implements Listener
 		//otherwise no wilderness dumping (unless underground) in worlds where claims are enabled
 		else if(wc.getClaimsEnabled()) //outside claims logic...
 		{
-			if(!player.hasPermission("griefprevention.lava"))
-			{
+			
 				if(bucketEvent.getBucket() == Material.LAVA_BUCKET)
 				{
-						GriefPrevention.sendMessage(player, TextMode.Err, Messages.NoWildernessBuckets);
+					if(wc.getLavaBucketBehaviour().Allowed(block.getLocation(), player).Denied()){
+						
 						bucketEvent.setCancelled(true);
 						return;
-				}}
+					}
+				}
 			 if(bucketEvent.getBucket() == Material.WATER_BUCKET){
 				
 				if(wc.getWaterBucketBehaviour().Allowed(block.getLocation(), player).Denied()){
-					GriefPrevention.sendMessage(player,TextMode.Err,Messages.NoWildernessBuckets);
+					
 					bucketEvent.setCancelled(true);
 					return;
 				}
 			
 			
+			 }
 		}
-		}
+		
 		//lava buckets can't be dumped near other players unless pvp is on
 		if(!block.getWorld().getPVP() && !player.hasPermission("griefprevention.lava"))
 		{
@@ -1311,7 +1314,7 @@ class PlayerEventHandler implements Listener
 			{
 				
 				if(wc.getLavaBucketBehaviour().Allowed(block.getLocation(), player).Denied()){
-					GriefPrevention.sendMessage(player,TextMode.Err,Messages.ConfigDisabled,"Lava Placement");
+					//GriefPrevention.sendMessage(player,TextMode.Err,Messages.ConfigDisabled,"Lava Placement");
 					bucketEvent.setCancelled(true);
 					return;
 				}
@@ -1483,27 +1486,15 @@ class PlayerEventHandler implements Listener
 		
 		
 		//apply rules for putting out fires (requires build permission)
-		if(event.getClickedBlock() != null && event.getClickedBlock().getRelative(event.getBlockFace()).getType() == Material.FIRE)
+		if(event.getAction()==Action.LEFT_CLICK_BLOCK && event.getClickedBlock() != null && event.getClickedBlock().getRelative(event.getBlockFace()).getType() == Material.FIRE)
 		{
-			Claim claim = this.dataStore.getClaimAt(clickedBlock.getLocation(), false, playerData.lastClaim);
-			if(claim != null)
-			{
-				
-				
-				
-				playerData.lastClaim = claim;
-				
-				
-				
-				String noBuildReason = claim.allowBuild(player);
-				if(noBuildReason != null)
-				{
-					event.setCancelled(true);
-					GriefPrevention.sendMessage(player, TextMode.Err, noBuildReason);
-					return;
-				}
+			if(!wc.getFireExtinguishing().Allowed(clickedBlock.getLocation(), player).Denied()){
+				event.setCancelled(true);
+				return;
 			}
+		
 		}
+		
 		else if(event.getClickedBlock()!=null && event.getClickedBlock().getType()!=Material.AIR && event.getItem()!=null && 
 				wc.getAdministrationTool()==event.getItem().getType()){
 		
@@ -1770,6 +1761,8 @@ class PlayerEventHandler implements Listener
 			//if he's investigating a claim			
 			else if(materialInHand == wc.getClaimsInvestigationTool())
 			{
+				
+				
 				//air indicates too far away
 				if(clickedBlockType == Material.AIR)
 				{
@@ -1777,10 +1770,42 @@ class PlayerEventHandler implements Listener
 					return;
 				}
 				
-				Claim claim = this.dataStore.getClaimAt(clickedBlock.getLocation(), false /*ignore height*/, playerData.lastClaim);
+				//if shift is pressed, show Surrounding Claims and break.
 				
+				Claim[] claimsshow = null;
+				if(player.isSneaking() && player.hasPermission("GriefPrevention.InvestigateArea")){
+				//initialize to all claims in the given radius of the location.
+					int useradius = wc.getConfigShowSurroundingsRadius();
+					//by radius we mean size.
+					//initialize the starting and ending X,Z locations to search
+					int StartX = player.getLocation().getBlockX() - useradius;
+					int EndX = player.getLocation().getBlockX() + useradius;
+					int StartZ = player.getLocation().getBlockZ() - useradius;
+					int EndZ = player.getLocation().getBlockZ() + useradius;
+					Set<Claim> buildlist = new HashSet<Claim>();
+					for (int X=StartX;X<EndX;X++){
+						for(int Z=StartZ;Z<EndZ;Z++){
+							
+							Claim grabclaim = dataStore.getClaimAt(new Location(player.getWorld(),X,clickedBlock.getLocation().getBlockY(),Z),false,null);
+							if(grabclaim!=null && !buildlist.contains(grabclaim))
+							{
+								buildlist.add(grabclaim);
+							}
+							
+							
+						}
+					}
+					claimsshow = new Claim[buildlist.size()];
+					buildlist.toArray(claimsshow);
+					
+					
+					
+				}
+				else {
+				claimsshow = new Claim[]{this.dataStore.getClaimAt(clickedBlock.getLocation(), false /*ignore height*/, playerData.lastClaim)};
+				}
 				//no claim case
-				if(claim == null)
+				if(claimsshow == null || claimsshow[0]==null)
 				{
 					GriefPrevention.sendMessage(player, TextMode.Info, Messages.BlockNotClaimed);
 					Visualization.Revert(player);
@@ -1789,32 +1814,65 @@ class PlayerEventHandler implements Listener
 				//claim case
 				else
 				{
-					playerData.lastClaim = claim;
-					GriefPrevention.sendMessage(player, TextMode.Info, Messages.BlockClaimed, claim.getOwnerName());
-					
-					//visualize boundary
-					Visualization visualization = Visualization.FromClaim(claim, clickedBlock.getY(), VisualizationType.Claim, player.getLocation());
-					Visualization.Apply(player, visualization);
-					
-					//if can resize this claim, tell about the boundaries
-					if(claim.allowEdit(player) == null)
-					{
-						GriefPrevention.sendMessage(player, TextMode.Info, "  " + claim.getWidth() + "x" + claim.getHeight() + "=" + claim.getArea());
+					if( claimsshow.length==1) Visualization.Revert(player);
+					else {
+						//Showing X Claims within X Blocks of (X,Z).
+						String messagedisplay = "Showing " + claimsshow.length + " Claims within " + 
+						wc.getConfigShowSurroundingsRadius() + " blocks of " + GriefPrevention.getfriendlyLocationString(clickedBlock.getLocation())	;
+						
+						//get the unique owners of the claims.
+						Set<String> Owners = new HashSet<String>();
+						for(Claim investigate:claimsshow){
+							if(!Owners.contains(investigate.getOwnerName()))
+								Owners.add(investigate.getOwnerName());
+						}
+						StringBuffer buildnames = new StringBuffer();
+						for(String loopname:Owners){
+							buildnames.append(loopname).append(",");
+						}
+						String shownames = buildnames.toString().substring(0,buildnames.length()-1);
+						
+						
+						
+						GriefPrevention.sendMessage(player, TextMode.Info, messagedisplay);
+						GriefPrevention.sendMessage(player, TextMode.Instr, "Owned by players:" + shownames);
+						
+						
 					}
 					
-					//if deleteclaims permission, tell about the player's offline time
-					if(!claim.isAdminClaim() && player.hasPermission("griefprevention.deleteclaims"))
-					{
-						PlayerData otherPlayerData = this.dataStore.getPlayerData(claim.getOwnerName());
-						Date lastLogin = otherPlayerData.lastLogin;
-						Date now = new Date();
-						long daysElapsed = (now.getTime() - lastLogin.getTime()) / (1000 * 60 * 60 * 24); 
+					
+					
+					for(Claim claim:claimsshow){
+						playerData.lastClaim = claim;
 						
-						GriefPrevention.sendMessage(player, TextMode.Info, Messages.PlayerOfflineTime, String.valueOf(daysElapsed));
 						
-						//drop the data we just loaded, if the player isn't online
-						if(GriefPrevention.instance.getServer().getPlayerExact(claim.getOwnerName()) == null)
-							this.dataStore.clearCachedPlayerData(claim.getOwnerName());
+						//visualize boundary
+						Visualization visualization = Visualization.FromClaim(claim, clickedBlock.getY(), VisualizationType.Claim, player.getLocation());
+						//clear visualized claims if there is only one item.
+						Visualization.Apply(player, visualization,claimsshow.length==1);
+						if(claimsshow.length==1){ //only show specific claim information when looking at a single claim
+							//if can resize this claim, tell about the boundaries
+							GriefPrevention.sendMessage(player, TextMode.Info, Messages.BlockClaimed, claim.getOwnerName());
+							if(claim.allowEdit(player) == null)
+							{
+								GriefPrevention.sendMessage(player, TextMode.Info, "  " + claim.getWidth() + "x" + claim.getHeight() + "=" + claim.getArea());
+							}
+							
+							//if deleteclaims permission, tell about the player's offline time
+							if(!claim.isAdminClaim() && player.hasPermission("griefprevention.deleteclaims"))
+							{
+								PlayerData otherPlayerData = this.dataStore.getPlayerData(claim.getOwnerName());
+								Date lastLogin = otherPlayerData.lastLogin;
+								Date now = new Date();
+								long daysElapsed = (now.getTime() - lastLogin.getTime()) / (1000 * 60 * 60 * 24); 
+								
+								GriefPrevention.sendMessage(player, TextMode.Info, Messages.PlayerOfflineTime, String.valueOf(daysElapsed));
+								
+								//drop the data we just loaded, if the player isn't online
+								if(GriefPrevention.instance.getServer().getPlayerExact(claim.getOwnerName()) == null)
+									this.dataStore.clearCachedPlayerData(claim.getOwnerName());
+							}
+						}
 					}
 				}
 				

@@ -40,12 +40,15 @@ public class Visualization
 	public ArrayList<VisualizationElement> elements = new ArrayList<VisualizationElement>();
 	
 	//sends a visualization to a player
-	public static void Apply(Player player, Visualization visualization)
+	public static void Apply(Player player,Visualization visualization){
+		Apply(player,visualization,true);
+	}
+	public static void Apply(Player player, Visualization visualization,boolean CancelCurrent)
 	{
 		PlayerData playerData = GriefPrevention.instance.dataStore.getPlayerData(player.getName());
 		
 		//if he has any current visualization, clear it first
-		if(playerData.currentVisualization != null)
+		if(playerData.currentVisualization != null && CancelCurrent)
 		{
 			Visualization.Revert(player);
 		}

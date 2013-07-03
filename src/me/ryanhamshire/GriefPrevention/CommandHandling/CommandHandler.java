@@ -1,6 +1,6 @@
 package me.ryanhamshire.GriefPrevention.CommandHandling;
 import java.util.ArrayList;
-import java.util.Calendar;
+//import java.util.Calendar;
 import java.util.List;
 
 import me.ryanhamshire.GriefPrevention.Claim;
@@ -81,8 +81,16 @@ public class CommandHandler implements CommandExecutor {
 			for(String addcmd:gotlabels){
 				System.out.println(addcmd);
 				PluginCommand pc = GriefPrevention.instance.getCommand(addcmd);
+				try {
 				Debugger.Write("Attaching Command \"" + addcmd + "\" to command class " + iterate.getClass().getName() , DebugLevel.Informational);
 				pc.setExecutor(iterate);
+				
+				}
+				catch(Exception exx){
+					System.out.println("Exception adding command:" + addcmd);
+					System.out.println("This is likely a mistake in plugin.yml, please notify the GriefPrevention maintainers :)");
+					exx.printStackTrace();
+				}
 			}
 
 		}

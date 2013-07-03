@@ -1,5 +1,8 @@
 package me.ryanhamshire.GriefPrevention.Configuration;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import me.ryanhamshire.GriefPrevention.Claim;
 import me.ryanhamshire.GriefPrevention.Debugger;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
@@ -63,7 +66,8 @@ public class ClaimBehaviourData {
 			if(atposition==null) return testresult=true; //unexpected...
 			switch(this){
 			case Disabled:
-				GriefPrevention.sendMessage(testPlayer, TextMode.Err, Messages.ConfigDisabled);
+				if(testPlayer!=null)
+					GriefPrevention.sendMessage(testPlayer, TextMode.Err, Messages.ConfigDisabled);
 				return testresult=false;
 			case RequireNone:
 				return testresult=true;	
@@ -143,6 +147,7 @@ public class ClaimBehaviourData {
 	}
 	private PlacementRules Wilderness;
 	private PlacementRules Claims;
+	
 	private ClaimBehaviourMode ClaimBehaviour;
 	public ClaimBehaviourMode getBehaviourMode(){ return ClaimBehaviour;}
 	public ClaimBehaviourData setBehaviourMode(ClaimBehaviourMode b){
@@ -151,6 +156,7 @@ public class ClaimBehaviourData {
 		cdc.ClaimBehaviour=b;
 		return cdc;
 	}
+	
 	/**
 	 * returns whether this Behaviour is allowed at the given location. if the passed player currently has
 	 * ignoreclaims on, this will return true no matter what. This delegates to the overload that displays messages
@@ -187,6 +193,7 @@ public class ClaimBehaviourData {
 	 * the value that would be retrieved without it's interference.
 	 * @return whether this behaviour is Allowed or Denied in this claim.
 	 */
+	@SuppressWarnings("unused")
 	public ClaimAllowanceConstants Allowed(Location position,Player RelevantPlayer,boolean ShowMessages,boolean fireEvent){
 		ClaimAllowanceConstants returned = ClaimAllowanceConstants.Allow;
 		try {
@@ -195,15 +202,19 @@ public class ClaimBehaviourData {
 		//String result=null;
 		PlayerData pd = null;
 		boolean ignoringclaims = false;
-		if(RelevantPlayer!=null) pd = GriefPrevention.instance.dataStore.getPlayerData(RelevantPlayer.getName());
-		if(pd!=null) ignoringclaims = pd.ignoreClaims;
+		if(RelevantPlayer!=null) {
+			pd = GriefPrevention.instance.dataStore.getPlayerData(RelevantPlayer.getName());
+			if(pd!=null) ignoringclaims = pd.ignoreClaims;
+			
+		}
 		if(fireEvent){
 			PermissionCheckEvent permcheck = new PermissionCheckEvent(this,RelevantPlayer);
 			Bukkit.getPluginManager().callEvent(permcheck);
 			if(permcheck.getResult()!=null){
-				return permcheck.getResult();
+				return returned=permcheck.getResult();
 		}
 		}
+		//check permissions if there is a player involved and we have them.
 		
 		
 		Claim testclaim = GriefPrevention.instance.dataStore.getClaimAt(position, true, null);
@@ -228,10 +239,10 @@ public class ClaimBehaviourData {
 		else if(testclaim==null){
 			//we aren't inside a claim.
 			//System.out.println(BehaviourName + "Wilderness test...");
-			ClaimAllowanceConstants wildernessresult = Wilderness.Allow(position,RelevantPlayer,false)?ClaimAllowanceConstants.Allow:ClaimAllowanceConstants.Deny;
-			if(wildernessresult.Denied() && ShowMessages && RelevantPlayer!=null){
-				GriefPrevention.sendMessage(RelevantPlayer, TextMode.Err, Messages.ConfigDisabled,this.BehaviourName);
-			}
+			ClaimAllowanceConstants wildernessresult = Wilderness.Allow(position,RelevantPlayer,ShowMessages && RelevantPlayer!=null)?ClaimAllowanceConstants.Allow:ClaimAllowanceConstants.Deny;
+			//if(wildernessresult.Denied() && ShowMessages && RelevantPlayer!=null){
+			//	GriefPrevention.sendMessage(RelevantPlayer, TextMode.Err, Messages.ConfigDisabled,this.BehaviourName);
+			//}
 			return (returned=wildernessresult);
 			
 		}
@@ -287,6 +298,7 @@ public class ClaimBehaviourData {
 		Wilderness = new PlacementRules(Source,outConfig,NodePath + ".Wilderness",Defaults.getWildernessRules());
 		Claims = new PlacementRules (Source,outConfig,NodePath + ".Claims",Defaults.getClaimsRules());
 		String strmode = Source.getString(NodePath + ".Claims.ClaimControl",Defaults.getBehaviourMode().name());
+		//check for a requiredpermissions entry. If there isn't one, though, don't save it.
 		
 		
 		ClaimBehaviour = ClaimBehaviourMode.parseMode(strmode);
@@ -312,4 +324,25 @@ public class ClaimBehaviourData {
 	public static ClaimBehaviourData getNone(String pName){ return new ClaimBehaviourData(pName,PlacementRules.Neither,PlacementRules.Neither,ClaimBehaviourMode.RequireNone);}
 	public static ClaimBehaviourData getAll(String pName){ return new ClaimBehaviourData(pName,PlacementRules.Both,PlacementRules.Both,ClaimBehaviourMode.RequireNone);}
 	
+	public ClaimBehaviourData setRequiredPermissions(String ... params){
+		PlacementRules copyClaims = Claims.setRequiredPermissions(params);
+		PlacementRules copyWilderness = Wilderness.setRequiredPermissions(params);
+		ClaimBehaviourData copydata = new ClaimBehaviourData(this);
+		copydata.Claims = copyClaims;
+		copydata.Wilderness=copyWilderness;
+		return copydata;
+	}
+	public ClaimBehaviourData setClaimRequiredPermission(String ... params){
+		PlacementRules copyClaims = Claims.setRequiredPermissions(params);
+		ClaimBehaviourData copydata = new ClaimBehaviourData(this);
+		copydata.Claims = copyClaims;
+		return copydata;
+		
+	}
+	public ClaimBehaviourData setWildernessRequiredPermission(String ... params){
+		PlacementRules copyWilds = Wilderness.setRequiredPermissions(params);
+		ClaimBehaviourData copydata = new ClaimBehaviourData(this);
+		copydata.Wilderness = copyWilds;
+		return copydata;
+	}
 }

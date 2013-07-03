@@ -1,6 +1,10 @@
 package me.ryanhamshire.GriefPrevention.Configuration;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
+import me.ryanhamshire.GriefPrevention.TextMode;
 import me.ryanhamshire.GriefPrevention.Configuration.ClaimBehaviourData.ClaimAllowanceConstants;
 
 import org.bukkit.Location;
@@ -52,6 +56,36 @@ public class PlacementRules {
 	public static PlacementRules BelowOnly = new PlacementRules(false,true);
 	public static PlacementRules Both = new PlacementRules(true,true);
 	public static PlacementRules Neither = new PlacementRules(false,false);
+	private List<String> RequiredPermissions = new ArrayList<String>();
+	
+	public List<String> getRequiredPermissions(){return RequiredPermissions;}
+	public PlacementRules setRequiredPermissions(String ... requiredperms){
+		List<String> makelist = new ArrayList<String>();
+		PlacementRules cdc = new PlacementRules(this);
+		for(String perm:requiredperms){
+			if(perm.contains(";")){
+				for(String addperm:perm.split(";")){
+					makelist.add(addperm);
+				}
+			}
+			else
+				makelist.add(perm);
+			}
+		cdc.RequiredPermissions = makelist;
+		//System.out.println("Set to have " + cdc.RequiredPermissions.size() + " perms");
+		return cdc;
+	}
+	
+	public PlacementRules setRequiredPermissions(List<String> requiredperms){
+		PlacementRules cdc = new PlacementRules(this);
+		List<String> madeperms = new ArrayList<String>();
+		for(String iterate:requiredperms){
+			madeperms.add(iterate);
+		}
+		cdc.RequiredPermissions = madeperms;
+		return cdc;
+	}
+	
 	@Override
 	public String toString(){
 		if(AboveSeaLevel.Allowed() && BelowSeaLevel.Denied()) return "Only Above Sea Level";
@@ -92,7 +126,19 @@ public class PlacementRules {
 		if(BelowSeaLevel==null) BelowSeaLevel = Defaults.BelowSeaLevel;
 		Target.set(NodePath + ".AboveSeaLevel", AboveSeaLevel.name());
 		Target.set(NodePath + ".BelowSeaLevel", BelowSeaLevel.name());
-		
+		if(Source.contains(NodePath + ".RequiredPermissions")){
+		this.RequiredPermissions = Source.getStringList(NodePath + ".RequiredPermissions");
+		}
+		else {
+			//System.out.println("RequiredPerms setting to item with " + Defaults.RequiredPermissions.size() + " Elements.");
+			RequiredPermissions = Defaults.RequiredPermissions;
+		}
+		//if it's null, no worries; just initialize to an empty list.
+		if(RequiredPermissions ==null) RequiredPermissions = new ArrayList<String>();
+		//if it contains elements, save the list.
+		if(RequiredPermissions.size()>0){
+			Target.set(NodePath +".RequiredPermissions", RequiredPermissions);
+		}
 		
 		
 	}
@@ -105,6 +151,39 @@ public class PlacementRules {
 		int SeaLevelofWorld = GriefPrevention.instance.getSeaLevel(Target.getWorld());
 		boolean result =  (AboveSeaLevel.Allowed() && (Target.getBlockY() >= SeaLevelofWorld)) ||
 				(BelowSeaLevel.Allowed() && (Target.getBlockY() < SeaLevelofWorld));
+		Player RelevantPlayer = p;
+		
+		if(RelevantPlayer!=null && RequiredPermissions.size()>0){
+			//the player has to have at least one of the permissions, or we will be forced to deny it.
+			boolean permsucceed = false;
+			for(String checkperm:RequiredPermissions){
+				if(RelevantPlayer.hasPermission(checkperm)){
+					permsucceed=true;
+					break;
+				}
+			}
+			if(!permsucceed) {
+				
+				StringBuffer buildpermnames = new StringBuffer();
+				for(String perm:RequiredPermissions){
+					buildpermnames.append(perm);
+					buildpermnames.append(",");
+				}
+				
+				String uselisting = buildpermnames.toString().substring(0, buildpermnames.length()-1);
+				if(ShowMessages){
+				if(RequiredPermissions.size()==1){
+					GriefPrevention.sendMessage(RelevantPlayer, TextMode.Err, "You need " + uselisting + " Permission for that Action.");
+				}
+				else {
+					GriefPrevention.sendMessage(RelevantPlayer, TextMode.Err, "You need " + uselisting.replace(","," or ") + " Permission for that Action");
+				}
+				}
+				result =false;
+			}
+		}
+		
+		
 		//System.out.println("Block:" + Target.getBlockY() + " SeaLevel:" + SeaLevelofWorld + " Allow:" + result);
 		return result;
 		

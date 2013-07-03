@@ -94,7 +94,11 @@ public class WorldConfig {
 	private ClaimBehaviourData ZombieDoorBreaking;
 	public ClaimBehaviourData getZombieDoorBreaking(){ return ZombieDoorBreaking;}
 	
+	private ClaimBehaviourData FireExtinguishing;
+	public ClaimBehaviourData getFireExtinguishing(){ return FireExtinguishing;}
 	
+	private ClaimBehaviourData FireSetting;
+	public ClaimBehaviourData getFireSetting(){ return FireSetting;}
 	private ClaimBehaviourData SheepShearingRules;
 	public ClaimBehaviourData getShearingRules(){ return SheepShearingRules;}
 	
@@ -330,6 +334,9 @@ public class WorldConfig {
 	private int config_claims_trappedCooldownMinutes;					//number of minutes between uses of the /trapped command
 	public int getClaimsTrappedCooldownMinutes(){ return config_claims_trappedCooldownMinutes;}
 	
+	private int config_claims_showsurroundingsRadius;
+	public int getConfigShowSurroundingsRadius(){ return config_claims_showsurroundingsRadius;}
+	
 	private Material config_claims_investigationTool;				//which material will be used to investigate claims with a right click
 	public Material getClaimsInvestigationTool(){ return config_claims_investigationTool;}
 	private Material config_claims_modificationTool;	  				//which material will be used to create/resize claims with a right click
@@ -530,7 +537,7 @@ public class WorldConfig {
 				ClaimBehaviourData.getOutsideClaims("Other Explosion Damage"));
 		
 		ClaimBehaviourData WaterRequire = new ClaimBehaviourData("Water Placement",PlacementRules.BelowOnly,PlacementRules.Both,ClaimBehaviourMode.RequireBuild);
-		ClaimBehaviourData LavaRequire = new ClaimBehaviourData("Lava Placement",PlacementRules.BelowOnly,PlacementRules.Both,ClaimBehaviourMode.RequireBuild);
+		ClaimBehaviourData LavaRequire = new ClaimBehaviourData("Lava Placement",PlacementRules.BelowOnly,PlacementRules.Both,ClaimBehaviourMode.RequireBuild).setWildernessRequiredPermission("GriefPrevention.Lava");
 		
 		this.WaterBucketBehaviour = new ClaimBehaviourData("Water Placement",config,outConfig,"GriefPrevention.Rules.WaterBuckets",
 		WaterRequire);
@@ -628,6 +635,11 @@ public class WorldConfig {
 		this.Beds = new ClaimBehaviourData("Beds",config,outConfig,"GriefPrevention.Rules.Beds",
 				ClaimBehaviourData.getAll("Beds").setBehaviourMode(ClaimBehaviourMode.RequireAccess));
 		
+		this.FireExtinguishing = new ClaimBehaviourData("Fire Extinguishing",config,outConfig,"GriefPrevention.Rules.FireExtinguishing",
+				ClaimBehaviourData.getAll("Fire Extinguishing").setBehaviourMode(ClaimBehaviourMode.RequireBuild));
+		
+		this.FireSetting = new ClaimBehaviourData("Fire Setting",config,outConfig,"GriefPrevention.Rules.FireSetting",
+				ClaimBehaviourData.getInsideClaims("Fire Setting").setBehaviourMode(ClaimBehaviourMode.RequireBuild).setWildernessRequiredPermission("GriefPrevention.Lava"));
 		//BreedingRules,EquineTamingRules,LeadUsageRules,
 		//EquineInventoryRules,NameTagUsageRules
 		//FeedingRules
@@ -769,7 +781,7 @@ public class WorldConfig {
 		outConfig.set("GriefPrevention.Claims.AbandonReturnRatio", this.config_claims_AbandonReturnRatio);
 		outConfig.set("GriefPrevention.CreativeRules",config_claims_creativeRules);
 		
-		
+		this.config_claims_showsurroundingsRadius = config.getInt("GriefPrevention.Claims.InvestigateSurroundingsRadius",50);
 						
 		this.config_claims_perplayer_claim_limit = config.getInt("GriefPrevention.Claims.PerPlayerLimit",0);
 		

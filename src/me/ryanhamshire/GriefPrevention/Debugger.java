@@ -24,7 +24,11 @@ public class Debugger {
 	public DebugLevel getCurrentLevel(){ return CurrentLevel;}
 	public static DebugLevel getCurrentDebugLevel(){ return GriefPrevention.instance.debug.getCurrentLevel();}
 	public Debugger(DebugLevel DebuggingLevel){
-		GriefPrevention.AddLogEntry("Debug Message Granularity:" + DebuggingLevel.name());
+		
+		GriefPrevention.AddLogEntry("Debug Message Granularity set to " + DebuggingLevel.name());
+		GriefPrevention.AddLogEntry("To change Debug Message granularity, edit the \"GriefPrevention.DebugLevel\" Setting in config.yml.");
+		
+		//GriefPrevention.AddLogEntry("Debug Message Granularity:" + DebuggingLevel.name());
 		CurrentLevel=DebuggingLevel;
 	}
 	public void Output(String Message,DebugLevel Level){

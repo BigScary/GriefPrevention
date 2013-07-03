@@ -91,7 +91,9 @@ public class CleanupUnusedClaimsTask implements Runnable
 		
 		//if he's been gone at least a week, if he has ONLY the new player claim, it will be removed
 		Calendar sevenDaysAgo = Calendar.getInstance();
+		if(sevenDaysAgo==null) return;
 		sevenDaysAgo.add(Calendar.DATE, -wc.getChestClaimExpirationDays());
+		
 		boolean newPlayerClaimsExpired = sevenDaysAgo.getTime().after(playerData.lastLogin);
 		
 		//if only one claim, and the player hasn't played in a week
