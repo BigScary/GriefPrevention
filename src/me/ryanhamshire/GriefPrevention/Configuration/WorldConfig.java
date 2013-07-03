@@ -625,6 +625,8 @@ public class WorldConfig {
 		this.Levers = new ClaimBehaviourData("Levers",config,outConfig,"GriefPrevention.Rules.Levers",
 				ClaimBehaviourData.getAll("Levers").setBehaviourMode(ClaimBehaviourMode.RequireAccess));
 		
+		this.Beds = new ClaimBehaviourData("Beds",config,outConfig,"GriefPrevention.Rules.Beds",
+				ClaimBehaviourData.getAll("Beds").setBehaviourMode(ClaimBehaviourMode.RequireAccess));
 		
 		//BreedingRules,EquineTamingRules,LeadUsageRules,
 		//EquineInventoryRules,NameTagUsageRules
