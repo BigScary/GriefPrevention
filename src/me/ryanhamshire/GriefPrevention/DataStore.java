@@ -61,6 +61,7 @@ public abstract class DataStore
 	
 	//path information, for where stuff stored on disk is well...  stored
 	public final static String dataLayerFolderPath = "plugins" + File.separator + "GriefPrevention";
+	public final static String oldDataLayerFolderPath = "plugins" + File.separator + "GriefPreventionData";
 	public final static String configFilePath = dataLayerFolderPath + File.separator + "config.yml";
 	final static String messagesFilePath = dataLayerFolderPath + File.separator + "messages.yml";
 	

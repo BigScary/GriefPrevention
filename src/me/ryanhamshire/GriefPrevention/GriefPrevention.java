@@ -19,6 +19,8 @@
 package me.ryanhamshire.GriefPrevention;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -78,6 +80,8 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import com.google.common.io.Files;
 
 //import com.gmail.nossr50.mcMMO;
 
@@ -227,8 +231,70 @@ public class GriefPrevention extends JavaPlugin
 	public CleanupUnusedClaimsTask CleanupTask = null;
 	
 
+	private void migrateData(){
+		
+		//Migrates data from 7.7 GriefPreventionData folder to GriefPrevention folder.
+		
+		
+	}
 	
 	private static boolean eventsRegistered = false;
+	private static final int ChunkSize = 4096;
+	private void recursiveCopy(File pSource, File pDest) throws IOException{
+	     
+	          if (pSource.isDirectory()) {
+	          // A simple validation, if the destination is not exist then create it
+	               if (!pDest.exists()) {
+	                    pDest.mkdirs();
+	               }
+	 
+	               // Create list of files and directories on the current source
+	               // Note: with the recursion 'fSource' changed accordingly
+	               String[] copyList = pSource.list();
+	 
+	               for (int index = 0; index < copyList.length; index++) {
+	                    File dest = new File(pDest, copyList[index]);
+	                    File source = new File(pSource, copyList[index]);
+	 
+	                    // Recursion call take place here
+	                    recursiveCopy(source, dest);
+	               }
+	          }
+	          else {
+	               // Copy the file into the already created destination.
+	        	  FileInputStream fInStream = null;
+	        	  FileOutputStream fOutStream = null;
+	               try {
+	            	   fInStream = new FileInputStream(pSource);
+		               fOutStream = new FileOutputStream(pDest);
+	 
+	               // Read 2K at a time from the file
+	               byte[] buffer = new byte[ChunkSize];
+	               int iBytesReads;
+	 
+	               // In each successful read, write back to the source
+	               while ((iBytesReads = fInStream.read(buffer)) >= 0) {
+	                    fOutStream.write(buffer, 0, iBytesReads);
+	               }
+	               }
+	               finally{
+	               // Safe exit
+	               if (fInStream != null) {
+	                    fInStream.close();
+	               }
+	 
+	               if (fOutStream != null) {
+	                    fOutStream.close();
+	               }
+	               }
+	               
+	          }
+	     
+	     
+	}
+	
+	
+	
 	//initializes well...   everything
 	public void onEnable()
 	{ 		
@@ -236,7 +302,20 @@ public class GriefPrevention extends JavaPlugin
 		AddLogEntry("Grief Prevention enabled.");
 		
 		cmdHandler = new CommandHandler();
-		
+		//if the old data folder exists and the new one doesn't...
+		File oldData = new File(dataStore.oldDataLayerFolderPath);
+		File newData = new File(dataStore.dataLayerFolderPath);
+		if(oldData.exists() && !newData.exists()){
+			//migrateData();
+			AddLogEntry("Found old GriefPrevention 7.7 or Earlier Data. Attempting to copy to new folder.");
+		try {
+			Files.copy(oldData,newData);
+		}
+		catch(IOException exx){
+			AddLogEntry("Exception occured attempting to copy config data.");
+			exx.printStackTrace();
+		}
+		}
 		
 		//MinecraftMMO = (mcMMO) Bukkit.getPluginManager().getPlugin("mcMMO");
 		Debugger.Write(new File(DataStore.configFilePath).getAbsolutePath(),DebugLevel.Verbose);
@@ -277,7 +356,7 @@ public class GriefPrevention extends JavaPlugin
 		
 		this.config_claims_initialBlocks = config.getInt("GriefPrevention.Claims.InitialBlocks",100);
 	    this.config_mod_config_search = config.getBoolean("GriefPrevention.Mods.PerformConfigSearch",true);
-	    this.config_claims_deleteclaimswithunrecognizedowners = config.getBoolean("GriefPrevention.Claims.DeleteWithUnrecognizedOwner",true);
+	    this.config_claims_deleteclaimswithunrecognizedowners = config.getBoolean("GriefPrevention.Claims.DeleteWithUnrecognizedOwner",false);
 	    outConfig.set("GriefPrevention.Claims.DeleteWithUnrecognizedOwner",this.config_claims_deleteclaimswithunrecognizedowners);
 		outConfig.set("GriefPrevention.Economy.ClaimBlocksPurchaseCost", this.config_economy_claimBlocksPurchaseCost);
 		outConfig.set("GriefPrevention.Economy.ClaimBlocksSellValue", this.config_economy_claimBlocksSellValue);
