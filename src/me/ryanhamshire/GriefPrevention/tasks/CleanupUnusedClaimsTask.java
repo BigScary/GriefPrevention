@@ -74,6 +74,11 @@ public class CleanupUnusedClaimsTask implements Runnable
 		
 		//skip administrative claims
 		if(claim.isAdminClaim()) return;
+		//skip claims in unloaded worlds.
+		if(!GriefPrevention.instance.ww.LoadedWorlds.
+				contains(claim.getLesserBoundaryCorner().getWorld())){
+				return; //not loaded.
+		}
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(claim.getLesserBoundaryCorner().getWorld());
 		if(wc==null) return;
 		//track whether we do any important work which would require cleanup afterward

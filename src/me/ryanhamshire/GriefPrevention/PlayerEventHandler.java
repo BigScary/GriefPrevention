@@ -910,7 +910,7 @@ class PlayerEventHandler implements Listener
 					return;
 				}
 			}
-			else if(handItem.getType()==Material.NAME_TAG){
+			else if(handItem.getType().getId()==421){
 				if(wc.getNameTagUsageRules().Allowed(entity.getLocation(), player).Denied()){
 					event.setCancelled(true);
 					return;
@@ -1489,7 +1489,7 @@ class PlayerEventHandler implements Listener
 		//permission at the block location for the player.
 		
 		if((clickedBlock.getType()==Material.FENCE || clickedBlock.getType()==Material.NETHER_FENCE) &&
-				inhand!=null && inhand == Material.LEASH){
+				inhand!=null && inhand.getId() ==420){
 			
 			if(wc.getLeadUsageRules().Allowed(clickedBlock.getLocation(), player).Denied()){
 				event.setCancelled(true);

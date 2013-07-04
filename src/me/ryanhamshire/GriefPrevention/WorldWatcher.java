@@ -5,10 +5,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Queue;
+import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 
 import me.ryanhamshire.GriefPrevention.Debugger.DebugLevel;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.event.EventHandler;
@@ -20,7 +22,7 @@ public class WorldWatcher implements Listener {
 	
 	
 	//public HashMap<String,List<UnloadedClaimData>> DeferredLoad = new HashMap<String,List<UnloadedClaimData>>();
-	
+	public Set<World> LoadedWorlds = new HashSet<World>();
 	
 	private Location Correspond(Location Source,World Target){
 		//System.out.println("Creating corresponding location, Source is in " + Source.getWorld().getName() + " And target is in " + Target.getName() + " Equal:" + Source.getWorld().equals(Target));
@@ -41,6 +43,7 @@ public class WorldWatcher implements Listener {
 	@EventHandler
 	public void WorldUnload(WorldUnloadEvent event){
 		GriefPrevention.instance.dataStore.WorldUnloaded(event.getWorld());
+		LoadedWorlds.remove(event.getWorld());
 	}
 	
 
@@ -62,6 +65,7 @@ public class WorldWatcher implements Listener {
 		
 		GriefPrevention.instance.dataStore.WorldLoaded(event.getWorld());
 		//that should do it, simple enough.
+		LoadedWorlds.add(event.getWorld());
 	}
 	
 	

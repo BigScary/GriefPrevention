@@ -58,8 +58,12 @@ public class ConfigData {
 		return buildList;
 		
 	}
-	public WorldConfig getWorldConfig(World forWorld){
-		return getWorldConfig(forWorld.getName());
+	public WorldConfig getWorldConfig(String forWorld){
+		
+		World Grabfor = Bukkit.getWorld(forWorld);
+		if(Grabfor==null) return new WorldConfig(forWorld);
+		
+		return getWorldConfig(Grabfor);
 	}
 	public List<String> GetWorldConfigurationFiles(){
 		List<String> ActFiles = new ArrayList<String>();
@@ -188,16 +192,9 @@ public class ConfigData {
 	 * @param worldName Name of world to get configuration of.
 	 * @return WorldConfig instance representing the configuration for the given world.
 	 */
-	public WorldConfig getWorldConfig(String worldName){
-		World grabfor =null;
-		//print log message if the passed world is not currently loaded or present.
-		//it will still go ahead and try to load the configuration.
-		if((grabfor = Bukkit.getWorld(worldName))==null){
-			//GriefPrevention.instance.getLogger().log(Level.SEVERE, "invalid World:" + worldName);
-			
-			try {throw new Exception();} catch(Exception ex){ex.printStackTrace();}
-		}
-		if(grabfor==null) return null;
+	public WorldConfig getWorldConfig(World grabfor){
+		
+		String worldName = grabfor.getName();
 		
 		//if it's not in the hashmap...
 		if(!WorldCfg.containsKey(worldName)){
