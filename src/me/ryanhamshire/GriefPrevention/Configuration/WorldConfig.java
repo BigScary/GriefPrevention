@@ -499,6 +499,7 @@ public class WorldConfig {
 			isCreative = Bukkit.getServer().getDefaultGameMode()==GameMode.CREATIVE;
 			isPvP = getworld.getPVP();
 			boolean gotpvp = config.getBoolean("GriefPrevention.PvP.Enabled",isPvP);
+			outConfig.set("GriefPrevention.PvP.Enabled", gotpvp);
 			getworld.setPVP(isPvP = gotpvp);
 		}
 		
