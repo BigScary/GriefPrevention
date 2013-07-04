@@ -268,7 +268,21 @@ class PlayerEventHandler implements Listener
 			StringBuilder sbuffer = new StringBuilder();
 			try {
 			for(int i=0;i<message.length()-wc.getSpamCapsMinLength();i++){
-				String teststr = message.substring(i,i+wc.getSpamCapsMinLength());
+				String teststr = ""; 
+				try {
+				teststr = message.substring(i,i+wc.getSpamCapsMinLength());
+				}
+				catch(StringIndexOutOfBoundsException exx){
+					//testing code for ticket 212
+					//print out diagnostic info.
+					exx.printStackTrace();
+					System.out.println("Unexpected Error Processing Chat Command");
+					System.out.println("Current Message:\"" + message + "\"");
+					System.out.println("SpamCapsMinLength:" + wc.getSpamCapsMinLength());
+					System.out.println("i:" + i);
+					
+					
+				}
 				if(teststr.equals(teststr.toUpperCase())){
 					//gotcha!
 					sbuffer.append(teststr.toLowerCase());
