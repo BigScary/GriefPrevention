@@ -309,7 +309,7 @@ public class GriefPrevention extends JavaPlugin
 			//migrateData();
 			AddLogEntry("Found old GriefPrevention 7.7 or Earlier Data. Attempting to copy to new folder.");
 		try {
-			Files.copy(oldData,newData);
+			recursiveCopy(oldData,newData);
 		}
 		catch(IOException exx){
 			AddLogEntry("Exception occured attempting to copy config data.");
