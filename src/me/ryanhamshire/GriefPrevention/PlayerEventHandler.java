@@ -519,8 +519,8 @@ class PlayerEventHandler implements Listener
 				//determine how long since last login and cooldown remaining
 				PlayerData playerData = this.dataStore.getPlayerData(player.getName());
 				long millisecondsSinceLastLogin = (new Date()).getTime() - playerData.lastLogin.getTime();
-				long minutesSinceLastLogin = millisecondsSinceLastLogin / 1000 / 60;
-				long cooldownRemaining = wc.getSpamLoginCooldownSeconds() - minutesSinceLastLogin;
+				long secondsSinceLastLogin = millisecondsSinceLastLogin / 1000;
+				long cooldownRemaining = wc.getSpamLoginCooldownSeconds() - secondsSinceLastLogin;
 				
 				//if cooldown remaining and player doesn't have permission to spam
 				if(cooldownRemaining > 0 && !player.hasPermission("griefprevention.loginspam"))

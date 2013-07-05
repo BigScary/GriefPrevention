@@ -237,15 +237,27 @@ public class GriefPrevention extends JavaPlugin
 		
 		
 	}
-	
+	private class RecursiveCopyResult
+	{
+		public int FileCount;
+		public int DirCount;
+		public RecursiveCopyResult(int pFileCount,int pDirCount){
+			FileCount=pFileCount;
+			DirCount = pDirCount;
+		}
+	}
 	private static boolean eventsRegistered = false;
 	private static final int ChunkSize = 4096;
-	private void recursiveCopy(File pSource, File pDest) throws IOException{
+	private RecursiveCopyResult recursiveCopy(File pSource, File pDest,boolean ShowMessages) throws IOException{
 	     
+			int CountFiles = 0;
+			int CountDirs = 0;
 	          if (pSource.isDirectory()) {
 	          // A simple validation, if the destination is not exist then create it
 	               if (!pDest.exists()) {
+	            	   if(ShowMessages) System.out.println("Creating Target:" + pDest.getPath());
 	                    pDest.mkdirs();
+	                    CountDirs++;
 	               }
 	 
 	               // Create list of files and directories on the current source
@@ -257,7 +269,9 @@ public class GriefPrevention extends JavaPlugin
 	                    File source = new File(pSource, copyList[index]);
 	 
 	                    // Recursion call take place here
-	                    recursiveCopy(source, dest);
+	                    RecursiveCopyResult recursiveresult = recursiveCopy(source, dest,ShowMessages);
+	                    CountDirs+=recursiveresult.DirCount;
+	                    CountFiles+= recursiveresult.FileCount;
 	               }
 	          }
 	          else {
@@ -276,6 +290,7 @@ public class GriefPrevention extends JavaPlugin
 	               while ((iBytesReads = fInStream.read(buffer)) >= 0) {
 	                    fOutStream.write(buffer, 0, iBytesReads);
 	               }
+	               CountFiles++;
 	               }
 	               finally{
 	               // Safe exit
@@ -290,7 +305,7 @@ public class GriefPrevention extends JavaPlugin
 	               
 	          }
 	     
-	     
+	     return new RecursiveCopyResult(CountFiles,CountDirs);
 	}
 	
 	
@@ -307,9 +322,12 @@ public class GriefPrevention extends JavaPlugin
 		File newData = new File(dataStore.dataLayerFolderPath);
 		if(oldData.exists() && !newData.exists()){
 			//migrateData();
-			AddLogEntry("Found old GriefPrevention 7.7 or Earlier Data. Attempting to copy to new folder.");
+			AddLogEntry("Found old GriefPrevention 7.7 or Earlier Data, but no 7.8 or later data. Attempting to copy to new folder.");
+			AddLogEntry("This will Copy your GriefPrevention 7.7 Data to the new GriefPrevention 7.8 and Later location.");
+			AddLogEntry("You will need to reconfigure your settings using the new World-based Configuration.");
 		try {
-			recursiveCopy(oldData,newData);
+			RecursiveCopyResult copied = recursiveCopy(oldData,newData,true);
+			AddLogEntry("Migration complete. Copied " + copied.FileCount + " Files in " + copied.DirCount + " Directories.");
 		}
 		catch(IOException exx){
 			AddLogEntry("Exception occured attempting to copy config data.");
