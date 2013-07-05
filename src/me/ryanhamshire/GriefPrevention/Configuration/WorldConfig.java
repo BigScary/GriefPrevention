@@ -838,6 +838,9 @@ public class WorldConfig {
 		}
 		else
 			this.config_spam_loginCooldownSeconds = cooldownminutes*60;
+		
+		outConfig.set("GriefPrevention.Spam.LoginCooldownSeconds",config_spam_loginCooldownSeconds);
+		
 		this.config_spam_warningMessage = config.getString("GriefPrevention.Spam.WarningMessage", "Please reduce your noise level.  Spammers will be banned.");
 		this.config_spam_allowedIpAddresses = config.getString("GriefPrevention.Spam.AllowedIpAddresses", "1.2.3.4; 5.6.7.8");
 		this.config_spam_banMessage = config.getString("GriefPrevention.Spam.BanMessage", "Banned for spamming.");
@@ -853,7 +856,7 @@ public class WorldConfig {
 		
 		outConfig.set("GriefPrevention.Spam.Enabled", this.config_spam_enabled);
 		
-		outConfig.set("GriefPrevention.Spam.LoginCooldownMinutes", this.config_spam_loginCooldownSeconds);
+		//
 		outConfig.set("GriefPrevention.Spam.MonitorSlashCommands", slashCommandsToMonitor);
 		outConfig.set("GriefPrevention.Spam.WarningMessage", this.config_spam_warningMessage);
 		outConfig.set("GriefPrevention.Spam.KickMessage", this.config_spam_kickMessage);
