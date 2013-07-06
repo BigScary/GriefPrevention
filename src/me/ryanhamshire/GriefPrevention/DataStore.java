@@ -1332,7 +1332,8 @@ public abstract class DataStore
 		this.addDefault(defaults, Messages.PlayerInPvPSafeZone, "That player is in a PvP safe zone.", null);		
 		this.addDefault(defaults, Messages.ClaimLocked, "This claim has been successfully locked against accidental/automatic deletion. Use /unlockclaim to unlock.", null);		
 		this.addDefault(defaults, Messages.ClaimUnlocked, "This claim has been successfully unlocked.", null);				
-		this.addDefault(defaults, Messages.LoginSpamWait, "You must wait {0} more minutes before logging-in again.", null);
+		//this.addDefault(defaults, Messages.LoginSpamWait, "You must wait about {0} more minutes before logging-in again.", null);
+		this.addDefault(defaults, Messages.LoginSpamWaitSeconds, "You must wait {0} more seconds before logging-in again.", null);
 		this.addDefault(defaults, Messages.AbandonClaimRestoreWarning, "Abandoning this claim will restore nature! If you still want to abandon it, use /abandonclaim again.",null);
 		this.addDefault(defaults, Messages.AbandonCost,"you lose {0} Claim blocks from abandoning this claim.","0:Number of claim blocks lost");
 		this.addDefault(defaults, Messages.AbandonCostWarning, "You will lose {0} Claim blocks if you abandon this claim. enter /abandonclaim again to confirm.", "0:Number of claim blocks that will be lost");

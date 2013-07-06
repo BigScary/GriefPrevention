@@ -834,7 +834,7 @@ public class WorldConfig {
 		this.config_spam_enabled = config.getBoolean("GriefPrevention.Spam.Enabled", true);
 		int cooldownminutes = config.getInt("GriefPrevention.Spam.LoginCooldownMinutes",-1);
 		if(cooldownminutes==-1){
-		this.config_spam_loginCooldownSeconds = config.getInt("GriefPrevention.Spam.LoginCooldownSeconds", 120);
+		this.config_spam_loginCooldownSeconds = config.getInt("GriefPrevention.Spam.LoginCooldownSeconds", 60);
 		}
 		else
 			this.config_spam_loginCooldownSeconds = cooldownminutes*60;
