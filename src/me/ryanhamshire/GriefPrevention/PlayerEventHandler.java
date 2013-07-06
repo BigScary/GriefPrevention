@@ -2386,7 +2386,7 @@ class PlayerEventHandler implements Listener
 					!(player.hasPermission("griefprevention.ignoreclaimslimit") )){
 					
 					//get the number of claims the player has in this world.
-					if(wc.getClaimsPerPlayerLimit() >= playerData.getWorldClaims(clickedBlock.getWorld()).size()){
+					if(wc.getClaimsPerPlayerLimit() <= playerData.getWorldClaims(clickedBlock.getWorld()).size()){
 					
 					
 					GriefPrevention.sendMessage(player, TextMode.Err, Messages.PlayerClaimLimit,String.valueOf(wc.getClaimsPerPlayerLimit()));
@@ -2538,10 +2538,11 @@ class PlayerEventHandler implements Listener
 						GriefPrevention.sendMessage(player, TextMode.Success, Messages.RemainingBlocksWorld,worldblocksremaining);
 					}
 					//if there is also a claim # limit, show the number they can still make.
-					if(wc.getClaimsPerPlayerLimit()>0){
+					if(wc.getClaimsPerPlayerLimit()>0 && !player.hasPermission("griefprevention.ignoreclaimslimit")){
 						int numclaims = playerData.getWorldClaims(player.getWorld()).size();
 						int remaining = wc.getClaimsPerPlayerLimit()-numclaims;
-						GriefPrevention.sendMessage(player, TextMode.Success, Messages.RemainingClaimsWorld,remaining);
+						System.out.println("Sending notification that Player has " + remaining + " Claims left in this world.");
+						GriefPrevention.sendMessage(player, TextMode.Success, Messages.RemainingClaimsWorld,String.valueOf(remaining));
 						
 					}
 					
