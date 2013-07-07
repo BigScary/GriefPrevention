@@ -54,6 +54,7 @@ public class ClaimArray implements Iterable<Claim> {
 		String usekey = c.getLesserBoundaryCorner().getWorld().getName();
 		if(claimworldmap.contains(usekey)){
 			claimworldmap.get(usekey).remove(c);
+			Debugger.Write("Claim removed from world mapping owned by " + c.getOwnerName() + " to world:" + c.getLesserBoundaryCorner().getWorld(),DebugLevel.Verbose);
 		}
 			
 	}
@@ -70,11 +71,15 @@ public class ClaimArray implements Iterable<Claim> {
 				chunkmap.put(chunk, aclaims);
 			}else {
 				int k = 0;
-				while(k < aclaims.size() && !aclaims.get(k).greaterThan(newClaim)) k++;
+				if(!aclaims.contains(newClaim)){
+					
+					aclaims.add(newClaim);
+				}
+				/*while(k < aclaims.size() && !aclaims.get(k).greaterThan(newClaim)) k++;
 				if(k < aclaims.size())
 					aclaims.add(k, newClaim);
 				else
-					aclaims.add(aclaims.size(), newClaim);
+					aclaims.add(aclaims.size(), newClaim);*/
 			}
 		}
 	}
@@ -87,9 +92,11 @@ public class ClaimArray implements Iterable<Claim> {
 		for(String chunk : chunks) {
 			ArrayList<Claim> aclaims = chunkmap.get(chunk);
 			if(aclaims != null) {
+				Debugger.Write("Removing Claim ID #" + i + " From Claim List for Chunk:" + chunk, DebugLevel.Verbose);
 				aclaims.remove(claim);
 				if(aclaims.size() == 0) {
 					chunkmap.remove(chunk);
+					Debugger.Write("Removing empty chunk mapping entry for chunk " + chunk + " As it now contains no claims.", DebugLevel.Verbose);
 				}
 			}
 		}
@@ -97,6 +104,7 @@ public class ClaimArray implements Iterable<Claim> {
 	
 	public static ArrayList<String> getChunks(Claim claim) {
 		String world = claim.getLesserBoundaryCorner().getWorld().getName();
+		
 		int lx = claim.getLesserBoundaryCorner().getBlockX();
 		int lz = claim.getLesserBoundaryCorner().getBlockZ();
 		int gx = claim.getGreaterBoundaryCorner().getBlockX();

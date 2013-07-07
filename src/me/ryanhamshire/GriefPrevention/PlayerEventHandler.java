@@ -1820,8 +1820,9 @@ class PlayerEventHandler implements Listener
 				claimsshow = new Claim[]{this.dataStore.getClaimAt(clickedBlock.getLocation(), false /*ignore height*/, playerData.lastClaim)};
 				}
 				//no claim case
-				if(claimsshow == null || claimsshow[0]==null)
+				if(claimsshow == null || claimsshow.length==0 || claimsshow[0]==null)
 				{
+					Visualization.Revert(player);
 					GriefPrevention.sendMessage(player, TextMode.Info, Messages.BlockNotClaimed);
 					
 				}

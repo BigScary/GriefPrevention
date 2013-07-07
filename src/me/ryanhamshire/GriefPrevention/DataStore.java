@@ -517,7 +517,8 @@ public abstract class DataStore
 			if(claim.parent!=null) continue;
 			//if we reach a claim which is greater than the temp claim created above, there's definitely no claim
 			//in the collection which includes our location
-			if(claim.greaterThan(tempClaim)) return null;
+			//if(claim.greaterThan(tempClaim)) return null; //removed. Could be changed to use a SortedSet.
+			//Sequential search in a single chunk is unlikely to be slower than a Tree lookup though.
 			
 			//find a top level claim
 			if(claim.contains(location, ignoreHeight, false))

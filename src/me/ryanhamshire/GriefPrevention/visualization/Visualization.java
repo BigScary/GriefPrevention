@@ -48,7 +48,7 @@ public class Visualization
 		PlayerData playerData = GriefPrevention.instance.dataStore.getPlayerData(player.getName());
 		
 		//if he has any current visualization, clear it first
-		if(playerData.currentVisualization != null && CancelCurrent)
+		if(playerData.ActiveVisualizations.size() > 0 && CancelCurrent)
 		{
 			Visualization.Revert(player);
 		}
@@ -65,21 +65,23 @@ public class Visualization
 	{
 		PlayerData playerData = GriefPrevention.instance.dataStore.getPlayerData(player.getName());
 		
-		Visualization visualization = playerData.currentVisualization;
+		//Visualization visualization = playerData.currentVisualization;
 		
-		if(playerData.currentVisualization != null)
+		if(playerData.ActiveVisualizations.size()>0)
 		{
 			if(player.isOnline())
 			{			
+				for(Visualization visualization:playerData.ActiveVisualizations){
 				for(int i = 0; i < visualization.elements.size(); i++)
 				{
 					VisualizationElement element = visualization.elements.get(i);
 					Block block = element.location.getBlock();
 					player.sendBlockChange(element.location, block.getType(), block.getData());
 				}
+				}
 			}
 			
-			playerData.currentVisualization = null;
+			playerData.ActiveVisualizations.clear();
 		}
 	}
 	

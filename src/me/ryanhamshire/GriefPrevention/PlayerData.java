@@ -18,10 +18,11 @@
 
 package me.ryanhamshire.GriefPrevention;
 import java.net.InetAddress;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Vector;
-
 import me.ryanhamshire.GriefPrevention.Claim;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import me.ryanhamshire.GriefPrevention.ShovelMode;
@@ -114,7 +115,7 @@ public class PlayerData
 	public boolean spamWarned = false;				//whether the player recently received a warning
 	
 	//visualization
-	public Visualization currentVisualization = null;
+	public List<Visualization> ActiveVisualizations = new ArrayList<Visualization>();
 	
 	//anti-camping pvp protection
 	public boolean pvpImmune = false;
