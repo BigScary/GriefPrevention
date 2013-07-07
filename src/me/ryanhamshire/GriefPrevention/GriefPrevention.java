@@ -355,7 +355,7 @@ public class GriefPrevention extends JavaPlugin
 		String databaseUserName = config.getString("GriefPrevention.Database.UserName", "");
 		String databasePassword = config.getString("GriefPrevention.Database.Password", "");
 		//sea level
-		String AcquiredLevel = config.getString("GriefPrevention.DebugLevel","Verbose");
+		String AcquiredLevel = config.getString("GriefPrevention.DebugLevel","None");
 		this.DebuggingLevel= Debugger.DebugLevel.valueOf(AcquiredLevel);
 		config.set("GriefPrevention.DebugLevel", DebuggingLevel.name());
 		this.debug = new Debugger(DebuggingLevel);
