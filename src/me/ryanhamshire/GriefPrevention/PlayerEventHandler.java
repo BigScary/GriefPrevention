@@ -2091,15 +2091,22 @@ class PlayerEventHandler implements Listener
 				if(checkclaim!=null){
 					//there is a claim; make sure it belongs to this player.
 					String cannotedit=checkclaim.allowEdit(player);
-					if(cannotedit==null){
+					if(cannotedit==null && GriefPrevention.instance.config_autosubclaims){
 						//it DOES belong to them.
 						//automatically switch to advanced claims mode, and show a message.
 						playerData.claimSubdividing = checkclaim;
 						playerData.shovelMode=ShovelMode.Subdivide;
 						//TODO: Raise StartClaimSubdivideEvent
 						GriefPrevention.sendMessage(player, TextMode.Info, "Entering Claim subdivide mode.");
-					} else {
+						return;
+					} else if(cannotedit!=null){
+						GriefPrevention.sendMessage(player,TextMode.Info,cannotedit);
+						return;
 						//do nothing.
+					}
+					else {
+						
+						GriefPrevention.sendMessage(player, TextMode.Instr,Messages.SubdivisionDemo);
 					}
 				}
 				

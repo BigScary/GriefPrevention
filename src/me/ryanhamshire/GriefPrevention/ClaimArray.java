@@ -58,9 +58,9 @@ public class ClaimArray implements Iterable<Claim> {
 		}
 			
 	}
-	public void add(int j, Claim newClaim) {
+	public void add(Claim newClaim) {
 		addClaimWorld(newClaim);
-		claims.add(j, newClaim);
+		claims.add(newClaim);
 		claimmap.put(newClaim.getID(), newClaim);
 		ArrayList<String> chunks = getChunks(newClaim);
 		for(String chunk : chunks) {
@@ -75,11 +75,7 @@ public class ClaimArray implements Iterable<Claim> {
 					
 					aclaims.add(newClaim);
 				}
-				/*while(k < aclaims.size() && !aclaims.get(k).greaterThan(newClaim)) k++;
-				if(k < aclaims.size())
-					aclaims.add(k, newClaim);
-				else
-					aclaims.add(aclaims.size(), newClaim);*/
+				chunkmap.put(chunk, aclaims);
 			}
 		}
 	}

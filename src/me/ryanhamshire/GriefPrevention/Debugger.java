@@ -38,8 +38,9 @@ public class Debugger {
 		}
 	}
 	public static void Write(String Message,DebugLevel Level){
-		if(GriefPrevention.instance!=null && GriefPrevention.instance.debug!=null)
-			GriefPrevention.instance.debug.Output(Message, Level);
+		//System.out.println(Message);
+		//if(GriefPrevention.instance!=null && GriefPrevention.instance.debug!=null)
+		//	GriefPrevention.instance.debug.Output(Message, Level);
 	}
 	
 }

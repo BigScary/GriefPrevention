@@ -42,8 +42,10 @@ public class WorldWatcher implements Listener {
 	
 	@EventHandler
 	public void WorldUnload(WorldUnloadEvent event){
-		GriefPrevention.instance.dataStore.WorldUnloaded(event.getWorld());
-		LoadedWorlds.remove(event.getWorld());
+		if(LoadedWorlds.contains(event.getWorld())){
+			GriefPrevention.instance.dataStore.WorldUnloaded(event.getWorld());
+			LoadedWorlds.remove(event.getWorld());
+		}
 	}
 	
 

@@ -108,12 +108,7 @@ ArrayList<Claim> claimsToRemove = new ArrayList<Claim>();
 				//otherwise, add this claim to the claims collection
 				else
 				{
-					int j = 0;
-					while(j < this.claims.size() && !this.claims.get(j).greaterThan(topLevelClaim)) j++;
-					if(j < this.claims.size())
-						this.claims.add(j, topLevelClaim);
-					else
-						this.claims.add(this.claims.size(), topLevelClaim);
+					this.claims.add(topLevelClaim);
 					topLevelClaim.inDataStore = true;								
 				}
 				
@@ -526,6 +521,7 @@ ArrayList<Claim> claimsToRemove = new ArrayList<Claim>();
 	@Override
 	synchronized void close()
 	{
+		super.close();
 		if(this.databaseConnection != null)
 		{
 			try

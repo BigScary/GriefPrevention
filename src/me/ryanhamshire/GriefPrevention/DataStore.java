@@ -221,11 +221,8 @@ public abstract class DataStore
 		
 		//add it and mark it as added
 		int j = 0;
-		while(j < this.claims.size() && !this.claims.get(j).greaterThan(newClaim)) j++;
-		if(j < this.claims.size())
-			this.claims.add(j, newClaim);
-		else
-			this.claims.add(this.claims.size(), newClaim);
+		this.claims.add(newClaim);
+		
 		newClaim.inDataStore = true;
 		
 		//except for administrative claims (which have no owner), update the owner's playerData with the new claim
@@ -297,6 +294,9 @@ public abstract class DataStore
 	    return new Location(world, x, y, z);
 	}	
 
+	synchronized public void saveClaimData(){
+		
+	}
 	/**
 	 * Saves any changes to a claim to secondary storage.
 	 * @param claim
@@ -381,6 +381,7 @@ public abstract class DataStore
 		Debugger.Write("Saved and removed " + accum + " Claims.",DebugLevel.Informational);
 	}
 	abstract void WorldLoaded(World worldload);
+	
 	synchronized public boolean deleteClaim(Claim claim){
 		return deleteClaim(claim,null);
 	}
@@ -490,13 +491,13 @@ public abstract class DataStore
 	 */
 	synchronized public Claim getClaimAt(Location location, boolean ignoreHeight, Claim cachedClaim)
 	{
-		Debugger.Write("Looking for Claim at:" + GriefPrevention.getfriendlyLocationString(location) + " Ignoreheight:" + ignoreHeight,DebugLevel.Verbose);
+		//Debugger.Write("Looking for Claim at:" + GriefPrevention.getfriendlyLocationString(location) + " Ignoreheight:" + ignoreHeight,DebugLevel.Verbose);
 		//check cachedClaim guess first.  if it's in the datastore and the location is inside it, we're done
 		if(cachedClaim != null && cachedClaim.inDataStore && cachedClaim.contains(location, ignoreHeight, true)) 
 			return cachedClaim;
 		
 		
-		//the claims list is ordered by greater boundary corner
+		
 		//create a temporary "fake" claim in memory for comparison purposes		
 		Claim tempClaim = new Claim();
 		tempClaim.lesserBoundaryCorner = location;
@@ -515,8 +516,7 @@ public abstract class DataStore
 		{
 			Claim claim = aclaims.get(i);
 			if(claim.parent!=null) continue;
-			//if we reach a claim which is greater than the temp claim created above, there's definitely no claim
-			//in the collection which includes our location
+			//
 			//if(claim.greaterThan(tempClaim)) return null; //removed. Could be changed to use a SortedSet.
 			//Sequential search in a single chunk is unlikely to be slower than a Tree lookup though.
 			
@@ -1354,6 +1354,9 @@ public abstract class DataStore
 		this.addDefault(defaults,Messages.ResizeFailOutsideParent,"Cannot resize subdivision as it would extend outside the containing claim.",null);
 		this.addDefault(defaults,Messages.BlockPlacementTooClose,"You cannot place this within {0} Blocks of an existing claim.","0:Number of max blocks");
 		this.addDefault(defaults, Messages.CantSiegeYourself, "You cannot lay siege on yourself!", null);
+		this.addDefault(defaults, Messages.AutoSubClaimsEnter, "Switching to Subdivide Claim Mode",null);
+		this.addDefault(defaults, Messages.AutoSubClaimsExit, "Switching to Standard Claim Mode",null);
+		this.addDefault(defaults,Messages.AutoSubClaimsNoPermission,"You need permission in a claim to make subdivisions.",null);
 		//load the config file
 		FileConfiguration config = YamlConfiguration.loadConfiguration(new File(messagesFilePath));
 		
@@ -1420,7 +1423,15 @@ public abstract class DataStore
 		return claims.claimmap.keySet().toArray(new Long[claims.claimmap.size()]);
 	}
 	
-	abstract void close();
+	void close(){
+		
+		for(Claim c:this.claims.claimmap.values()){
+			System.out.println("Saving Claim ID:" + c.getID());
+			this.saveClaim(c);
+		}
+		
+		
+	}
 
 	public int getClaimsSize() {
 		return claims.size();

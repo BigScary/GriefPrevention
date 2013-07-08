@@ -37,6 +37,7 @@ import me.ryanhamshire.GriefPrevention.Configuration.ModBlockHelper;
 import me.ryanhamshire.GriefPrevention.Configuration.ModdedBlocksSearchResults;
 import me.ryanhamshire.GriefPrevention.Configuration.WorldConfig;
 import me.ryanhamshire.GriefPrevention.Debugger.DebugLevel;
+import me.ryanhamshire.GriefPrevention.events.GPLoadEvent;
 import me.ryanhamshire.GriefPrevention.tasks.CleanupUnusedClaimsTask;
 import me.ryanhamshire.GriefPrevention.tasks.DeliverClaimBlocksTask;
 import me.ryanhamshire.GriefPrevention.tasks.EntityCleanupTask;
@@ -102,6 +103,7 @@ public class GriefPrevention extends JavaPlugin
 	//public ArrayList<String> config_claims_enabledCreativeWorlds;	//list of worlds where additional creative mode anti-grief rules apply
 	public int config_claims_initialBlocks;							//the number of claim blocks a new player starts with
 	public int config_claims_maxAccruedBlocks;						//the limit on accrued blocks (over time).  doesn't limit purchased or admin-gifted blocks
+	public boolean config_autosubclaims; //auto subclaims, for right-clicking with shovel in normal mode within a claim. Kind of annoying so defaults to false.
 	public boolean config_claims_deleteclaimswithunrecognizedowners;
 	public RegExTestHelper ModdedBlockRegexHelper;
 	public RegExTestHelper OreBlockRegexHelper;
@@ -171,6 +173,7 @@ public class GriefPrevention extends JavaPlugin
 	//adds a server log entry
 	public static void AddLogEntry(String entry)
 	{
+		if(instance==null) return;
 		instance.getLogger().log(Level.INFO,entry);
 	}
 	public Player getNearestPlayer(Location l){
@@ -375,6 +378,8 @@ public class GriefPrevention extends JavaPlugin
 		this.config_claims_initialBlocks = config.getInt("GriefPrevention.Claims.InitialBlocks",100);
 	    this.config_mod_config_search = config.getBoolean("GriefPrevention.Mods.PerformConfigSearch",true);
 	    this.config_claims_deleteclaimswithunrecognizedowners = config.getBoolean("GriefPrevention.Claims.DeleteWithUnrecognizedOwner",false);
+	    this.config_autosubclaims = config.getBoolean("GriefPrevention.Claims.AutoSubClaimSwitch",false);
+	    outConfig.set("GriefPrevention.Claims.AutoSubClaimsSwitch",this.config_autosubclaims);
 	    outConfig.set("GriefPrevention.Claims.DeleteWithUnrecognizedOwner",this.config_claims_deleteclaimswithunrecognizedowners);
 		outConfig.set("GriefPrevention.Economy.ClaimBlocksPurchaseCost", this.config_economy_claimBlocksPurchaseCost);
 		outConfig.set("GriefPrevention.Economy.ClaimBlocksSellValue", this.config_economy_claimBlocksSellValue);
@@ -517,7 +522,7 @@ public class GriefPrevention extends JavaPlugin
 		}
 		MetaHandler = new ClaimMetaHandler();
 		try {
-			new File(DataStore.configFilePath).delete();
+			//new File(DataStore.configFilePath).delete();
 			outConfig.save(new File(DataStore.configFilePath).getAbsolutePath());
 		}
 		catch(IOException exx){
@@ -531,7 +536,7 @@ public class GriefPrevention extends JavaPlugin
 			ww.WorldLoad(wle);
 		}
 		
-		
+		Bukkit.getPluginManager().callEvent(new GPLoadEvent(this));
 		
 	}
 	
@@ -610,7 +615,11 @@ public class GriefPrevention extends JavaPlugin
 	{ 
 		//emulate each world unloading.
 		
-		
+		//cancel ALL pending tasks.
+				Bukkit.getScheduler().cancelTasks(this);
+				
+				this.dataStore.saveClaimData();
+				
 		for(World iterate:Bukkit.getWorlds()){
 			ww.WorldUnload(new WorldUnloadEvent(iterate));
 		}
@@ -624,9 +633,12 @@ public class GriefPrevention extends JavaPlugin
 			PlayerData playerData = this.dataStore.getPlayerData(playerName);
 			this.dataStore.savePlayerData(playerName, playerData);
 		}
-		//cancel ALL pending tasks.
-		Bukkit.getScheduler().cancelTasks(this);
+		
 		this.dataStore.close();
+		//instance=null;
+		
+		this.cmdHandler = null;
+		dataStore=null;
 		
 		AddLogEntry("GriefPrevention disabled.");
 	}
@@ -1152,5 +1164,9 @@ public class GriefPrevention extends JavaPlugin
 			return overrideValue;
 		}*/
 		return overrideValue;
+	}
+	public void reloadConfiguration() {
+		// TODO Auto-generated method stub
+		
 	}
 }

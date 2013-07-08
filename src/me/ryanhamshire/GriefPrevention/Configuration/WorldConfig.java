@@ -507,7 +507,21 @@ public class WorldConfig {
 		GriefPrevention.instance.getLogger().log(Level.INFO,"Reading Configuration for World:" + pName);
 		this.config_seaLevelOverride = config.getInt("GriefPrevention.SeaLevelOverride",-1);
 		
-		outConfig.set("GriefPrevention.SeaLevelOverride", config_seaLevelOverride);
+		if(this.config_seaLevelOverride==-1){
+			
+			//try to get new setting.
+			int newsealevel = config.getInt("GriefPrevention.SeaLevelOverride.Setting",-1);
+			boolean dooverride = config.getBoolean("GriefPrevention.SeaLevelOverride.Enabled",false);
+			
+			if(dooverride && newsealevel!=-1) config_seaLevelOverride=newsealevel;
+			
+			
+		}
+		if(config_seaLevelOverride!=-1){
+			outConfig.set("GriefPrevention.SeaLevelOverride.Setting",config_seaLevelOverride);
+		}
+		outConfig.set("GriefPrevention.SeaLevelOverride.Enabled",config_seaLevelOverride!=-1);
+		
 		//read in the data for TNT explosions and Golem/Wither placements.
 		this.config_afkDistanceCheck = config.getInt("GriefPrevention.AFKDistance",3);
 		this.SilverfishBreakRules = new ClaimBehaviourData("Silverfish Break",config,outConfig,"GriefPrevention.Rules.SilverfishBreak",

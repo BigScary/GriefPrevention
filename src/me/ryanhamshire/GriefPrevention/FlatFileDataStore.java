@@ -24,6 +24,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import me.ryanhamshire.GriefPrevention.Debugger.DebugLevel;
 import me.ryanhamshire.GriefPrevention.exceptions.WorldNotFoundException;
 
 import org.bukkit.*;
@@ -55,14 +56,18 @@ public class FlatFileDataStore extends DataStore
 	}
     void WorldLoaded(World loaded){
 	
+    	int claimsread = 0;
     	File claimDataFolder = new File(claimDataFolderPath);
 		File[] files = claimDataFolder.listFiles();
 		for(File iterate:files){
 			
-			if(getClaimWorld(iterate).equals(loaded.getName()))
+			if(getClaimWorld(iterate).equals(loaded.getName())){
+				claimsread++;
 			   readClaim(iterate);
+			}
 			
 		}
+		System.out.println("Read in " + claimsread + " Claims for world:" + loaded.getName());
     	
     	
     }
@@ -182,11 +187,13 @@ public class FlatFileDataStore extends DataStore
 					topLevelClaim = new Claim(lesserBoundaryCorner, greaterBoundaryCorner, ownerName, builderNames, containerNames, accessorNames, managerNames, claimID, neverdelete);
 					
 					//search for another claim overlapping this one
+					
 					Claim conflictClaim = this.getClaimAt(topLevelClaim.lesserBoundaryCorner, true, null);
 					
 					//if there is such a claim, delete this file and move on to the next
 					if(conflictClaim != null)
 					{
+						System.out.println("Deleting Claim File:" + SourceFile.getAbsolutePath() + " as it is overlapped by ID #" + conflictClaim.getID());
 						inStream.close();
 						SourceFile.delete();
 						line = null;
@@ -197,12 +204,9 @@ public class FlatFileDataStore extends DataStore
 					else
 					{
 						topLevelClaim.modifiedDate = new Date(SourceFile.lastModified());
-						int j = 0;
-						while(j < this.claims.size() && !this.claims.get(j).greaterThan(topLevelClaim)) j++;
-						if(j < this.claims.size())
-							this.claims.add(j, topLevelClaim);
-						else
-							this.claims.add(this.claims.size(), topLevelClaim);
+						
+						this.claims.add(topLevelClaim);
+						
 						topLevelClaim.inDataStore = true;								
 					}
 				}
@@ -483,9 +487,14 @@ public class FlatFileDataStore extends DataStore
 		
 		//remove from disk
 		File claimFile = new File(claimDataFolderPath + File.separator + claimID);
-		if(claimFile.exists() && !claimFile.delete())
+		if(claimFile.exists())
 		{
+			System.out.println("Deleting Claim ID #" + claimID);
+			//temporary stack trace.
+			try { throw new Exception();}catch(Exception exx){exx.printStackTrace();}
+			if(!claimFile.delete()){
 			GriefPrevention.AddLogEntry("Error: Unable to delete claim file \"" + claimFile.getAbsolutePath() + "\".");
+			}
 		}		
 	}
 	private String getPlayerDataFile(String sPlayerName){
@@ -768,7 +777,7 @@ public class FlatFileDataStore extends DataStore
 	}
 
 	@Override
-	synchronized void close() { }
+	synchronized void close() {super.close(); }
 
 	
 }
