@@ -1426,7 +1426,7 @@ public abstract class DataStore
 	void close(){
 		
 		for(Claim c:this.claims.claimmap.values()){
-			System.out.println("Saving Claim ID:" + c.getID());
+			//System.out.println("Saving Claim ID:" + c.getID());
 			this.saveClaim(c);
 		}
 		

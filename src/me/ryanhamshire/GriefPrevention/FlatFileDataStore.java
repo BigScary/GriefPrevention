@@ -67,7 +67,7 @@ public class FlatFileDataStore extends DataStore
 			}
 			
 		}
-		System.out.println("Read in " + claimsread + " Claims for world:" + loaded.getName());
+		//System.out.println("Read in " + claimsread + " Claims for world:" + loaded.getName());
     	
     	
     }
@@ -193,7 +193,7 @@ public class FlatFileDataStore extends DataStore
 					//if there is such a claim, delete this file and move on to the next
 					if(conflictClaim != null)
 					{
-						System.out.println("Deleting Claim File:" + SourceFile.getAbsolutePath() + " as it is overlapped by ID #" + conflictClaim.getID());
+					//	System.out.println("Deleting Claim File:" + SourceFile.getAbsolutePath() + " as it is overlapped by ID #" + conflictClaim.getID());
 						inStream.close();
 						SourceFile.delete();
 						line = null;
@@ -489,7 +489,7 @@ public class FlatFileDataStore extends DataStore
 		File claimFile = new File(claimDataFolderPath + File.separator + claimID);
 		if(claimFile.exists())
 		{
-			System.out.println("Deleting Claim ID #" + claimID);
+		//	System.out.println("Deleting Claim ID #" + claimID);
 			//temporary stack trace.
 			try { throw new Exception();}catch(Exception exx){exx.printStackTrace();}
 			if(!claimFile.delete()){
