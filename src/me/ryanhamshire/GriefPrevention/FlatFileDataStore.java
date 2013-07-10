@@ -491,7 +491,7 @@ public class FlatFileDataStore extends DataStore
 		{
 		//	System.out.println("Deleting Claim ID #" + claimID);
 			//temporary stack trace.
-			try { throw new Exception();}catch(Exception exx){exx.printStackTrace();}
+			//try { throw new Exception();}catch(Exception exx){exx.printStackTrace();}
 			if(!claimFile.delete()){
 			GriefPrevention.AddLogEntry("Error: Unable to delete claim file \"" + claimFile.getAbsolutePath() + "\".");
 			}

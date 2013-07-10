@@ -21,7 +21,10 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
 import me.ryanhamshire.GriefPrevention.Claim;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
@@ -37,11 +40,49 @@ import org.bukkit.entity.Player;
 //holds all of GriefPrevention's player-tied data
 public class PlayerData 
 {
+	//we need to track when players step on pressure plates, since we only want it to occur the first time it get's stepped on.
+	public class PressurePlateData
+	{
+		Date LastStepTime;
+		Location PlateLocation;
+		public Date getLastStepTime(){ return LastStepTime;}
+		public void setLastStepTime(Date value){LastStepTime=value;}
+		public Location getPlateLocation(){ return PlateLocation;}
+		public PressurePlateData(Location pPlateLocation){
+			PlateLocation = PlateLocation;
+			LastStepTime = new Date();
+		}
+	}
+	
+	
 	//the player's name
 	public String playerName;
 	
 	//the player's claims
 	public Vector<Claim> claims = new Vector<Claim>();
+	
+	public Map<String,PressurePlateData> PlateData = new HashMap<String,PressurePlateData>();
+	//accessor for PressurePlateData. the event occurs as long as the player is standing on the pressure plate,
+	//so we want it to only allow showing messages the "first time"
+	
+	
+	public Date getLastSteppedOn(Location pLocation){
+		
+		if(PlateData.containsKey(pLocation.toString())){
+			return PlateData.get(pLocation.toString()).getLastStepTime();
+		}
+		else {
+			Date yearago = new Date();
+			yearago = new Date(yearago.getTime()-(1000*4400));
+			return yearago;
+		}
+	}
+	public void setLastSteppedOn(Location pLocation){
+		PressurePlateData newvalue = new PressurePlateData(pLocation);
+		PlateData.put(pLocation.toString(),newvalue);
+		
+	}
+	
 	
 	public Vector<Claim> getWorldClaims(World p){
 		Vector<Claim> makeresult = new Vector<Claim>();
@@ -113,6 +154,8 @@ public class PlayerData
 	public Date lastMessageTimestamp = new Date();  //last time the player sent a chat message or used a monitored slash command
 	public int spamCount = 0;						//number of consecutive "spams"
 	public boolean spamWarned = false;				//whether the player recently received a warning
+	
+	
 	
 	//visualization
 	public List<Visualization> ActiveVisualizations = new ArrayList<Visualization>();

@@ -376,7 +376,7 @@ class PlayerEventHandler implements Listener
 			if(muted)
 			{
 				//make a log entry
-				GriefPrevention.AddLogEntry("Muted spam from " + player.getName() + ": " + message);
+				GriefPrevention.AddLogEntry("Muted spam (spamcount:" + playerData.spamCount + ") from " + player.getName() + ": " + message);
 				
 				//send a fake message so the player doesn't realize he's muted
 				//less information for spammers = less effective spam filter dodging
@@ -1631,7 +1631,21 @@ class PlayerEventHandler implements Listener
 		
 		if(useRule!=null){
 			
-			if(useRule.Allowed(clickedBlock.getLocation(), player,true).Denied())
+			//stone and wood pressure plates must exceed the timeout to show a message,
+			boolean doshowmessage= true;
+			Calendar fiveseccal= Calendar.getInstance();
+			fiveseccal.add(Calendar.SECOND,-1);
+			Date laststepped = fiveseccal.getTime();
+			
+			if(useRule==wc.getWoodPressurePlates() || useRule==wc.getStonePressurePlates()){
+				Date prevstepped = playerData.getLastSteppedOn(clickedBlock.getLocation());
+				doshowmessage = prevstepped==null || prevstepped.before(laststepped);
+			}
+			//System.out.println("doshowmessage=" + doshowmessage);
+			if(doshowmessage)
+				playerData.setLastSteppedOn(clickedBlock.getLocation());
+			
+			if(useRule.Allowed(clickedBlock.getLocation(), player,doshowmessage).Denied())
 			{
 				event.setCancelled(true);
 				return;

@@ -2,7 +2,9 @@ package me.ryanhamshire.GriefPrevention;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 
 /**
@@ -57,7 +59,13 @@ public class PlayerGroup {
 		//sourcenode will be the node: normally, GriefPrevention.Groups.
 		//System.out.println("Attempting to read groups from" + SourceNode);
 		ArrayList<PlayerGroup> results = new ArrayList<PlayerGroup>();
-		List<String> GroupNames = Source.getStringList(SourceNode + ".Names");
+		ConfigurationSection csec = Source.getConfigurationSection(SourceNode + ".Names");
+		if(csec==null){
+			//no groups.
+			return new ArrayList<PlayerGroup>();
+		}
+		Set<String> GroupNames = csec.getKeys(false);
+				
 		System.out.println("Found " + GroupNames.size() + " Groups" );
 		for(String iterategroup:GroupNames){
 			//create Group Name.

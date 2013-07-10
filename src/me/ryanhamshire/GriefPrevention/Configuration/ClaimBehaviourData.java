@@ -66,7 +66,7 @@ public class ClaimBehaviourData {
 			if(atposition==null) return testresult=true; //unexpected...
 			switch(this){
 			case Disabled:
-				if(testPlayer!=null)
+				if(testPlayer!=null && ShowMessages)
 					GriefPrevention.sendMessage(testPlayer, TextMode.Err, Messages.ConfigDisabled);
 				return testresult=false;
 			case RequireNone:
