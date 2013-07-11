@@ -919,18 +919,18 @@ class PlayerEventHandler implements Listener
 		}
 		if (isHorse(entity)){
 			
-			Animals h = (Animals)entity;
+			Horse h = (Horse)entity;
 			
-			if(handItem.getType()==Material.GOLDEN_APPLE){
-				//apply breeding rules.
-				if(wc.getBreedingRules().Allowed(h.getLocation(), player).Denied()){
+			if(h.isTamed() && handItem.getType()==Material.GOLDEN_APPLE){
+				//if horse is tamed, apply breeding rules.
+				if( wc.getBreedingRules().Allowed(h.getLocation(), player).Denied()){
 					event.setCancelled(true);
 					return;
 				}
 				
 			}
 			else if(handItem.getType()==Material.WHEAT || handItem.getType()==Material.HAY_BLOCK ||
-					handItem.getType()==Material.APPLE){
+					handItem.getType()==Material.APPLE || handItem.getType()==Material.GOLDEN_APPLE){
 				//apply feeding rules.
 				if(wc.getFeedingRules().Allowed(h.getLocation(), player).Denied()){
 					event.setCancelled(true);
@@ -939,25 +939,23 @@ class PlayerEventHandler implements Listener
 				
 			}
 			else{
-				//if the horse is untamed, apply untamed horse rules.
-				//Currently horses don't seem to expose if they are tamed or not.
 				
-				
-				//if(h.isCustomNameVisible()){
-					//Tamed. Apply Containers rules if they aren't sneaking, otherwise,
+				if(h.isTamed()){
+					//if the player is the owner of the horse,
+					//they can do what they want no matter where they are.
+					if(h.getOwner().getName().equals(player.getName())) return; 
+					//otherwise, Apply Containers rules if they aren't sneaking, otherwise,
 					//apply the Inventory rules.
+					//what this means is that if you ride a horse onto somebody elses claim, they will have access to the horse.
+					//if the EquineInventoryRules/ContainerRules are set to allow.
 					if(player.isSneaking()){
 						if(wc.getEquineInventoryRules().Allowed(h.getLocation(), player).Denied())
 							event.setCancelled(true);
 							return;
 						
 					}
-					else
-					if(wc.getContainersRules().Allowed(h.getLocation(), player).Denied()){
-						event.setCancelled(true);
-						return;
-					}
-				//}
+					
+				}
 				
 				
 			}

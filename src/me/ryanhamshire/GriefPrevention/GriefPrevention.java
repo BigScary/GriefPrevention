@@ -130,16 +130,7 @@ public class GriefPrevention extends JavaPlugin
 	public ModdedBlocksSearchResults ModdedBlocks = null;
 	public boolean isHorse(Entity entitytest){
 		
-		if(!(entitytest instanceof Animals)) return false;
-		
-		if(entitytest instanceof Chicken) return false;
-		if(entitytest instanceof Cow) return false;
-		if(entitytest instanceof Ocelot) return false;
-		if(entitytest instanceof Pig) return false;
-		if(entitytest instanceof Wolf) return false;
-		
-		//chicken,cow,ocelot,pig,sheep,wolf
-		return true;
+		return entitytest instanceof Horse;
 		
 	}
 	/**
@@ -159,7 +150,7 @@ public class GriefPrevention extends JavaPlugin
 		else if(forEntity instanceof Sheep || forEntity instanceof Cow || forEntity instanceof MushroomCow){
 			return new Material[]{Material.WHEAT};
 		}
-		else if(isHorse(forEntity)){
+		else if(forEntity instanceof Horse){
 			return new Material[]{Material.GOLDEN_APPLE};
 		}
 		else if(forEntity instanceof Wolf){

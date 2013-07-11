@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.logging.Level;
 
 import me.ryanhamshire.GriefPrevention.DataStore;
+import me.ryanhamshire.GriefPrevention.Debugger;
+import me.ryanhamshire.GriefPrevention.Debugger.DebugLevel;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import me.ryanhamshire.GriefPrevention.MaterialCollection;
 import me.ryanhamshire.GriefPrevention.MaterialInfo;
@@ -149,6 +151,9 @@ public class WorldConfig {
 	
 	private ClaimBehaviourData NameTagUsageRules;
 	public ClaimBehaviourData getNameTagUsageRules(){ return NameTagUsageRules;}
+	
+	
+	
 	
 	//private members followed by their read-only accessor.
 	private boolean claims_Seige_Enabled;
@@ -460,7 +465,7 @@ public class WorldConfig {
 	//private HashMap<String, Integer> config_seaLevelOverride;		//override for sea level, because bukkit doesn't report the right value for all situations
 	public Integer getSeaLevelOverride(){
 		if(config_seaLevelOverride==-1)
-		return (config_seaLevelOverride=Bukkit.getWorld(this.getWorldName()).getSeaLevel());
+		return (config_seaLevelOverride=Bukkit.getWorld(this.getWorldName()).getSeaLevel()-1);
 		else
 			return config_seaLevelOverride;
 		}
@@ -504,7 +509,8 @@ public class WorldConfig {
 		}
 		
 		
-		GriefPrevention.instance.getLogger().log(Level.INFO,"Reading Configuration for World:" + pName);
+		Debugger.Write("Reading Configuration for World:" + pName,DebugLevel.Verbose);
+		
 		this.config_seaLevelOverride = config.getInt("GriefPrevention.SeaLevelOverride",-1);
 		
 		if(this.config_seaLevelOverride==-1){
@@ -686,7 +692,7 @@ public class WorldConfig {
 		
 		
 		this.EquineInventoryRules = new ClaimBehaviourData("Equine Inventory",config,outConfig,"GriefPrevention.Rules.EquineInventory",
-				ClaimBehaviourData.getAll("Equine Inventory").setBehaviourMode(ClaimBehaviourMode.RequireContainer));
+				ClaimBehaviourData.getNone("Equine Inventory"));
 		
 		
 		//Name Tag usage.

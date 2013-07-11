@@ -271,8 +271,9 @@ class EntityEventHandler implements Listener
 		
 		ClaimBehaviourData preExplodeCheck = null;
 		
-		if(isCreeper)
+		if(isCreeper){
 			preExplodeCheck = wc.getCreeperExplosionBehaviour();
+		}
 		else if(isWither)
 			preExplodeCheck = wc.getWitherExplosionBehaviour();
 		else if(isTNT)
