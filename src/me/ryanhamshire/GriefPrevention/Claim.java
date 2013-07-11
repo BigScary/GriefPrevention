@@ -897,7 +897,7 @@ public class Claim
 	 * @param accessors
 	 * @param managers
 	 */
-	public void getPermissions(ArrayList<String> builders, ArrayList<String> containers, ArrayList<String> accessors, ArrayList<String> managers)
+	public void getPermissions(List<String> builders, List<String> containers, List<String> accessors, List<String> managers)
 	{
 		//loop through all the entries in the hash map
 		//if we have a parent, add the parent permissions first, then overwrite them.
@@ -922,10 +922,11 @@ public class Claim
 		}
 		
 		//managers are handled a little differently
-		for(int i = 0; i < this.managers.size(); i++)
+		for(String manager:managers)
 		{
-			managers.add(this.managers.get(i));
+			managers.add(manager);
 		}
+
 
 		
 		

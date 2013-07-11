@@ -38,6 +38,7 @@ import me.ryanhamshire.GriefPrevention.Configuration.ModdedBlocksSearchResults;
 import me.ryanhamshire.GriefPrevention.Configuration.WorldConfig;
 import me.ryanhamshire.GriefPrevention.Debugger.DebugLevel;
 import me.ryanhamshire.GriefPrevention.events.GPLoadEvent;
+import me.ryanhamshire.GriefPrevention.events.GPUnloadEvent;
 import me.ryanhamshire.GriefPrevention.tasks.CleanupUnusedClaimsTask;
 import me.ryanhamshire.GriefPrevention.tasks.DeliverClaimBlocksTask;
 import me.ryanhamshire.GriefPrevention.tasks.EntityCleanupTask;
@@ -620,10 +621,8 @@ public class GriefPrevention extends JavaPlugin
 				
 				this.dataStore.saveClaimData();
 				
-		for(World iterate:Bukkit.getWorlds()){
-			ww.WorldUnload(new WorldUnloadEvent(iterate));
-		}
-		ww=null;
+		GPUnloadEvent uevent = new GPUnloadEvent(this);
+		Bukkit.getPluginManager().callEvent(uevent);
 		//save data for any online players
 		Player [] players = this.getServer().getOnlinePlayers();
 		for(int i = 0; i < players.length; i++)
@@ -633,7 +632,11 @@ public class GriefPrevention extends JavaPlugin
 			PlayerData playerData = this.dataStore.getPlayerData(playerName);
 			this.dataStore.savePlayerData(playerName, playerData);
 		}
-		
+		for(World iterate:Bukkit.getWorlds()){
+			ww.WorldUnload(new WorldUnloadEvent(iterate));
+		}
+		ww=null;
+		ww=null;
 		this.dataStore.close();
 		//instance=null;
 		

@@ -1642,8 +1642,7 @@ class PlayerEventHandler implements Listener
 				doshowmessage = prevstepped==null || prevstepped.before(laststepped);
 			}
 			//System.out.println("doshowmessage=" + doshowmessage);
-			if(doshowmessage)
-				playerData.setLastSteppedOn(clickedBlock.getLocation());
+			playerData.setLastSteppedOn(clickedBlock.getLocation());
 			
 			if(useRule.Allowed(clickedBlock.getLocation(), player,doshowmessage).Denied())
 			{

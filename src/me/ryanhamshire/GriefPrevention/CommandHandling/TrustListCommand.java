@@ -54,8 +54,8 @@ public class TrustListCommand extends GriefPreventionCommand{
 		
 		if(managers.size() > 0)
 		{
-			for(int i = 0; i < managers.size(); i++)
-				permissions.append(managers.get(i) + " ");
+			for(String manager: managers)
+				permissions.append(manager + " ");
 		}
 		
 		player.sendMessage(permissions.toString());
@@ -64,8 +64,8 @@ public class TrustListCommand extends GriefPreventionCommand{
 		
 		if(builders.size() > 0)
 		{				
-			for(int i = 0; i < builders.size(); i++)
-				permissions.append(builders.get(i) + " ");		
+			for(String builder:builders)
+				permissions.append(builder + " ");		
 		}
 		
 		player.sendMessage(permissions.toString());
@@ -74,8 +74,8 @@ public class TrustListCommand extends GriefPreventionCommand{
 		
 		if(containers.size() > 0)
 		{
-			for(int i = 0; i < containers.size(); i++)
-				permissions.append(containers.get(i) + " ");		
+			for(String container:containers)
+				permissions.append(container + " ");		
 		}
 		
 		player.sendMessage(permissions.toString());
@@ -84,8 +84,8 @@ public class TrustListCommand extends GriefPreventionCommand{
 			
 		if(accessors.size() > 0)
 		{
-			for(int i = 0; i < accessors.size(); i++)
-				permissions.append(accessors.get(i) + " ");			
+			for(String accessor:accessors)
+				permissions.append(accessor + " ");			
 		}
 		
 		player.sendMessage(permissions.toString());
