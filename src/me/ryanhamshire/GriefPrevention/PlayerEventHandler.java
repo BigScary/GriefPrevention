@@ -1353,7 +1353,7 @@ class PlayerEventHandler implements Listener
 	//see above
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
 	public void onPlayerBucketFill (PlayerBucketFillEvent bucketEvent)
-	{
+	{try {
 		Player player = bucketEvent.getPlayer();
 		Block block = bucketEvent.getBlockClicked();
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(block.getWorld());
@@ -1366,7 +1366,22 @@ class PlayerEventHandler implements Listener
 			return;
 		}
 	}
+	finally {
+		if(bucketEvent.isCancelled()){
+			final PlayerBucketFillEvent cloned = bucketEvent; 
+			Bukkit.getScheduler().scheduleSyncDelayedTask(GriefPrevention.instance,new Runnable() {
+			
+			public void run(){
+			
+			cloned.getPlayer().sendBlockChange(cloned.getBlockClicked().getLocation(),
+					cloned.getBlockClicked().getType(), cloned.getBlockClicked().getData());
+			}}
+			,0);
+		}
+	}
+	}
 	private static HashSet<Byte> transparentMaterials = null;
+	
 	private static HashSet<Material> GPTools = null;
 	private static HashSet<Material> ContainerMaterials = null;
 	private void getTransparentMaterials(){
