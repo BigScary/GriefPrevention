@@ -80,8 +80,32 @@ public class WorldConfig {
 	private ClaimBehaviourData SnowGolemSpawnBehaviour; //data for now Snow Golems can be spawned.
 	public ClaimBehaviourData getSnowGolemSpawnBehaviour(){ return SnowGolemSpawnBehaviour;}
 	
-	
-	
+	//Dispenser rules.
+	private ClaimBehaviourData DispenserWaterBehaviour;
+	private ClaimBehaviourData DispenserLavaBehaviour;
+	private ClaimBehaviourData DispenserArrowBehaviour;
+	private ClaimBehaviourData DispenserFireChargeBehaviour;
+	private ClaimBehaviourData DispenserFlintandSteelBehaviour;
+	private ClaimBehaviourData DispenserPositivePotionBehaviour;
+	private ClaimBehaviourData DispenserNegativePotionBehaviour;
+	private ClaimBehaviourData DispenserSpawnEggBehaviour;
+	private ClaimBehaviourData DispenserFireworkBehaviour;
+	private ClaimBehaviourData DispenserMiscBehaviour;
+	private ClaimBehaviourData DispenserSnowballBehaviour;
+	private ClaimBehaviourData DispenserEggBehaviour;
+	public ClaimBehaviourData getDispenserWaterBehaviour(){ return DispenserWaterBehaviour;}
+	public ClaimBehaviourData getDispenserLavaBehaviour() { return DispenserLavaBehaviour;}
+	public ClaimBehaviourData getDispenserArrowBehaviour() { return DispenserArrowBehaviour;}
+	public ClaimBehaviourData getDispenserFireChargeBehaviour(){ return DispenserFireChargeBehaviour;}
+	public ClaimBehaviourData getDispenserFlintandSteelBehaviour(){ return DispenserFlintandSteelBehaviour;}
+	public ClaimBehaviourData getDispenserPositivePotionBehaviour(){ return this.DispenserPositivePotionBehaviour;}
+	public ClaimBehaviourData getDispenserNegativePotionBehaviour(){ return this.DispenserPositivePotionBehaviour;}
+	public ClaimBehaviourData getDispenserMiscBehaviour(){ return this.DispenserMiscBehaviour;}
+	public ClaimBehaviourData getDispenserFireworkBehaviour(){ return this.DispenserFireworkBehaviour;}
+	public ClaimBehaviourData getDispenserSpawnEggBehaviour(){ return this.DispenserSpawnEggBehaviour;}
+	public ClaimBehaviourData getDispenserSnowballBehaviour(){ return this.DispenserSnowballBehaviour;}
+	public ClaimBehaviourData getDispenserEggBehaviour(){ return this.DispenserEggBehaviour;}
+			
 	
 	private ClaimBehaviourData WaterBucketBehaviour;
 	public ClaimBehaviourData getWaterBucketBehaviour(){ return WaterBucketBehaviour;}
@@ -709,6 +733,42 @@ public class WorldConfig {
 		
 		this.FeedingRules = new ClaimBehaviourData("Feeding",config,outConfig,"GriefPrevention.Rules.Feeding",
 				ClaimBehaviourData.getAll("Feeding").setBehaviourMode(ClaimBehaviourMode.RequireAccess));
+		
+		
+		//Dispenser rules.
+		this.DispenserLavaBehaviour = new ClaimBehaviourData("Lava Dispensing",config,outConfig,"GriefPrevention.Rules.Dispensers.Lava",
+				ClaimBehaviourData.getInsideClaims("Lava Dispensing"));
+		
+		this.DispenserWaterBehaviour = new ClaimBehaviourData("Water Dispensing",config,outConfig,"GriefPrevention.Rules.Dispensers.Water",
+				ClaimBehaviourData.getAll("Water Dispensing"));
+		
+		this.DispenserArrowBehaviour = new ClaimBehaviourData("Arrow Dispensing",config,outConfig,"GriefPrevention.Rules.Dispensers.Arrows",
+				ClaimBehaviourData.getInsideClaims("Arrow Dispensing"));
+		
+		this.DispenserFireChargeBehaviour = new ClaimBehaviourData("Fire Charge Dispensing",config,outConfig,"GriefPrevention.Rules.Dispensers.FireCharges",
+				ClaimBehaviourData.getInsideClaims("Fire Charge Dispensing"));
+		
+		this.DispenserFlintandSteelBehaviour = new ClaimBehaviourData("Flint and Steel Dispensing",config,outConfig,"GriefPrevention.Rules.Dispensers.FlintandSteel",
+				ClaimBehaviourData.getInsideClaims("Flint and Steel Dispensing"));
+		
+		this.DispenserPositivePotionBehaviour = new ClaimBehaviourData("Positive Potion Dispensing",config,outConfig,"GriefPrevention.Rules.Dispensers.PositivePotions",
+				ClaimBehaviourData.getAll("Positive Potion Dispensing"));
+		
+		this.DispenserNegativePotionBehaviour = new ClaimBehaviourData("Negative Potion Dispensing",config,outConfig,"GriefPrevention.Rules.Dispensers.NegativePotions",
+				ClaimBehaviourData.getAll("Negative Potion Dispensing"));
+		
+		this.DispenserSpawnEggBehaviour = new ClaimBehaviourData("Spawn Egg Dispensing",config,outConfig,"GriefPrevention.Rules.Dispensers.SpawnEggs",
+				ClaimBehaviourData.getAll("Spawn Egg Dispensing"));
+		
+		this.DispenserFireworkBehaviour = new ClaimBehaviourData("Firework Dispensing",config,outConfig,"GriefPrevention.Rules.Dispensers.Fireworks",
+				ClaimBehaviourData.getAll("Firework Dispensing"));
+		
+		this.DispenserSnowballBehaviour = new ClaimBehaviourData("Snowball Dispensing",config,outConfig,"GriefPrevention.Rules.Dispensers.Snowballs",
+				ClaimBehaviourData.getAll("Snowball Dispensing"));
+		this.DispenserEggBehaviour = new ClaimBehaviourData("Egg Dispensing",config,outConfig,"GriefPrevention.Rules.Dispensers.Eggs",
+				ClaimBehaviourData.getInsideClaims("Egg Dispensing"));
+		this.DispenserMiscBehaviour = new ClaimBehaviourData("Misc Dispensing",config,outConfig,"GriefPrevention.Rules.Dispensers.Misc",
+				ClaimBehaviourData.getAll("Misc Dispensing"));
 		/*private ClaimBehaviourData ContainerTheft;
 	public ClaimBehaviourData getContainerTheft(){ return ContainerTheft;}
 	private ClaimBehaviourData CreatureDamage;

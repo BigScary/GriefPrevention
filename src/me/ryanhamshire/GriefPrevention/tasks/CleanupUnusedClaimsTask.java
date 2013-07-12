@@ -23,6 +23,8 @@ import java.util.Random;
 import java.util.Vector;
 
 import me.ryanhamshire.GriefPrevention.Claim;
+import me.ryanhamshire.GriefPrevention.Debugger;
+import me.ryanhamshire.GriefPrevention.Debugger.DebugLevel;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import me.ryanhamshire.GriefPrevention.PlayerData;
 import me.ryanhamshire.GriefPrevention.Configuration.WorldConfig;
@@ -50,7 +52,7 @@ public class CleanupUnusedClaimsTask implements Runnable
 	{
 		//don't do anything when there are no claims
 		if(GriefPrevention.instance.dataStore.getClaimsSize() == 0) return;
-		
+		Debugger.Write("Claim Cleanup Running.", DebugLevel.Verbose);
 		if(!flInitialized){
 			if(GriefPrevention.instance==null || GriefPrevention.instance.dataStore==null) return;
 			//start scanning in a random spot
@@ -68,7 +70,7 @@ public class CleanupUnusedClaimsTask implements Runnable
 		
 		//wrap search around to beginning
 		if(this.nextClaimIndex >= GriefPrevention.instance.dataStore.getClaimsSize()) this.nextClaimIndex = 0;
-		
+		this.nextClaimIndex = (this.nextClaimIndex+1)%GriefPrevention.instance.dataStore.getClaimsSize();
 		//decide which claim to check next
 		Claim claim = GriefPrevention.instance.dataStore.getClaimArray().get(this.nextClaimIndex++);
 		
@@ -104,9 +106,11 @@ public class CleanupUnusedClaimsTask implements Runnable
 		//if only one claim, and the player hasn't played in a week
 		if(newPlayerClaimsExpired && playerData.claims.size() == 1)
 		{
+			
 			//if that's a chest claim and those are set to expire
-			if(claim.getArea() <= areaOfDefaultClaim && wc.getChestClaimExpirationDays() > 0)
+			if(claim.getArea() <= areaOfDefaultClaim && newPlayerClaimsExpired && wc.getChestClaimExpirationDays()>0)
 			{
+				Debugger.Write("Deleting Chest Claim owned by " + claim.ownerName + " last login:" + playerData.lastLogin.toString(), DebugLevel.Verbose);
 				claim.removeSurfaceFluids(null);
 				GriefPrevention.instance.dataStore.deleteClaim(claim);
 				cleanupChunks = true;

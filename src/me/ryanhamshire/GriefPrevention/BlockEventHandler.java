@@ -21,6 +21,7 @@ package me.ryanhamshire.GriefPrevention;
 import java.util.ArrayList;
 import java.util.List;
 
+import me.ryanhamshire.GriefPrevention.Configuration.ClaimBehaviourData;
 import me.ryanhamshire.GriefPrevention.Configuration.WorldConfig;
 import me.ryanhamshire.GriefPrevention.Debugger.DebugLevel;
 import me.ryanhamshire.GriefPrevention.visualization.Visualization;
@@ -56,6 +57,9 @@ import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 //event handlers related to blocks
@@ -65,6 +69,23 @@ import org.bukkit.util.Vector;
  */
 public class BlockEventHandler implements Listener 
 {
+	
+	private static PotionEffectType[] PositiveEffectsArray = new PotionEffectType[]{
+		PotionEffectType.HEAL,
+		PotionEffectType.ABSORPTION,
+		PotionEffectType.DAMAGE_RESISTANCE,
+		PotionEffectType.INVISIBILITY,
+		PotionEffectType.NIGHT_VISION,
+		PotionEffectType.FAST_DIGGING,
+		PotionEffectType.FIRE_RESISTANCE,
+		PotionEffectType.HEALTH_BOOST,
+		PotionEffectType.REGENERATION,
+		PotionEffectType.SATURATION,
+		PotionEffectType.JUMP,
+		PotionEffectType.SPEED,
+		PotionEffectType.WATER_BREATHING
+	};
+	private List<PotionEffectType> PositiveEffects;
 	//convenience reference to singleton datastore
 	private DataStore dataStore;
 	
@@ -725,50 +746,123 @@ public class BlockEventHandler implements Listener
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
 	public void onDispense(BlockDispenseEvent dispenseEvent)
 	{
+		
 		//from where?
 		Block fromBlock = dispenseEvent.getBlock();
-		WorldConfig wc = GriefPrevention.instance.getWorldCfg(fromBlock.getLocation().getWorld());
 		if(fromBlock.getType().equals(Material.DROPPER)) return;
+		WorldConfig wc = GriefPrevention.instance.getWorldCfg(fromBlock.getLocation().getWorld());
+		
 		//to where?
 		Vector velocity = dispenseEvent.getVelocity();
 		int xChange = 0;
 		int zChange = 0;
-		if(Math.abs(velocity.getX()) > Math.abs(velocity.getZ()))
-		{
-			if(velocity.getX() > 0) xChange = 1;
-			else xChange = -1;				
+		int yChange=0;
+		velocity.normalize();
+		float xAbs = (float) Math.abs(velocity.getX());
+		float yAbs = (float) Math.abs(velocity.getY());
+		float zAbs = (float) Math.abs(velocity.getZ());
+		
+		if(xAbs > yAbs && xAbs > zAbs){
+			//x is main direction.
+			xChange = (int) Math.signum(velocity.getX());
 		}
-		else
-		{
-			if(velocity.getZ() > 0) zChange = 1;
-			else zChange = -1;
+		else if(yAbs > xAbs && yAbs > zAbs){
+			//y is main direction. 
+			yChange = (int)Math.signum(velocity.getY());
+		}
+		else {
+			//z must be main direction.
+			zChange = (int)Math.signum(velocity.getZ());
 		}
 		
-		Block toBlock = fromBlock.getRelative(xChange, 0, zChange);
 		
-		Claim fromClaim = this.dataStore.getClaimAt(fromBlock.getLocation(), false, null);
-		Claim toClaim = this.dataStore.getClaimAt(toBlock.getLocation(), false, fromClaim);
 		
-		//into wilderness is NOT OK when surface buckets are limited
-		Material materialDispensed = dispenseEvent.getItem().getType();
-		
-		if(
-				(materialDispensed == Material.WATER_BUCKET && wc.getWaterBucketBehaviour().Allowed(toBlock.getLocation(),null).Allowed() ||
-				(materialDispensed == Material.LAVA_BUCKET && wc.getLavaBucketBehaviour().Allowed(toBlock.getLocation(),null).Allowed())
-				&& GriefPrevention.instance.claimsEnabledForWorld(fromBlock.getWorld())))		
-		{
+		Block toBlock = fromBlock.getRelative(xChange, yChange, zChange);
+		//both must be either on a claim (the same one) or not in a claim.
+		Claim fromClaim = GriefPrevention.instance.dataStore.getClaimAt(fromBlock.getLocation(), false, null);
+		Claim toClaim = GriefPrevention.instance.dataStore.getClaimAt(toBlock.getLocation(), false, null);
+		//if the target is a claim but the source is not, cancel.
+		if(toClaim!=null && fromClaim==null){
+			//cancel.
 			dispenseEvent.setCancelled(true);
 			return;
 		}
 		
-		//wilderness to wilderness is OK
-		if(fromClaim == null && toClaim == null) return;
 		
-		//within claim is OK
-		if(fromClaim == toClaim) return;
 		
-		//everything else is NOT OK
-		dispenseEvent.setCancelled(true);
+		//Claim fromClaim = this.dataStore.getClaimAt(fromBlock.getLocation(), false, null);
+		//Claim toClaim = this.dataStore.getClaimAt(toBlock.getLocation(), false, fromClaim);
+		
+		//Determine which set of Dispenser rules is active, based on the item being dispensed.
+		ClaimBehaviourData chosenRules = null;
+		ItemStack beingdispensed = dispenseEvent.getItem();
+		//System.out.println("Item dispensing:" + beingdispensed.getType().name());
+		//if the item being "dispensed" is a bucket:
+		//check for water or lava in front of the dispenser, in the target block.
+		if(beingdispensed.getType()==Material.BUCKET){
+			if(toBlock.getType()==Material.WATER){
+				chosenRules = wc.getDispenserWaterBehaviour();
+			}
+			else if(toBlock.getType()==Material.LAVA){
+				chosenRules = wc.getDispenserLavaBehaviour();
+			}
+		}
+		else if(beingdispensed.getType() == Material.SNOW_BALL){
+			chosenRules = wc.getDispenserSnowballBehaviour();
+		}
+		else if(beingdispensed.getType()==Material.MONSTER_EGG){
+			chosenRules = wc.getDispenserSpawnEggBehaviour();
+		}
+		else if(beingdispensed.getType()==Material.FIREWORK){
+			chosenRules = wc.getDispenserFireworkBehaviour();
+		}
+		else if(beingdispensed.getType()==Material.ARROW){
+			chosenRules = wc.getDispenserArrowBehaviour();
+		}
+		else if(beingdispensed.getType()==Material.FLINT_AND_STEEL){
+			chosenRules = wc.getDispenserFlintandSteelBehaviour();
+		}
+		else if(beingdispensed.getType()==Material.FIREBALL){
+			chosenRules = wc.getDispenserFireChargeBehaviour();
+		}
+		else if(beingdispensed.getType()==Material.POTION){
+			
+			PotionMeta grabmeta = (PotionMeta) beingdispensed.getItemMeta();
+			PotionEffect firsteffect = grabmeta.getCustomEffects().get(0);
+			PotionEffectType testtype = firsteffect.getType();
+			if(this.PositiveEffects==null){
+				this.PositiveEffects = new ArrayList<PotionEffectType>();
+				for(PotionEffectType addit:this.PositiveEffectsArray){
+					PositiveEffects.add(addit);
+				}
+			}
+			if(PositiveEffects.contains(testtype)){
+				chosenRules=wc.getDispenserPositivePotionBehaviour();
+			}
+			else {
+				chosenRules = wc.getDispenserNegativePotionBehaviour();
+			}
+			
+			
+			
+			
+		}
+		if(chosenRules==null) chosenRules = wc.getDispenserMiscBehaviour();
+		
+		
+		if(chosenRules.Allowed(fromBlock.getLocation(), null).Denied()){
+			dispenseEvent.setCancelled(true);
+		}
+		else if(chosenRules.Allowed(toBlock.getLocation(), null).Denied()){
+			dispenseEvent.setCancelled(true);
+		}
+		
+		
+		
+		
+		
+		
+		
 	}		
 	
 	@EventHandler(ignoreCancelled = true)

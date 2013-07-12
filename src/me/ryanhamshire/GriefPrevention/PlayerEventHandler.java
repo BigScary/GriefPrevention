@@ -943,8 +943,8 @@ class PlayerEventHandler implements Listener
 				if(h.isTamed()){
 					//if the player is the owner of the horse,
 					//they can do what they want no matter where they are.
-					if(h.getOwner()!=null){
-						if(h.getOwner().getName().equals(player.getName())) return;
+				{
+					if(h.getOwner()==null || h.getOwner().getName().equals(player.getName())) return;
 					}
 						//otherwise, Apply Containers rules if they aren't sneaking, otherwise,
 						//apply the Inventory rules.
@@ -956,8 +956,8 @@ class PlayerEventHandler implements Listener
 								return;
 							
 						}
-					
 				}
+				
 				
 				
 			}
