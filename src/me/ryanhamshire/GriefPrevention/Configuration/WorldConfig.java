@@ -107,11 +107,17 @@ public class WorldConfig {
 	public ClaimBehaviourData getDispenserEggBehaviour(){ return this.DispenserEggBehaviour;}
 			
 	
-	private ClaimBehaviourData WaterBucketBehaviour;
-	public ClaimBehaviourData getWaterBucketBehaviour(){ return WaterBucketBehaviour;}
+	private ClaimBehaviourData WaterBucketFillBehaviour;
+	public ClaimBehaviourData getWaterBucketFillBehaviour(){ return WaterBucketFillBehaviour;}
 	
-	private ClaimBehaviourData LavaBucketBehaviour;
-	public ClaimBehaviourData getLavaBucketBehaviour(){ return LavaBucketBehaviour;}
+	private ClaimBehaviourData LavaBucketFillBehaviour;
+	public ClaimBehaviourData getLavaBucketFillBehaviour(){ return LavaBucketFillBehaviour;}
+	
+	private ClaimBehaviourData WaterBucketEmptyBehaviour;
+	public ClaimBehaviourData getWaterBucketEmptyBehaviour(){ return WaterBucketEmptyBehaviour;}
+	
+	private ClaimBehaviourData LavaBucketEmptyBehaviour;
+	public ClaimBehaviourData getLavaBucketEmptyBehaviour(){ return LavaBucketEmptyBehaviour;}
 	
 	private ClaimBehaviourData VillagerTrades;                     //prevent trades on claims players don't have permissions on
 	public ClaimBehaviourData getVillagerTrades(){ return VillagerTrades;}
@@ -590,12 +596,16 @@ public class WorldConfig {
 		ClaimBehaviourData WaterRequire = new ClaimBehaviourData("Water Placement",PlacementRules.BelowOnly,PlacementRules.Both,ClaimBehaviourMode.RequireBuild);
 		ClaimBehaviourData LavaRequire = new ClaimBehaviourData("Lava Placement",PlacementRules.BelowOnly,PlacementRules.Both,ClaimBehaviourMode.RequireBuild).setWildernessRequiredPermission("GriefPrevention.Lava");
 		
-		this.WaterBucketBehaviour = new ClaimBehaviourData("Water Placement",config,outConfig,"GriefPrevention.Rules.WaterBuckets",
+		this.WaterBucketEmptyBehaviour = new ClaimBehaviourData("Water Placement",config,outConfig,"GriefPrevention.Rules.WaterBuckets.Place",
 		WaterRequire);
 		
-		this.LavaBucketBehaviour = new ClaimBehaviourData("Lava Placement",config,outConfig,"GriefPrevention.Rules.LavaBuckets",
+		this.LavaBucketEmptyBehaviour = new ClaimBehaviourData("Lava Placement",config,outConfig,"GriefPrevention.Rules.LavaBuckets.Place",
 				LavaRequire);
+		this.WaterBucketFillBehaviour = new ClaimBehaviourData("Water Bucket Fill",config,outConfig,"GriefPrevention.Rules.WaterBuckets.Fill",
+				ClaimBehaviourData.getAll("Water Bucket Fill").setBehaviourMode(ClaimBehaviourMode.RequireBuild));
 		
+		this.LavaBucketFillBehaviour = new ClaimBehaviourData("Lava Bucket Fill",config,outConfig,"GriefPrevention.Rules.LavaBuckets.Fill",
+				ClaimBehaviourData.getAll("Lava Bucket Fill").setBehaviourMode(ClaimBehaviourMode.RequireBuild));
 		//Snow golem spawn rules.
 		
 		this.IronGolemSpawnBehaviour = new ClaimBehaviourData("Iron Golem Spawning",config,outConfig,"GriefPrevention.Rules.BuildIronGolem",

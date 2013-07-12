@@ -28,6 +28,7 @@ import java.util.regex.Pattern;
 
 import me.ryanhamshire.GriefPrevention.Configuration.ClaimBehaviourData.ClaimAllowanceConstants;
 import me.ryanhamshire.GriefPrevention.Configuration.ClaimBehaviourData;
+import me.ryanhamshire.GriefPrevention.Configuration.ClaimBehaviourData.ClaimBehaviourMode;
 import me.ryanhamshire.GriefPrevention.Configuration.ItemUsageRules;
 import me.ryanhamshire.GriefPrevention.Configuration.WorldConfig;
 import me.ryanhamshire.GriefPrevention.Debugger.DebugLevel;
@@ -1237,7 +1238,7 @@ class PlayerEventHandler implements Listener
 		int minLavaDistance = 10;
 		
 		if(bucketEvent.getBucket()==Material.LAVA_BUCKET){
-			switch(wc.getLavaBucketBehaviour().Allowed(block.getLocation(), player)) 
+			switch(wc.getLavaBucketEmptyBehaviour().Allowed(block.getLocation(), player)) 
 			 {
 			 case Allow_Forced:
 			     return; //force allow.
@@ -1249,7 +1250,7 @@ class PlayerEventHandler implements Listener
 			}
 		}
 		else if(bucketEvent.getBucket()==Material.WATER_BUCKET){
-			 switch(wc.getWaterBucketBehaviour().Allowed(block.getLocation(), player,false)) 
+			 switch(wc.getWaterBucketEmptyBehaviour().Allowed(block.getLocation(), player,false)) 
 			 {
 			 case Allow_Forced:
 			     return; //force allow.
@@ -1276,14 +1277,14 @@ class PlayerEventHandler implements Listener
 
 		//checks for Behaviour perms.
 		if(bucketEvent.getBucket() == Material.LAVA_BUCKET){
-			if(wc.getLavaBucketBehaviour().Allowed(block.getLocation(),player).Denied()){
+			if(wc.getLavaBucketEmptyBehaviour().Allowed(block.getLocation(),player).Denied()){
 				//GriefPrevention.sendMessage(player, TextMode.Err, Messages.ConfigDisabled,"Lava placement ");
 				bucketEvent.setCancelled(true);
 				return;
 			}
 		}
 		else if(bucketEvent.getBucket() == Material.WATER_BUCKET){
-			if(wc.getWaterBucketBehaviour().Allowed(block.getLocation(),player).Denied()){
+			if(wc.getWaterBucketEmptyBehaviour().Allowed(block.getLocation(),player).Denied()){
 				//GriefPrevention.sendMessage(player, TextMode.Err, Messages.ConfigDisabled,"Water placement ");
 				bucketEvent.setCancelled(true);
 				return;
@@ -1304,7 +1305,7 @@ class PlayerEventHandler implements Listener
 			
 				if(bucketEvent.getBucket() == Material.LAVA_BUCKET)
 				{
-					if(wc.getLavaBucketBehaviour().Allowed(block.getLocation(), player).Denied()){
+					if(wc.getLavaBucketEmptyBehaviour().Allowed(block.getLocation(), player).Denied()){
 						
 						bucketEvent.setCancelled(true);
 						return;
@@ -1312,7 +1313,7 @@ class PlayerEventHandler implements Listener
 				}
 			 if(bucketEvent.getBucket() == Material.WATER_BUCKET){
 				
-				if(wc.getWaterBucketBehaviour().Allowed(block.getLocation(), player).Denied()){
+				if(wc.getWaterBucketEmptyBehaviour().Allowed(block.getLocation(), player).Denied()){
 					
 					bucketEvent.setCancelled(true);
 					return;
@@ -1328,7 +1329,7 @@ class PlayerEventHandler implements Listener
 			if(bucketEvent.getBucket() == Material.LAVA_BUCKET)
 			{
 				
-				if(wc.getLavaBucketBehaviour().Allowed(block.getLocation(), player).Denied()){
+				if(wc.getLavaBucketEmptyBehaviour().Allowed(block.getLocation(), player).Denied()){
 					//GriefPrevention.sendMessage(player,TextMode.Err,Messages.ConfigDisabled,"Lava Placement");
 					bucketEvent.setCancelled(true);
 					return;
@@ -1359,7 +1360,14 @@ class PlayerEventHandler implements Listener
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(block.getWorld());
 		//make sure the player is allowed to build at the location
 		//String noBuildReason = GriefPrevention.instance.allowBuild(player, block.getLocation());
-		if(wc.getWaterBucketBehaviour().Allowed(block.getLocation(), player).Denied())
+		
+		ClaimBehaviourData cbm = wc.getWaterBucketFillBehaviour();
+		if(block.getType()==Material.LAVA){
+			cbm = wc.getLavaBucketFillBehaviour();
+		}
+		
+		
+		if(cbm.Allowed(block.getLocation(), player).Denied())
 		{
 			//GriefPrevention.sendMessage(player, TextMode.Err, noBuildReason);
 			bucketEvent.setCancelled(true);
