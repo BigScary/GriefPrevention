@@ -943,17 +943,19 @@ class PlayerEventHandler implements Listener
 				if(h.isTamed()){
 					//if the player is the owner of the horse,
 					//they can do what they want no matter where they are.
-					if(h.getOwner().getName().equals(player.getName())) return; 
-					//otherwise, Apply Containers rules if they aren't sneaking, otherwise,
-					//apply the Inventory rules.
-					//what this means is that if you ride a horse onto somebody elses claim, they will have access to the horse.
-					//if the EquineInventoryRules/ContainerRules are set to allow.
-					if(player.isSneaking()){
-						if(wc.getEquineInventoryRules().Allowed(h.getLocation(), player).Denied())
-							event.setCancelled(true);
-							return;
-						
+					if(h.getOwner()!=null){
+						if(h.getOwner().getName().equals(player.getName())) return;
 					}
+						//otherwise, Apply Containers rules if they aren't sneaking, otherwise,
+						//apply the Inventory rules.
+						//what this means is that if you ride a horse onto somebody elses claim, they will have access to the horse.
+						//if the EquineInventoryRules/ContainerRules are set to allow.
+						if(player.isSneaking()){
+							if(wc.getEquineInventoryRules().Allowed(h.getLocation(), player).Denied())
+								event.setCancelled(true);
+								return;
+							
+						}
 					
 				}
 				

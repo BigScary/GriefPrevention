@@ -81,6 +81,8 @@ public class WorldConfig {
 	public ClaimBehaviourData getSnowGolemSpawnBehaviour(){ return SnowGolemSpawnBehaviour;}
 	
 	
+	
+	
 	private ClaimBehaviourData WaterBucketBehaviour;
 	public ClaimBehaviourData getWaterBucketBehaviour(){ return WaterBucketBehaviour;}
 	
