@@ -254,7 +254,7 @@ class EntityEventHandler implements Listener
 		Location location = explodeEvent.getLocation();
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(location.getWorld());
 		
-		Claim claimatEntity = GriefPrevention.instance.dataStore.getClaimAt(location, true, null);
+		Claim claimatEntity = GriefPrevention.instance.dataStore.getClaimAt(location, true);
 		//quickest exit: if we are inside a claim and allowExplosions is false, break.
 		//if(claimatEntity!=null && claimatEntity.areExplosivesAllowed) return;
 		
@@ -312,7 +312,7 @@ class EntityEventHandler implements Listener
 			}
 			else {
 				//it is allowed, however, if it is on a claim only allow if explosions are enabled for that claim.
-				claimpos = GriefPrevention.instance.dataStore.getClaimAt(block.getLocation(), false, claimpos);
+				claimpos = GriefPrevention.instance.dataStore.getClaimAt(block.getLocation(), false);
 				if(claimpos!=null && !claimpos.areExplosivesAllowed){
 					blocks.remove(i--);
 				}
@@ -548,7 +548,7 @@ class EntityEventHandler implements Listener
 		if(!GriefPrevention.instance.creativeRulesApply(entity.getLocation())) return;
 
 		//otherwise, just apply the limit on total entities per claim 
-		Claim claim = this.dataStore.getClaimAt(event.getLocation(), false, null);
+		Claim claim = this.dataStore.getClaimAt(event.getLocation(), false);
 		if(claim!=null && claim.allowMoreEntities() != null)
 		{
 			event.setCancelled(true);
@@ -648,7 +648,7 @@ class EntityEventHandler implements Listener
 		if(event.getEntity() instanceof Enderman)
 		{
 			//and the block is claimed
-			if(this.dataStore.getClaimAt(event.getBlock().getLocation(), false, null) != null)
+			if(this.dataStore.getClaimAt(event.getBlock().getLocation(), false) != null)
 			{
 				//he doesn't get to steal it
 				event.setCancelled(true);
@@ -710,7 +710,7 @@ class EntityEventHandler implements Listener
 		else if(GriefPrevention.instance.creativeRulesApply(event.getEntity().getLocation()))
 		{
 			PlayerData playerData = this.dataStore.getPlayerData(event.getPlayer().getName());
-			Claim claim = this.dataStore.getClaimAt(event.getBlock().getLocation(), false, playerData.lastClaim);
+			Claim claim = this.dataStore.getClaimAt(event.getBlock().getLocation(), false);
 			if(claim == null) return;
 			
 			String noEntitiesReason = claim.allowMoreEntities();
@@ -735,7 +735,7 @@ class EntityEventHandler implements Listener
 	{
 		//environmental damage
 		if(event.getEntity() instanceof Hanging){ //hanging objects are not destroyed by explosions inside claims.
-			Claim claimatpos = dataStore.getClaimAt(event.getEntity().getLocation(), false, null);
+			Claim claimatpos = dataStore.getClaimAt(event.getEntity().getLocation(), false);
 			if(claimatpos!=null){
 				if(!claimatpos.areExplosivesAllowed){
 					event.setCancelled(true);
@@ -839,7 +839,7 @@ class EntityEventHandler implements Listener
 			//FEATURE: prevent players from engaging in PvP combat inside land claims (when it's disabled)
 			if(wc.getPvPNoCombatinPlayerClaims() || wc.getNoPvPCombatinAdminClaims())
 			{
-				Claim attackerClaim = this.dataStore.getClaimAt(attacker.getLocation(), false, attackerData.lastClaim);
+				Claim attackerClaim = this.dataStore.getClaimAt(attacker.getLocation(), false);
 				if(	attackerClaim != null && 
 					(attackerClaim.isAdminClaim() && wc.getNoPvPCombatinAdminClaims() ||
 					!attackerClaim.isAdminClaim() && wc.getPvPNoCombatinPlayerClaims()))
@@ -850,7 +850,7 @@ class EntityEventHandler implements Listener
 					return;
 				}
 				
-				Claim defenderClaim = this.dataStore.getClaimAt(defender.getLocation(), false, defenderData.lastClaim);
+				Claim defenderClaim = this.dataStore.getClaimAt(defender.getLocation(), false);
 				if( defenderClaim != null &&
 					(defenderClaim.isAdminClaim() && wc.getNoPvPCombatinAdminClaims() ||
 					!defenderClaim.isAdminClaim() && wc.getPvPNoCombatinPlayerClaims()))
@@ -895,7 +895,7 @@ class EntityEventHandler implements Listener
 					cachedClaim = playerData.lastClaim;
 				}
 				
-				Claim claim = this.dataStore.getClaimAt(event.getEntity().getLocation(), false, cachedClaim);
+				Claim claim = this.dataStore.getClaimAt(event.getEntity().getLocation(), false);
 				
 				//if it's claimed
 				if(claim != null)
@@ -928,7 +928,7 @@ class EntityEventHandler implements Listener
 					{		
 						if(event.getEntityType()==EntityType.WOLF || event.getEntityType()==EntityType.OCELOT){
 							//get the claim at this position...
-							Claim mobclaim = GriefPrevention.instance.dataStore.getClaimAt(event.getEntity().getLocation(),true,null);
+							Claim mobclaim = GriefPrevention.instance.dataStore.getClaimAt(event.getEntity().getLocation(),true);
 							//is this claim under siege?
 							if(mobclaim!=null && mobclaim.siegeData!=null){
 								
@@ -1018,7 +1018,7 @@ class EntityEventHandler implements Listener
 			cachedClaim = playerData.lastClaim;
 		}
 		
-		Claim claim = this.dataStore.getClaimAt(event.getVehicle().getLocation(), false, cachedClaim);
+		Claim claim = this.dataStore.getClaimAt(event.getVehicle().getLocation(), false);
 		
 		//if it's claimed
 		if(claim != null)

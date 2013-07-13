@@ -19,7 +19,7 @@ public class ClaimInfoCommand extends GriefPreventionCommand{
 		Player player = (Player)sender;
 		Claim claimatpos = null;
 		if(args.length ==0)
-			claimatpos = inst.dataStore.getClaimAt(player.getLocation(),true,null);
+			claimatpos = inst.dataStore.getClaimAt(player.getLocation(),true);
 		else {
 			int claimid = Integer.parseInt(args[0]);
 			claimatpos = inst.dataStore.getClaim(claimid);

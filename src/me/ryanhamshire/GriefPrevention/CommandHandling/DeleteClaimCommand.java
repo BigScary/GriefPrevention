@@ -29,7 +29,7 @@ public class DeleteClaimCommand extends GriefPreventionCommand {
 		
 		if (command.getName().equalsIgnoreCase("deleteclaim")) {
 			Claim claim = inst.dataStore.getClaimAt(player.getLocation(),
-					true /* ignore height */, null);
+					true /* ignore height */);
 
 			if (claim == null) {
 				GriefPrevention.sendMessage(player, TextMode.Err,

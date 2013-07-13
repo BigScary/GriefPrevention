@@ -31,7 +31,7 @@ public class GiveClaimCommand extends GriefPreventionCommand {
 		if(!(source.hasPermission("griefprevention.giveclaims") || source.hasPermission("griefprevention.adminclaims"))){
 		
 			//find the claim at the players location.
-			Claim claimtogive = dataStore.getClaimAt(source.getLocation(), true, null);
+			Claim claimtogive = dataStore.getClaimAt(source.getLocation(), true);
 			//if the owner is not the source, they have to have adminclaims permission too.
 			if(!claimtogive.getOwnerName().equalsIgnoreCase(source.getName())){
 				//if they don't have adminclaims permission, deny it.

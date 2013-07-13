@@ -62,7 +62,7 @@ public class ClaimBehaviourData {
 			if(testPlayer!=null) pd = GriefPrevention.instance.dataStore.getPlayerData(testPlayer.getName());
 			if((pd!=null)&&pd.ignoreClaims || this==RequireNone) return true;
 			String result = null;
-			Claim atposition  = GriefPrevention.instance.dataStore.getClaimAt(testLocation, false, null);
+			Claim atposition  = GriefPrevention.instance.dataStore.getClaimAt(testLocation, false);
 			if(atposition==null) return testresult=true; //unexpected...
 			switch(this){
 			case Disabled:
@@ -217,7 +217,7 @@ public class ClaimBehaviourData {
 		//check permissions if there is a player involved and we have them.
 		
 		
-		Claim testclaim = GriefPrevention.instance.dataStore.getClaimAt(position, true, null);
+		Claim testclaim = GriefPrevention.instance.dataStore.getClaimAt(position, true);
 		if(testclaim!=null){
 			if(ignoringclaims) return ClaimAllowanceConstants.Allow;
 			if(!this.ClaimBehaviour.PerformTest(position, RelevantPlayer, ShowMessages))

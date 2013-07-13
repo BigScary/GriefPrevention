@@ -20,7 +20,7 @@ public class ClearManagersCommand extends  GriefPreventionCommand{
 		DataStore dataStore = GriefPrevention.instance.dataStore;
 		if(!(sender instanceof Player)) return false;
 		Player player = (Player)sender;
-		Claim claimatpos = dataStore.getClaimAt(player.getLocation(), true, null);
+		Claim claimatpos = dataStore.getClaimAt(player.getLocation(), true);
 		PlayerData pdata = dataStore.getPlayerData(player.getName());
 		if(claimatpos!=null){
 			if(claimatpos.isAdminClaim()){

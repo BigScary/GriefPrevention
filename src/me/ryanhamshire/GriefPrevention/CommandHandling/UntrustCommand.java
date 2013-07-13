@@ -23,7 +23,7 @@ public class UntrustCommand extends GriefPreventionCommand{
 		Player player = (sender instanceof Player)?(Player)sender:null;
 		if(player==null) return false;
 		//determine which claim the player is standing in
-		Claim claim = inst.dataStore.getClaimAt(player.getLocation(), true /*ignore height*/, null);
+		Claim claim = inst.dataStore.getClaimAt(player.getLocation(), true /*ignore height*/);
 		
 		//bracket any permissions
 		if(args[0].contains("."))

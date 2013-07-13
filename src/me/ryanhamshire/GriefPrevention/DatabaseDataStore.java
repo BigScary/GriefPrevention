@@ -96,7 +96,7 @@ ArrayList<Claim> claimsToRemove = new ArrayList<Claim>();
 				Claim topLevelClaim = new Claim(lesserBoundaryCorner, greaterBoundaryCorner, ownerName, builderNames, containerNames, accessorNames, managerNames, claimID, neverdelete);
 				
 				//search for another claim overlapping this one
-				Claim conflictClaim = this.getClaimAt(topLevelClaim.lesserBoundaryCorner, true, null);
+				Claim conflictClaim = this.getClaimAt(topLevelClaim.lesserBoundaryCorner, true);
 								
 				//if there is such a claim, mark it for later removal
 				if(conflictClaim != null)

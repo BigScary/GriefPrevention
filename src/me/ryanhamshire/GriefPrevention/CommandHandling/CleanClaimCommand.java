@@ -80,7 +80,7 @@ public class CleanClaimCommand extends GriefPreventionCommand{
 	    }
 	    //System.out.println(source.typeID + " " +target.typeID);
 	    PlayerData pd = dataStore.getPlayerData(player.getName());
-	    Claim retrieveclaim = dataStore.getClaimAt(player.getLocation(), true, null);
+	    Claim retrieveclaim = dataStore.getClaimAt(player.getLocation(), true);
 	    if(retrieveclaim!=null){
 		    if(pd.ignoreClaims || retrieveclaim.ownerName.equalsIgnoreCase(player.getName())){
 		    	HandleClaimClean(retrieveclaim,source,target,player);

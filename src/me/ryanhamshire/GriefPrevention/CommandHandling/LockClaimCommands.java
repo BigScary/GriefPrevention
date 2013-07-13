@@ -23,7 +23,7 @@ public class LockClaimCommands extends GriefPreventionCommand {
 			//requires exactly one parameter, the other player's name
 			if(args.length != 0) return false;
 			
-			Claim claim = dataStore.getClaimAt(player.getLocation(), true /*ignore height*/, null);
+			Claim claim = dataStore.getClaimAt(player.getLocation(), true /*ignore height*/);
 			if((player.hasPermission("griefprevention.lock") && claim.ownerName.equalsIgnoreCase(player.getName())) || player.hasPermission("griefprevention.adminlock")) {
 				claim.neverdelete = true;
 				dataStore.saveClaim(claim);
@@ -39,7 +39,7 @@ public class LockClaimCommands extends GriefPreventionCommand {
 			//requires exactly one parameter, the other player's name
 			if(args.length != 0) return false;
 			
-			Claim claim = dataStore.getClaimAt(player.getLocation(), true /*ignore height*/, null);
+			Claim claim = dataStore.getClaimAt(player.getLocation(), true /*ignore height*/);
 			if((player.hasPermission("griefprevention.lock") && claim.ownerName.equalsIgnoreCase(player.getName())) || player.hasPermission("griefprevention.adminlock")) {
 				claim.neverdelete = false;
 				dataStore.saveClaim(claim);

@@ -103,7 +103,7 @@ public class EntityCleanupTask implements Runnable
 				//all non-player entities must be in claims
 				else if(!(entity instanceof Player))
 				{
-					Claim claim = GriefPrevention.instance.dataStore.getClaimAt(entity.getLocation(), false, cachedClaim);
+					Claim claim = GriefPrevention.instance.dataStore.getClaimAt(entity.getLocation(), false);
 					if(claim != null)
 					{
 						cachedClaim = claim;

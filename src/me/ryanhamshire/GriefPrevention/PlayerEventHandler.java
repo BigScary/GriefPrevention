@@ -830,7 +830,7 @@ class PlayerEventHandler implements Listener
 		if(event.getCause() == TeleportCause.ENDER_PEARL) return;
 		
 		Location source = event.getFrom();
-		Claim sourceClaim = this.dataStore.getClaimAt(source, false, playerData.lastClaim);
+		Claim sourceClaim = this.dataStore.getClaimAt(source, false);
 		if(sourceClaim != null && sourceClaim.siegeData != null)
 		{
 			GriefPrevention.sendMessage(player, TextMode.Err, Messages.SiegeNoTeleport);
@@ -839,7 +839,7 @@ class PlayerEventHandler implements Listener
 		}
 		
 		Location destination = event.getTo();
-		Claim destinationClaim = this.dataStore.getClaimAt(destination, false, null);
+		Claim destinationClaim = this.dataStore.getClaimAt(destination, false);
 		if(destinationClaim != null && destinationClaim.siegeData != null)
 		{
 			GriefPrevention.sendMessage(player, TextMode.Err, Messages.BesiegedNoTeleport);
@@ -1074,7 +1074,7 @@ class PlayerEventHandler implements Listener
 		if(wc.getContainersRules().Allowed(entity.getLocation(),player,false).Denied() && entity instanceof Vehicle)
 		{
 			//if the entity is in a claim
-			Claim claim = this.dataStore.getClaimAt(entity.getLocation(), false, null);
+			Claim claim = this.dataStore.getClaimAt(entity.getLocation(), false);
 			if(claim != null)
 			{
 				//for storage, hopper, and powered minecarts, apply container rules (this is a potential theft)
@@ -1221,7 +1221,7 @@ class PlayerEventHandler implements Listener
 		//if the bed is in a claim
 		else if(resultdata.Denied()){
 			
-		        Claim grabclaim = GriefPrevention.instance.dataStore.getClaimAt(block.getLocation(), true, null);
+		        Claim grabclaim = GriefPrevention.instance.dataStore.getClaimAt(block.getLocation(), true);
 				bedEvent.setCancelled(true);
 				GriefPrevention.sendMessage(player, TextMode.Err, Messages.NoBedPermission, grabclaim.getOwnerName());
 			
@@ -1273,7 +1273,7 @@ class PlayerEventHandler implements Listener
 		
 		//if the bucket is being used in a claim, allow for dumping lava closer to other players
 		PlayerData playerData = this.dataStore.getPlayerData(player.getName());
-		Claim claim = this.dataStore.getClaimAt(block.getLocation(), false, playerData.lastClaim);
+		Claim claim = this.dataStore.getClaimAt(block.getLocation(), false);
 
 		//checks for Behaviour perms.
 		if(bucketEvent.getBucket() == Material.LAVA_BUCKET){
@@ -1589,7 +1589,7 @@ class PlayerEventHandler implements Listener
 			}
 			
 			//special Chest looting behaviour.
-			Claim cc = this.dataStore.getClaimAt(clickedBlock.getLocation(),true,null);
+			Claim cc = this.dataStore.getClaimAt(clickedBlock.getLocation(),true);
 			//if doorsOpen...
 			if(cc!=null && cc.doorsOpen){
 				if((cc.LootedChests++)<=wc.getSeigeLootChests()){
@@ -1766,7 +1766,7 @@ class PlayerEventHandler implements Listener
 			
 			else if(materialInHand ==  Material.BOAT)
 			{
-				Claim claim = this.dataStore.getClaimAt(clickedBlock.getLocation(), false, playerData.lastClaim);
+				Claim claim = this.dataStore.getClaimAt(clickedBlock.getLocation(), false);
 				if(claim != null)
 				{
 					String noAccessReason = claim.allowAccess(player);
@@ -1795,7 +1795,7 @@ class PlayerEventHandler implements Listener
 				}
 			
 				//enforce limit on total number of entities in this claim
-				Claim claim = this.dataStore.getClaimAt(clickedBlock.getLocation(), false, playerData.lastClaim);
+				Claim claim = this.dataStore.getClaimAt(clickedBlock.getLocation(), false);
 				if(claim == null) return;
 				
 				String noEntitiesReason = claim.allowMoreEntities();
@@ -1837,7 +1837,7 @@ class PlayerEventHandler implements Listener
 					for (int X=StartX;X<EndX;X++){
 						for(int Z=StartZ;Z<EndZ;Z++){
 							
-							Claim grabclaim = dataStore.getClaimAt(new Location(player.getWorld(),X,clickedBlock.getLocation().getBlockY(),Z),false,null);
+							Claim grabclaim = dataStore.getClaimAt(new Location(player.getWorld(),X,clickedBlock.getLocation().getBlockY(),Z),false);
 							if(grabclaim!=null && !buildlist.contains(grabclaim))
 							{
 								buildlist.add(grabclaim);
@@ -1853,7 +1853,7 @@ class PlayerEventHandler implements Listener
 					
 				}
 				else {
-				claimsshow = new Claim[]{this.dataStore.getClaimAt(clickedBlock.getLocation(), false /*ignore height*/, playerData.lastClaim)};
+				claimsshow = new Claim[]{this.dataStore.getClaimAt(clickedBlock.getLocation(), false /*ignore height*/)};
 				}
 				//no claim case
 				if(claimsshow == null || claimsshow.length==0 || claimsshow[0]==null)
@@ -1955,7 +1955,7 @@ class PlayerEventHandler implements Listener
 			if(playerData.shovelMode == ShovelMode.RestoreNature || playerData.shovelMode == ShovelMode.RestoreNatureAggressive)
 			{
 				//if the clicked block is in a claim, visualize that claim and deliver an error message
-				Claim claim = this.dataStore.getClaimAt(clickedBlock.getLocation(), false, playerData.lastClaim);
+				Claim claim = this.dataStore.getClaimAt(clickedBlock.getLocation(), false);
 				if(claim != null)
 				{
 					GriefPrevention.sendMessage(player, TextMode.Err, Messages.BlockClaimed, claim.getOwnerName());
@@ -2058,7 +2058,7 @@ class PlayerEventHandler implements Listener
 							Block block = centerBlock.getWorld().getBlockAt(x, y, z);
 							
 							//respect claims
-							Claim claim = this.dataStore.getClaimAt(block.getLocation(), false, cachedClaim);
+							Claim claim = this.dataStore.getClaimAt(block.getLocation(), false);
 							if(claim != null)
 							{
 								cachedClaim = claim;
@@ -2122,7 +2122,7 @@ class PlayerEventHandler implements Listener
 			}
 			if(playerData.claimResizing==null){
 				//see if the player has clicked inside one of their claims.
-				Claim checkclaim = GriefPrevention.instance.dataStore.getClaimAt(clickedBlock.getLocation(),true, null);
+				Claim checkclaim = GriefPrevention.instance.dataStore.getClaimAt(clickedBlock.getLocation(),true);
 				//is there even a claim here?
 				if(checkclaim!=null){
 					//there is a claim; make sure it belongs to this player.
@@ -2305,7 +2305,7 @@ class PlayerEventHandler implements Listener
 			}
 			
 			//otherwise, since not currently resizing a claim, must be starting a resize, creating a new claim, or creating a subdivision
-			Claim claim = this.dataStore.getClaimAt(clickedBlock.getLocation(), true /*ignore height*/, playerData.lastClaim);			
+			Claim claim = this.dataStore.getClaimAt(clickedBlock.getLocation(), true /*ignore height*/);			
 			
 			//if within an existing claim, he's not creating a new one
 			if(claim != null)

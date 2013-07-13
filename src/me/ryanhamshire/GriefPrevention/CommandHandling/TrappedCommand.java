@@ -27,7 +27,7 @@ public class TrappedCommand extends GriefPreventionCommand{
 		if(player==null) return false;
 		WorldConfig wc = inst.getWorldCfg(player.getWorld());
 		PlayerData playerData = inst.dataStore.getPlayerData(player.getName());
-		Claim claim = inst.dataStore.getClaimAt(player.getLocation(), false, playerData.lastClaim);
+		Claim claim = inst.dataStore.getClaimAt(player.getLocation(), false);
 		
 		//if another /trapped is pending, ignore this slash command
 		if(playerData.pendingTrapped)

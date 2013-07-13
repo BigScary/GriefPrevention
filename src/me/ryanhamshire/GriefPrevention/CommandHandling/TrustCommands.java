@@ -21,7 +21,7 @@ public class TrustCommands extends GriefPreventionCommand{
 	{
 		GriefPrevention inst = GriefPrevention.instance;
 		//determine which claim the player is standing in
-		Claim claim = inst.dataStore.getClaimAt(player.getLocation(), true /*ignore height*/, null);
+		Claim claim = inst.dataStore.getClaimAt(player.getLocation(), true /*ignore height*/);
 		
 		//validate player or group argument
 		String permission = null;

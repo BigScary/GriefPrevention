@@ -188,7 +188,7 @@ public class FlatFileDataStore extends DataStore
 					
 					//search for another claim overlapping this one
 					
-					Claim conflictClaim = this.getClaimAt(topLevelClaim.lesserBoundaryCorner, true, null);
+					Claim conflictClaim = this.getClaimAt(topLevelClaim.lesserBoundaryCorner, true);
 					
 					//if there is such a claim, delete this file and move on to the next
 					if(conflictClaim != null)

@@ -24,7 +24,7 @@ public class AbandonClaimCommand extends GriefPreventionCommand {
 		WorldConfig wc = inst.getWorldCfg(player.getWorld());
 		
 		//which claim is being abandoned?
-		Claim claim = inst.dataStore.getClaimAt(player.getLocation(), true /*ignore height*/, null);
+		Claim claim = inst.dataStore.getClaimAt(player.getLocation(), true /*ignore height*/);
 		if(claim == null)
 		{
 			GriefPrevention.sendMessage(player, TextMode.Instr, Messages.AbandonClaimMissing);

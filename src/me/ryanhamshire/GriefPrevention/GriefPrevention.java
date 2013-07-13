@@ -890,7 +890,7 @@ public class GriefPrevention extends JavaPlugin
 		while(true)
 		{
 			Claim claim = null;
-			claim = GriefPrevention.instance.dataStore.getClaimAt(candidateLocation, false, null);
+			claim = GriefPrevention.instance.dataStore.getClaimAt(candidateLocation, false);
 			
 			//if there's a claim here, keep looking
 			if(claim != null)
@@ -978,7 +978,7 @@ public class GriefPrevention extends JavaPlugin
 	public String allowBuild(Player player, Location location)
 	{
 		PlayerData playerData = this.dataStore.getPlayerData(player.getName());
-		Claim claim = this.dataStore.getClaimAt(location, false, playerData.lastClaim);
+		Claim claim = this.dataStore.getClaimAt(location, false);
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(player.getWorld());
 		//exception: administrators in ignore claims mode and special player accounts created by server mods
 		if(playerData.ignoreClaims || wc.getModsIgnoreClaimsAccounts().contains(player.getName())) return null;
@@ -1023,7 +1023,7 @@ public class GriefPrevention extends JavaPlugin
 	public String allowBreak(Player player, Location location)
 	{
 		PlayerData playerData = this.dataStore.getPlayerData(player.getName());
-		Claim claim = this.dataStore.getClaimAt(location, false, playerData.lastClaim);
+		Claim claim = this.dataStore.getClaimAt(location, false);
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(player.getWorld());
 		//exception: administrators in ignore claims mode, and special player accounts created by server mods
 		if(playerData.ignoreClaims || wc.getModsIgnoreClaimsAccounts().contains(player.getName())) return null;

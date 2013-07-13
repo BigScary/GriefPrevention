@@ -45,7 +45,7 @@ public class SiegeCheckupTask implements Runnable
 		Player attacker = this.siegeData.attacker;
 		
 		//where is the defender?
-		Claim defenderClaim = dataStore.getClaimAt(defender.getLocation(), false, null);
+		Claim defenderClaim = dataStore.getClaimAt(defender.getLocation(), false);
 		
 		//if this is a new claim and he has some permission there, extend the siege to include it
 		if(defenderClaim != null)

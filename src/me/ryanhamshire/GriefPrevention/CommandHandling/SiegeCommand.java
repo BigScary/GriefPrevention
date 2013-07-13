@@ -98,7 +98,7 @@ public class SiegeCommand extends GriefPreventionCommand {
 			return true;
 		}
 		
-		Claim defenderClaim = inst.dataStore.getClaimAt(defender.getLocation(), false, null);
+		Claim defenderClaim = inst.dataStore.getClaimAt(defender.getLocation(), false);
 		
 		//defender must have some level of permission there to be protected
 		if(defenderClaim == null || defenderClaim.allowAccess(defender) != null)

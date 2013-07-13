@@ -460,7 +460,7 @@ public abstract class DataStore
 				for(int ztest=0;ztest<MaxDistance;ztest++){
 					int useZPos=ZPos+(ztest*sign);
 					Location corelocation = new Location(testLocation.getWorld(),useXPos,64,useZPos);
-					Claim grabclaim = getClaimAt(corelocation,true,null);
+					Claim grabclaim = getClaimAt(corelocation,true);
 					if(grabclaim!=null){
 						return new ClaimDistanceResult(grabclaim,Math.min(xtest, ztest));
 					}
@@ -483,20 +483,25 @@ public abstract class DataStore
 		
 		
 	}
-	
+	synchronized public Claim getClaimAt(Location location,boolean ignoreHeight,Claim cachedClaim){
+		
+		if(cachedClaim.inDataStore && cachedClaim.contains(location, ignoreHeight,false))
+			return cachedClaim;
+		
+		return getClaimAt(location,ignoreHeight);
+		
+		
+	}
 	/**
 	 * Gets the claim at a specific location
 	 * @param location
 	 * @param ignoreHeight TRUE means that a location UNDER an existing claim will return the claim
-	 * @param cachedClaim can be NULL, but will help performance if you have a reasonable guess about which claim the location is in
 	 * @return claim in the given location. Null, if no Claim at the given location.
 	 */
-	synchronized public Claim getClaimAt(Location location, boolean ignoreHeight, Claim cachedClaim)
+	synchronized public Claim getClaimAt(Location location, boolean ignoreHeight)
 	{
 		//Debugger.Write("Looking for Claim at:" + GriefPrevention.getfriendlyLocationString(location) + " Ignoreheight:" + ignoreHeight,DebugLevel.Verbose);
-		//check cachedClaim guess first.  if it's in the datastore and the location is inside it, we're done
-		if(cachedClaim != null && cachedClaim.inDataStore && cachedClaim.contains(location, ignoreHeight, true)) 
-			return cachedClaim;
+	
 		
 		
 		

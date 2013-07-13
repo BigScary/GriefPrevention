@@ -18,7 +18,7 @@ public class ClaimExplosionsCommand extends GriefPreventionCommand{
 		Player player = (sender instanceof Player)?(Player)sender:null;
 		GriefPrevention inst = GriefPrevention.instance;
 		
-		Claim claim = inst.dataStore.getClaimAt(player.getLocation(), true /*ignore height*/, null);
+		Claim claim = inst.dataStore.getClaimAt(player.getLocation(), true /*ignore height*/);
 		
 		if(claim == null)
 		{

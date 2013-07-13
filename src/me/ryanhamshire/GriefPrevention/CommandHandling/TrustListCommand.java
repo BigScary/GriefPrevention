@@ -22,7 +22,7 @@ public class TrustListCommand extends GriefPreventionCommand{
 		if(player==null) return false;
 		GriefPrevention inst = GriefPrevention.instance;
 		
-		Claim claim = inst.dataStore.getClaimAt(player.getLocation(), true, null);
+		Claim claim = inst.dataStore.getClaimAt(player.getLocation(), true);
 		
 		//if no claim here, error message
 		if(claim == null)
