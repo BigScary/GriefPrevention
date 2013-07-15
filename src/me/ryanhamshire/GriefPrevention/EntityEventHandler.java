@@ -21,6 +21,7 @@ package me.ryanhamshire.GriefPrevention;
 import java.util.Calendar;
 import java.util.List;
 
+import me.ryanhamshire.GriefPrevention.PlayerData.PressurePlateData;
 import me.ryanhamshire.GriefPrevention.Configuration.ClaimBehaviourData;
 import me.ryanhamshire.GriefPrevention.Configuration.ClaimBehaviourData.ClaimAllowanceConstants;
 import me.ryanhamshire.GriefPrevention.Configuration.PlacementRules.BasicPermissionConstants;
@@ -201,6 +202,12 @@ class EntityEventHandler implements Listener
 	public void onEntityInteract(EntityInteractEvent event)
 	{
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(event.getEntity().getWorld());
+		Player grabplayer=null;
+		PlayerData pdata = null;
+		
+		
+		
+		
 		if(event.getEntity() instanceof Arrow)
 		{
 			Arrow proj = (Arrow)event.getEntity();
@@ -231,9 +238,11 @@ class EntityEventHandler implements Listener
 			
 			
 		}
-		if(event.getBlock().getType()==Material.STONE_PLATE){
-			Player grabplayer = event.getEntity() instanceof Player?(Player)event.getEntity():null;
+		else {
+			
+			grabplayer = event.getEntity() instanceof Player?(Player)event.getEntity():null;
 			if(grabplayer==null){
+				pdata = GriefPrevention.instance.dataStore.getPlayerData(grabplayer.getName());
 				if(event.getEntity().getPassenger()!=null){
 					if(event.getEntity().getPassenger() instanceof Player){
 						grabplayer = (Player)event.getEntity().getPassenger();
@@ -241,9 +250,27 @@ class EntityEventHandler implements Listener
 				}
 				
 			}
+		}
+		
+		if(event.getBlock().getType()==Material.STONE_PLATE){
+		if(grabplayer!=null)
+		{
+			pdata.PlateData.put(event.getBlock().getLocation().toString(), pdata.new PressurePlateData(event.getBlock().getLocation()));
+		}
 			if(wc.getStonePressurePlates().Allowed(event.getBlock().getLocation(), grabplayer).Denied()){
 				event.setCancelled(true);
 			
+				return;
+			}
+		}
+		else if(event.getBlock().getType()==Material.WOOD_PLATE){
+			
+				if(grabplayer!=null)
+				{
+					pdata.PlateData.put(event.getBlock().getLocation().toString(), pdata.new PressurePlateData(event.getBlock().getLocation()));
+				}
+			if(wc.getWoodPressurePlates().Allowed(event.getBlock().getLocation(), grabplayer).Denied()){
+				event.setCancelled(true);
 				return;
 			}
 		}
