@@ -492,6 +492,50 @@ public abstract class DataStore
 		
 		
 	}
+	synchronized public Set<Claim> getClaimsIn(Location Lesser,Location Greater,boolean Inclusive){
+		
+		if(Lesser==null) throw new IllegalArgumentException("Lesser");
+		if(Greater==null) throw new IllegalArgumentException("Greater");
+		WorldConfig wc = GriefPrevention.instance.getWorldCfg(Lesser.getWorld());
+		int LessX = Math.min(Lesser.getBlockX(), Greater.getBlockX());
+		int LessY = Math.min(Lesser.getBlockY(), Greater.getBlockY());
+		int LessZ = Math.min(Lesser.getBlockZ(), Greater.getBlockZ());
+		
+		int GreatX = Math.max(Lesser.getBlockX(), Greater.getBlockX());
+		int GreatY = Math.max(Lesser.getBlockY(), Greater.getBlockY());
+		int GreatZ = Math.max(Lesser.getBlockZ(), Greater.getBlockZ());
+		
+		Location pta = new Location(Lesser.getWorld(),LessX,LessY,LessZ);
+		Location ptb = new Location(Lesser.getWorld(),GreatX,GreatY,GreatZ);
+		
+		int minclaimsize = wc.getMinClaimSize();
+		HashSet<Claim> result = new HashSet<Claim>();
+		//iterate on X and Z.
+		for(int x = LessX;x<GreatX;x+=minclaimsize){
+			for(int z=LessZ;z<GreatZ;z+=minclaimsize){
+				
+				Claim foundclaim = getClaimAt(new Location(Lesser.getWorld(),x,64,z),false);
+				if(foundclaim!=null)
+				{
+					if(!result.contains(foundclaim))
+						result.add(foundclaim);
+				}
+					
+				
+				
+			}
+			
+		}
+		
+		
+		return result;
+		
+		
+		
+		
+	}
+	
+	
 	/**
 	 * Gets the claim at a specific location
 	 * @param location

@@ -25,6 +25,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import me.ryanhamshire.GriefPrevention.Debugger.DebugLevel;
+import me.ryanhamshire.GriefPrevention.Configuration.WorldConfig;
 import me.ryanhamshire.GriefPrevention.exceptions.WorldNotFoundException;
 
 import org.bukkit.*;
@@ -139,6 +140,17 @@ public class FlatFileDataStore extends DataStore
 				//third line is owner name
 				line = inStream.readLine();						
 				String ownerName = line;
+				
+				//if it's smaller than the minimum size discard it.
+				int Xdiff = greaterBoundaryCorner.getBlockX()-lesserBoundaryCorner.getBlockX();
+				int Zdiff = greaterBoundaryCorner.getBlockZ()-lesserBoundaryCorner.getBlockZ();
+				WorldConfig wc = GriefPrevention.instance.getWorldCfg(lesserBoundaryCorner.getWorld());
+				if(Xdiff < wc.getMinClaimSize() || Zdiff < wc.getMinClaimSize()){
+					GriefPrevention.AddLogEntry("discarded Claim in world " + greaterBoundaryCorner.getWorld().getName() + " size:" + Xdiff + "," + Zdiff + " is smaller than " + wc.getMinClaimSize());
+				}
+						
+				
+				
 				//is there PlayerData for this gai?
 				
 				if(!GriefPrevention.instance.dataStore.hasPlayerData(ownerName) && GriefPrevention.instance.config_claims_deleteclaimswithunrecognizedowners){

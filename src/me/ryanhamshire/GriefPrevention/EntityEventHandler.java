@@ -233,6 +233,14 @@ class EntityEventHandler implements Listener
 		}
 		if(event.getBlock().getType()==Material.STONE_PLATE){
 			Player grabplayer = event.getEntity() instanceof Player?(Player)event.getEntity():null;
+			if(grabplayer==null){
+				if(event.getEntity().getPassenger()!=null){
+					if(event.getEntity().getPassenger() instanceof Player){
+						grabplayer = (Player)event.getEntity().getPassenger();
+					}
+				}
+				
+			}
 			if(wc.getStonePressurePlates().Allowed(event.getBlock().getLocation(), grabplayer).Denied()){
 				event.setCancelled(true);
 			
