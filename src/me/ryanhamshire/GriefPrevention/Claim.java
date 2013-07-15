@@ -888,7 +888,10 @@ public class Claim
 		this.playerNameToClaimPermissionMap.clear();
 		return true;
 	}
-
+	@Deprecated
+	public void getPermissions(ArrayList<String> builders, ArrayList<String> containers, ArrayList<String> accessors, ArrayList<String> managers){
+		getPermissions((List<String>)builders,(List<String>)containers,(List<String>)accessors,(List<String>)managers);
+	}
 	/**
 	 * Gets ALL permissions.<br />
 	 * Useful for  making copies of permissions during a claim resize and listing all permissions in a claim.
