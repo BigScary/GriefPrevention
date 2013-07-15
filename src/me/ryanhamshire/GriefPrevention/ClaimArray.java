@@ -3,15 +3,16 @@ package me.ryanhamshire.GriefPrevention;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import me.ryanhamshire.GriefPrevention.Debugger.DebugLevel;
 
 public class ClaimArray implements Iterable<Claim> {
 	
 	private ArrayList<Claim> claims = new ArrayList<Claim>();
-	ConcurrentHashMap<Long, Claim> claimmap = new ConcurrentHashMap<Long, Claim>();
-	ConcurrentHashMap<String,ArrayList<Claim>> claimworldmap = new ConcurrentHashMap<String,ArrayList<Claim>>();
-	ConcurrentHashMap<String, ArrayList<Claim>> chunkmap = new ConcurrentHashMap<String, ArrayList<Claim>>();
+	ConcurrentMap<Long, Claim> claimmap = new ConcurrentHashMap<Long, Claim>();
+	ConcurrentMap<String,ArrayList<Claim>> claimworldmap = new ConcurrentHashMap<String,ArrayList<Claim>>();
+	ConcurrentMap<String, ArrayList<Claim>> chunkmap = new ConcurrentHashMap<String, ArrayList<Claim>>();
 
 	public int size() {
 		return claims.size();
@@ -41,7 +42,7 @@ public class ClaimArray implements Iterable<Claim> {
 	}
 	private void addClaimWorld(Claim c){
 		String usekey = c.getLesserBoundaryCorner().getWorld().getName();
-		 if(!claimworldmap.contains(usekey))
+		 if(!claimworldmap.containsKey(usekey))
 		     claimworldmap.put(usekey, new ArrayList<Claim>());
 		 
 		 if(!claimworldmap.get(usekey).contains(c))
@@ -52,7 +53,7 @@ public class ClaimArray implements Iterable<Claim> {
 	}
 	private void removeClaimWorld(Claim c){
 		String usekey = c.getLesserBoundaryCorner().getWorld().getName();
-		if(claimworldmap.contains(usekey)){
+		if(claimworldmap.containsKey(usekey)){
 			claimworldmap.get(usekey).remove(c);
 			Debugger.Write("Claim removed from world mapping owned by " + c.getOwnerName() + " to world:" + c.getLesserBoundaryCorner().getWorld(),DebugLevel.Verbose);
 		}

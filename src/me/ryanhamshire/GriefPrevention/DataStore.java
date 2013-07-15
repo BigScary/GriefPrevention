@@ -19,6 +19,7 @@
 package me.ryanhamshire.GriefPrevention;
 
 import java.io.*;
+import java.lang.reflect.Field;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -60,8 +61,15 @@ public abstract class DataStore
 	Long nextClaimID = (long)0;
 	
 	//path information, for where stuff stored on disk is well...  stored
+	/**
+	 * Location of the dataLayer folder This will be the GriefPrevention folder within the bukkit plugins/ folder.
+	 */
 	public final static String dataLayerFolderPath = "plugins" + File.separator + "GriefPrevention";
+	/**
+	 * Old location of the dataLayer folder This will be the GriefPreventionData folder within the bukkit plugins/ folder.
+	 */
 	public final static String oldDataLayerFolderPath = "plugins" + File.separator + "GriefPreventionData";
+	
 	public final static String configFilePath = dataLayerFolderPath + File.separator + "config.yml";
 	final static String messagesFilePath = dataLayerFolderPath + File.separator + "messages.yml";
 	
@@ -476,16 +484,11 @@ public abstract class DataStore
 		
 		return null;
 		
-		
-		
-		
-		
-		
-		
 	}
+	
 	synchronized public Claim getClaimAt(Location location,boolean ignoreHeight,Claim cachedClaim){
 		
-		if(cachedClaim.inDataStore && cachedClaim.contains(location, ignoreHeight,false))
+		if(cachedClaim!=null && cachedClaim.inDataStore && cachedClaim.contains(location, ignoreHeight,false))
 			return cachedClaim;
 		
 		return getClaimAt(location,ignoreHeight);
@@ -517,6 +520,7 @@ public abstract class DataStore
 				Claim foundclaim = getClaimAt(new Location(Lesser.getWorld(),x,64,z),false);
 				if(foundclaim!=null)
 				{
+					z = foundclaim.getGreaterBoundaryCorner().getBlockZ()+1;
 					if(!result.contains(foundclaim))
 						result.add(foundclaim);
 				}

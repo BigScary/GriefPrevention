@@ -17,12 +17,14 @@
  */
 
 package me.ryanhamshire.GriefPrevention;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -1417,6 +1419,7 @@ class PlayerEventHandler implements Listener
 			transparentMaterials.add(Byte.valueOf((byte)Material.LEVER.getId()));
 		}
 	}
+	
 	//when a player interacts with the world
 	@EventHandler(priority = EventPriority.LOWEST)
 	void onPlayerInteract(PlayerInteractEvent event)
@@ -1431,6 +1434,8 @@ class PlayerEventHandler implements Listener
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(player.getWorld());
 		//determine target block.  FEATURE: shovel and stick can be used from a distance away
 		Block clickedBlock = event.getClickedBlock();
+		
+	
 		
 		if(wc.getItemRules()!=null){
 			getTransparentMaterials();
