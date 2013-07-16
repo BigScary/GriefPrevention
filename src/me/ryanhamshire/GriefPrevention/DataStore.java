@@ -495,6 +495,15 @@ public abstract class DataStore
 		
 		
 	}
+	/**
+	 * returns the set of claims that are within the given range.
+	 *  
+	 * @param Lesser Lesser Boundary.
+	 * @param Greater Greater Boundary.
+	 * @param Inclusive if true, the result Set will only include Claims that are entirely encompassed by the given locations.
+	 * @return Set of claims.
+	 */
+			
 	synchronized public Set<Claim> getClaimsIn(Location Lesser,Location Greater,boolean Inclusive){
 		
 		if(Lesser==null) throw new IllegalArgumentException("Lesser");
@@ -510,7 +519,9 @@ public abstract class DataStore
 		
 		Location pta = new Location(Lesser.getWorld(),LessX,LessY,LessZ);
 		Location ptb = new Location(Lesser.getWorld(),GreatX,GreatY,GreatZ);
-		
+		Claim tempclaim = new Claim();
+		tempclaim.lesserBoundaryCorner = pta;
+		tempclaim.greaterBoundaryCorner = ptb;
 		int minclaimsize = wc.getMinClaimSize();
 		HashSet<Claim> result = new HashSet<Claim>();
 		//iterate on X and Z.
@@ -520,9 +531,11 @@ public abstract class DataStore
 				Claim foundclaim = getClaimAt(new Location(Lesser.getWorld(),x,64,z),false);
 				if(foundclaim!=null)
 				{
+					if(!Inclusive || tempclaim.contains(foundclaim, true)){
 					z = foundclaim.getGreaterBoundaryCorner().getBlockZ()+1;
 					if(!result.contains(foundclaim))
 						result.add(foundclaim);
+					}
 				}
 					
 				
@@ -538,7 +551,27 @@ public abstract class DataStore
 		
 		
 	}
-	
+	/**
+	 * returns the Claims that occupy any part of the given chunk.
+	 * @param targetLocation Location, which lies on the Chunk to investigate.
+	 * @return Claims within the chunk occupied by the given Location.
+	 */
+	synchronized public List<Claim> getClaimsInChunk(Location targetLocation){
+		
+		return getClaimsInChunk(targetLocation.getChunk());
+		
+	}
+	/**
+	 * returns the Claims that occupy any part of the given chunk.
+	 * @param target Chunk to investigate.
+	 * @return claims within the given Chunk.
+	 */
+	synchronized public List<Claim> getClaimsInChunk(Chunk target){
+		
+		String chunkstr = this.getChunk(target);
+		return claims.getClaims(chunkstr);		
+		
+	}
 	
 	/**
 	 * Gets the claim at a specific location
@@ -1493,8 +1526,12 @@ public abstract class DataStore
 	public int getClaimsSize() {
 		return claims.size();
 	}
-	
-	private String getChunk(Location loc) {
+	String getChunk(Chunk chk){
+		int chunkX = chk.getX();
+		int chunkZ = chk.getZ();
+		return chk.getWorld().getName() + ";" + chunkX + "," + chunkZ;
+	}
+	String getChunk(Location loc) {
 		int chunkX = loc.getBlockX() >> 4;
 		int chunkZ = loc.getBlockZ() >> 4;
 		return loc.getWorld().getName() + ";" + chunkX + "," + chunkZ;

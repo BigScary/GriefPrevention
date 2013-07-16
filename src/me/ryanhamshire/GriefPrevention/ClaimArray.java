@@ -2,8 +2,11 @@ package me.ryanhamshire.GriefPrevention;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+
+import org.bukkit.Location;
 
 import me.ryanhamshire.GriefPrevention.Debugger.DebugLevel;
 
@@ -97,6 +100,16 @@ public class ClaimArray implements Iterable<Claim> {
 				}
 			}
 		}
+	}
+	
+	public List<Claim> getClaimsInChunk(Location ChunkLocation){
+	
+		String chunkstr = GriefPrevention.instance.dataStore.getChunk(ChunkLocation);
+		return getClaims(chunkstr);
+	}
+	public List<Claim> getClaims(String chunk){
+		if(!chunkmap.containsKey(chunk)) return new ArrayList<Claim>();
+		return chunkmap.get(chunk);
 	}
 	
 	public static ArrayList<String> getChunks(Claim claim) {
