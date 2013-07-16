@@ -241,8 +241,8 @@ class EntityEventHandler implements Listener
 		else {
 			
 			grabplayer = event.getEntity() instanceof Player?(Player)event.getEntity():null;
-			if(grabplayer==null){
-				pdata = GriefPrevention.instance.dataStore.getPlayerData(grabplayer.getName());
+			if(grabplayer!=null){
+				
 				if(event.getEntity().getPassenger()!=null){
 					if(event.getEntity().getPassenger() instanceof Player){
 						grabplayer = (Player)event.getEntity().getPassenger();
@@ -251,7 +251,7 @@ class EntityEventHandler implements Listener
 				
 			}
 		}
-		
+		if(grabplayer!=null)pdata = GriefPrevention.instance.dataStore.getPlayerData(grabplayer.getName());
 		if(event.getBlock().getType()==Material.STONE_PLATE){
 		if(grabplayer!=null)
 		{
