@@ -166,7 +166,8 @@ ArrayList<Claim> claimsToRemove = new ArrayList<Claim>();
 		
 		}
 		catch(Exception exx){
-			
+			System.out.println("Exception from databaseDataStore handling of WorldLoad-");
+			exx.printStackTrace();
 		}
 		
 	}
@@ -193,7 +194,7 @@ ArrayList<Claim> claimsToRemove = new ArrayList<Claim>();
 			GriefPrevention.AddLogEntry("ERROR: Unable to connect to database.  Check your config file settings.");
 			throw e2;
 		}
-		
+		GriefPrevention.AddLogEntry("Java MySQL driver loaded and connection established.");
 		try
 		{
 			//ensure the data tables exist
@@ -376,6 +377,7 @@ ArrayList<Claim> claimsToRemove = new ArrayList<Claim>();
 					parentId +	", " +
 					claim.neverdelete +
 					");");
+			GriefPrevention.AddLogEntry("Successfully inserted data into griefprevention_claimdata- ID:" + claim.getID());
 		}
 		catch(SQLException e)
 		{
@@ -438,6 +440,21 @@ ArrayList<Claim> claimsToRemove = new ArrayList<Claim>();
 			
 		return playerData;
 	} 
+	@Override
+	public boolean deletePlayerData(String playerName) {
+		// TODO Auto-generated method stub
+		try {
+			this.refreshDataConnection();
+			Statement statement = this.databaseConnection.createStatement();
+			return statement.execute("DELETE FROM griefprevention_playerdata WHERE name='" + playerName + "';");
+		}
+		catch(Exception exx){
+			exx.printStackTrace();
+		}
+		
+		return true;
+		
+	}
 	@Override
 	public boolean hasPlayerData(String pName){
 		try {
@@ -521,6 +538,7 @@ ArrayList<Claim> claimsToRemove = new ArrayList<Claim>();
 	@Override
 	synchronized void close()
 	{
+		System.out.println("DatabaseStore closing: Claims #" + this.claims.size());
 		super.close();
 		if(this.databaseConnection != null)
 		{
@@ -550,4 +568,7 @@ ArrayList<Claim> claimsToRemove = new ArrayList<Claim>();
 			this.databaseConnection = DriverManager.getConnection(this.databaseUrl, connectionProps); 
 		}
 	}
+
+
+	
 }

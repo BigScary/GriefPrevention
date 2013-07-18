@@ -333,7 +333,7 @@ public abstract class DataStore
 	
 	//increments the claim ID and updates secondary storage to be sure it's saved
 	abstract void incrementNextClaimID();
-	
+	public abstract boolean deletePlayerData(String playerName);
 	public abstract boolean hasPlayerData(String playerName);
 	/**
 	 * Retrieves player data from memory or secondary storage, as necessary.
@@ -1536,4 +1536,6 @@ public abstract class DataStore
 		int chunkZ = loc.getBlockZ() >> 4;
 		return loc.getWorld().getName() + ";" + chunkX + "," + chunkZ;
 	}
+
+	
 }

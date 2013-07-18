@@ -122,6 +122,8 @@ public class GriefPrevention extends JavaPlugin
 	
 	public double config_economy_claimBlocksSellValue;				//return on a sold claim block.  set to zero to disable sale.
 	
+	
+	public double config_claimcleanup_deletePlayerDataWithNoClaims; //whether to delete the PlayerData if a Players last claim is cleaned up.
 	//how far away to search from a tree trunk for its branch blocks
 	public static final int TREE_RADIUS = 5;
 	

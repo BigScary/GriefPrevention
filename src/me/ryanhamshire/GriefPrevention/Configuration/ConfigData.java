@@ -35,7 +35,17 @@ import org.bukkit.entity.Player;
 public class ConfigData {
 
 	private String TemplateFile;
+	private WorldConfig SingleWorldConfig=null;
+	private String SingleWorldConfigLocation = null;
 	private String WorldConfigLocation = null;
+	
+	/**
+	 * retrieves the Single World Configuration. 
+	 * This is set in the config.yml by setting GriefPrevention.SingleWorldConfig to a filename.
+	 * @return WorldConfig instance holding configuration options
+	 */
+	public WorldConfig getSingleWorldConfiguration(){ return SingleWorldConfig;}
+	
 	public String getTemplateFile(){ return TemplateFile;}
 	private HashMap<String,WorldConfig> WorldCfg = new HashMap<String,WorldConfig>();
 	//private WorldConfig DefaultSurvival = null;
@@ -59,11 +69,25 @@ public class ConfigData {
 		
 	}
 	public WorldConfig getWorldConfig(String forWorld){
-		
+		if(this.SingleWorldConfig!=null) return SingleWorldConfig;
 		World Grabfor = Bukkit.getWorld(forWorld);
 		if(Grabfor==null) return new WorldConfig(forWorld);
 		
 		return getWorldConfig(Grabfor);
+	}
+	public List<String> GetWorldConfigNames(){
+		List<String> results = new ArrayList<String>();
+		File SourceFolder = new File(WorldConfigLocation);
+		for(File iterate:SourceFolder.listFiles()){
+			if(iterate.getName().startsWith("_")) continue;
+			if(iterate.getName().toUpperCase().endsWith(".YML")){
+				String basename = iterate.getName().replaceFirst("[.][^.]+$", "");
+				results.add(basename);
+			}
+		}
+		return results;
+		
+		
 	}
 	public List<String> GetWorldConfigurationFiles(){
 		List<String> ActFiles = new ArrayList<String>();
@@ -74,7 +98,7 @@ public class ConfigData {
 		//iterate through each file.
 		for(File iterate:SourceFolder.listFiles()){
 			if(iterate.getName().startsWith("_")) continue;
-			if(iterate.getName().toUpperCase().endsWith(".yml")){
+			if(iterate.getName().toUpperCase().endsWith(".YML")){
 				ActFiles.add(iterate.getPath());
 			}
 			
@@ -193,7 +217,7 @@ public class ConfigData {
 	 * @return WorldConfig instance representing the configuration for the given world.
 	 */
 	public WorldConfig getWorldConfig(World grabfor){
-		
+		if(this.SingleWorldConfig!=null) return SingleWorldConfig;
 		String worldName = grabfor.getName();
 		
 		//if it's not in the hashmap...
@@ -261,6 +285,7 @@ public class ConfigData {
 		
 		return DataStore.dataLayerFolderPath + File.separator + "WorldConfigs/" + sName + ".cfg";
 	}
+	private static final String NoneSpecifier = "<None>";
 	/**
 	 * Constructs a new ConfigData instance from the given core configuration location
 	 * and the passed in target out configuration.
@@ -280,6 +305,19 @@ public class ConfigData {
 			TemplateFile = DefaultTemplateFile;
 			
 		}
+		String SingleConfig = CoreConfig.getString("GriefPrevention.WorldConfig.SingleWorld",NoneSpecifier);
+		SingleWorldConfigLocation = SingleConfig;
+		if(!SingleConfig.equals(NoneSpecifier) && new File(NoneSpecifier).exists()){
+			GriefPrevention.AddLogEntry("SingleWorld Configuration Mode Enabled. File \"" + SingleConfig + "\" will be used for all worlds.");
+			YamlConfiguration SingleReadConfig = YamlConfiguration.loadConfiguration(new File(SingleConfig));
+			YamlConfiguration SingleTargetConfig = new YamlConfiguration();
+			this.SingleWorldConfig = new WorldConfig("Single World", SingleReadConfig, SingleTargetConfig);
+			try {
+				SingleTargetConfig.save(SingleConfig);
+			}
+			catch(IOException exx){}
+		}
+		outConfig.set("GriefPrevention.WorldConfig.SingleWorld",SingleConfig);
 		outConfig.set("GriefPrevention.WorldConfig.TemplateFile", TemplateFile);
 		//check for appropriate configuration in given FileConfiguration. Note we also save out this configuration information.
 		//configurable World Configuration folder.

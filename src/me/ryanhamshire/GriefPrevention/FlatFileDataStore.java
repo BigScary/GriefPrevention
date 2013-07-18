@@ -141,19 +141,12 @@ public class FlatFileDataStore extends DataStore
 				line = inStream.readLine();						
 				String ownerName = line;
 				
-				//if it's smaller than the minimum size discard it.
-				int Xdiff = greaterBoundaryCorner.getBlockX()-lesserBoundaryCorner.getBlockX();
-				int Zdiff = greaterBoundaryCorner.getBlockZ()-lesserBoundaryCorner.getBlockZ();
-				WorldConfig wc = GriefPrevention.instance.getWorldCfg(lesserBoundaryCorner.getWorld());
-				if(Xdiff < wc.getMinClaimSize() || Zdiff < wc.getMinClaimSize()){
-					GriefPrevention.AddLogEntry("discarded Claim in world " + greaterBoundaryCorner.getWorld().getName() + " size:" + Xdiff + "," + Zdiff + " is smaller than " + wc.getMinClaimSize());
-				}
-						
+				
 				
 				
 				//is there PlayerData for this gai?
 				
-				if(!GriefPrevention.instance.dataStore.hasPlayerData(ownerName) && GriefPrevention.instance.config_claims_deleteclaimswithunrecognizedowners){
+				if(!hasPlayerData(ownerName) && GriefPrevention.instance.config_claims_deleteclaimswithunrecognizedowners){
 					//PlayerData not found, don't load this claim.
 					GriefPrevention.AddLogEntry("discarded Claim belonging to " + ownerName + " Because there is no PlayerData for that Player.");
 					return;
@@ -518,6 +511,11 @@ public class FlatFileDataStore extends DataStore
 		return new File(getPlayerDataFile(playerName)).exists();
 	}
 	@Override
+	public boolean deletePlayerData(String playerName) {
+		new File(getPlayerDataFile(playerName)).delete();
+		return !hasPlayerData(playerName);
+	}
+	@Override
 	synchronized PlayerData getPlayerDataFromStorage(String playerName)
 	{
 		File playerFile = new File(getPlayerDataFile(playerName));
@@ -721,15 +719,29 @@ public class FlatFileDataStore extends DataStore
 		}
 		catch(IOException exception){}		
 	}
-	
+	private void ForceLoadAllClaims(){
+		//force all claims to load.
+		//we do this by simply loading all worlds.
+		for(String iterate:GriefPrevention.instance.Configuration.GetWorldConfigNames()){
+			GriefPrevention.AddLogEntry("Force-loading World:" + iterate);
+			World loadedworld = Bukkit.getServer().createWorld(new WorldCreator(iterate));
+			//we need to call the WorldLoaded() method manually.
+			this.WorldLoaded(loadedworld);
+			
+		}
+		
+	}
 	synchronized void migrateData(DatabaseDataStore databaseStore)
 	{
+		ForceLoadAllClaims();
+		
+		
 		//migrate claims
-		for(int i = 0; i < this.claims.size(); i++)
-		{
-			Claim claim = this.claims.get(i);
-			databaseStore.addClaim(claim);
+		for(Claim c:this.claims){
+			GriefPrevention.AddLogEntry("Migrating Claim #" + c.getID());
+			databaseStore.addClaim(c);
 		}
+		
 		
 		//migrate groups
 		Iterator<String> groupNamesEnumerator = this.permissionToBonusBlocksMap.keySet().iterator();

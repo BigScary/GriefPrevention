@@ -985,6 +985,7 @@ class EntityEventHandler implements Listener
 						}
 						
 						
+						
 						String noContainersReason = claim.allowContainers(attacker);
 						if(noContainersReason != null)
 						{

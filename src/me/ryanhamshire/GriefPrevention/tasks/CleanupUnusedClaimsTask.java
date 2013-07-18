@@ -113,6 +113,10 @@ public class CleanupUnusedClaimsTask implements Runnable
 				Debugger.Write("Deleting Chest Claim owned by " + claim.ownerName + " last login:" + playerData.lastLogin.toString(), DebugLevel.Verbose);
 				claim.removeSurfaceFluids(null);
 				GriefPrevention.instance.dataStore.deleteClaim(claim);
+				if(playerData.claims.size()==0){
+					GriefPrevention.instance.dataStore.deletePlayerData(playerData.playerName);
+				}
+				
 				cleanupChunks = true;
 				
 				//if configured to do so, restore the land to natural
@@ -143,6 +147,8 @@ public class CleanupUnusedClaimsTask implements Runnable
 				//delete them
 				GriefPrevention.instance.dataStore.deleteClaimsForPlayer(claim.getOwnerName(), true, false);
 				GriefPrevention.AddLogEntry(" All of " + claim.getOwnerName() + "'s claims have expired. Removing all but the locked claims.");
+				GriefPrevention.instance.dataStore.deletePlayerData(playerData.playerName);
+				
 				
 				for(int i = 0; i < claims.size(); i++)
 				{
