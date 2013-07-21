@@ -2489,7 +2489,7 @@ class PlayerEventHandler implements Listener
 					GriefPrevention.sendMessage(player, TextMode.Err, Messages.NewClaimTooSmall, String.valueOf(wc.getMinClaimSize()));
 					return;
 				}
-				else if(!playerData.claimResizing.isAdminClaim() && newClaimWidth * newClaimHeight < wc.getMinClaimSizeBlocks()){
+				else if(playerData.shovelMode != ShovelMode.Admin && newClaimWidth * newClaimHeight < wc.getMinClaimSizeBlocks()){
 					GriefPrevention.sendMessage(player,TextMode.Err,Messages.ResizeTooFewBlocks,String.valueOf(wc.getMinClaimSizeBlocks()));
 					return;
 				}
