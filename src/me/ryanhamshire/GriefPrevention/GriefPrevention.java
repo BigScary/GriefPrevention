@@ -110,8 +110,9 @@ public class GriefPrevention extends JavaPlugin
 	public RegExTestHelper OreBlockRegexHelper;
 	public RegExTestHelper AccessRegexPattern;
 	public WorldWatcher ww = new WorldWatcher();
-
+    private MovementWatcher moveWatcher = null;
 	public boolean config_mod_config_search;
+	public boolean config_movementWatcher = false;
 	public Debugger.DebugLevel DebuggingLevel;
 	//start removal....
 	//reference to the economy plugin, if economy integration is enabled
@@ -304,8 +305,20 @@ public class GriefPrevention extends JavaPlugin
 	     
 	     return new RecursiveCopyResult(CountFiles,CountDirs);
 	}
-	
-	
+	/**
+	 * This method should be called by any Plugin that wishes to track Claim Entry and Exit Events.
+	 * It enables the Movement Watcher Listener. This is disabled by default.
+	 * It can also be force-enabled in the configuration file. However plugins should
+	 * call this method to ensure that the MovementWatcher is active.
+	 * Calling this method multiple times will not cause multiple movementwatchers to be created.
+	 */
+	public void InitializeMovementWatcher(){
+		
+		if(this.moveWatcher!=null) return;
+		moveWatcher = new MovementWatcher();
+		Bukkit.getPluginManager().registerEvents(moveWatcher, this);
+		
+	}
 	
 	//initializes well...   everything
 	public void onEnable()
@@ -393,6 +406,8 @@ public class GriefPrevention extends JavaPlugin
 		
 			
 		}
+		this.config_movementWatcher = config.getBoolean("GriefPrevention.EnableMoveWatcher",false);
+		outConfig.set("GriefPrevention.EnableMoveWatcher", config_movementWatcher);
 		Configuration = new ConfigData(config,outConfig);
 		
 		if(config_mod_config_search){ //if specified, to search, save the results to the template file.
@@ -453,6 +468,11 @@ public class GriefPrevention extends JavaPlugin
 		//look through all world configurations.
 		boolean claimcleanupOn=false;
 		boolean entitycleanupEnabled=false;
+		
+		if(config_movementWatcher){
+			this.moveWatcher = new MovementWatcher();
+			Bukkit.getPluginManager().registerEvents(moveWatcher,this);
+		}
 		
 		if(entitycleanupEnabled){
 			EntityCleanupTask task = new EntityCleanupTask(0);

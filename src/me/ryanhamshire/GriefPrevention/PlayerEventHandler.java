@@ -2221,7 +2221,10 @@ class PlayerEventHandler implements Listener
 						GriefPrevention.sendMessage(player, TextMode.Err, Messages.ResizeClaimTooSmall, String.valueOf(wc.getMinClaimSize()));
 						return;
 					}
-					
+					else if(!playerData.claimResizing.isAdminClaim() && newWidth * newHeight < wc.getMinClaimSizeBlocks()){
+						GriefPrevention.sendMessage(player,TextMode.Err,Messages.ResizeTooFewBlocks,String.valueOf(wc.getMinClaimSizeBlocks()));
+						return;
+					}
 					//make sure player has enough blocks to make up the difference
 					if(!playerData.claimResizing.isAdminClaim() && player.getName().equals(playerData.claimResizing.getOwnerName()))
 					{
@@ -2486,7 +2489,10 @@ class PlayerEventHandler implements Listener
 					GriefPrevention.sendMessage(player, TextMode.Err, Messages.NewClaimTooSmall, String.valueOf(wc.getMinClaimSize()));
 					return;
 				}
-				
+				else if(!playerData.claimResizing.isAdminClaim() && newClaimWidth * newClaimHeight < wc.getMinClaimSizeBlocks()){
+					GriefPrevention.sendMessage(player,TextMode.Err,Messages.ResizeTooFewBlocks,String.valueOf(wc.getMinClaimSizeBlocks()));
+					return;
+				}
 				//if not an administrative claim, verify the player has enough claim blocks for this new claim
 				if(playerData.shovelMode != ShovelMode.Admin)
 				{					

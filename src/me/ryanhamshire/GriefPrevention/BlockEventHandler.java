@@ -53,6 +53,8 @@ import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.BlockSpreadEvent;
 import org.bukkit.event.block.SignChangeEvent;
+import org.bukkit.event.world.PortalCreateEvent;
+import org.bukkit.event.world.PortalCreateEvent.CreateReason;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -612,10 +614,31 @@ public class BlockEventHandler implements Listener
 		}
 	}
 	
+	public void onPortalCreate(PortalCreateEvent event){
+		if(event.getReason()==CreateReason.OBC_DESTINATION){
+			
+			//if a portal is being created, make sure none of the destination blocks are in a claim.
+		    //iterate through all the blocks being made...
+			for(Block iterate:event.getBlocks()){
+				
+				//get any claim at the block's location.
+				Claim grabclaim = GriefPrevention.instance.dataStore.getClaimAt(iterate.getLocation(), true);
+				if(grabclaim!=null){
+					event.getBlocks().clear();
+					event.setCancelled(true);
+					return; 
+				}
+				
+			}
+			
+		}
+	}
+	
 	//fire doesn't spread unless configured to, but other blocks still do (mushrooms and vines, for example)
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onBlockSpread (BlockSpreadEvent spreadEvent)
 	{
+		
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(spreadEvent.getBlock().getWorld());
 		if(spreadEvent.getSource().getType() != Material.FIRE) return;
 		

@@ -13,7 +13,7 @@ import org.bukkit.event.HandlerList;
  * @author Tux2
  *
  */
-public class ClaimModifiedEvent extends Event implements Cancellable {
+public class ClaimModifiedEvent extends ClaimEvent implements Cancellable {
 
 	public enum Type {
 		OwnerChanged,
@@ -38,29 +38,26 @@ public class ClaimModifiedEvent extends Event implements Cancellable {
     public static HandlerList getHandlerList() {
         return handlers;
     }
+  
     
-    Claim claim;
-    String player;
+   
+    private String PlayerChanged;
+    public String getPlayerChanged(){ return PlayerChanged;}
     Type type;
     
-    public ClaimModifiedEvent(Claim claim, String player, Type type) {
-    	this.claim = claim;
-    	this.player = player;
+    public ClaimModifiedEvent(Claim claim, String pPlayerChanged, Type type) {
+    	super(claim);
     	this.type = type;
+    	PlayerChanged=pPlayerChanged;
     }
-    
+  
     public Claim getClaim() {
     	return claim;
     }
     
-    public String getPlayer() {
-    	return player;
-    }
-    /**
-     * retrievs the Player performing the modification.
-     * @return
-     */
-    public Player getModifier(){ return Bukkit.getPlayer(player);}
+
+   
+
     public Type getType() {
     	return type;
     }

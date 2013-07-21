@@ -13,7 +13,7 @@ import org.bukkit.event.HandlerList;
  * @author Tux2
  *
  */
-public class ClaimResizeEvent extends Event implements Cancellable {
+public class ClaimResizeEvent extends PlayerClaimEvent implements Cancellable {
 
 	// Custom Event Requirements
     private static final HandlerList handlers = new HandlerList();
@@ -32,29 +32,22 @@ public class ClaimResizeEvent extends Event implements Cancellable {
     
     public Location getNewLesserBoundaryCorner(){ return newLesserBoundaryCorner;}
     public Location getNewGreaterBoundaryCorner(){ return newGreaterBoundaryCorner;}
-    private Player resizer;
+   
   
     public ClaimResizeEvent(Claim oldclaim, Location newLesserBoundary,Location newGreaterBoundary,Player Resizer) {
-    	this.claim = oldclaim;
+    	super(oldclaim,Resizer);
     	newLesserBoundaryCorner = newLesserBoundary;
     	newGreaterBoundaryCorner=newGreaterBoundary;
-    	this.resizer = Resizer;
     }
     
-    /**
-     * Gets the claim being resized.
-     * @return
-     */
-    public Claim getClaim(){ return claim;}
-    
     
     
     
     /**
-     * retrieves the Player performing this resize.
+     * retrieves the Player performing this resize. This is the same result as the inherited getPlayer() event.
      * @return
      */
-    public Player getResizer(){ return resizer;}
+    public Player getResizer(){ return p;}
     boolean canceled = false;
 
 	public boolean isCancelled() {

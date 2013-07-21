@@ -51,11 +51,8 @@ public class Claim
 	
 	//String representations of the lesser and Greater Boundary corners.
 	//these are ONLY used when passed in the constructor.
-	//an Attempt is made to parse them and if the world isn't loaded the claim will be
-	//"dormant" which means it will return false for most queries.
-	private String LesserCorner;
-	private String GreaterCorner;
-	private boolean WasDeferred=false;
+
+
 	private String ClaimWorldName;
 	/**
 	 * Retrieves the world name in which this claim resides.

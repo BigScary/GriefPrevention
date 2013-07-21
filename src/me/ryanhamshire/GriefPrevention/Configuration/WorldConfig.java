@@ -309,6 +309,11 @@ public class WorldConfig {
 	public int getMinClaimSize(){ return config_claims_minSize;}
 	private int config_claims_maxblocks; //maximum blocks a player can claim in this world. This does not change and is essentially a cap to keep a player
 	//from 'taking over' an entire world. 0 indicates there is no limit.
+	
+	private int config_claims_minBlocks;
+	public int getMinClaimSizeBlocks(){ return config_claims_minBlocks;}
+	
+	
 	public int getClaims_maxBlocks(){ return config_claims_maxblocks;}
 	private List<BlockPlacementRules> config_BlockPlacementRules;
 	public List<BlockPlacementRules> getBlockPlacementRules(){ return config_BlockPlacementRules;}
@@ -894,6 +899,7 @@ public class WorldConfig {
 		this.config_claims_automaticClaimsForNewPlayersRadius = config.getInt("GriefPrevention.Claims.AutomaticNewPlayerClaimsRadius", 4);
 		this.config_claims_claimsExtendIntoGroundDistance = config.getInt("GriefPrevention.Claims.ExtendIntoGroundDistance", 5);
 		this.config_claims_creationRequiresPermission = config.getBoolean("GriefPrevention.Claims.CreationRequiresPermission", false);
+		this.config_claims_minBlocks = config.getInt("GriefPrevention.Claims.MinimumBlocks",100);
 		this.config_claims_minSize = config.getInt("GriefPrevention.Claims.MinimumSize", 10);
 		this.config_claims_maxDepth = config.getInt("GriefPrevention.Claims.MaximumDepth", 0);
 		this.config_claims_trappedCooldownMinutes = config.getInt("GriefPrevention.Claims.TrappedCommandCooldownMinutes", 8*60);
@@ -1219,6 +1225,7 @@ public class WorldConfig {
 		outConfig.set("GriefPrevention.Claims.ExtendIntoGroundDistance", this.config_claims_claimsExtendIntoGroundDistance);
 		outConfig.set("GriefPrevention.Claims.CreationRequiresPermission", this.config_claims_creationRequiresPermission);
 		outConfig.set("GriefPrevention.Claims.MinimumSize", this.config_claims_minSize);
+		outConfig.set("GriefPrevention.Claims.MinimumBlocks", this.config_claims_minBlocks);
 		outConfig.set("GriefPrevention.Claims.MaximumDepth", this.config_claims_maxDepth);
 		outConfig.set("GriefPrevention.Claims.TrappedCommandCooldownMinutes", this.config_claims_trappedCooldownMinutes);
 		outConfig.set("GriefPrevention.Claims.InvestigationTool", this.config_claims_investigationTool.name());

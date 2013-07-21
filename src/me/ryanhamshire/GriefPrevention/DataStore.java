@@ -1445,6 +1445,8 @@ public abstract class DataStore
 		this.addDefault(defaults, Messages.AutoSubClaimsEnter, "Switching to Subdivide Claim Mode",null);
 		this.addDefault(defaults, Messages.AutoSubClaimsExit, "Switching to Standard Claim Mode",null);
 		this.addDefault(defaults,Messages.AutoSubClaimsNoPermission,"You need permission in a claim to make subdivisions.",null);
+		this.addDefault(defaults, Messages.CreateClaimTooFewBlocks, "That claim would not cover enough blocks. Claims must use at least {0} Blocks", "0:Number of minimum blocks on a claim");
+		this.addDefault(defaults, Messages.ResizeNeedMoreBlocks, "The resized claim would not cover enough blocks. Claims must use at least {0} Blocks", "0:Number of minimum blocks on a claim");
 		//load the config file
 		FileConfiguration config = YamlConfiguration.loadConfiguration(new File(messagesFilePath));
 		
