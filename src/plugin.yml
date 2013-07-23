@@ -147,9 +147,9 @@ commands:
       usage: /DeleteAllAdminClaims
       permission: griefprevention.adminclaims
    transferclaim:
-      description: Converts an administrative claim to a private claim.
-      usage: /TransferClaim <player> [targetplayer]
-      permission: griefprevention.adjustclaimblocks
+      description: Converts an administrative claim to a private claim or a private claim to an administrative claim.
+      usage: /TransferClaim [targetplayer]
+      permission: griefprevention.transferclaims
    giveclaim:
       description: Gives a claim to another player. Requires AdminClaims permission to give a claim that doesn't belong to the player.
       usage: /GiveClaim <TargetPlayer>

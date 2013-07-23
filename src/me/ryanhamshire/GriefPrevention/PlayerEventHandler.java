@@ -1750,7 +1750,7 @@ class PlayerEventHandler implements Listener
 				clickedBlockType == Material.DIODE_BLOCK_ON || 
 				clickedBlockType == Material.DIODE_BLOCK_OFF ||
 				clickedBlockType == Material.REDSTONE_COMPARATOR_OFF ||
-				clickedBlockType == Material.REDSTONE_COMPARATOR_ON)
+				clickedBlockType == Material.REDSTONE_COMPARATOR_ON && event.getAction()==Action.RIGHT_CLICK_BLOCK)
 		{
 			ClaimAllowanceConstants tweakallow = wc.getBlockTweakRules().Allowed(clickedBlock.getLocation(), event.getPlayer());
 			if(tweakallow == ClaimAllowanceConstants.Allow_Forced) return;

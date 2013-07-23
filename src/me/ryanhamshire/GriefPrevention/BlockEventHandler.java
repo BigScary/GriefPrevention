@@ -211,8 +211,48 @@ public class BlockEventHandler implements Listener
 			
 			
 		}
-		
+	    PlayerData playerData = this.dataStore.getPlayerData(player.getName());
+		Claim claim = this.dataStore.getClaimAt(block.getLocation(), true);
 		//make sure the player is allowed to break at the location
+	
+		
+	
+		
+		//if there's a claim here
+		if(claim != null)
+		{
+			
+			//if the claim is under siege...
+			if(claim.siegeData!=null){
+				//and the breaking player is the attacker...
+				if(player.getName().equalsIgnoreCase(claim.siegeData.attacker.getName())){
+					//AND if we have the restoration of damage from claims enabled...
+					if(wc.getSiegeBlockRevert()){
+						//cancel the item drop.
+						//it looks like breakEvent doesn't let us set the actual drops.
+						//therefore we will cancel the event and replace the block with air ourselves.
+						String usekey = GriefPrevention.getfriendlyLocationString(breakEvent.getBlock().getLocation());
+						//if it already contains an entry, the block was broken during this siege
+						//and replaced with another block that is being broken again.
+						if(!claim.siegeData.SiegedBlocks.containsKey(usekey)){
+						breakEvent.getBlock().setType(Material.AIR);
+						breakEvent.setCancelled(true);
+						}
+					}
+				}
+				
+				
+				
+			}
+			else if //if breaking UNDER the claim and the player has permission to build in the claim
+			(block.getY() < claim.lesserBoundaryCorner.getBlockY() && claim.allowBuild(player) == null)
+			{
+				//extend the claim downward beyond the breakage point
+				this.dataStore.extendClaim(claim, claim.getLesserBoundaryCorner().getBlockY() - wc.getClaimsExtendIntoGroundDistance());
+			}
+			
+			
+		}
 		String noBuildReason = GriefPrevention.instance.allowBreak(player, block.getLocation());
 		if(noBuildReason != null)
 		{
@@ -220,21 +260,6 @@ public class BlockEventHandler implements Listener
 			breakEvent.setCancelled(true);
 			return;
 		}
-		
-		PlayerData playerData = this.dataStore.getPlayerData(player.getName());
-		Claim claim = this.dataStore.getClaimAt(block.getLocation(), true);
-		
-		//if there's a claim here
-		if(claim != null)
-		{
-			//if breaking UNDER the claim and the player has permission to build in the claim
-			if(block.getY() < claim.lesserBoundaryCorner.getBlockY() && claim.allowBuild(player) == null)
-			{
-				//extend the claim downward beyond the breakage point
-				this.dataStore.extendClaim(claim, claim.getLesserBoundaryCorner().getBlockY() - wc.getClaimsExtendIntoGroundDistance());
-			}
-		}
-		
 		//FEATURE: automatically clean up hanging treetops
 		//if it's a log
 		if(block.getType() == Material.LOG && wc.getRemoveFloatingTreetops())

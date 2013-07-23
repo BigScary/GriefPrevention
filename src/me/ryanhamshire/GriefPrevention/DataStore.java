@@ -938,10 +938,11 @@ public abstract class DataStore
 		int revertedCount=0;
 		if(!siegeData.SiegedBlocks.isEmpty()){
 			
-			
-			while(!siegeData.SiegedBlocks.isEmpty()){
-				siegeData.SiegedBlocks.poll().reset();
+			for(BrokenBlockInfo bbi:siegeData.SiegedBlocks.values()){
+			    bbi.reset();
+			    revertedCount++;
 			}
+			siegeData.SiegedBlocks.clear();
 			GriefPrevention.AddLogEntry("reverted " + revertedCount + " Sieged Blocks.");
 			
 		}
@@ -1447,6 +1448,7 @@ public abstract class DataStore
 		this.addDefault(defaults,Messages.AutoSubClaimsNoPermission,"You need permission in a claim to make subdivisions.",null);
 		this.addDefault(defaults, Messages.CreateClaimTooFewBlocks, "That claim would not cover enough blocks. Claims must use at least {0} Blocks", "0:Number of minimum blocks on a claim");
 		this.addDefault(defaults, Messages.ResizeNeedMoreBlocks, "The resized claim would not cover enough blocks. Claims must use at least {0} Blocks", "0:Number of minimum blocks on a claim");
+		this.addDefault(defaults, Messages.ResizeTooFewBlocks, "That claim would not take up enough space. Claims must use at least {0} Blocks.", "0:Minimum blocks in a claim");
 		//load the config file
 		FileConfiguration config = YamlConfiguration.loadConfiguration(new File(messagesFilePath));
 		

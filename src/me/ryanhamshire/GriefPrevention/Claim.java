@@ -655,9 +655,7 @@ public class Claim
 			}
 			else
 			{
-				if(wc.getSiegeBlockRevert()){
-				siegeData.SiegedBlocks.add(new BrokenBlockInfo(BlocktoCheck.getLocation()));
-				}
+				
 				return null;
 			}
 		}

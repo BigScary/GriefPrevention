@@ -19,11 +19,14 @@
 package me.ryanhamshire.GriefPrevention;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 
 import org.bukkit.entity.Player;
 
 import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
 //information about an ongoing siege
@@ -35,7 +38,7 @@ public class SiegeData
 	public int checkupTaskID;
 	//number of containers that have been looted.
 	public int LootedContainers;
-	public Queue<BrokenBlockInfo> SiegedBlocks = new LinkedBlockingQueue<BrokenBlockInfo>();
+	public Map<String,BrokenBlockInfo> SiegedBlocks = new ConcurrentHashMap<String,BrokenBlockInfo>();
 	public SiegeData(Player attacker, Player defender, Claim claim)
 	{
 		this.defender = defender;
