@@ -223,28 +223,8 @@ public class BlockEventHandler implements Listener
 		{
 			
 			//if the claim is under siege...
-			if(claim.siegeData!=null){
-				//and the breaking player is the attacker...
-				if(player.getName().equalsIgnoreCase(claim.siegeData.attacker.getName())){
-					//AND if we have the restoration of damage from claims enabled...
-					if(wc.getSiegeBlockRevert()){
-						//cancel the item drop.
-						//it looks like breakEvent doesn't let us set the actual drops.
-						//therefore we will cancel the event and replace the block with air ourselves.
-						String usekey = GriefPrevention.getfriendlyLocationString(breakEvent.getBlock().getLocation());
-						//if it already contains an entry, the block was broken during this siege
-						//and replaced with another block that is being broken again.
-						if(!claim.siegeData.SiegedBlocks.containsKey(usekey)){
-						breakEvent.getBlock().setType(Material.AIR);
-						breakEvent.setCancelled(true);
-						}
-					}
-				}
-				
-				
-				
-			}
-			else if //if breaking UNDER the claim and the player has permission to build in the claim
+		
+			if //if breaking UNDER the claim and the player has permission to build in the claim
 			(block.getY() < claim.lesserBoundaryCorner.getBlockY() && claim.allowBuild(player) == null)
 			{
 				//extend the claim downward beyond the breakage point

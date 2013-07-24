@@ -631,6 +631,17 @@ public class Claim
 		//if under siege, some blocks will be breakable
 		if(this.siegeData != null)
 		{
+	
+				//and the breaking player is the attacker...
+				
+				
+				
+				
+			
+			
+			
+			
+			
 			boolean breakable = false;
 			
 			//search for block type in list of breakable blocks
@@ -644,6 +655,35 @@ public class Claim
 				}
 			}
 			breakable|=BrokenBlockInfo.canBreak(BlocktoCheck.getLocation());
+			
+			if(breakable && player.getName().equalsIgnoreCase(siegeData.attacker.getName())){
+				//if breakable, player is the attacker, and 
+				if(wc.getSiegeBlockRevert()){
+					//cancel the item drop.
+					//it looks like breakEvent doesn't let us set the actual drops.
+					//therefore we will cancel the event and replace the block with air ourselves.
+					String usekey = GriefPrevention.getfriendlyLocationString(BlocktoCheck.getLocation());
+					//if it already contains an entry, the block was broken during this siege
+					//and replaced with another block that is being broken again.
+					if(!siegeData.SiegedBlocks.containsKey(usekey)){
+						return null; //allow the break this time. the block was placed since
+						//so there shouldn't be a dupe issue, and since we aren't putting the block back after (but rather some other)
+						//there isn't going to be extra.
+					}
+					else {
+						//otherwise, we have to add it to the siege blocks list.
+						siegeData.SiegedBlocks.put(usekey, new BrokenBlockInfo(BlocktoCheck.getLocation()));
+						//replace it manually
+						BlocktoCheck.setType(Material.AIR);
+						//return empty string, because obviously returning strings is totally a flexible design choice
+						//and doesn't at all pose problems for when we want to indicate to cancel the calling event
+						//without showing a message. Oh wait no it's the opposite isn't it.
+						return "";
+					}
+				}
+			}
+			
+			
 			//custom error messages for siege mode
 			if(!breakable)
 			{

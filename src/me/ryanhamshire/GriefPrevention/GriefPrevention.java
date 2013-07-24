@@ -968,6 +968,8 @@ public class GriefPrevention extends JavaPlugin
 	//sends a color-coded message to a player
 	public static void sendMessage(Player player, ChatColor color, String message)
 	{
+		//if the message is zero-length, display nothing.
+		if(message.length()==0) return;
 		if(player == null)
 		{
 			GriefPrevention.AddLogEntry(removeColors(message));

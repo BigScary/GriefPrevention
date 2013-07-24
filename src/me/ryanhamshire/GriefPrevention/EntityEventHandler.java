@@ -612,7 +612,7 @@ class EntityEventHandler implements Listener
 		//FEATURE: when a player is involved in a siege (attacker or defender role)
 		//his death will end the siege
 		
-		if(!(entity instanceof Player)) return;  //only tracking players
+		if(entity instanceof Player){
 		
 		Player player = (Player)entity;
 		PlayerData playerData = this.dataStore.getPlayerData(player.getName());
@@ -626,11 +626,11 @@ class EntityEventHandler implements Listener
 			//end it, with the dieing player being the loser
 			this.dataStore.endSiege(playerData.siegeData, null, player.getName(), true /*ended due to death*/);
 		}
-		
+		}
 		//if it is an ocelot or wolf, and the owner is under seige, 
 		//inform the owner of the casualty on the line of battle.
 		
-		if(entity instanceof Wolf || entity instanceof Ocelot){
+		else if(entity instanceof Wolf || entity instanceof Ocelot){
 			
 			if(entity instanceof Tameable){
 				Tameable tamed = (Tameable)entity;
