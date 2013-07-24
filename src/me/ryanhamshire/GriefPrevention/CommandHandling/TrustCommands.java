@@ -114,6 +114,7 @@ public class TrustCommands extends GriefPreventionCommand{
 			//otherwise just use the ClaimPermission enum values
 			else
 			{
+				
 				switch(permissionLevel)
 				{
 					case Access:

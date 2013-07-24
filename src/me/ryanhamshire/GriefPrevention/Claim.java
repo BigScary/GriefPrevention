@@ -32,6 +32,7 @@ import me.ryanhamshire.GriefPrevention.Configuration.WorldConfig;
 import me.ryanhamshire.GriefPrevention.events.ClaimModifiedEvent;
 import me.ryanhamshire.GriefPrevention.tasks.RestoreNatureProcessingTask;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.bukkit.*;
 import org.bukkit.World.Environment;
 import org.bukkit.block.Block;
@@ -854,7 +855,7 @@ public class Claim
 				permtype = ClaimModifiedEvent.Type.AddedInventoryTrust;
 				break;
 			default:
-				permtype = null;
+				permtype = ClaimModifiedEvent.Type.AddedManager;
 			}
 			
 			
@@ -865,6 +866,7 @@ public class Claim
 				return false;
 			}
 		}
+		System.out.println("Adding " + playerName.toLowerCase() + " to permmap, perm level " + permissionLevel);
 		this.playerNameToClaimPermissionMap.put(playerName.toLowerCase(),  permissionLevel);
 		return true;
 	}
@@ -968,7 +970,7 @@ public class Claim
 		}
 		
 		//managers are handled a little differently
-		for(String manager:managers)
+		for(String manager:this.managers)
 		{
 			managers.add(manager);
 		}
@@ -1311,7 +1313,9 @@ public class Claim
 				return false;
 			}
 		}
+		System.out.println("Adding " + player + " as manager to claim ID #" + this.getID());
 		managers.add(player);
+		if(inDataStore) GriefPrevention.instance.dataStore.saveClaim(this);
 		return true;
 	}
 
@@ -1330,11 +1334,13 @@ public class Claim
 			}
 		}
 		managers.remove(player);
+		if(inDataStore) GriefPrevention.instance.dataStore.saveClaim(this);
 		return true;
 	}
 	public void clearManagers(){
+		ArrayList<String> duplicate = new ArrayList<String>(managers);
 		
-		for(String iterateman:managers){
+		for(String iterateman:duplicate ){
 			removeManager(iterateman);
 		}
 		
