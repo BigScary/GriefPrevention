@@ -31,6 +31,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import me.ryanhamshire.GriefPrevention.CommandHandling.CommandHandler;
+import me.ryanhamshire.GriefPrevention.CommandHandling.GPReloadCommand;
 import me.ryanhamshire.GriefPrevention.Configuration.ClaimMetaHandler;
 import me.ryanhamshire.GriefPrevention.Configuration.ConfigData;
 import me.ryanhamshire.GriefPrevention.Configuration.ModBlockHelper;
@@ -1185,6 +1186,7 @@ public class GriefPrevention extends JavaPlugin
 	}
 	public void reloadConfiguration() {
 		// TODO Auto-generated method stub
-		
+		Bukkit.dispatchCommand(Bukkit.getConsoleSender(),"gpreload");
 	}
+	
 }

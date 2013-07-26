@@ -48,6 +48,7 @@ import org.bukkit.event.block.BlockDispenseEvent;
 import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.block.BlockIgniteEvent.IgniteCause;
+import org.bukkit.event.block.BlockPhysicsEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -98,8 +99,8 @@ public class BlockEventHandler implements Listener
 	//constructor
 	public BlockEventHandler(DataStore dataStore)
 	{
+	
 		this.dataStore = dataStore;
-		
 	
 	}
 	
@@ -211,7 +212,7 @@ public class BlockEventHandler implements Listener
 			
 			
 		}
-	    PlayerData playerData = this.dataStore.getPlayerData(player.getName());
+	    
 		Claim claim = this.dataStore.getClaimAt(block.getLocation(), true);
 		//make sure the player is allowed to break at the location
 	
@@ -236,6 +237,7 @@ public class BlockEventHandler implements Listener
 		String noBuildReason = GriefPrevention.instance.allowBreak(player, block.getLocation());
 		if(noBuildReason != null)
 		{
+			//System.out.println("BuildReason!=null.");
 			GriefPrevention.sendMessage(player, TextMode.Err, noBuildReason);
 			breakEvent.setCancelled(true);
 			return;
@@ -639,6 +641,18 @@ public class BlockEventHandler implements Listener
 		}
 	}
 	
+	@EventHandler(priority =EventPriority.LOWEST)
+	public void onBlockPhysics(BlockPhysicsEvent event){
+		
+		
+		//determine if location is inside a claim.
+		//note that we can expand this to include some funky ruleset in the future.
+	
+		
+		
+	}
+	
+	
 	//fire doesn't spread unless configured to, but other blocks still do (mushrooms and vines, for example)
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onBlockSpread (BlockSpreadEvent spreadEvent)
@@ -734,6 +748,7 @@ public class BlockEventHandler implements Listener
 		
 		//from where?
 		Block fromBlock = spreadEvent.getBlock();
+		if(fromBlock==null) return;
 		Claim fromClaim = this.dataStore.getClaimAt(fromBlock.getLocation(), false);
 		if(fromClaim != null)
 		{

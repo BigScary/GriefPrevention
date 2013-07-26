@@ -635,14 +635,6 @@ public class Claim
 	
 				//and the breaking player is the attacker...
 				
-				
-				
-				
-			
-			
-			
-			
-			
 			boolean breakable = false;
 			
 			//search for block type in list of breakable blocks
@@ -660,13 +652,14 @@ public class Claim
 			if(breakable && player.getName().equalsIgnoreCase(siegeData.attacker.getName())){
 				//if breakable, player is the attacker, and 
 				if(wc.getSiegeBlockRevert()){
+					
 					//cancel the item drop.
 					//it looks like breakEvent doesn't let us set the actual drops.
 					//therefore we will cancel the event and replace the block with air ourselves.
 					String usekey = GriefPrevention.getfriendlyLocationString(BlocktoCheck.getLocation());
 					//if it already contains an entry, the block was broken during this siege
 					//and replaced with another block that is being broken again.
-					if(!siegeData.SiegedBlocks.containsKey(usekey)){
+					if(siegeData.SiegedBlocks.containsKey(usekey)){
 						return null; //allow the break this time. the block was placed since
 						//so there shouldn't be a dupe issue, and since we aren't putting the block back after (but rather some other)
 						//there isn't going to be extra.

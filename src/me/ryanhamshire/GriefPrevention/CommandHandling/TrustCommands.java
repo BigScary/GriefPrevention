@@ -78,12 +78,12 @@ public class TrustCommands extends GriefPreventionCommand{
 				recipientName = "public";
 			}
 		}
-		
+		PlayerData playerData = inst.dataStore.getPlayerData(player.getName());
 		//determine which claims should be modified
 		ArrayList<Claim> targetClaims = new ArrayList<Claim>();
 		if(claim == null)
 		{
-			PlayerData playerData = inst.dataStore.getPlayerData(player.getName());
+			
 			for(int i = 0; i < playerData.claims.size(); i++)
 			{
 				targetClaims.add(playerData.claims.get(i));
@@ -144,6 +144,18 @@ public class TrustCommands extends GriefPreventionCommand{
 			GriefPrevention.sendMessage(player, TextMode.Err, Messages.GrantPermissionNoClaim);
 			return;
 		}
+		
+		//if number of target claims is greater than 1, require 'warning' flag.
+		if(targetClaims.size() > 1){
+			
+			if(!playerData.warnedAboutMajorDeletion){
+				GriefPrevention.sendMessage(player, TextMode.Info, "use the trust command again to give " + recipientName + " access to all your claims." );
+				playerData.warnedAboutMajorDeletion=true;
+			}
+			
+			
+		}
+		
 		//if forcedenial is true, we will add the exclamation back to the name for addition.
 		if(isforceddenial) recipientName = "!" + recipientName;
 		//apply changes

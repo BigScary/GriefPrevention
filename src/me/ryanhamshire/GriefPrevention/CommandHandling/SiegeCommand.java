@@ -80,7 +80,8 @@ public class SiegeCommand extends GriefPreventionCommand {
 		if(defender.getName().equalsIgnoreCase(attacker.getName())){
 			GriefPrevention.sendMessage(player, TextMode.Err, Messages.CantSiegeYourself);
 			return true;
-		}
+		} 
+		//revert this commented out block...
 		
 		
 		//victim must not be under siege already

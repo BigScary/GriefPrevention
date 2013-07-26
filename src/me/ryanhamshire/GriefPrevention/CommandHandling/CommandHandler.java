@@ -39,6 +39,7 @@ public class CommandHandler implements CommandExecutor {
 	private List<GriefPreventionCommand> GPCommands = new ArrayList<GriefPreventionCommand>(); 
 
 	
+	
 	public CommandHandler(){
 		
 		//registers appropriate Commands. Each
