@@ -859,7 +859,7 @@ public class Claim
 				return false;
 			}
 		}
-		System.out.println("Adding " + playerName.toLowerCase() + " to permmap, perm level " + permissionLevel);
+		//System.out.println("Adding " + playerName.toLowerCase() + " to permmap, perm level " + permissionLevel);
 		this.playerNameToClaimPermissionMap.put(playerName.toLowerCase(),  permissionLevel);
 		return true;
 	}

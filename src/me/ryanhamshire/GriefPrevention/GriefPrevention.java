@@ -40,7 +40,7 @@ import me.ryanhamshire.GriefPrevention.Configuration.WorldConfig;
 import me.ryanhamshire.GriefPrevention.Debugger.DebugLevel;
 import me.ryanhamshire.GriefPrevention.events.GPLoadEvent;
 import me.ryanhamshire.GriefPrevention.events.GPUnloadEvent;
-import me.ryanhamshire.GriefPrevention.tasks.CleanupUnusedClaimsTask;
+
 import me.ryanhamshire.GriefPrevention.tasks.DeliverClaimBlocksTask;
 import me.ryanhamshire.GriefPrevention.tasks.EntityCleanupTask;
 import me.ryanhamshire.GriefPrevention.tasks.PlayerRescueTask;
@@ -227,7 +227,7 @@ public class GriefPrevention extends JavaPlugin
 		return MetaHandler;
 	}
 	public DeliverClaimBlocksTask ClaimTask = null;
-	public CleanupUnusedClaimsTask CleanupTask = null;
+	
 	
 
 	private void migrateData(){
@@ -368,7 +368,7 @@ public class GriefPrevention extends JavaPlugin
 		//sea level
 		String AcquiredLevel = config.getString("GriefPrevention.DebugLevel","None");
 		this.DebuggingLevel= Debugger.DebugLevel.valueOf(AcquiredLevel);
-		config.set("GriefPrevention.DebugLevel", DebuggingLevel.name());
+		outConfig.set("GriefPrevention.DebugLevel", DebuggingLevel.name());
 		this.debug = new Debugger(DebuggingLevel);
 		outConfig.set("GriefPrevention.Database.URL", databaseUrl);
 		outConfig.set("GriefPrevention.Database.UserName",databaseUserName);

@@ -16,7 +16,7 @@ import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import me.ryanhamshire.GriefPrevention.MaterialCollection;
 import me.ryanhamshire.GriefPrevention.MaterialInfo;
 import me.ryanhamshire.GriefPrevention.Configuration.ClaimBehaviourData.ClaimBehaviourMode;
-import me.ryanhamshire.GriefPrevention.tasks.CleanupUnusedClaimsTask;
+
 import me.ryanhamshire.GriefPrevention.tasks.DeliverClaimBlocksTask;
 import net.milkbowl.vault.economy.Economy;
 
@@ -1301,12 +1301,7 @@ public class WorldConfig {
 					GriefPrevention.instance.ClaimTask, 60L*20*2, 60L*20*5);			
 		}
 		//similar logic for ClaimCleanup: if claim cleanup is enabled and there isn't a cleanup task, start it.
-		if(this.getClaimCleanupEnabled() && GriefPrevention.instance.CleanupTask==null){
-			CleanupUnusedClaimsTask task2 = new CleanupUnusedClaimsTask();
-			GriefPrevention.instance.getServer().getScheduler().scheduleSyncRepeatingTask(GriefPrevention.instance,
-					task2, 20L * 60 * 2, 20L * 60 * 5);
-		
-	    }
+	
 		
 		
 	}

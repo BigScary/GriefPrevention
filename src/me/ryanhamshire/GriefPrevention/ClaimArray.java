@@ -7,6 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import org.bukkit.Location;
+import org.bukkit.World;
 
 import me.ryanhamshire.GriefPrevention.Debugger.DebugLevel;
 
@@ -42,6 +43,13 @@ public class ClaimArray implements Iterable<Claim> {
 		return getchild;
 		
 		
+	}
+	public List<Claim> getWorldClaims(World w){
+		return getWorldClaims(w.getName());
+	}
+	public List<Claim> getWorldClaims(String worldname){
+		if(!claimworldmap.containsKey(worldname)) return new ArrayList<Claim>();
+		return claimworldmap.get(worldname);
 	}
 	private void addClaimWorld(Claim c){
 		String usekey = c.getLesserBoundaryCorner().getWorld().getName();

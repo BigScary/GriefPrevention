@@ -538,7 +538,7 @@ ArrayList<Claim> claimsToRemove = new ArrayList<Claim>();
 	@Override
 	synchronized void close()
 	{
-		System.out.println("DatabaseStore closing: Claims #" + this.claims.size());
+		//System.out.println("DatabaseStore closing: Claims #" + this.claims.size());
 		super.close();
 		if(this.databaseConnection != null)
 		{

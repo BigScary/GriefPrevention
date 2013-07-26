@@ -1527,6 +1527,7 @@ public abstract class DataStore
 		
 	}
 
+	
 	public int getClaimsSize() {
 		return claims.size();
 	}

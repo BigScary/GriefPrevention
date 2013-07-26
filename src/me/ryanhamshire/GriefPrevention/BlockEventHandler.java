@@ -874,6 +874,7 @@ public class BlockEventHandler implements Listener
 			
 			
 			Potion p = Potion.fromItemStack(beingdispensed);
+			if(p.isSplash()){
 			PotionEffectType testtype = p.getType().getEffectType();
 			
 			
@@ -890,7 +891,7 @@ public class BlockEventHandler implements Listener
 				chosenRules = wc.getDispenserNegativePotionBehaviour();
 			}
 			
-			
+			}
 			
 			
 		}
