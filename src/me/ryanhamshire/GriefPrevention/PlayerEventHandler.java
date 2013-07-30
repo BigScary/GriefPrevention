@@ -1541,7 +1541,7 @@ class PlayerEventHandler implements Listener
 		//apply rules for putting out fires (requires build permission)
 		if(event.getAction()==Action.LEFT_CLICK_BLOCK && event.getClickedBlock() != null && event.getClickedBlock().getRelative(event.getBlockFace()).getType() == Material.FIRE)
 		{
-			if(!wc.getFireExtinguishing().Allowed(clickedBlock.getLocation(), player).Denied()){
+			if(wc.getFireExtinguishing().Allowed(clickedBlock.getLocation(), player).Denied()){
 				event.setCancelled(true);
 				return;
 			}
@@ -1606,12 +1606,12 @@ class PlayerEventHandler implements Listener
 			//special Chest looting behaviour.
 			Claim cc = this.dataStore.getClaimAt(clickedBlock.getLocation(),true);
 			//if doorsOpen...
+			
 			if(cc!=null && cc.doorsOpen){
-				if((cc.LootedChests++)<=wc.getSeigeLootChests()){
+				
+				if((cc.LootedChests++)<=wc.getSeigeLootChests() && wc.getSeigeLootChests()>0){
 					//tell the player how many more chests they can loot.
 					player.sendMessage(ChatColor.YELLOW + " You may loot " + (wc.getSeigeLootChests()-cc.LootedChests) + " more chests");
-					
-					
 					return;
 				}
 				
@@ -1691,48 +1691,7 @@ class PlayerEventHandler implements Listener
 			
 			
 		}
-		/*//older code here for now...
-		//otherwise apply rules for doors, if configured that way
-		else if((wc.getClaimsLockWoodenDoors() && clickedBlockType == Material.WOODEN_DOOR) ||
-				(wc.getClaimsLockTrapDoors() && clickedBlockType == Material.TRAP_DOOR) ||
-				(wc.getClaimsLockFenceGates() && clickedBlockType == Material.FENCE_GATE))
-		{
-			Claim claim = this.dataStore.getClaimAt(clickedBlock.getLocation(), false, playerData.lastClaim);
-			if(claim != null)
-			{
-				playerData.lastClaim = claim;
-				
-				String noAccessReason = claim.allowAccess(player);
-				if(noAccessReason != null)
-				{
-					
-					event.setCancelled(true);
-					GriefPrevention.sendMessage(player, TextMode.Err, noAccessReason);
-					return;
-				}
-			}	
-		}
 		
-		//otherwise apply rules for buttons and switches
-		else if(wc.getClaimsPreventButtonsSwitches() && (clickedBlockType == null || clickedBlockType == Material.STONE_BUTTON || clickedBlockType == Material.WOOD_BUTTON || clickedBlockType == Material.LEVER || wc.getModsAccessTrustIds().Contains(new MaterialInfo(clickedBlock.getTypeId(), clickedBlock.getData(), null))))
-		{
-			
-			Claim claim = this.dataStore.getClaimAt(clickedBlock.getLocation(), false, playerData.lastClaim);
-			if(claim != null)
-			{
-				playerData.lastClaim = claim;
-				
-				String noAccessReason = claim.allowAccess(player);
-				if(noAccessReason != null)
-				{
-					
-					event.setCancelled(true);
-					GriefPrevention.sendMessage(player, TextMode.Err, noAccessReason);
-					return;
-				}
-			}			
-		}
-		*/
 		//apply rule for players trampling tilled soil back to dirt (never allow it)
 		//NOTE: that this event applies only to players.  monsters and animals can still trample.
 		else if(event.getAction() == Action.PHYSICAL && clickedBlockType == Material.SOIL)
@@ -2288,7 +2247,7 @@ class PlayerEventHandler implements Listener
 					Visualization.Apply(player, visualization);
 					
 					//if resizing someone else's claim, make a log entry
-					if(!playerData.claimResizing.ownerName.equals(playerName))
+					if(!playerData.claimResizing.getOwnerName().equals(playerName))
 					{
 						GriefPrevention.AddLogEntry(playerName + " resized " + playerData.claimResizing.getOwnerName() + "'s claim at " + GriefPrevention.getfriendlyLocationString(playerData.claimResizing.lesserBoundaryCorner) + ".");
 					}

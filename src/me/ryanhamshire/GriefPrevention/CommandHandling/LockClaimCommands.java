@@ -24,7 +24,7 @@ public class LockClaimCommands extends GriefPreventionCommand {
 			if(args.length != 0) return false;
 			
 			Claim claim = dataStore.getClaimAt(player.getLocation(), true /*ignore height*/);
-			if((player.hasPermission("griefprevention.lock") && claim.ownerName.equalsIgnoreCase(player.getName())) || player.hasPermission("griefprevention.adminlock")) {
+			if((player.hasPermission("griefprevention.lock") && claim.getOwnerName().equalsIgnoreCase(player.getName())) || player.hasPermission("griefprevention.adminlock")) {
 				claim.neverdelete = true;
 				dataStore.saveClaim(claim);
 				GriefPrevention.sendMessage(player, TextMode.Success, Messages.ClaimLocked);
@@ -40,7 +40,7 @@ public class LockClaimCommands extends GriefPreventionCommand {
 			if(args.length != 0) return false;
 			
 			Claim claim = dataStore.getClaimAt(player.getLocation(), true /*ignore height*/);
-			if((player.hasPermission("griefprevention.lock") && claim.ownerName.equalsIgnoreCase(player.getName())) || player.hasPermission("griefprevention.adminlock")) {
+			if((player.hasPermission("griefprevention.lock") && claim.getOwnerName().equalsIgnoreCase(player.getName())) || player.hasPermission("griefprevention.adminlock")) {
 				claim.neverdelete = false;
 				dataStore.saveClaim(claim);
 				GriefPrevention.sendMessage(player, TextMode.Success, Messages.ClaimUnlocked);

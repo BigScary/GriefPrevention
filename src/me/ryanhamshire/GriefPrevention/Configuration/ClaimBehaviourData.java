@@ -72,7 +72,7 @@ public class ClaimBehaviourData {
 			case RequireNone:
 				return testresult=true;	
 			case RequireOwner:
-				if(atposition.ownerName.equalsIgnoreCase(testPlayer.getName())){
+				if(atposition.getOwnerName().equalsIgnoreCase(testPlayer.getName())){
 					return testresult=true;
 					
 				}else {

@@ -90,7 +90,7 @@ public class Claim
 	 * ownername.  for admin claims, this is the empty string
 	 * use getOwnerName() to get a friendly name (will be "an administrator" for admin claims)
 	 */
-	public String ownerName;
+	private String ownerName;
 	
 	/**
 	 * list of players who (beyond the claim owner) have permission to grant permissions in this claim
@@ -647,7 +647,7 @@ public class Claim
 					break;
 				}
 			}
-			breakable|=BrokenBlockInfo.canBreak(BlocktoCheck.getLocation());
+			breakable=breakable || BrokenBlockInfo.canBreak(BlocktoCheck.getLocation());
 			
 			if(breakable && player.getName().equalsIgnoreCase(siegeData.attacker.getName())){
 				//if breakable, player is the attacker, and 
@@ -991,7 +991,12 @@ public class Claim
 	{
 		return this.greaterBoundaryCorner.clone();
 	}
-	
+	public void setOwnerName(String value){
+		
+		if(this.parent!=null) this.parent.setOwnerName(value);
+		
+		this.ownerName = value;
+	}
 	/**
 	 * Returns a friendly owner name (for admin claims, returns "an administrator" as the owner)
 	 * @return
@@ -1023,7 +1028,7 @@ public class Claim
 			return false;
 		if(Target.getBlockZ() < MinZ || Target.getBlockZ() > MaxZ)
 			return false;
-		if(!ignoreHeight && (Target.getBlockY() < MaxY || Target.getBlockY() > MaxY))
+		if(!ignoreHeight && (Target.getBlockY() < MinY || Target.getBlockY() > MaxY))
 			return false;
 		
 		

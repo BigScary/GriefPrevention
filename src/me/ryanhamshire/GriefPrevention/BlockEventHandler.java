@@ -776,7 +776,7 @@ public class BlockEventHandler implements Listener
 			OfflinePlayer fromOwner = null;			
 			if(fromClaim != null)
 			{				
-				fromOwner = GriefPrevention.instance.getServer().getOfflinePlayer(fromClaim.ownerName);
+				fromOwner = GriefPrevention.instance.getServer().getOfflinePlayer(fromClaim.getOwnerName());
 			}
 			
 			//cancel unless the owner of the spreading block is allowed to build in the receiving claim
@@ -872,28 +872,28 @@ public class BlockEventHandler implements Listener
 		}
 		else if(beingdispensed.getType()==Material.POTION){
 			
-			
-			Potion p = Potion.fromItemStack(beingdispensed);
-			if(p.isSplash()){
-			PotionEffectType testtype = p.getType().getEffectType();
-			
-			
-			if(this.PositiveEffects==null){
-				this.PositiveEffects = new ArrayList<PotionEffectType>();
-				for(PotionEffectType addit:this.PositiveEffectsArray){
-					PositiveEffects.add(addit);
+			if(beingdispensed.getDurability()!=0){
+				Potion p = Potion.fromItemStack(beingdispensed);
+				if(p.isSplash()){
+				PotionEffectType testtype = p.getType().getEffectType();
+				
+				
+				if(this.PositiveEffects==null){
+					this.PositiveEffects = new ArrayList<PotionEffectType>();
+					for(PotionEffectType addit:this.PositiveEffectsArray){
+						PositiveEffects.add(addit);
+					}
 				}
-			}
-			if(PositiveEffects.contains(testtype)){
-				chosenRules=wc.getDispenserPositivePotionBehaviour();
-			}
-			else {
-				chosenRules = wc.getDispenserNegativePotionBehaviour();
-			}
+				if(PositiveEffects.contains(testtype)){
+					chosenRules=wc.getDispenserPositivePotionBehaviour();
+				}
+				else {
+					chosenRules = wc.getDispenserNegativePotionBehaviour();
+				}
+				
+				}
 			
 			}
-			
-			
 		}
 		if(chosenRules==null) chosenRules = wc.getDispenserMiscBehaviour();
 		

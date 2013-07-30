@@ -213,7 +213,15 @@ ArrayList<Claim> claimsToRemove = new ArrayList<Claim>();
 				statement.execute("CREATE TABLE IF NOT EXISTS griefprevention_nextclaimid (nextid INT(15));");
 
 				statement.execute("CREATE TABLE IF NOT EXISTS griefprevention_claimdata (id INT(15), owner VARCHAR(50), lessercorner VARCHAR(100), greatercorner VARCHAR(100), builders VARCHAR(1000), containers VARCHAR(1000), accessors VARCHAR(1000), managers VARCHAR(1000), parentid INT(15), neverdelete BOOLEAN NOT NULL DEFAULT 0);");
+				//in case it's a previous schema, change it to auto_increment.
+				//statement.execute("ALTER TABLE griefprevention_claimdata modify column id INT AUTO_INCREMENT");
+					
 
+				//IF EXISTS(SELECT * FROM sys.indexes WHERE object_id = object_id('schema.tablename') AND NAME ='indexname')
+			    //DROP INDEX indexname ON SCHEMA.tablename;
+				
+				
+				
 				statement.execute("CREATE TABLE IF NOT EXISTS griefprevention_playerdata (name VARCHAR(50), lastlogin DATETIME, accruedblocks INT(15), bonusblocks INT(15));");
 
 				ResultSet tempresult = statement.executeQuery("SHOW COLUMNS FROM griefprevention_claimdata LIKE 'neverdelete';");
@@ -280,7 +288,9 @@ ArrayList<Claim> claimsToRemove = new ArrayList<Claim>();
 			this.refreshDataConnection();
 			
 			//wipe out any existing data about this claim
-			this.deleteClaimFromSecondaryStorage(claim);
+			//this.deleteClaimFromSecondaryStorage(claim);
+			
+			
 			
 			//write top level claim data to the database
 			this.writeClaimData(claim);
@@ -304,7 +314,7 @@ ArrayList<Claim> claimsToRemove = new ArrayList<Claim>();
 	{
 		String lesserCornerString = this.locationToString(claim.getLesserBoundaryCorner());
 		String greaterCornerString = this.locationToString(claim.getGreaterBoundaryCorner());
-		String owner = claim.ownerName;
+		String owner = claim.getOwnerName();
 		
 		ArrayList<String> builders = new ArrayList<String>();
 		ArrayList<String> containers = new ArrayList<String>();
@@ -363,7 +373,40 @@ ArrayList<Claim> claimsToRemove = new ArrayList<Claim>();
 		try
 		{
 			this.refreshDataConnection();
-			
+			//if the ID is in the database, then
+			Statement idexists = databaseConnection.createStatement();
+			ResultSet itexists = idexists.executeQuery("SELECT COUNT(*) FROM griefprevention_claimdata WHERE id=" + id);
+			itexists.next();
+			boolean useupdate = itexists.getInt(0)>0;
+			//
+			if(useupdate){
+			Statement updatestatement = databaseConnection.createStatement();
+			//statement.execute("CREATE TABLE IF NOT EXISTS 
+			//griefprevention_claimdata 
+			//(id INTEGER, owner VARCHAR(50), 
+			//lessercorner VARCHAR(100),
+			//greatercorner VARCHAR(100),
+			//builders TEXT, 
+			//containers TEXT, 
+			//accessors TEXT,
+			//managers TEXT,
+			//parentid INTEGER, 
+			//neverdelete BOOLEAN NOT NULL DEFAULT false);");
+			updatestatement.execute("UPDATE griefprevention_claimdata " +
+			"SET id='" + id + "'" + 
+			",SET owner='" + owner + "'" +
+			",SET lessercorner='" + lesserCornerString + "'" +
+			",SET greatercorner='" + greaterCornerString + "'" +
+			",SET builders='" + buildersString + "'" +
+			",SET containers='" + containersString + "'" +
+			",SET accessors='" + accessorsString + "'" +
+			",SET managers='" + managersString + "'" +
+			",SET parentid='" + parentId + "'" +
+			",SET neverdelete='" + claim.neverdelete + "' " +
+			"WHERE id=" + id); 
+			GriefPrevention.AddLogEntry("updated data into griefprevention_claimdata- ID:" + claim.getID());
+			}
+			else {
 			Statement statement = databaseConnection.createStatement();
 			statement.execute("INSERT INTO griefprevention_claimdata VALUES(" +
 					id + ", '" +
@@ -378,6 +421,7 @@ ArrayList<Claim> claimsToRemove = new ArrayList<Claim>();
 					claim.neverdelete +
 					");");
 			GriefPrevention.AddLogEntry("Successfully inserted data into griefprevention_claimdata- ID:" + claim.getID());
+			}
 		}
 		catch(SQLException e)
 		{

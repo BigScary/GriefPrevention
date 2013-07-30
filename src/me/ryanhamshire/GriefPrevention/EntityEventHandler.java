@@ -614,18 +614,19 @@ class EntityEventHandler implements Listener
 		
 		if(entity instanceof Player){
 		
-		Player player = (Player)entity;
-		PlayerData playerData = this.dataStore.getPlayerData(player.getName());
-		WorldConfig wc = GriefPrevention.instance.getWorldCfg(player.getWorld());
-		//if involved in a siege
-		if(playerData.siegeData != null)
-		{
-			//don't drop items as usual, they will be sent to the siege winner
-			if(wc.getSiegeAutoTransfer()) event.getDrops().clear();
-			
-			//end it, with the dieing player being the loser
-			this.dataStore.endSiege(playerData.siegeData, null, player.getName(), true /*ended due to death*/);
-		}
+			Player player = (Player)entity;
+			PlayerData playerData = this.dataStore.getPlayerData(player.getName());
+			WorldConfig wc = GriefPrevention.instance.getWorldCfg(player.getWorld());
+			//if involved in a siege
+			if(playerData.siegeData != null)
+			{
+				//don't drop items as usual, they will be sent to the siege winner
+				if(wc.getSiegeAutoTransfer()) event.getDrops().clear();
+				
+				//end it, with the dieing player being the loser
+				this.dataStore.endSiege(playerData.siegeData, null, player.getName(), true /*ended due to death*/);
+				return;
+			}
 		}
 		//if it is an ocelot or wolf, and the owner is under seige, 
 		//inform the owner of the casualty on the line of battle.

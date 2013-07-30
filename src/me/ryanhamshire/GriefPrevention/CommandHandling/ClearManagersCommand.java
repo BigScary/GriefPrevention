@@ -27,7 +27,7 @@ public class ClearManagersCommand extends  GriefPreventionCommand{
 				GriefPrevention.sendMessage(player, TextMode.Err, Messages.ClearManagersNotAdmin);
 				return true;
 			}
-			if(pdata.ignoreClaims ||  claimatpos.ownerName.equalsIgnoreCase(player.getName())){
+			if(pdata.ignoreClaims ||  claimatpos.getOwnerName().equalsIgnoreCase(player.getName())){
 				for(String currmanager :claimatpos.getManagerList()){
 					claimatpos.removeManager(currmanager);
 					return true;

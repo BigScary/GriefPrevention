@@ -174,14 +174,14 @@ public abstract class DataStore
 		PlayerData ownerData = null;
 		if(!claim.isAdminClaim())
 		{
-			ownerData = this.getPlayerData(claim.ownerName);
+			ownerData = this.getPlayerData(claim.getOwnerName());
 		}
 		
 		//determine new owner
 		PlayerData newOwnerData = this.getPlayerData(newOwnerName);
 		
 		//transfer
-		claim.ownerName = newOwnerName;
+		claim.setOwnerName(newOwnerName);
 		this.saveClaim(claim);
 		
 		//adjust blocks and other records
@@ -189,7 +189,7 @@ public abstract class DataStore
 		{
 			ownerData.claims.remove(claim);
 			ownerData.bonusClaimBlocks -= claim.getArea();
-			this.savePlayerData(claim.ownerName, ownerData);
+			this.savePlayerData(claim.getOwnerName(), ownerData);
 		}
 		
 		newOwnerData.claims.add(claim);
@@ -359,7 +359,7 @@ public abstract class DataStore
 			for(int i = 0; i < this.claims.size(); i++)
 			{
 				Claim claim = this.claims.get(i);
-				if(claim.ownerName.equals(playerName))
+				if(claim.getOwnerName().equals(playerName))
 				{
 					playerData.claims.add(claim);
 				}
@@ -951,7 +951,7 @@ public abstract class DataStore
 		{
 			Claim claim = siegeData.claims.get(i);
 			claim.siegeData = null;
-			this.siegeCooldownRemaining.put(siegeData.attacker.getName() + "_" + claim.ownerName, cooldownEnd);
+			this.siegeCooldownRemaining.put(siegeData.attacker.getName() + "_" + claim.getOwnerName(), cooldownEnd);
 			
 			//if doors should be opened for looting, do that now
 			if(grantAccess)
@@ -1049,9 +1049,9 @@ public abstract class DataStore
 		}
 		
 		//look for an attacker/claim cooldown
-		if(cooldownEnd == null && this.siegeCooldownRemaining.get(attacker.getName() + "_" + defenderClaim.ownerName) != null)
+		if(cooldownEnd == null && this.siegeCooldownRemaining.get(attacker.getName() + "_" + defenderClaim.getOwnerName()) != null)
 		{
-			cooldownEnd = this.siegeCooldownRemaining.get(attacker.getName() + "_" + defenderClaim.ownerName);
+			cooldownEnd = this.siegeCooldownRemaining.get(attacker.getName() + "_" + defenderClaim.getOwnerName());
 			
 			if(Calendar.getInstance().getTimeInMillis() < cooldownEnd)
 			{
@@ -1059,7 +1059,7 @@ public abstract class DataStore
 			}
 			
 			//if found but expired, remove it
-			this.siegeCooldownRemaining.remove(attacker.getName() + "_" + defenderClaim.ownerName);			
+			this.siegeCooldownRemaining.remove(attacker.getName() + "_" + defenderClaim.getOwnerName());			
 		}
 		
 		return false;
@@ -1110,7 +1110,7 @@ public abstract class DataStore
 		for(int i = 0; i < this.claims.size(); i++)
 		{
 			Claim claim = this.claims.get(i);
-			if(claim.ownerName.equals(playerName) && 
+			if(claim.getOwnerName().equals(playerName) && 
 					(deleteCreativeClaims || !GriefPrevention.instance.creativeRulesApply(claim.getLesserBoundaryCorner())) &&
 					(!claim.neverdelete || deleteLockedClaims)) {
 				claimsToDelete.add(claim);
@@ -1190,7 +1190,7 @@ public abstract class DataStore
 		this.deleteClaim(claim,false,claimcreator);					
 		
 		//try to create this new claim, ignoring the original when checking for overlap
-		CreateClaimResult result = this.createClaim(claim.getLesserBoundaryCorner().getWorld(), newx1, newx2, newy1, newy2, newz1, newz2, claim.ownerName, claim.parent, claim.id, claim.neverdelete, claim,claimcreator,false);
+		CreateClaimResult result = this.createClaim(claim.getLesserBoundaryCorner().getWorld(), newx1, newx2, newy1, newy2, newz1, newz2, claim.getOwnerName(), claim.parent, claim.id, claim.neverdelete, claim,claimcreator,false);
 		
 		//if succeeded
 		if(result.succeeded == CreateClaimResult.Result.Success)
@@ -1446,8 +1446,8 @@ public abstract class DataStore
 		this.addDefault(defaults, Messages.AutoSubClaimsEnter, "Switching to Subdivide Claim Mode",null);
 		this.addDefault(defaults, Messages.AutoSubClaimsExit, "Switching to Standard Claim Mode",null);
 		this.addDefault(defaults,Messages.AutoSubClaimsNoPermission,"You need permission in a claim to make subdivisions.",null);
-		this.addDefault(defaults, Messages.CreateClaimTooFewBlocks, "That claim would not cover enough blocks. Claims must use at least {0} Blocks", "0:Number of minimum blocks on a claim");
-		this.addDefault(defaults, Messages.ResizeNeedMoreBlocks, "The resized claim would not cover enough blocks. Claims must use at least {0} Blocks", "0:Number of minimum blocks on a claim");
+		this.addDefault(defaults, Messages.CreateClaimTooFewBlocks, "That claim would require too many blocks. You need {0} more.","0:Numberof minimum claim blocks");
+		this.addDefault(defaults, Messages.ResizeNeedMoreBlocks, "The resized claim would be too large. You need {0} more claim blocks.", "0:number of claim blocks required");
 		this.addDefault(defaults, Messages.ResizeTooFewBlocks, "That claim would not take up enough space. Claims must use at least {0} Blocks.", "0:Minimum blocks in a claim");
 		//load the config file
 		FileConfiguration config = YamlConfiguration.loadConfiguration(new File(messagesFilePath));

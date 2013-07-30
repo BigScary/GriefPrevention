@@ -63,6 +63,7 @@ public class ClaimArray implements Iterable<Claim> {
 				 
 	}
 	private void removeClaimWorld(Claim c){
+		if(c==null) return;
 		String usekey = c.getLesserBoundaryCorner().getWorld().getName();
 		if(claimworldmap.containsKey(usekey)){
 			claimworldmap.get(usekey).remove(c);

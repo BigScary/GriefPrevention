@@ -41,7 +41,7 @@ public class GiveClaimCommand extends GriefPreventionCommand {
 				}
 			}
 			//transfer ownership.
-			claimtogive.ownerName = target.getName();
+			claimtogive.setOwnerName(target.getName());
 
 			String originalOwner = claimtogive.getOwnerName();
 			try {dataStore.changeClaimOwner(claimtogive, target.getName());

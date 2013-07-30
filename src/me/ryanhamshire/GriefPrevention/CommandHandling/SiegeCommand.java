@@ -76,11 +76,13 @@ public class SiegeCommand extends GriefPreventionCommand {
 		{
 			return false;
 		}
+		/*
 		//defender cannot be attacker.
 		if(defender.getName().equalsIgnoreCase(attacker.getName())){
 			GriefPrevention.sendMessage(player, TextMode.Err, Messages.CantSiegeYourself);
 			return true;
 		} 
+		*/
 		//revert this commented out block...
 		
 		
@@ -104,7 +106,7 @@ public class SiegeCommand extends GriefPreventionCommand {
 		//defender must have some level of permission there to be protected
 		if(defenderClaim == null || defenderClaim.allowAccess(defender) != null)
 		{
-			GriefPrevention.sendMessage(player, TextMode.Err, Messages.NotSiegableThere);
+			GriefPrevention.sendMessage(player, TextMode.Err, Messages.NotSiegableThere,defender.getName());
 			return true;
 		}									
 		
