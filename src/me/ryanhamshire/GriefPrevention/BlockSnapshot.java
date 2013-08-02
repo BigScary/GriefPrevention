@@ -22,14 +22,12 @@ import org.bukkit.Location;
 
 //basically, just a few data points from a block conveniently encapsulated in a class
 //this is used only by the RestoreNature code
-public class BlockSnapshot 
-{
+public class BlockSnapshot {
 	public Location location;
 	public int typeId;
-	public byte data;	
-	
-	public BlockSnapshot(Location location, int typeId, byte data)
-	{
+	public byte data;
+
+	public BlockSnapshot(Location location, int typeId, byte data) {
 		this.location = location;
 		this.typeId = typeId;
 		this.data = data;

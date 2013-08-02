@@ -25,105 +25,105 @@ import java.util.List;
 import org.bukkit.Material;
 
 //ordered list of material info objects, for fast searching
-public class MaterialCollection
-{
-	HashMap<Integer,List<MaterialInfo>> materials = new HashMap<Integer,List<MaterialInfo>>();
-	
-	public List<MaterialInfo> getMaterials(){
-		
+public class MaterialCollection {
+	HashMap<Integer, List<MaterialInfo>> materials = new HashMap<Integer, List<MaterialInfo>>();
+
+	public List<MaterialInfo> getMaterials() {
+
 		List<MaterialInfo> Result = new ArrayList<MaterialInfo>();
-		for(List<MaterialInfo> listiterate:materials.values()){
+		for (List<MaterialInfo> listiterate : materials.values()) {
 			Result.addAll(listiterate);
 		}
 		return Result;
-		
-		
+
 	}
-	
-	
-	public void add(Material m){
+
+	public void add(Material m) {
 		add(new MaterialInfo(m));
 	}
+
 	public void remove(MaterialInfo mi) {
-		if(!materials.containsKey(mi.getTypeID())){
-			return; //nothing to remove, since the id isn't even here.
+		if (!materials.containsKey(mi.getTypeID())) {
+			return; // nothing to remove, since the id isn't even here.
 		}
 		List<MaterialInfo> mlist = this.materials.get(mi.typeID);
-		for(int i=0;i<mlist.size();i++){
-			if(mlist.get(i).equals(mi)){
+		for (int i = 0; i < mlist.size(); i++) {
+			if (mlist.get(i).equals(mi)) {
 				mlist.remove(i);
 			}
 		}
-		
+
 	}
-	public void add(MaterialInfo material)
-	{
-		if(!materials.containsKey(material.getTypeID())){
-			materials.put(material.getTypeID(),new ArrayList<MaterialInfo>());
+
+	public void add(MaterialInfo material) {
+		if (!materials.containsKey(material.getTypeID())) {
+			materials.put(material.getTypeID(), new ArrayList<MaterialInfo>());
 		}
 		List<MaterialInfo> mlist = this.materials.get(material.typeID);
 		mlist.add(material);
-		
+
 	}
-	public boolean contains(Material m){
+
+	public boolean contains(Material m) {
 		return contains(new MaterialInfo(m));
 	}
-	public boolean contains(MaterialInfo material)
-	{
-		if(this.materials.containsKey(material.typeID))
-		{
-			return 	this.materials.get(material.typeID).contains(material);
+
+	public boolean contains(MaterialInfo material) {
+		if (this.materials.containsKey(material.typeID)) {
+			return this.materials.get(material.typeID).contains(material);
 		}
-		
-		
+
 		return false;
 	}
-	public MaterialCollection(){
-		
+
+	public MaterialCollection() {
+
 	}
-	public List<String> GetList(){
+
+	public List<String> GetList() {
 		ArrayList<String> buildresult = new ArrayList<String>();
-		for(MaterialInfo mi:getMaterials()){
+		for (MaterialInfo mi : getMaterials()) {
 			buildresult.add(mi.toString());
 		}
 		return buildresult;
 	}
-	public MaterialCollection(MaterialCollection Source){
-		for(MaterialInfo iterate:Source.getMaterials()){
-			this.add((MaterialInfo)(iterate.clone()));
+
+	public MaterialCollection(MaterialCollection Source) {
+		for (MaterialInfo iterate : Source.getMaterials()) {
+			this.add((MaterialInfo) (iterate.clone()));
 		}
 	}
-	public MaterialCollection(List<MaterialInfo> materialsAdd){
-		for(MaterialInfo iterate:materialsAdd){
+
+	public MaterialCollection(List<MaterialInfo> materialsAdd) {
+		for (MaterialInfo iterate : materialsAdd) {
 			add(iterate);
 		}
 	}
-	
+
 	@Override
-	public String toString()
-	{
+	public String toString() {
 		StringBuilder stringBuilder = new StringBuilder();
-		for(List<MaterialInfo> iteratelist:materials.values()){
-			
-			for(MaterialInfo iteratemat:iteratelist){
-			stringBuilder.append(iteratemat.toString() + " ");
+		for (List<MaterialInfo> iteratelist : materials.values()) {
+
+			for (MaterialInfo iteratemat : iteratelist) {
+				stringBuilder.append(iteratemat.toString() + " ");
 			}
 		}
-		
+
 		return stringBuilder.toString();
 	}
-	
-	public int size()
-	{
+
+	public int size() {
 		return this.materials.size();
 	}
 
-	public void clear() 
-	{
+	public void clear() {
 		this.materials.clear();
 	}
-	public Object clone(){
+
+	@Override
+	public Object clone() {
 		return new MaterialCollection(this);
 	}
-	
+
 }

@@ -2,10 +2,15 @@ package me.ryanhamshire.GriefPrevention.events;
 
 import me.ryanhamshire.GriefPrevention.Claim;
 
-import org.bukkit.event.Event;
+import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 
-public abstract class ClaimEvent extends Event {
+/**
+ * Whenever a claim is created this event is called, after it has been added to
+ * the datastore.
+ */
+public class ClaimAfterCreateEvent extends PlayerClaimEvent {
+
 	// Custom Event Requirements
 	private static final HandlerList handlers = new HandlerList();
 
@@ -19,19 +24,9 @@ public abstract class ClaimEvent extends Event {
 
 	}
 
-	protected Claim claim;
-
-	/**
-	 * the claim being affected
-	 * 
-	 * @return
-	 */
-	public Claim getClaim() {
-		return claim;
+	public ClaimAfterCreateEvent(Claim claim, Player p) {
+		super(claim, p);
 
 	}
 
-	protected ClaimEvent(Claim c) {
-		claim = c;
-	}
 }

@@ -26,593 +26,691 @@ import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import me.ryanhamshire.GriefPrevention.Debugger.DebugLevel;
 import me.ryanhamshire.GriefPrevention.exceptions.WorldNotFoundException;
 
 import org.bukkit.*;
+import org.bukkit.configuration.ConfigurationSection;
 
 //manages data stored in the file system
-public class DatabaseDataStore extends DataStore
-{
+public class DatabaseDataStore extends DataStore {
 	private Connection databaseConnection = null;
-	
+
 	private String databaseUrl;
 	private String userName;
 	private String password;
-	
-	DatabaseDataStore(String url, String userName, String password) throws Exception
-	{
-		this.databaseUrl = url;
-		this.userName = userName;
-		this.password = password;
-		
-		this.initialize();
-	}
 
-	
 	@Override
-	void WorldLoaded(World loading){
+	void WorldLoaded(World loading) {
 		try {
-		Statement statement = databaseConnection.createStatement();
-		ResultSet results = statement.executeQuery("SELECT * FROM griefprevention_claimdata where lessercorner LIKE \"" + loading.getName() + ";%\";");
-ArrayList<Claim> claimsToRemove = new ArrayList<Claim>();
-		
-		while(results.next())
-		{
-			try
-			{
-				//skip subdivisions
-				long parentId = results.getLong("parentid");
-				if(parentId != -1) continue;
-				
-				
-				long claimID = results.getLong("id");
-					
-				String lesserCornerString = results.getString("lessercorner");
-				
-				
-				String greaterCornerString = results.getString("greatercorner");
-				
-				
-				String ownerName = results.getString("owner");
-	
-				String buildersString = results.getString("builders");
-				String [] builderNames = buildersString.split(";");
-				
-				String containersString = results.getString("containers");
-				String [] containerNames = containersString.split(";");
-				
-				String accessorsString = results.getString("accessors");
-				String [] accessorNames = accessorsString.split(";");
-				
-				String managersString = results.getString("managers");
-				String [] managerNames = managersString.split(";");
-				
-				boolean neverdelete = results.getBoolean("neverdelete");
-				
-				Location lesserBoundaryCorner = this.locationFromString(lesserCornerString);
-				Location greaterBoundaryCorner = this.locationFromString(greaterCornerString);
-				
-				
-				Claim topLevelClaim = new Claim(lesserBoundaryCorner, greaterBoundaryCorner, ownerName, builderNames, containerNames, accessorNames, managerNames, claimID, neverdelete);
-				
-				//search for another claim overlapping this one
-				Claim conflictClaim = this.getClaimAt(topLevelClaim.lesserBoundaryCorner, true);
-								
-				//if there is such a claim, mark it for later removal
-				if(conflictClaim != null)
-				{
-					claimsToRemove.add(conflictClaim);
-					continue;
-				}
-				
-				//otherwise, add this claim to the claims collection
-				else
-				{
-					this.claims.add(topLevelClaim);
-					topLevelClaim.inDataStore = true;								
-				}
-				
-				//look for any subdivisions for this claim
-				Statement statement2 = this.databaseConnection.createStatement();
-				ResultSet childResults = statement2.executeQuery("SELECT * FROM griefprevention_claimdata WHERE parentid=" + topLevelClaim.id + ";");
-				
-				while(childResults.next())
-				{			
-					lesserCornerString = childResults.getString("lessercorner");
-					lesserBoundaryCorner = this.locationFromString(lesserCornerString);
-					Long subid = childResults.getLong("id");
-					greaterCornerString = childResults.getString("greatercorner");
-					greaterBoundaryCorner = this.locationFromString(greaterCornerString);
-					
-					buildersString = childResults.getString("builders");
-					builderNames = buildersString.split(";");
-					
-					containersString = childResults.getString("containers");
-					containerNames = containersString.split(";");
-					
-					accessorsString = childResults.getString("accessors");
-					accessorNames = accessorsString.split(";");
-					
-					managersString = childResults.getString("managers");
-					managerNames = managersString.split(";");
-					
-					neverdelete = results.getBoolean("neverdelete");
-					
-					Claim childClaim = new Claim(lesserBoundaryCorner, greaterBoundaryCorner, ownerName, builderNames, containerNames, accessorNames, managerNames, null, neverdelete);
-					
-					//add this claim to the list of children of the current top level claim
-					childClaim.parent = topLevelClaim;
-					topLevelClaim.children.add(childClaim);
-					childClaim.subClaimid= subid;
-					childClaim.inDataStore = true;						
+			Statement statement = databaseConnection.createStatement();
+			ResultSet results = statement
+					.executeQuery("SELECT * FROM griefprevention_claimdata where lessercorner LIKE \""
+							+ loading.getName() + ";%\";");
+			ArrayList<Claim> claimsToRemove = new ArrayList<Claim>();
+
+			while (results.next()) {
+				try {
+					// skip subdivisions
+					long parentId = results.getLong("parentid");
+					if (parentId != -1)
+						continue;
+
+					long claimID = results.getLong("id");
+
+					String lesserCornerString = results
+							.getString("lessercorner");
+
+					String greaterCornerString = results
+							.getString("greatercorner");
+
+					String ownerName = results.getString("owner");
+
+					String buildersString = results.getString("builders");
+					String[] builderNames = buildersString.split(";");
+
+					String containersString = results.getString("containers");
+					String[] containerNames = containersString.split(";");
+
+					String accessorsString = results.getString("accessors");
+					String[] accessorNames = accessorsString.split(";");
+
+					String managersString = results.getString("managers");
+					String[] managerNames = managersString.split(";");
+
+					boolean neverdelete = results.getBoolean("neverdelete");
+
+					Location lesserBoundaryCorner = this
+							.locationFromString(lesserCornerString);
+					Location greaterBoundaryCorner = this
+							.locationFromString(greaterCornerString);
+
+					Claim topLevelClaim = new Claim(lesserBoundaryCorner,
+							greaterBoundaryCorner, ownerName, builderNames,
+							containerNames, accessorNames, managerNames,
+							claimID, neverdelete);
+
+					// search for another claim overlapping this one
+					Claim conflictClaim = this.getClaimAt(
+							topLevelClaim.lesserBoundaryCorner, true);
+
+					// if there is such a claim, mark it for later removal
+					if (conflictClaim != null) {
+						claimsToRemove.add(conflictClaim);
+						continue;
+					}
+
+					// otherwise, add this claim to the claims collection
+					else {
+						this.claims.add(topLevelClaim);
+						topLevelClaim.inDataStore = true;
+					}
+
+					// look for any subdivisions for this claim
+					Statement statement2 = this.databaseConnection
+							.createStatement();
+					ResultSet childResults = statement2
+							.executeQuery("SELECT * FROM griefprevention_claimdata WHERE parentid="
+									+ topLevelClaim.id + ";");
+
+					while (childResults.next()) {
+						lesserCornerString = childResults
+								.getString("lessercorner");
+						lesserBoundaryCorner = this
+								.locationFromString(lesserCornerString);
+						Long subid = childResults.getLong("id");
+						greaterCornerString = childResults
+								.getString("greatercorner");
+						greaterBoundaryCorner = this
+								.locationFromString(greaterCornerString);
+
+						buildersString = childResults.getString("builders");
+						builderNames = buildersString.split(";");
+
+						containersString = childResults.getString("containers");
+						containerNames = containersString.split(";");
+
+						accessorsString = childResults.getString("accessors");
+						accessorNames = accessorsString.split(";");
+
+						managersString = childResults.getString("managers");
+						managerNames = managersString.split(";");
+
+						neverdelete = results.getBoolean("neverdelete");
+
+						Claim childClaim = new Claim(lesserBoundaryCorner,
+								greaterBoundaryCorner, ownerName, builderNames,
+								containerNames, accessorNames, managerNames,
+								null, neverdelete);
+
+						// add this claim to the list of children of the current
+						// top level claim
+						childClaim.parent = topLevelClaim;
+						topLevelClaim.children.add(childClaim);
+						childClaim.subClaimid = subid;
+						childClaim.inDataStore = true;
+					}
+				} catch (SQLException e) {
+					GriefPrevention
+							.AddLogEntry("Unable to load a claim.  Details: "
+									+ e.getMessage() + " ... "
+									+ results.toString());
+					e.printStackTrace();
+				} catch (WorldNotFoundException e) {
+					// We don't need to worry about this exception.
+					// This is just here to catch it so that the plugin
+					// can load without erroring out.
 				}
 			}
-			catch(SQLException e)
-			{
-				GriefPrevention.AddLogEntry("Unable to load a claim.  Details: " + e.getMessage() + " ... " + results.toString());
-				e.printStackTrace();
+
+			for (int i = 0; i < claimsToRemove.size(); i++) {
+				this.deleteClaimFromSecondaryStorage(claimsToRemove.get(i));
 			}
-			catch(WorldNotFoundException e) {
-				//We don't need to worry about this exception.
-				//This is just here to catch it so that the plugin
-				//can load without erroring out.
-			}
-		}
-		
-		for(int i = 0; i < claimsToRemove.size(); i++)
-		{
-			this.deleteClaimFromSecondaryStorage(claimsToRemove.get(i));
-		}
-		
-		}
-		catch(Exception exx){
-			System.out.println("Exception from databaseDataStore handling of WorldLoad-");
+
+		} catch (Exception exx) {
+			System.out
+					.println("Exception from databaseDataStore handling of WorldLoad-");
 			exx.printStackTrace();
 		}
-		
+
 	}
+
+	public DatabaseDataStore(ConfigurationSection Source,
+			ConfigurationSection Target) throws Exception {
+		initialize(Source, Target);
+
+	}
+
 	@Override
-	void initialize() throws Exception
-	{
-		try
-		{
-			//load the java driver for mySQL
-			Class.forName("com.mysql.jdbc.Driver");
+	void initialize(ConfigurationSection Source, ConfigurationSection Target)
+			throws Exception {
+
+		// "jdbc:mysql://<hostname>/database"
+		String FormatString = "jdbc:mysql://%s/%s";
+
+		databaseUrl = Source.getString("URL", "");
+		if (databaseUrl == null || databaseUrl.length() == 0) {
+			String grabhost = Source.getString("Host", "localhost");
+			String grabdbname = Source.getString("Database", "GriefPrevention");
+
+			databaseUrl = String.format(FormatString, grabhost, grabdbname);
+			Target.set("Host", grabhost);
+			Target.set("Database", grabdbname);
+
 		}
-		catch(Exception e)
-		{
-			GriefPrevention.AddLogEntry("ERROR: Unable to load Java's mySQL database driver.  Check to make sure you've installed it properly.");
+
+		userName = Source.getString("Username", "");
+		this.password = Source.getString("Password", "");
+
+		Target.set("URL", databaseUrl);
+		Target.set("Username", userName);
+		Target.set("Password", password);
+
+		try {
+			// load the java driver for mySQL
+			Class.forName("com.mysql.jdbc.Driver");
+		} catch (Exception e) {
+			GriefPrevention
+					.AddLogEntry("ERROR: Unable to load Java's mySQL database driver.  Check to make sure you've installed it properly.");
 			throw e;
 		}
-		
-		try
-		{
+
+		try {
 			this.refreshDataConnection();
-		}
-		catch(Exception e2)
-		{
-			GriefPrevention.AddLogEntry("ERROR: Unable to connect to database.  Check your config file settings.");
+		} catch (Exception e2) {
+			GriefPrevention
+					.AddLogEntry("ERROR: Unable to connect to database.  Check your config file settings.");
 			throw e2;
 		}
-		GriefPrevention.AddLogEntry("Java MySQL driver loaded and connection established.");
-		try
-		{
-			//ensure the data tables exist
+		GriefPrevention
+				.AddLogEntry("Java MySQL driver loaded and connection established.");
+		try {
+			// ensure the data tables exist
 			Statement statement = databaseConnection.createStatement();
-			
-			if (this.databaseUrl.startsWith("jdbc:postgresql"))
-			{
-				statement.execute("CREATE TABLE IF NOT EXISTS griefprevention_nextclaimid (nextid INTEGER);");
 
-				statement.execute("CREATE TABLE IF NOT EXISTS griefprevention_claimdata (id INTEGER, owner VARCHAR(50), lessercorner VARCHAR(100), greatercorner VARCHAR(100), builders TEXT, containers TEXT, accessors TEXT, managers TEXT, parentid INTEGER, neverdelete BOOLEAN NOT NULL DEFAULT false);");
+			if (this.databaseUrl.startsWith("jdbc:postgresql")) {
+				statement
+						.execute("CREATE TABLE IF NOT EXISTS griefprevention_nextclaimid (nextid INTEGER);");
 
-				statement.execute("CREATE TABLE IF NOT EXISTS griefprevention_playerdata (name VARCHAR(50), lastlogin TIMESTAMP WITH TIME ZONE, accruedblocks INTEGER, bonusblocks INTEGER);");
-			}
-			else
-			{
-				statement.execute("CREATE TABLE IF NOT EXISTS griefprevention_nextclaimid (nextid INT(15));");
+				statement
+						.execute("CREATE TABLE IF NOT EXISTS griefprevention_claimdata (id INTEGER, owner VARCHAR(50), lessercorner VARCHAR(100), greatercorner VARCHAR(100), builders TEXT, containers TEXT, accessors TEXT, managers TEXT, parentid INTEGER, neverdelete BOOLEAN NOT NULL DEFAULT false);");
 
-				statement.execute("CREATE TABLE IF NOT EXISTS griefprevention_claimdata (id INT(15), owner VARCHAR(50), lessercorner VARCHAR(100), greatercorner VARCHAR(100), builders VARCHAR(1000), containers VARCHAR(1000), accessors VARCHAR(1000), managers VARCHAR(1000), parentid INT(15), neverdelete BOOLEAN NOT NULL DEFAULT 0);");
-				//in case it's a previous schema, change it to auto_increment.
-				//statement.execute("ALTER TABLE griefprevention_claimdata modify column id INT AUTO_INCREMENT");
-					
+				statement
+						.execute("CREATE TABLE IF NOT EXISTS griefprevention_playerdata (name VARCHAR(50), lastlogin TIMESTAMP WITH TIME ZONE, accruedblocks INTEGER, bonusblocks INTEGER);");
+			} else {
+				statement
+						.execute("CREATE TABLE IF NOT EXISTS griefprevention_nextclaimid (nextid INT(15));");
 
-				//IF EXISTS(SELECT * FROM sys.indexes WHERE object_id = object_id('schema.tablename') AND NAME ='indexname')
-			    //DROP INDEX indexname ON SCHEMA.tablename;
-				
-				
-				
-				statement.execute("CREATE TABLE IF NOT EXISTS griefprevention_playerdata (name VARCHAR(50), lastlogin DATETIME, accruedblocks INT(15), bonusblocks INT(15));");
+				statement
+						.execute("CREATE TABLE IF NOT EXISTS griefprevention_claimdata (id INT(15), owner VARCHAR(50), lessercorner VARCHAR(100), greatercorner VARCHAR(100), builders VARCHAR(1000), containers VARCHAR(1000), accessors VARCHAR(1000), managers VARCHAR(1000), parentid INT(15), neverdelete BOOLEAN NOT NULL DEFAULT 0);");
+				// in case it's a previous schema, change it to auto_increment.
+				// statement.execute("ALTER TABLE griefprevention_claimdata modify column id INT AUTO_INCREMENT");
 
-				ResultSet tempresult = statement.executeQuery("SHOW COLUMNS FROM griefprevention_claimdata LIKE 'neverdelete';");
+				// IF EXISTS(SELECT * FROM sys.indexes WHERE object_id =
+				// object_id('schema.tablename') AND NAME ='indexname')
+				// DROP INDEX indexname ON SCHEMA.tablename;
+
+				statement
+						.execute("CREATE TABLE IF NOT EXISTS griefprevention_playerdata (name VARCHAR(50), lastlogin DATETIME, accruedblocks INT(15), bonusblocks INT(15));");
+
+				ResultSet tempresult = statement
+						.executeQuery("SHOW COLUMNS FROM griefprevention_claimdata LIKE 'neverdelete';");
 				if (!tempresult.next()) {
-					statement.execute("ALTER TABLE griefprevention_claimdata ADD neverdelete BOOLEAN NOT NULL DEFAULT 0;");
+					statement
+							.execute("ALTER TABLE griefprevention_claimdata ADD neverdelete BOOLEAN NOT NULL DEFAULT 0;");
 				}
 			}
-		}
-		catch(Exception e3)
-		{
-			GriefPrevention.AddLogEntry("ERROR: Unable to create the necessary database table.  Details:");
+		} catch (Exception e3) {
+			GriefPrevention
+					.AddLogEntry("ERROR: Unable to create the necessary database table.  Details:");
 			GriefPrevention.AddLogEntry(e3.getMessage());
 			throw e3;
 		}
-		
-		//load group data into memory
+
+		// load group data into memory
 		Statement statement = databaseConnection.createStatement();
-		ResultSet results = statement.executeQuery("SELECT * FROM griefprevention_playerdata;");
-		
-		while(results.next())
-		{
+		ResultSet results = statement
+				.executeQuery("SELECT * FROM griefprevention_playerdata;");
+
+		while (results.next()) {
 			String name = results.getString("name");
-			
-			//ignore non-groups.  all group names start with a dollar sign.
-			if(!name.startsWith("$")) continue;
-			
+
+			// ignore non-groups. all group names start with a dollar sign.
+			if (!name.startsWith("$"))
+				continue;
+
 			String groupName = name.substring(1);
-			if(groupName == null || groupName.isEmpty()) continue;  //defensive coding, avoid unlikely cases
-			
+			if (groupName == null || groupName.isEmpty())
+				continue; // defensive coding, avoid unlikely cases
+
 			int groupBonusBlocks = results.getInt("bonusblocks");
-				
-			this.permissionToBonusBlocksMap.put(groupName, groupBonusBlocks);			
-		}
-		
-		//load next claim number into memory
-		results = statement.executeQuery("SELECT * FROM griefprevention_nextclaimid;");
-		
-		//if there's nothing yet, add it
-		if(!results.next())
-		{
-			statement.execute("INSERT INTO griefprevention_nextclaimid VALUES(0);");
-			this.nextClaimID = (long)0;
+
+			this.permissionToBonusBlocksMap.put(groupName, groupBonusBlocks);
 		}
 
-		//otherwise load it
-		else
-		{
+		// load next claim number into memory
+		results = statement
+				.executeQuery("SELECT * FROM griefprevention_nextclaimid;");
+
+		// if there's nothing yet, add it
+		if (!results.next()) {
+			statement
+					.execute("INSERT INTO griefprevention_nextclaimid VALUES(0);");
+			this.nextClaimID = (long) 0;
+		}
+
+		// otherwise load it
+		else {
 			this.nextClaimID = results.getLong("nextid");
 		}
-		
-		//load claims data into memory		
-		results = statement.executeQuery("SELECT * FROM griefprevention_claimdata;");
-		
-		
-		
-		super.initialize();
+
+		// load claims data into memory
+		results = statement
+				.executeQuery("SELECT * FROM griefprevention_claimdata;");
+
+		super.initialize(Source, Target);
 	}
-	
+
 	@Override
-	synchronized void writeClaimToStorage(Claim claim)  //see datastore.cs.  this will ALWAYS be a top level claim
+	synchronized void writeClaimToStorage(Claim claim) // see datastore.cs. this
+														// will ALWAYS be a top
+														// level claim
 	{
-		try
-		{
+		try {
 			this.refreshDataConnection();
-			
-			//wipe out any existing data about this claim
-			//this.deleteClaimFromSecondaryStorage(claim);
-			
-			
-			
-			//write top level claim data to the database
+
+			// wipe out any existing data about this claim
+			// this.deleteClaimFromSecondaryStorage(claim);
+
+			// write top level claim data to the database
 			this.writeClaimData(claim);
-					
-			//for each subdivision
-			for(int i = 0; i < claim.children.size(); i++)
-			{
-				//write the subdivision's data to the database
+
+			// for each subdivision
+			for (int i = 0; i < claim.children.size(); i++) {
+				// write the subdivision's data to the database
 				this.writeClaimData(claim.children.get(i));
 			}
-		}
-		catch(SQLException e)
-		{
-			GriefPrevention.AddLogEntry("Unable to save data for claim at " + this.locationToString(claim.lesserBoundaryCorner) + ".  Details:");
-			GriefPrevention.AddLogEntry(e.getMessage());
+		} catch (SQLException e) {
+			GriefPrevention.AddLogEntry("Unable to save data for claim at "
+					+ this.locationToString(claim.lesserBoundaryCorner)
+					+ ".  Details:");
+			e.printStackTrace();
 		}
 	}
-	
-	//actually writes claim data to the database
-	synchronized private void writeClaimData(Claim claim) throws SQLException
-	{
-		String lesserCornerString = this.locationToString(claim.getLesserBoundaryCorner());
-		String greaterCornerString = this.locationToString(claim.getGreaterBoundaryCorner());
+
+	// actually writes claim data to the database
+	synchronized private void writeClaimData(Claim claim) throws SQLException {
+		String lesserCornerString = this.locationToString(claim
+				.getLesserBoundaryCorner());
+		String greaterCornerString = this.locationToString(claim
+				.getGreaterBoundaryCorner());
 		String owner = claim.getOwnerName();
-		
+
 		ArrayList<String> builders = new ArrayList<String>();
 		ArrayList<String> containers = new ArrayList<String>();
 		ArrayList<String> accessors = new ArrayList<String>();
 		ArrayList<String> managers = new ArrayList<String>();
-		
+
 		claim.getPermissions(builders, containers, accessors, managers);
-		
+
 		String buildersString = "";
-		for(int i = 0; i < builders.size(); i++)
-		{
+		for (int i = 0; i < builders.size(); i++) {
 			buildersString += builders.get(i) + ";";
 		}
-		
+
 		String containersString = "";
-		for(int i = 0; i < containers.size(); i++)
-		{
+		for (int i = 0; i < containers.size(); i++) {
 			containersString += containers.get(i) + ";";
 		}
-		
+
 		String accessorsString = "";
-		for(int i = 0; i < accessors.size(); i++)
-		{
+		for (int i = 0; i < accessors.size(); i++) {
 			accessorsString += accessors.get(i) + ";";
 		}
 
 		String managersString = "";
-		for(int i = 0; i < managers.size(); i++)
-		{
+		for (int i = 0; i < managers.size(); i++) {
 			managersString += managers.get(i) + ";";
 		}
-		
+
 		long parentId;
 		long id;
-		if(claim.parent == null)
-		{
+		if (claim.parent == null) {
 			parentId = -1;
-		}
-		else
-		{
+		} else {
 			parentId = claim.parent.id;
-			
-			id = claim.getSubClaimID()!=null?claim.getSubClaimID():claim.parent.children.indexOf(claim);
+
+			id = claim.getSubClaimID() != null ? claim.getSubClaimID()
+					: claim.parent.children.indexOf(claim);
 		}
-		
-		
-		if(claim.id == null)
-		{
-			id = claim.getSubClaimID()!=null?claim.getSubClaimID():-1;
-		}
-		else
-		{
+
+		if (claim.id == null) {
+			id = claim.getSubClaimID() != null ? claim.getSubClaimID() : -1;
+		} else {
 			id = claim.id;
 		}
-		
-		try
-		{
+
+		try {
 			this.refreshDataConnection();
-			//if the ID is in the database, then
+			// if the ID is in the database, then
 			Statement idexists = databaseConnection.createStatement();
-			ResultSet itexists = idexists.executeQuery("SELECT COUNT(*) FROM griefprevention_claimdata WHERE id=" + id);
+			ResultSet itexists = idexists
+					.executeQuery("SELECT COUNT(*) AS total FROM griefprevention_claimdata WHERE id="
+							+ id);
 			itexists.next();
-			boolean useupdate = itexists.getInt(0)>0;
+			boolean useupdate = itexists.getInt("total") > 0;
 			//
-			if(useupdate){
-			Statement updatestatement = databaseConnection.createStatement();
-			//statement.execute("CREATE TABLE IF NOT EXISTS 
-			//griefprevention_claimdata 
-			//(id INTEGER, owner VARCHAR(50), 
-			//lessercorner VARCHAR(100),
-			//greatercorner VARCHAR(100),
-			//builders TEXT, 
-			//containers TEXT, 
-			//accessors TEXT,
-			//managers TEXT,
-			//parentid INTEGER, 
-			//neverdelete BOOLEAN NOT NULL DEFAULT false);");
-			updatestatement.execute("UPDATE griefprevention_claimdata " +
-			"SET id='" + id + "'" + 
-			",SET owner='" + owner + "'" +
-			",SET lessercorner='" + lesserCornerString + "'" +
-			",SET greatercorner='" + greaterCornerString + "'" +
-			",SET builders='" + buildersString + "'" +
-			",SET containers='" + containersString + "'" +
-			",SET accessors='" + accessorsString + "'" +
-			",SET managers='" + managersString + "'" +
-			",SET parentid='" + parentId + "'" +
-			",SET neverdelete='" + claim.neverdelete + "' " +
-			"WHERE id=" + id); 
-			GriefPrevention.AddLogEntry("updated data into griefprevention_claimdata- ID:" + claim.getID());
+			if (useupdate) {
+				Statement updatestatement = databaseConnection
+						.createStatement();
+				// statement.execute("CREATE TABLE IF NOT EXISTS
+				// griefprevention_claimdata
+				// (id INTEGER, owner VARCHAR(50),
+				// lessercorner VARCHAR(100),
+				// greatercorner VARCHAR(100),
+				// builders TEXT,
+				// containers TEXT,
+				// accessors TEXT,
+				// managers TEXT,
+				// parentid INTEGER,
+				// neverdelete BOOLEAN NOT NULL DEFAULT false);");
+				updatestatement
+						.execute("UPDATE griefprevention_claimdata "
+								+ "SET id='"
+								+ id
+								+ "'"
+								+ ",owner='"
+								+ owner
+								+ "'"
+								+ ",lessercorner='"
+								+ lesserCornerString
+								+ "'"
+								+ ",greatercorner='"
+								+ greaterCornerString
+								+ "'"
+								+ ",builders='"
+								+ buildersString
+								+ "'"
+								+ ",containers='"
+								+ containersString
+								+ "'"
+								+ ",accessors='"
+								+ accessorsString
+								+ "'"
+								+ ",managers='"
+								+ managersString
+								+ "'"
+								+ ",parentid='"
+								+ parentId
+								+ "'"
+								+ ",neverdelete='"
+								+ (claim.neverdelete ? 1 : 0)
+								+ "' "
+								+ "WHERE id=" + id);
+				Debugger.Write(
+						"updated data into griefprevention_claimdata- ID:"
+								+ claim.getID(), DebugLevel.Verbose);
+
+			} else {
+				Statement statement = databaseConnection.createStatement();
+				statement
+						.execute("INSERT INTO griefprevention_claimdata VALUES("
+								+ id
+								+ ", '"
+								+ owner
+								+ "', '"
+								+ lesserCornerString
+								+ "', '"
+								+ greaterCornerString
+								+ "', '"
+								+ buildersString
+								+ "', '"
+								+ containersString
+								+ "', '"
+								+ accessorsString
+								+ "', '"
+								+ managersString
+								+ "', "
+								+ parentId
+								+ ", "
+								+ claim.neverdelete
+								+ ");");
+				Debugger.Write(
+						"Successfully inserted data into griefprevention_claimdata- ID:"
+								+ claim.getID(), DebugLevel.Verbose);
 			}
-			else {
-			Statement statement = databaseConnection.createStatement();
-			statement.execute("INSERT INTO griefprevention_claimdata VALUES(" +
-					id + ", '" +
-					owner + "', '" +
-					lesserCornerString + "', '" +
-					greaterCornerString + "', '" +
-					buildersString + "', '" +
-					containersString + "', '" +
-					accessorsString + "', '" +
-					managersString + "', " +
-					parentId +	", " +
-					claim.neverdelete +
-					");");
-			GriefPrevention.AddLogEntry("Successfully inserted data into griefprevention_claimdata- ID:" + claim.getID());
-			}
-		}
-		catch(SQLException e)
-		{
-			GriefPrevention.AddLogEntry("Unable to save data for claim at " + this.locationToString(claim.lesserBoundaryCorner) + ".  Details:");
-			GriefPrevention.AddLogEntry(e.getMessage());
+		} catch (SQLException e) {
+
+			GriefPrevention.AddLogEntry("Unable to save data for claim at "
+					+ this.locationToString(claim.lesserBoundaryCorner)
+					+ ".  Details:");
+			e.printStackTrace();
 		}
 	}
-	
-	//deletes a top level claim from the database
+
+	// deletes a top level claim from the database
 	@Override
-	synchronized void deleteClaimFromSecondaryStorage(Claim claim)
-	{
-		try
-		{
+	synchronized void deleteClaimFromSecondaryStorage(Claim claim) {
+		try {
 			this.refreshDataConnection();
-			
+
 			Statement statement = this.databaseConnection.createStatement();
-			statement.execute("DELETE FROM griefprevention_claimdata WHERE id=" + claim.id + ";");			
-			statement.execute("DELETE FROM griefprevention_claimdata WHERE parentid=" + claim.id + ";");
-		}
-		catch(SQLException e)
-		{
-			GriefPrevention.AddLogEntry("Unable to delete data for claim at " + this.locationToString(claim.lesserBoundaryCorner) + ".  Details:");
+			statement.execute("DELETE FROM griefprevention_claimdata WHERE id="
+					+ claim.id + ";");
+			statement
+					.execute("DELETE FROM griefprevention_claimdata WHERE parentid="
+							+ claim.id + ";");
+		} catch (SQLException e) {
+			GriefPrevention.AddLogEntry("Unable to delete data for claim at "
+					+ this.locationToString(claim.lesserBoundaryCorner)
+					+ ".  Details:");
 			GriefPrevention.AddLogEntry(e.getMessage());
 		}
 	}
-	
+
 	@Override
-	synchronized PlayerData getPlayerDataFromStorage(String playerName)
-	{
+	synchronized PlayerData getPlayerDataFromStorage(String playerName) {
 		PlayerData playerData = new PlayerData();
 		playerData.playerName = playerName;
-		
-		try
-		{
+
+		try {
 			this.refreshDataConnection();
-			
+
 			Statement statement = this.databaseConnection.createStatement();
-			ResultSet results = statement.executeQuery("SELECT * FROM griefprevention_playerdata WHERE name='" + playerName + "';");
-		
-			//if there's no data for this player, create it with defaults
-			if(!results.next())
-			{
+			ResultSet results = statement
+					.executeQuery("SELECT * FROM griefprevention_playerdata WHERE name='"
+							+ playerName + "';");
+
+			// if there's no data for this player, create it with defaults
+			if (!results.next()) {
 				this.savePlayerData(playerName, playerData);
 			}
-			
-			//otherwise, just read from the database
-			else
-			{			
+			//
+			// otherwise, just read from the database
+			else {
 				playerData.lastLogin = results.getTimestamp("lastlogin");
 				playerData.accruedClaimBlocks = results.getInt("accruedblocks");
-				playerData.bonusClaimBlocks = results.getInt("bonusblocks");				
+				playerData.bonusClaimBlocks = results.getInt("bonusblocks");
 			}
-		}
-		catch(SQLException e)
-		{
-			GriefPrevention.AddLogEntry("Unable to retrieve data for player " + playerName + ".  Details:");
+		} catch (SQLException e) {
+			GriefPrevention.AddLogEntry("Unable to retrieve data for player "
+					+ playerName + ".  Details:");
 			GriefPrevention.AddLogEntry(e.getMessage());
 		}
-			
+
 		return playerData;
-	} 
+	}
+
 	@Override
 	public boolean deletePlayerData(String playerName) {
 		// TODO Auto-generated method stub
 		try {
 			this.refreshDataConnection();
 			Statement statement = this.databaseConnection.createStatement();
-			return statement.execute("DELETE FROM griefprevention_playerdata WHERE name='" + playerName + "';");
-		}
-		catch(Exception exx){
+			return statement
+					.execute("DELETE FROM griefprevention_playerdata WHERE name='"
+							+ playerName + "';");
+		} catch (Exception exx) {
 			exx.printStackTrace();
 		}
-		
+
 		return true;
-		
+
 	}
+
 	@Override
-	public boolean hasPlayerData(String pName){
+	public boolean hasPlayerData(String pName) {
 		try {
 			this.refreshDataConnection();
 			Statement statement = this.databaseConnection.createStatement();
-			ResultSet results = statement.executeQuery("SELECT COUNT(*) FROM griefprevention_playerdata WHERE name='" + pName + "';");
+			ResultSet results = statement
+					.executeQuery("SELECT COUNT(*) FROM griefprevention_playerdata WHERE name='"
+							+ pName + "';");
 			results.next();
 			int gotcount = results.getInt("Count");
-			if(gotcount>0) return true;
-			
-			
-		}
-		catch(SQLException e){
-			
+			if (gotcount > 0)
+				return true;
+
+		} catch (SQLException e) {
+
 		}
 		return false;
 	}
-	//saves changes to player data.  MUST be called after you're done making changes, otherwise a reload will lose them
+
+	// saves changes to player data. MUST be called after you're done making
+	// changes, otherwise a reload will lose them
 	@Override
-	synchronized public void savePlayerData(String playerName, PlayerData playerData)
-	{
-		//never save data for the "administrative" account.  an empty string for player name indicates administrative account
-		if(playerName.length() == 0) return;
-		
-		try
-		{
+	synchronized public void savePlayerData(String playerName,
+			PlayerData playerData) {
+		// never save data for the "administrative" account. an empty string for
+		// player name indicates administrative account
+		if (playerName.length() == 0)
+			return;
+
+		try {
 			this.refreshDataConnection();
-			
-			SimpleDateFormat sqlFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+			SimpleDateFormat sqlFormat = new SimpleDateFormat(
+					"yyyy-MM-dd HH:mm:ss");
 			String dateString = sqlFormat.format(playerData.lastLogin);
-			
+
 			Statement statement = databaseConnection.createStatement();
-			statement.execute("DELETE FROM griefprevention_playerdata WHERE name='" + playerName + "';");
-			statement.execute("INSERT INTO griefprevention_playerdata VALUES ('" + playerName + "', '" + dateString + "', " + playerData.accruedClaimBlocks + ", " + playerData.bonusClaimBlocks + ");");
-		}
-		catch(SQLException e)
-		{
-			GriefPrevention.AddLogEntry("Unable to save data for player " + playerName + ".  Details:");
-			GriefPrevention.AddLogEntry(e.getMessage());
+			statement
+					.execute("DELETE FROM griefprevention_playerdata WHERE name='"
+							+ playerName + "';");
+			statement
+					.execute("INSERT INTO griefprevention_playerdata VALUES ('"
+							+ playerName + "', '" + dateString + "', "
+							+ playerData.accruedClaimBlocks + ", "
+							+ playerData.bonusClaimBlocks + ");");
+		} catch (SQLException e) {
+			GriefPrevention.AddLogEntry("Unable to save data for player "
+					+ playerName + ".  Details:");
+			e.printStackTrace();
 		}
 	}
-	
+
 	@Override
-	synchronized void incrementNextClaimID()
-	{
+	synchronized void incrementNextClaimID() {
 		this.setNextClaimID(this.nextClaimID + 1);
 	}
-	
-	//sets the next claim ID.  used by incrementNextClaimID() above, and also while migrating data from a flat file data store
-	synchronized void setNextClaimID(long nextID)
-	{
+
+	// sets the next claim ID. used by incrementNextClaimID() above, and also
+	// while migrating data from a flat file data store
+	@Override
+	public synchronized void setNextClaimID(long nextID) {
 		this.nextClaimID = nextID;
-		
-		try
-		{
+
+		try {
 			this.refreshDataConnection();
-			
+
 			Statement statement = databaseConnection.createStatement();
 			statement.execute("DELETE FROM griefprevention_nextclaimid;");
-			statement.execute("INSERT INTO griefprevention_nextclaimid VALUES (" + nextID + ");");
-		}
-		catch(SQLException e)
-		{
-			GriefPrevention.AddLogEntry("Unable to set next claim ID to " + nextID + ".  Details:");
+			statement
+					.execute("INSERT INTO griefprevention_nextclaimid VALUES ("
+							+ nextID + ");");
+		} catch (SQLException e) {
+			GriefPrevention.AddLogEntry("Unable to set next claim ID to "
+					+ nextID + ".  Details:");
 			GriefPrevention.AddLogEntry(e.getMessage());
 		}
 	}
-	
-	//updates the database with a group's bonus blocks
+
+	// updates the database with a group's bonus blocks
 	@Override
-	synchronized void saveGroupBonusBlocks(String groupName, int currentValue)
-	{
-		//group bonus blocks are stored in the player data table, with player name = $groupName
+	synchronized void saveGroupBonusBlocks(String groupName, int currentValue) {
+		// group bonus blocks are stored in the player data table, with player
+		// name = $groupName
 		String playerName = "$" + groupName;
 		PlayerData playerData = new PlayerData();
 		playerData.bonusClaimBlocks = currentValue;
-		
+
 		this.savePlayerData(playerName, playerData);
 	}
-	
+
 	@Override
-	synchronized void close()
-	{
-		//System.out.println("DatabaseStore closing: Claims #" + this.claims.size());
+	synchronized void close() {
+		// System.out.println("DatabaseStore closing: Claims #" +
+		// this.claims.size());
 		super.close();
-		if(this.databaseConnection != null)
-		{
-			try
-			{
-				if(!this.databaseConnection.isClosed())
-				{
+		if (this.databaseConnection != null) {
+			try {
+				if (!this.databaseConnection.isClosed()) {
 					this.databaseConnection.close();
 				}
+			} catch (SQLException e) {
 			}
-			catch(SQLException e){};
+			;
 		}
-		
+
 		this.databaseConnection = null;
 	}
-	
-	private void refreshDataConnection() throws SQLException
-	{
-		if(this.databaseConnection == null || this.databaseConnection.isClosed())
-		{
-			//set username/pass properties
+
+	private void refreshDataConnection() throws SQLException {
+		if (this.databaseConnection == null
+				|| this.databaseConnection.isClosed()) {
+			// set username/pass properties
 			Properties connectionProps = new Properties();
 			connectionProps.put("user", this.userName);
 			connectionProps.put("password", this.password);
-			
-			//establish connection
-			this.databaseConnection = DriverManager.getConnection(this.databaseUrl, connectionProps); 
+
+			// establish connection
+			this.databaseConnection = DriverManager.getConnection(
+					this.databaseUrl, connectionProps);
 		}
 	}
 
+	@Override
+	public List<PlayerData> getAllPlayerData() {
+		// TODO Auto-generated method stub
+		super.ForceLoadAllClaims();
+		List<PlayerData> generateList = new ArrayList<PlayerData>();
+		try {
 
-	
+			this.refreshDataConnection();
+			Statement statement = databaseConnection.createStatement();
+			ResultSet gotplayers = statement
+					.executeQuery("SELECT * FROM griefprevention_playerdata");
+			while (gotplayers.next()) {
+				// name,lastlogin,accruedblocks,bonusblocks
+				String pname = gotplayers.getString("name");
+				Date lastlog = gotplayers.getTimestamp("lastlogin");
+				int accrued = gotplayers.getInt("accruedblocks");
+				int bonus = gotplayers.getInt("bonusblocks");
+				PlayerData pd = new PlayerData();
+				pd.playerName = pname;
+				pd.lastLogin = lastlog;
+				pd.accruedClaimBlocks = accrued;
+				pd.bonusClaimBlocks = bonus;
+				generateList.add(pd);
+
+			}
+			return generateList;
+
+		} catch (Exception exx) {
+
+		}
+		return new ArrayList<PlayerData>();
+	}
+
 }

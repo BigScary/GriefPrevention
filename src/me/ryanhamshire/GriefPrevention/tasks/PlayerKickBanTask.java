@@ -15,7 +15,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
- 
+
 package me.ryanhamshire.GriefPrevention.tasks;
 
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
@@ -27,59 +27,50 @@ import org.bukkit.entity.Player;
 //kicks or bans a player
 //need a task for this because async threads (like the chat event handlers) can't kick or ban.
 //but they CAN schedule a task to run in the main thread to do that job
-public class PlayerKickBanTask implements Runnable 
-{
-	//player to kick or ban
+public class PlayerKickBanTask implements Runnable {
+	// player to kick or ban
 	private Player player;
-	
-	//ban message.  if null, don't ban
+
+	// ban message. if null, don't ban
 	private String banReason;
-	
-	public PlayerKickBanTask(Player player, String banReason)
-	{
+
+	public PlayerKickBanTask(Player player, String banReason) {
 		this.player = player;
-		this.banReason = banReason;		
+		this.banReason = banReason;
 	}
-	private void runCommands(String cmds,String... replacements){
-		
+
+	private void runCommands(String cmds, String... replacements) {
+
 		String[] commandsrun = cmds.split(";");
-		
-		
-		for(String cmd:commandsrun){
-			int i=0;
-			for(String replacement:replacements){
+
+		for (String cmd : commandsrun) {
+			int i = 0;
+			for (String replacement : replacements) {
 				String substitution = "{" + i + "}";
 				cmd = cmd.replace(substitution, replacement);
 				i++;
-				
+
 			}
-			if(cmd.startsWith("/")) cmd = cmd.substring(2);
+			if (cmd.startsWith("/"))
+				cmd = cmd.substring(2);
 			Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd);
-			
+
 		}
-		
-		
-		
-		
-		
+
 	}
-	
-	public void run()
-	{
-		WorldConfig wc = GriefPrevention.instance.getWorldCfg(player.getWorld());
+
+	public void run() {
+		WorldConfig wc = GriefPrevention.instance
+				.getWorldCfg(player.getWorld());
 		String kickcommands = wc.getSpamKickCommand();
 		String bancommands = wc.getSpamBanCommand();
-		
-		
-		if(this.banReason != null)
-		{		
-			//ban
-			//GriefPrevention.instance.getServer().getOfflinePlayer(this.player.getName()).setBanned(true);
-			runCommands(bancommands,this.player.getName());
-		}	
-		else if(this.player.isOnline())
-		{
-			runCommands(kickcommands,this.player.getName());
+
+		if (this.banReason != null) {
+			// ban
+			// GriefPrevention.instance.getServer().getOfflinePlayer(this.player.getName()).setBanned(true);
+			runCommands(bancommands, this.player.getName());
+		} else if (this.player.isOnline()) {
+			runCommands(kickcommands, this.player.getName());
 		}
 	}
 }

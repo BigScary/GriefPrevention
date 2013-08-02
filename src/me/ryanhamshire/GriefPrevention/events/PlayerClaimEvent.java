@@ -7,28 +7,32 @@ import org.bukkit.event.HandlerList;
 
 public abstract class PlayerClaimEvent extends ClaimEvent {
 	// Custom Event Requirements
-    private static final HandlerList handlers = new HandlerList();
-    
-    public HandlerList getHandlers() {
-        return handlers;
-    }
-     
-    public static HandlerList getHandlerList() {
-        return handlers;
-        
-        
-    }
-    protected Player p;
-    /**
-     * returns the relevant player for this event.
-     * @return
-     */
-    public Player getPlayer(){ return p;}
-    
+	private static final HandlerList handlers = new HandlerList();
 
-    protected PlayerClaimEvent(Claim pClaim,Player pPlayer){
-    	super(pClaim);
-    	p = pPlayer;
-    	
-    }
+	@Override
+	public HandlerList getHandlers() {
+		return handlers;
+	}
+
+	public static HandlerList getHandlerList() {
+		return handlers;
+
+	}
+
+	protected Player p;
+
+	/**
+	 * returns the relevant player for this event.
+	 * 
+	 * @return
+	 */
+	public Player getPlayer() {
+		return p;
+	}
+
+	protected PlayerClaimEvent(Claim pClaim, Player pPlayer) {
+		super(pClaim);
+		p = pPlayer;
+
+	}
 }

@@ -1,18 +1,19 @@
 package me.ryanhamshire.GriefPrevention.events;
 
-import me.ryanhamshire.GriefPrevention.SiegeData;
+import me.ryanhamshire.GriefPrevention.Claim;
 
+import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
-import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
 /**
- * Cancellable Event called when a Siege is about to start.
- * 
- * @author BC_Programming
- * 
+ * Whenever a claim is created this event is called. This event is called before
+ * the claim is added to the dataStore and initialized, as such it does not yet
+ * have an ID. If you need to process events for new claims as they are made,
+ * consider using the ClaimAfterCreateEvent.
  */
-public class SiegeStartEvent extends Event implements Cancellable {
+public class ClaimBeforeCreateEvent extends PlayerClaimEvent implements
+		Cancellable {
 
 	// Custom Event Requirements
 	private static final HandlerList handlers = new HandlerList();
@@ -24,21 +25,12 @@ public class SiegeStartEvent extends Event implements Cancellable {
 
 	public static HandlerList getHandlerList() {
 		return handlers;
+
 	}
 
-	SiegeData SiegeInfo;
+	public ClaimBeforeCreateEvent(Claim claim, Player p) {
+		super(claim, p);
 
-	/**
-	 * returns the Information of the upcoming Siege.
-	 * 
-	 * @return
-	 */
-	public SiegeData getSiegeData() {
-		return SiegeInfo;
-	}
-
-	public SiegeStartEvent(SiegeData sd) {
-		SiegeInfo = sd;
 	}
 
 	boolean canceled = false;

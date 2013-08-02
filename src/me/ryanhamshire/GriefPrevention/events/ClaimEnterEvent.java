@@ -6,24 +6,26 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 
 /**
- * hey look the event that was never going to get added was added. What do ya know.
- * Fired when the movementwatcher is enabled when players enter and claims
+ * hey look the event that was never going to get added was added. What do ya
+ * know. Fired when the movementwatcher is enabled when players enter and claims
  * 
- *
+ * 
  */
 public class ClaimEnterEvent extends PlayerClaimEvent {
 
 	// Custom Event Requirements
-    private static final HandlerList handlers = new HandlerList();
-    
-    public HandlerList getHandlers() {
-        return handlers;
-    }
-     
-    public static HandlerList getHandlerList() {
-        return handlers;
-    }
-	public ClaimEnterEvent(Claim c,Player p){
-		super(c,p);
+	private static final HandlerList handlers = new HandlerList();
+
+	@Override
+	public HandlerList getHandlers() {
+		return handlers;
+	}
+
+	public static HandlerList getHandlerList() {
+		return handlers;
+	}
+
+	public ClaimEnterEvent(Claim c, Player p) {
+		super(c, p);
 	}
 }
