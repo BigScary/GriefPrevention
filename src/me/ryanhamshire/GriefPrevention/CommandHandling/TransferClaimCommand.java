@@ -8,7 +8,6 @@ import me.ryanhamshire.GriefPrevention.TextMode;
 import me.ryanhamshire.GriefPrevention.events.ClaimTransferEvent;
 
 import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -37,10 +36,8 @@ public class TransferClaimCommand extends GriefPreventionCommand {
 			// not inside a claim, so not valid.
 			GriefPrevention.sendMessage(player, TextMode.Err,
 					"There is no claim here.");
-			
 
-		}
-		else {
+		} else {
 			toAdmin = !inclaim.isAdminClaim();
 		}
 		// /TransferClaim

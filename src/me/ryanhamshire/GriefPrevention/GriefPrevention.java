@@ -431,6 +431,9 @@ public class GriefPrevention extends JavaPlugin {
 		ConfigurationSection DataSettings = DataStoreRead
 				.getConfigurationSection(config_Storage_Kind);
 
+		if(DataSettings==null) {
+			DataSettings = DataStoreRead.createSection(config_Storage_Kind);
+		}
 		YamlConfiguration DataStoreWrite = DataStoreRead;
 
 		// sea level
@@ -523,7 +526,9 @@ public class GriefPrevention extends JavaPlugin {
 				try {
 					databaseStore = new DatabaseDataStore(DataSettings,
 							DataSettings);
+					
 				} catch (Exception exx) {
+					exx.printStackTrace();
 					try {
 						DataStoreWrite.save(usestoragedata);
 					} catch (Exception except) {

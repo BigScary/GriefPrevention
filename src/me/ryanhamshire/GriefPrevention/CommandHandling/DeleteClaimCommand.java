@@ -19,17 +19,17 @@ public class DeleteClaimCommand extends GriefPreventionCommand {
 	public boolean onCommand(CommandSender sender, Command command,
 			String label, String[] args) {
 		// determine which claim the player is standing in
-		
+
 		GriefPrevention inst = GriefPrevention.instance;
 		Player player = (sender instanceof Player) ? (Player) sender : null;
 		if (player == null)
 			return false;
-		
+
 		WorldConfig wc = inst.getWorldCfg(player.getWorld());
-		
+
 		if (command.getName().equalsIgnoreCase("deleteclaim")) {
-			Claim claim = inst.dataStore.getClaimAt(player.getLocation(),
-					true /* ignore height */);
+			Claim claim = inst.dataStore
+					.getClaimAt(player.getLocation(), true /* ignore height */);
 
 			if (claim == null) {
 				GriefPrevention.sendMessage(player, TextMode.Err,
@@ -130,26 +130,33 @@ public class DeleteClaimCommand extends GriefPreventionCommand {
 
 			return true;
 		}
-		if(command.getName().equalsIgnoreCase("deletealladminclaims"))
-		{
-			if(!player.hasPermission("griefprevention.deleteclaims"))
-			{
-				GriefPrevention.sendMessage(player, TextMode.Err, Messages.NoDeletePermission);
+		if (command.getName().equalsIgnoreCase("deletealladminclaims")) {
+			if (!player.hasPermission("griefprevention.deleteclaims")) {
+				GriefPrevention.sendMessage(player, TextMode.Err,
+						Messages.NoDeletePermission);
 				return true;
 			}
-			
-			//delete all admin claims
-			inst.dataStore.deleteClaimsForPlayer("", true, true);  //empty string for owner name indicates an administrative claim
-			
-			GriefPrevention.sendMessage(player, TextMode.Success, Messages.AllAdminDeleted);
-			if(player != null)
-			{
-				GriefPrevention.AddLogEntry(player.getName() + " deleted all administrative claims.");
-			
-				//revert any current visualization
+
+			// delete all admin claims
+			inst.dataStore.deleteClaimsForPlayer("", true, true); // empty
+																	// string
+																	// for owner
+																	// name
+																	// indicates
+																	// an
+																	// administrative
+																	// claim
+
+			GriefPrevention.sendMessage(player, TextMode.Success,
+					Messages.AllAdminDeleted);
+			if (player != null) {
+				GriefPrevention.AddLogEntry(player.getName()
+						+ " deleted all administrative claims.");
+
+				// revert any current visualization
 				Visualization.Revert(player);
 			}
-			
+
 			return true;
 		}
 
@@ -159,7 +166,8 @@ public class DeleteClaimCommand extends GriefPreventionCommand {
 	@Override
 	public String[] getLabels() {
 		// TODO Auto-generated method stub
-		return new String[] { "deleteclaim", "deleteallclaims","deletealladminclaims" };
+		return new String[] { "deleteclaim", "deleteallclaims",
+				"deletealladminclaims" };
 	}
 
 }

@@ -9,51 +9,54 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class SetClaimBlocksCommand extends GriefPreventionCommand{
+public class SetClaimBlocksCommand extends GriefPreventionCommand {
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command command,
 			String label, String[] args) {
 		// TODO Auto-generated method stub
 		GriefPrevention inst = GriefPrevention.instance;
-		
-		if(args.length != 2) return false;
-		//find the specified player
-		Player player = (sender instanceof Player)?(Player)sender:null;
-        OfflinePlayer targetPlayer = inst.resolvePlayer(args[0]);
-        if(targetPlayer == null)
-        {
-                GriefPrevention.sendMessage(player, TextMode.Err, "Player \"" + args[0] + "\" not found.");
-                return true;
-        }
 
-        //parse the adjustment amount
-        int adjustment;
-        try
-        {
-                adjustment = Integer.parseInt(args[1]);
-        }
-        catch(NumberFormatException numberFormatException)
-        {
-                return false;  //causes usage to be displayed
-        }
-        //give blocks to player
-        PlayerData playerData = inst.dataStore.getPlayerData(targetPlayer.getName());
-        playerData.accruedClaimBlocks = adjustment;
-        inst.dataStore.savePlayerData(targetPlayer.getName(), playerData);
+		if (args.length != 2)
+			return false;
+		// find the specified player
+		Player player = (sender instanceof Player) ? (Player) sender : null;
+		OfflinePlayer targetPlayer = inst.resolvePlayer(args[0]);
+		if (targetPlayer == null) {
+			GriefPrevention.sendMessage(player, TextMode.Err, "Player \""
+					+ args[0] + "\" not found.");
+			return true;
+		}
 
-        GriefPrevention.sendMessage(player, TextMode.Success, "Set " + targetPlayer.getName() + "'s bonus claim blocks to " + adjustment + ".  New total bonus blocks: " + playerData.bonusClaimBlocks + ".");
-        GriefPrevention.AddLogEntry(player.getName() + " Set " + targetPlayer.getName() + "'s bonus claim blocks to "  + adjustment + ".");
+		// parse the adjustment amount
+		int adjustment;
+		try {
+			adjustment = Integer.parseInt(args[1]);
+		} catch (NumberFormatException numberFormatException) {
+			return false; // causes usage to be displayed
+		}
+		// give blocks to player
+		PlayerData playerData = inst.dataStore.getPlayerData(targetPlayer
+				.getName());
+		playerData.accruedClaimBlocks = adjustment;
+		inst.dataStore.savePlayerData(targetPlayer.getName(), playerData);
 
-        return true;      
-		
-		
+		GriefPrevention.sendMessage(player, TextMode.Success, "Set "
+				+ targetPlayer.getName() + "'s bonus claim blocks to "
+				+ adjustment + ".  New total bonus blocks: "
+				+ playerData.bonusClaimBlocks + ".");
+		GriefPrevention.AddLogEntry(player.getName() + " Set "
+				+ targetPlayer.getName() + "'s bonus claim blocks to "
+				+ adjustment + ".");
+
+		return true;
+
 	}
 
 	@Override
 	public String[] getLabels() {
 		// TODO Auto-generated method stub
-		return new String[]{"setclaimblocks"};
+		return new String[] { "setclaimblocks" };
 	}
 
 }
