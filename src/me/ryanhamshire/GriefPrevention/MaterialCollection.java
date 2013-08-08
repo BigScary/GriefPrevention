@@ -19,56 +19,111 @@
 package me.ryanhamshire.GriefPrevention;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import org.bukkit.Material;
 
 //ordered list of material info objects, for fast searching
-public class MaterialCollection
-{
-	ArrayList<MaterialInfo> materials = new ArrayList<MaterialInfo>();
-	
-	void Add(MaterialInfo material)
-	{
-		int i;
-		for(i = 0; i < this.materials.size() && this.materials.get(i).typeID <= material.typeID; i++);
-		this.materials.add(i, material);
+public class MaterialCollection {
+	HashMap<Integer, List<MaterialInfo>> materials = new HashMap<Integer, List<MaterialInfo>>();
+
+	public MaterialCollection() {
+
 	}
-	
-	boolean Contains(MaterialInfo material)
-	{
-		for(int i = 0; i < this.materials.size() ; i++)
-		{
-			MaterialInfo thisMaterial = this.materials.get(i);
-			if(material.typeID == thisMaterial.typeID && (thisMaterial.allDataValues || material.data == thisMaterial.data))
-			{
-				return true;
-			}
-			else if(thisMaterial.typeID > material.typeID)
-			{
-				return false;
-			}
+
+	public MaterialCollection(List<MaterialInfo> materialsAdd) {
+		for (MaterialInfo iterate : materialsAdd) {
+			add(iterate);
 		}
-		
+	}
+
+	public MaterialCollection(MaterialCollection Source) {
+		for (MaterialInfo iterate : Source.getMaterials()) {
+			this.add((MaterialInfo) (iterate.clone()));
+		}
+	}
+
+	public void add(Material m) {
+		add(new MaterialInfo(m));
+	}
+
+	public void add(MaterialInfo material) {
+		if (!materials.containsKey(material.getTypeID())) {
+			materials.put(material.getTypeID(), new ArrayList<MaterialInfo>());
+		}
+		List<MaterialInfo> mlist = this.materials.get(material.typeID);
+		mlist.add(material);
+
+	}
+
+	public void clear() {
+		this.materials.clear();
+	}
+
+	@Override
+	public Object clone() {
+		return new MaterialCollection(this);
+	}
+
+	public boolean contains(Material m) {
+		return contains(new MaterialInfo(m));
+	}
+
+	public boolean contains(MaterialInfo material) {
+		if (this.materials.containsKey(material.typeID)) {
+			return this.materials.get(material.typeID).contains(material);
+		}
+
 		return false;
 	}
-	
-	@Override
-	public String toString()
-	{
-		StringBuilder stringBuilder = new StringBuilder();
-		for(int i = 0; i < this.materials.size(); i++)
-		{
-			stringBuilder.append(this.materials.get(i).toString() + " ");
+
+	public List<String> GetList() {
+		ArrayList<String> buildresult = new ArrayList<String>();
+		for (MaterialInfo mi : getMaterials()) {
+			buildresult.add(mi.toString());
 		}
-		
-		return stringBuilder.toString();
+		return buildresult;
 	}
-	
-	public int size()
-	{
+
+	public List<MaterialInfo> getMaterials() {
+
+		List<MaterialInfo> Result = new ArrayList<MaterialInfo>();
+		for (List<MaterialInfo> listiterate : materials.values()) {
+			Result.addAll(listiterate);
+		}
+		return Result;
+
+	}
+
+	public void remove(MaterialInfo mi) {
+		if (!materials.containsKey(mi.getTypeID())) {
+			return; // nothing to remove, since the id isn't even here.
+		}
+		List<MaterialInfo> mlist = this.materials.get(mi.typeID);
+		for (int i = 0; i < mlist.size(); i++) {
+			if (mlist.get(i).equals(mi)) {
+				mlist.remove(i);
+			}
+		}
+
+	}
+
+	public int size() {
 		return this.materials.size();
 	}
 
-	public void clear() 
-	{
-		this.materials.clear();
+	@Override
+	public String toString() {
+		StringBuilder stringBuilder = new StringBuilder();
+		for (List<MaterialInfo> iteratelist : materials.values()) {
+
+			for (MaterialInfo iteratemat : iteratelist) {
+				stringBuilder.append(iteratemat.toString() + " ");
+			}
+		}
+
+		return stringBuilder.toString();
 	}
+
 }
