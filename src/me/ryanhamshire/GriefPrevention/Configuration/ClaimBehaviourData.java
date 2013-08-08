@@ -161,6 +161,11 @@ public class ClaimBehaviourData {
 	private PlacementRules Wilderness;
 
 
+	public ClaimBehaviourData setSeaLevelOffsets(PlacementRules.SeaLevelOverrideTypes useType,int Offset){
+		Claims.setSeaLevelOffset(useType, Offset);
+		Wilderness.setSeaLevelOffset(useType, Offset);
+		return this;
+	}
 	
 	public ClaimBehaviourData(ClaimBehaviourData Source) {
 

@@ -70,6 +70,11 @@ public class PlacementRules {
 	private BasicPermissionConstants BelowSeaLevel;
 	private List<String> RequiredPermissions = new ArrayList<String>();
 	private int SeaLevelOffset = 0;
+	public PlacementRules setSeaLevelOffset(SeaLevelOverrideTypes useType,int value){
+		SeaLevelType = useType;
+		SeaLevelOffset = value;
+		return this;
+	}
 	public int getSeaLevelOffset() { return SeaLevelOffset;}
 	private SeaLevelOverrideTypes SeaLevelType;
 	public SeaLevelOverrideTypes getSeaLevelType(){ return SeaLevelType;}
@@ -180,6 +185,8 @@ public class PlacementRules {
 	public PlacementRules(PlacementRules CopySource) {
 		this.AboveSeaLevel = CopySource.AboveSeaLevel;
 		this.BelowSeaLevel = CopySource.BelowSeaLevel;
+		this.SeaLevelOffset = CopySource.SeaLevelOffset;
+		this.SeaLevelType = CopySource.SeaLevelType;
 	}
 
 	private int getSeaLevel(World w){
