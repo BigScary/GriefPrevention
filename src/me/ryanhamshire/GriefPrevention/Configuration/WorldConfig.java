@@ -1767,7 +1767,7 @@ public class WorldConfig {
 	// situations
 	public Integer getSeaLevelOverride() {
 		if (config_seaLevelOverride == -1)
-			return (config_seaLevelOverride = Bukkit.getWorld(this.getWorldName()).getSeaLevel() - 1);
+			return (config_seaLevelOverride = Bukkit.getWorld(this.getWorldName()).getSeaLevel());
 		else
 			return config_seaLevelOverride;
 	}
