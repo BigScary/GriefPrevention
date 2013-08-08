@@ -12,6 +12,7 @@ import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import me.ryanhamshire.GriefPrevention.MaterialCollection;
 import me.ryanhamshire.GriefPrevention.MaterialInfo;
 import me.ryanhamshire.GriefPrevention.Configuration.ClaimBehaviourData.ClaimBehaviourMode;
+import me.ryanhamshire.GriefPrevention.Configuration.PlacementRules.SeaLevelOverrideTypes;
 import me.ryanhamshire.GriefPrevention.tasks.DeliverClaimBlocksTask;
 
 import org.bukkit.Bukkit;
@@ -649,24 +650,24 @@ public class WorldConfig {
 		this.config_afkDistanceCheck = config.getInt("GriefPrevention.AFKDistance", 3);
 		this.SilverfishBreakRules = new ClaimBehaviourData("Silverfish Break", config, outConfig, "GriefPrevention.Rules.SilverfishBreak", new ClaimBehaviourData("Silverfish Break", PlacementRules.Both, PlacementRules.Neither, ClaimBehaviourMode.Disabled));
 
-		this.CreeperExplosionsBehaviour = new ClaimBehaviourData("Creeper Explosions", config, outConfig, "GriefPrevention.Rules.CreeperExplosions", new ClaimBehaviourData("Creeper Explosions", PlacementRules.Both, PlacementRules.Both, ClaimBehaviourMode.Disabled));
-		this.WitherExplosionBehaviour = new ClaimBehaviourData("Wither Explosions", config, outConfig, "GriefPrevention.Rules.WitherExplosions", new ClaimBehaviourData("Wither Explosions", PlacementRules.Neither, PlacementRules.Neither, ClaimBehaviourMode.Disabled));
+		this.CreeperExplosionsBehaviour = new ClaimBehaviourData("Creeper Explosions", config, outConfig, "GriefPrevention.Rules.CreeperExplosions", new ClaimBehaviourData("Creeper Explosions", PlacementRules.Both, PlacementRules.Both, ClaimBehaviourMode.Disabled).setSeaLevelOffsets(SeaLevelOverrideTypes.Offset, 1));
+		this.WitherExplosionBehaviour = new ClaimBehaviourData("Wither Explosions", config, outConfig, "GriefPrevention.Rules.WitherExplosions", new ClaimBehaviourData("Wither Explosions", PlacementRules.Neither, PlacementRules.Neither, ClaimBehaviourMode.Disabled).setSeaLevelOffsets(SeaLevelOverrideTypes.Offset, 1));
 
 		this.TNTExplosionsBehaviour = new ClaimBehaviourData("TNT Explosions", config, outConfig, "GriefPrevention.Rules.TNTExplosions",
 
-		ClaimBehaviourData.getAll("TNT Explosions"));
+		ClaimBehaviourData.getAll("TNT Explosions").setSeaLevelOffsets(SeaLevelOverrideTypes.Offset, 1));
 
-		this.OtherExplosionBehaviour = new ClaimBehaviourData("Other Explosions", config, outConfig, "GriefPrevention.Rules.OtherExplosions", ClaimBehaviourData.getAll("Other Explosions"));
+		this.OtherExplosionBehaviour = new ClaimBehaviourData("Other Explosions", config, outConfig, "GriefPrevention.Rules.OtherExplosions", ClaimBehaviourData.getAll("Other Explosions").setSeaLevelOffsets(SeaLevelOverrideTypes.Offset, 1));
 
-		this.CreeperExplosionBlockDamageBehaviour = new ClaimBehaviourData("Creeper Explosion Damage", config, outConfig, "GriefPrevention.Rules.BlockDamageCreeperExplosion", new ClaimBehaviourData("Creeper Explosion Damage", PlacementRules.Both, PlacementRules.Neither, ClaimBehaviourMode.Disabled));
+		this.CreeperExplosionBlockDamageBehaviour = new ClaimBehaviourData("Creeper Explosion Damage", config, outConfig, "GriefPrevention.Rules.BlockDamageCreeperExplosion", new ClaimBehaviourData("Creeper Explosion Damage", PlacementRules.Both, PlacementRules.Neither, ClaimBehaviourMode.Disabled).setSeaLevelOffsets(SeaLevelOverrideTypes.Offset, 1));
 
-		this.WitherExplosionBlockDamageBehaviour = new ClaimBehaviourData("Wither Explosion Damage", config, outConfig, "GriefPrevention.Rules.BlockDamageWitherExplosions", new ClaimBehaviourData("Wither Explosion Damage", PlacementRules.Both, PlacementRules.Neither, ClaimBehaviourMode.Disabled));
+		this.WitherExplosionBlockDamageBehaviour = new ClaimBehaviourData("Wither Explosion Damage", config, outConfig, "GriefPrevention.Rules.BlockDamageWitherExplosions", new ClaimBehaviourData("Wither Explosion Damage", PlacementRules.Both, PlacementRules.Neither, ClaimBehaviourMode.Disabled).setSeaLevelOffsets(SeaLevelOverrideTypes.Offset, 1));
 
 		this.WitherEatBehaviour = new ClaimBehaviourData("Wither Eating", config, outConfig, "GriefPrevention.Rules.WitherEating", new ClaimBehaviourData("Wither Eating", PlacementRules.Both, PlacementRules.Neither, ClaimBehaviourMode.Disabled));
 
-		this.TNTExplosionBlockDamageBehaviour = new ClaimBehaviourData("TNT Explosion Damage", config, outConfig, "GriefPrevention.Rules.BlockDamageTNTExplosions", ClaimBehaviourData.getOutsideClaims("TNT Explosion Damage"));
+		this.TNTExplosionBlockDamageBehaviour = new ClaimBehaviourData("TNT Explosion Damage", config, outConfig, "GriefPrevention.Rules.BlockDamageTNTExplosions", ClaimBehaviourData.getOutsideClaims("TNT Explosion Damage").setSeaLevelOffsets(SeaLevelOverrideTypes.Offset, 1));
 
-		this.OtherExplosionBlockDamageBehaviour = new ClaimBehaviourData("Other Explosion Damage", config, outConfig, "GriefPrevention.Rules.BlockDamageOtherExplosions", ClaimBehaviourData.getOutsideClaims("Other Explosion Damage"));
+		this.OtherExplosionBlockDamageBehaviour = new ClaimBehaviourData("Other Explosion Damage", config, outConfig, "GriefPrevention.Rules.BlockDamageOtherExplosions", ClaimBehaviourData.getOutsideClaims("Other Explosion Damage").setSeaLevelOffsets(SeaLevelOverrideTypes.Offset, 1));
 
 		ClaimBehaviourData WaterRequire = new ClaimBehaviourData("Water Placement", PlacementRules.BelowOnly, PlacementRules.Both, ClaimBehaviourMode.RequireBuild);
 		ClaimBehaviourData LavaRequire = new ClaimBehaviourData("Lava Placement", PlacementRules.BelowOnly, PlacementRules.Both, ClaimBehaviourMode.RequireBuild).setWildernessRequiredPermission("GriefPrevention.Lava");
