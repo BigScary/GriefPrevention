@@ -16,16 +16,16 @@ public class ClaimEnterEvent extends PlayerClaimEvent {
 	// Custom Event Requirements
 	private static final HandlerList handlers = new HandlerList();
 
-	@Override
-	public HandlerList getHandlers() {
-		return handlers;
-	}
-
 	public static HandlerList getHandlerList() {
 		return handlers;
 	}
 
 	public ClaimEnterEvent(Claim c, Player p) {
 		super(c, p);
+	}
+
+	@Override
+	public HandlerList getHandlers() {
+		return handlers;
 	}
 }

@@ -14,11 +14,6 @@ public class ClaimAfterCreateEvent extends PlayerClaimEvent {
 	// Custom Event Requirements
 	private static final HandlerList handlers = new HandlerList();
 
-	@Override
-	public HandlerList getHandlers() {
-		return handlers;
-	}
-
 	public static HandlerList getHandlerList() {
 		return handlers;
 
@@ -27,6 +22,11 @@ public class ClaimAfterCreateEvent extends PlayerClaimEvent {
 	public ClaimAfterCreateEvent(Claim claim, Player p) {
 		super(claim, p);
 
+	}
+
+	@Override
+	public HandlerList getHandlers() {
+		return handlers;
 	}
 
 }

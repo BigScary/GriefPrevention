@@ -8,23 +8,7 @@ public class WeakLocation {
 
 	private String WorldName;
 
-	public String getWorldName() {
-		return WorldName;
-	}
-
 	private double X, Y, Z;
-
-	public double getX() {
-		return X;
-	}
-
-	public double getY() {
-		return Y;
-	}
-
-	public double getZ() {
-		return Z;
-	}
 
 	public WeakLocation(String pWorldName, double pX, double pY, double pZ) {
 		WorldName = pWorldName;
@@ -41,5 +25,21 @@ public class WeakLocation {
 
 		return new Location(grabworld, X, Y, Z);
 
+	}
+
+	public String getWorldName() {
+		return WorldName;
+	}
+
+	public double getX() {
+		return X;
+	}
+
+	public double getY() {
+		return Y;
+	}
+
+	public double getZ() {
+		return Z;
 	}
 }

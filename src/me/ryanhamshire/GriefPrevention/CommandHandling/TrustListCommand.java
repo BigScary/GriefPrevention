@@ -15,8 +15,13 @@ import org.bukkit.entity.Player;
 public class TrustListCommand extends GriefPreventionCommand {
 
 	@Override
-	public boolean onCommand(CommandSender sender, Command command,
-			String label, String[] args) {
+	public String[] getLabels() {
+		// TODO Auto-generated method stub
+		return new String[] { "trustlist" };
+	}
+
+	@Override
+	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		// TODO Auto-generated method stub
 		Player player = (sender instanceof Player) ? (Player) sender : null;
 		if (player == null)
@@ -27,8 +32,7 @@ public class TrustListCommand extends GriefPreventionCommand {
 
 		// if no claim here, error message
 		if (claim == null) {
-			GriefPrevention.sendMessage(player, TextMode.Err,
-					Messages.TrustListNoClaim);
+			GriefPrevention.sendMessage(player, TextMode.Err, Messages.TrustListNoClaim);
 			return true;
 		}
 
@@ -89,12 +93,6 @@ public class TrustListCommand extends GriefPreventionCommand {
 		player.sendMessage("(M-anager, B-builder, C-ontainers, A-ccess)");
 
 		return true;
-	}
-
-	@Override
-	public String[] getLabels() {
-		// TODO Auto-generated method stub
-		return new String[] { "trustlist" };
 	}
 
 }

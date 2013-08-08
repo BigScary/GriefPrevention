@@ -15,26 +15,19 @@ import org.bukkit.event.HandlerList;
 public class ClaimModifiedEvent extends ClaimEvent implements Cancellable {
 
 	public enum Type {
-		OwnerChanged, AddedAccessTrust, RemovedAccessTrust, AddedBuildTrust, RemovedBuildTrust, AddedInventoryTrust, RemovedInventoryTrust, AddedManager, RemovedManager, PermissionsCleared;
+		AddedAccessTrust, AddedBuildTrust, AddedInventoryTrust, AddedManager, OwnerChanged, PermissionsCleared, RemovedAccessTrust, RemovedBuildTrust, RemovedInventoryTrust, RemovedManager;
 	}
 
 	// Custom Event Requirements
 	private static final HandlerList handlers = new HandlerList();
 
-	@Override
-	public HandlerList getHandlers() {
-		return handlers;
-	}
-
 	public static HandlerList getHandlerList() {
 		return handlers;
 	}
 
-	private String PlayerChanged;
+	boolean canceled = false;
 
-	public String getPlayerChanged() {
-		return PlayerChanged;
-	}
+	private String PlayerChanged;
 
 	Type type;
 
@@ -49,11 +42,18 @@ public class ClaimModifiedEvent extends ClaimEvent implements Cancellable {
 		return claim;
 	}
 
+	@Override
+	public HandlerList getHandlers() {
+		return handlers;
+	}
+
+	public String getPlayerChanged() {
+		return PlayerChanged;
+	}
+
 	public Type getType() {
 		return type;
 	}
-
-	boolean canceled = false;
 
 	public boolean isCancelled() {
 		return canceled;

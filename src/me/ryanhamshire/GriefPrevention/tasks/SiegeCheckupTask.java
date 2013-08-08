@@ -34,14 +34,26 @@ public class SiegeCheckupTask implements Runnable {
 		this.siegeData = siegeData;
 	}
 
+	// a player has to be within 25 blocks of the edge of a besieged claim to be
+	// considered still in the fight
+	private boolean playerRemains(Player player) {
+		for (int i = 0; i < this.siegeData.claims.size(); i++) {
+			Claim claim = this.siegeData.claims.get(i);
+			if (claim.isNear(player.getLocation(), 25)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	public void run() {
 		DataStore dataStore = GriefPrevention.instance.dataStore;
 		Player defender = this.siegeData.defender;
 		Player attacker = this.siegeData.attacker;
 
 		// where is the defender?
-		Claim defenderClaim = dataStore.getClaimAt(defender.getLocation(),
-				false);
+		Claim defenderClaim = dataStore.getClaimAt(defender.getLocation(), false);
 
 		// if this is a new claim and he has some permission there, extend the
 		// siege to include it
@@ -65,14 +77,12 @@ public class SiegeCheckupTask implements Runnable {
 
 		// otherwise attacker wins if the defender runs away
 		else if (attackerRemains && !defenderRemains) {
-			dataStore.endSiege(this.siegeData, attacker.getName(),
-					defender.getName(), false);
+			dataStore.endSiege(this.siegeData, attacker.getName(), defender.getName(), false);
 		}
 
 		// or defender wins if the attacker leaves
 		else if (!attackerRemains && defenderRemains) {
-			dataStore.endSiege(this.siegeData, defender.getName(),
-					attacker.getName(), false);
+			dataStore.endSiege(this.siegeData, defender.getName(), attacker.getName(), false);
 		}
 
 		// if they both left, but are still close together, the battle continues
@@ -88,30 +98,12 @@ public class SiegeCheckupTask implements Runnable {
 		// otherwise they both left and aren't close to each other, so call the
 		// attacker the winner (defender escaped, possibly after a chase)
 		else {
-			dataStore.endSiege(this.siegeData, attacker.getName(),
-					defender.getName(), false);
+			dataStore.endSiege(this.siegeData, attacker.getName(), defender.getName(), false);
 		}
-	}
-
-	// a player has to be within 25 blocks of the edge of a besieged claim to be
-	// considered still in the fight
-	private boolean playerRemains(Player player) {
-		for (int i = 0; i < this.siegeData.claims.size(); i++) {
-			Claim claim = this.siegeData.claims.get(i);
-			if (claim.isNear(player.getLocation(), 25)) {
-				return true;
-			}
-		}
-
-		return false;
 	}
 
 	// schedules another checkup later
 	private void scheduleAnotherCheck() {
-		this.siegeData.checkupTaskID = GriefPrevention.instance
-				.getServer()
-				.getScheduler()
-				.scheduleSyncDelayedTask(GriefPrevention.instance, this,
-						20L * 30);
+		this.siegeData.checkupTaskID = GriefPrevention.instance.getServer().getScheduler().scheduleSyncDelayedTask(GriefPrevention.instance, this, 20L * 30);
 	}
 }

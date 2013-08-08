@@ -10,33 +10,6 @@ public class PlayerGroups {
 
 	private HashMap<String, PlayerGroup> PlayerGroups = new HashMap<String, PlayerGroup>();
 
-	/**
-	 * returns a copy of the PlayerGroups of this instance.
-	 * 
-	 * @return
-	 */
-	public List<PlayerGroup> getPlayerGroups() {
-		return new ArrayList<PlayerGroup>(PlayerGroups.values());
-	}
-
-	public boolean GroupExists(String testName) {
-		return getGroupByName(testName) != null;
-	}
-
-	/**
-	 * retrieves a a specified group, or null of the name does not match any
-	 * group.
-	 * 
-	 * @param groupname
-	 * @return
-	 */
-	public PlayerGroup getGroupByName(String groupname) {
-		String capgroup = groupname.toUpperCase();
-		if (!PlayerGroups.containsKey(capgroup))
-			return null;
-		return PlayerGroups.get(capgroup);
-	}
-
 	/*
 	 * Groups: Names:[Donator,HalfOp]: - Donator: [Chicken,Waffle] - HalfOp:
 	 * [Choodles,Smeagle]
@@ -56,22 +29,17 @@ public class PlayerGroups {
 	}
 
 	/**
-	 * Saves this PlayerGroups list to a FileConfiguration.
+	 * retrieves a a specified group, or null of the name does not match any
+	 * group.
 	 * 
-	 * @param Target
-	 * @param TargetNode
+	 * @param groupname
+	 * @return
 	 */
-	void Save(FileConfiguration Target, String TargetNode) {
-		ArrayList<String> groupnames = new ArrayList<String>();
-		for (PlayerGroup pg : PlayerGroups.values()) {
-			groupnames.add(pg.getGroupName());
-		}
-		Target.set(TargetNode + ".Names", groupnames);
-		for (PlayerGroup iterate : PlayerGroups.values()) {
-			String usenode = TargetNode + "." + iterate.getGroupName();
-			iterate.Save(Target, usenode);
-		}
-
+	public PlayerGroup getGroupByName(String groupname) {
+		String capgroup = groupname.toUpperCase();
+		if (!PlayerGroups.containsKey(capgroup))
+			return null;
+		return PlayerGroups.get(capgroup);
 	}
 
 	/**
@@ -89,6 +57,38 @@ public class PlayerGroups {
 		}
 
 		return makelist;
+	}
+
+	/**
+	 * returns a copy of the PlayerGroups of this instance.
+	 * 
+	 * @return
+	 */
+	public List<PlayerGroup> getPlayerGroups() {
+		return new ArrayList<PlayerGroup>(PlayerGroups.values());
+	}
+
+	public boolean GroupExists(String testName) {
+		return getGroupByName(testName) != null;
+	}
+
+	/**
+	 * Saves this PlayerGroups list to a FileConfiguration.
+	 * 
+	 * @param Target
+	 * @param TargetNode
+	 */
+	void Save(FileConfiguration Target, String TargetNode) {
+		ArrayList<String> groupnames = new ArrayList<String>();
+		for (PlayerGroup pg : PlayerGroups.values()) {
+			groupnames.add(pg.getGroupName());
+		}
+		Target.set(TargetNode + ".Names", groupnames);
+		for (PlayerGroup iterate : PlayerGroups.values()) {
+			String usenode = TargetNode + "." + iterate.getGroupName();
+			iterate.Save(Target, usenode);
+		}
+
 	}
 
 }

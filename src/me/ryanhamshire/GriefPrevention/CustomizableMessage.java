@@ -20,8 +20,8 @@ package me.ryanhamshire.GriefPrevention;
 
 public class CustomizableMessage {
 	public Messages id;
-	public String text;
 	public String notes;
+	public String text;
 
 	public CustomizableMessage(Messages id, String text, String notes) {
 		this.id = id;

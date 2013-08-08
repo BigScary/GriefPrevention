@@ -18,15 +18,25 @@
 
 package me.ryanhamshire.GriefPrevention;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 
 import me.ryanhamshire.GriefPrevention.exceptions.WorldNotFoundException;
 
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -34,12 +44,20 @@ import org.bukkit.entity.Player;
 
 //manages data stored in the file system
 public class FlatFileDataStore extends DataStore {
-	private final static String playerDataFolderPath = dataLayerFolderPath
-			+ File.separator + "PlayerData";
-	private final static String claimDataFolderPath = dataLayerFolderPath
-			+ File.separator + "ClaimData";
-	private final static String nextClaimIdFilePath = claimDataFolderPath
-			+ File.separator + "_nextClaimID";
+	private final static String claimDataFolderPath = dataLayerFolderPath + File.separator + "ClaimData";
+	private final static String nextClaimIdFilePath = claimDataFolderPath + File.separator + "_nextClaimID";
+	private final static String playerDataFolderPath = dataLayerFolderPath + File.separator + "PlayerData";
+
+	private static FileConfiguration getSourceCfg() {
+		File f = new File(DataStore.dataLayerFolderPath + "flat.yml");
+		if (f.exists())
+			return YamlConfiguration.loadConfiguration(f);
+		return new YamlConfiguration();
+	}
+
+	private static FileConfiguration getTargetCfg() {
+		return new YamlConfiguration();
+	}
 
 	/**
 	 * determines whether there is Player or claims data available. This
@@ -54,44 +72,64 @@ public class FlatFileDataStore extends DataStore {
 		return playerDataFolder.exists() || claimsDataFolder.exists();
 	}
 
-	private static FileConfiguration getSourceCfg() {
-		File f = new File(DataStore.dataLayerFolderPath + "flat.yml");
-		if (f.exists())
-			return YamlConfiguration.loadConfiguration(f);
-		return new YamlConfiguration();
-	}
-
-	private static FileConfiguration getTargetCfg() {
-		return new YamlConfiguration();
-	}
-
 	public FlatFileDataStore() throws Exception {
 		this(getSourceCfg(), getTargetCfg());
 	}
 
 	// initialization!
-	public FlatFileDataStore(FileConfiguration Source, FileConfiguration Target)
-			throws Exception {
+	public FlatFileDataStore(FileConfiguration Source, FileConfiguration Target) throws Exception {
 		this.initialize(Source, Target);
 	}
 
 	@Override
-	void WorldLoaded(World loaded) {
+	synchronized void close() {
+		super.close();
+	}
 
-		int claimsread = 0;
-		File claimDataFolder = new File(claimDataFolderPath);
-		File[] files = claimDataFolder.listFiles();
-		for (File iterate : files) {
+	// deletes a top level claim from the file system
+	@Override
+	synchronized void deleteClaimFromSecondaryStorage(Claim claim) {
+		String claimID = String.valueOf(claim.id);
 
-			if (getClaimWorld(iterate).equals(loaded.getName())) {
-				claimsread++;
-				readClaim(iterate);
+		// remove from disk
+		File claimFile = new File(claimDataFolderPath + File.separator + claimID);
+		if (claimFile.exists()) {
+			// System.out.println("Deleting Claim ID #" + claimID);
+			// temporary stack trace.
+			// try { throw new Exception();}catch(Exception
+			// exx){exx.printStackTrace();}
+			if (!claimFile.delete()) {
+				GriefPrevention.AddLogEntry("Error: Unable to delete claim file \"" + claimFile.getAbsolutePath() + "\".");
 			}
+		}
+	}
+
+	@Override
+	public boolean deletePlayerData(String playerName) {
+		new File(getPlayerDataFile(playerName)).delete();
+		return !hasPlayerData(playerName);
+	}
+
+	@Override
+	public List<PlayerData> getAllPlayerData() {
+		File playerDataFolder = new File(playerDataFolderPath);
+		File[] files = playerDataFolder.listFiles();
+		ArrayList<PlayerData> Buildresult = new ArrayList<PlayerData>();
+		for (int i = 0; i < files.length; i++) {
+			File file = files[i];
+			if (!file.isFile())
+				continue; // avoids folders
+
+			// all group data files start with a dollar sign. ignoring those,
+			// already handled above
+			if (file.getName().startsWith("$"))
+				continue;
+
+			String playerName = file.getName();
+			Buildresult.add(this.getPlayerData(playerName));
 
 		}
-		// System.out.println("Read in " + claimsread + " Claims for world:" +
-		// loaded.getName());
-
+		return Buildresult;
 	}
 
 	String getClaimWorld(File SourceFile) {
@@ -101,8 +139,7 @@ public class FlatFileDataStore extends DataStore {
 		if (!SourceFile.exists())
 			return "";
 		try {
-			BufferedReader fr = new BufferedReader(new FileReader(
-					SourceFile.getAbsolutePath()));
+			BufferedReader fr = new BufferedReader(new FileReader(SourceFile.getAbsolutePath()));
 			String firstline = fr.readLine();
 			fr.close();
 			String[] splitresult = firstline.split(";");
@@ -113,199 +150,123 @@ public class FlatFileDataStore extends DataStore {
 		}
 	}
 
-	void readClaim(File SourceFile) {
-		// reads a single Claim.
-		// loads this claim from the given file.
-		if (SourceFile.getPath().startsWith("_"))
-			return;
-		Long claimID;
-		try {
-			claimID = Long.parseLong(SourceFile.getName());
-		}
-
-		// because some older versions used a different file name pattern before
-		// claim IDs were introduced,
-		// those files need to be "converted" by renaming them to a unique ID
-		catch (Exception e) {
-			claimID = this.nextClaimID;
-			this.incrementNextClaimID();
-			File newFile = new File(claimDataFolderPath + File.separator
-					+ String.valueOf(this.nextClaimID));
-			SourceFile.renameTo(newFile);
-			SourceFile = newFile;
-		}
-		BufferedReader inStream = null;
-		try {
-			Claim topLevelClaim = null;
-			FileReader fr = new FileReader(SourceFile.getAbsolutePath());
-			inStream = new BufferedReader(fr);
-			String line = inStream.readLine();
-
-			while (line != null) {
-				Long usesubclaimid = null;
-				if (line.toUpperCase().startsWith("SUB:")) {
-					usesubclaimid = Long.parseLong(line.substring(4));
-					line = inStream.readLine(); // read to the next line.
-				}
-				// first line is lesser boundary corner location
-				String splitentry = line.split(";")[0];
-				// if the world doesn't exist yet, we need to create a
-				// DeferredWorldClaim instance and
-				// add it to the dataStore hashMap.
-				Location lesserBoundaryCorner = null;
-				Location greaterBoundaryCorner = null;
-				lesserBoundaryCorner = this.locationFromString(line);
-				// second line is greater boundary corner location
-				line = inStream.readLine();
-				greaterBoundaryCorner = this.locationFromString(line);
-
-				// third line is owner name
-				line = inStream.readLine();
-				String ownerName = line;
-
-				// is there PlayerData for this gai?
-
-				if (!hasPlayerData(ownerName)
-						&& GriefPrevention.instance.config_claims_deleteclaimswithunrecognizedowners) {
-					// PlayerData not found, don't load this claim.
-					GriefPrevention
-							.AddLogEntry("discarded Claim belonging to "
-									+ ownerName
-									+ " Because there is no PlayerData for that Player.");
-					return;
-				}
-
-				// fourth line is list of builders
-				line = inStream.readLine();
-				String[] builderNames = line.split(";");
-
-				// fifth line is list of players who can access containers
-				line = inStream.readLine();
-				String[] containerNames = line.split(";");
-
-				// sixth line is list of players who can use buttons and
-				// switches
-				line = inStream.readLine();
-				String[] accessorNames = line.split(";");
-
-				// seventh line is list of players who can grant permissions
-				line = inStream.readLine();
-				if (line == null)
-					line = "";
-				String[] managerNames = line.split(";");
-
-				// Eighth line either contains whether the claim can ever be
-				// deleted, or the divider for the subclaims
-				boolean neverdelete = false;
-				line = inStream.readLine();
-				if (line == null)
-					line = "";
-				if (!line.contains("==========")) {
-					neverdelete = Boolean.parseBoolean(line);
-				}
-
-				// Sub claims below this line
-				while (line != null && !line.contains("=========="))
-					line = inStream.readLine();
-
-				// build a claim instance from those data
-				// if this is the first claim loaded from this file, it's the
-				// top level claim
-
-				if (topLevelClaim == null) {
-					// instantiate
-					topLevelClaim = new Claim(lesserBoundaryCorner,
-							greaterBoundaryCorner, ownerName, builderNames,
-							containerNames, accessorNames, managerNames,
-							claimID, neverdelete);
-
-					// search for another claim overlapping this one
-
-					Claim conflictClaim = this.getClaimAt(
-							topLevelClaim.lesserBoundaryCorner, true);
-
-					// if there is such a claim, delete this file and move on to
-					// the next
-					if (conflictClaim != null) {
-						// System.out.println("Deleting Claim File:" +
-						// SourceFile.getAbsolutePath() +
-						// " as it is overlapped by ID #" +
-						// conflictClaim.getID());
-						inStream.close();
-						SourceFile.delete();
-						line = null;
-						continue;
-					}
-
-					// otherwise, add this claim to the claims collection
-					else {
-						topLevelClaim.modifiedDate = new Date(
-								SourceFile.lastModified());
-
-						this.claims.add(topLevelClaim);
-
-						topLevelClaim.inDataStore = true;
-					}
-				}
-
-				// otherwise there's already a top level claim, so this must be
-				// a subdivision of that top level claim
-				else {
-
-					// if it starts with "sub:" then it is a subid.
-					if (usesubclaimid == null) {
-
-						// otherwise, must be older file without subclaim ID.
-						// default to current count of children.
-						usesubclaimid = (long) topLevelClaim.children.size();
-						// System.out.println("Older file: Assigned SubID:" +
-						// usesubid +" with Parent claim:" + topLevelClaim);
-						// reset...
-					}
-					// as such, try to read in the subclaim ID.
-					Claim subdivision = new Claim(lesserBoundaryCorner,
-							greaterBoundaryCorner, "--subdivision--",
-							builderNames, containerNames, accessorNames,
-							managerNames, null, neverdelete);
-					subdivision.subClaimid = usesubclaimid;
-					subdivision.modifiedDate = new Date(
-							SourceFile.lastModified());
-					subdivision.parent = topLevelClaim;
-					topLevelClaim.children.add(subdivision);
-					subdivision.inDataStore = true;
-				}
-
-				// move up to the first line in the next subdivision
-				line = inStream.readLine();
-			}
-
-			inStream.close();
-		}
-		// We don't need to log any additional error messages for this error.
-		catch (WorldNotFoundException e) {
-			// Nothing to do here.
-		}
-
-		// if there's any problem with the file's content, log an error message
-		// and skip it
-		catch (Exception e) {
-			GriefPrevention.AddLogEntry("Unable to load data for claim \""
-					+ SourceFile.getName() + "\": " + e.getClass().getName()
-					+ "-" + e.getMessage());
-			e.printStackTrace();
-		}
-
-		try {
-			if (inStream != null)
-				inStream.close();
-		} catch (IOException exception) {
-		}
-
+	private String getPlayerDataFile(String sPlayerName) {
+		return playerDataFolderPath + File.separator + sPlayerName;
 	}
 
 	@Override
-	void initialize(ConfigurationSection Source, ConfigurationSection Target)
-			throws Exception {
+	synchronized PlayerData getPlayerDataFromStorage(String playerName) {
+		File playerFile = new File(getPlayerDataFile(playerName));
+
+		PlayerData playerData = new PlayerData();
+		playerData.playerName = playerName;
+
+		// if it doesn't exist as a file
+		if (!playerFile.exists()) {
+			// create a file with defaults, but only if the player has been
+			// online before.
+			Player playerobj = Bukkit.getPlayer(playerName);
+			if (playerobj == null) {
+				this.savePlayerData(playerName, playerData);
+			}
+
+			else if (playerobj.hasPlayedBefore() || playerobj.isOnline()) {
+				this.savePlayerData(playerName, playerData);
+			}
+		}
+
+		// otherwise, read the file
+		else {
+			BufferedReader inStream = null;
+			try {
+				inStream = new BufferedReader(new FileReader(playerFile.getAbsolutePath()));
+
+				// first line is last login timestamp
+				String lastLoginTimestampString = inStream.readLine();
+
+				// convert that to a date and store it
+				DateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss");
+				try {
+					playerData.lastLogin = dateFormat.parse(lastLoginTimestampString);
+				} catch (ParseException parseException) {
+					GriefPrevention.AddLogEntry("Unable to load last login for \"" + playerFile.getName() + "\".");
+					playerData.lastLogin = null;
+				}
+
+				// second line is accrued claim blocks
+				String accruedBlocksString = inStream.readLine();
+
+				// convert that to a number and store it
+				playerData.accruedClaimBlocks = Integer.parseInt(accruedBlocksString);
+
+				// third line is any bonus claim blocks granted by
+				// administrators
+				String bonusBlocksString = inStream.readLine();
+
+				// convert that to a number and store it
+				playerData.bonusClaimBlocks = Integer.parseInt(bonusBlocksString);
+
+				// fourth line is a double-semicolon-delimited list of claims,
+				// which is currently ignored
+				// String claimsString = inStream.readLine();
+				inStream.readLine();
+
+				inStream.close();
+			}
+
+			// if there's any problem with the file's content, log an error
+			// message
+			catch (Exception e) {
+				GriefPrevention.AddLogEntry("Unable to load data for player \"" + playerName + "\": " + e.getMessage());
+			}
+
+			try {
+				if (inStream != null)
+					inStream.close();
+			} catch (IOException exception) {
+			}
+		}
+
+		return playerData;
+	}
+
+	@Override
+	public boolean hasPlayerData(String playerName) {
+		// TODO Auto-generated method stub
+		return new File(getPlayerDataFile(playerName)).exists();
+	}
+
+	@Override
+	synchronized void incrementNextClaimID() {
+		// increment in memory
+		this.nextClaimID++;
+
+		BufferedWriter outStream = null;
+
+		try {
+			// open the file and write the new value
+			File nextClaimIdFile = new File(nextClaimIdFilePath);
+			nextClaimIdFile.createNewFile();
+			outStream = new BufferedWriter(new FileWriter(nextClaimIdFile));
+
+			outStream.write(String.valueOf(this.nextClaimID));
+		}
+
+		// if any problem, log it
+		catch (Exception e) {
+			GriefPrevention.AddLogEntry("Unexpected exception saving next claim ID: " + e.getMessage());
+		}
+
+		// close the file
+		try {
+			if (outStream != null)
+				outStream.close();
+		} catch (IOException exception) {
+		}
+	}
+
+	@Override
+	void initialize(ConfigurationSection Source, ConfigurationSection Target) throws Exception {
 
 		// ensure data folders exist
 		new File(playerDataFolderPath).mkdirs();
@@ -330,18 +291,14 @@ public class FlatFileDataStore extends DataStore {
 
 			BufferedReader inStream = null;
 			try {
-				inStream = new BufferedReader(new FileReader(
-						file.getAbsolutePath()));
+				inStream = new BufferedReader(new FileReader(file.getAbsolutePath()));
 				String line = inStream.readLine();
 
 				int groupBonusBlocks = Integer.parseInt(line);
 
-				this.permissionToBonusBlocksMap
-						.put(groupName, groupBonusBlocks);
+				this.permissionToBonusBlocksMap.put(groupName, groupBonusBlocks);
 			} catch (Exception e) {
-				GriefPrevention
-						.AddLogEntry("Unable to load group bonus block data from file \""
-								+ file.getName() + "\": " + e.getMessage());
+				GriefPrevention.AddLogEntry("Unable to load group bonus block data from file \"" + file.getName() + "\": " + e.getMessage());
 			}
 
 			try {
@@ -356,8 +313,7 @@ public class FlatFileDataStore extends DataStore {
 		if (nextClaimIdFile.exists()) {
 			BufferedReader inStream = null;
 			try {
-				inStream = new BufferedReader(new FileReader(
-						nextClaimIdFile.getAbsolutePath()));
+				inStream = new BufferedReader(new FileReader(nextClaimIdFile.getAbsolutePath()));
 
 				// read the id
 				String line = inStream.readLine();
@@ -406,59 +362,371 @@ public class FlatFileDataStore extends DataStore {
 		super.initialize(Source, Target);
 	}
 
-	@Override
-	synchronized void writeClaimToStorage(Claim claim) {
-		String claimID = String.valueOf(claim.id);
+	synchronized void migrateData(DataStore targetStore) {
+		ForceLoadAllClaims();
 
-		BufferedWriter outStream = null;
+		// migrate claims
+		for (Claim c : this.claims) {
+			GriefPrevention.AddLogEntry("Migrating Claim #" + c.getID());
+			targetStore.addClaim(c);
+		}
+
+		// migrate groups
+		Iterator<String> groupNamesEnumerator = this.permissionToBonusBlocksMap.keySet().iterator();
+		while (groupNamesEnumerator.hasNext()) {
+			String groupName = groupNamesEnumerator.next();
+			targetStore.saveGroupBonusBlocks(groupName, this.permissionToBonusBlocksMap.get(groupName));
+		}
+
+		// migrate players
+		for (PlayerData pdata : getAllPlayerData()) {
+			targetStore.playerNameToPlayerDataMap.put(pdata.playerName, pdata);
+
+		}
+
+		// migrate next claim ID
+		if (this.nextClaimID > targetStore.nextClaimID) {
+			targetStore.setNextClaimID(this.nextClaimID);
+		}
+
+		// rename player and claim data folders so the migration won't run again
+		int i = 0;
+		File claimsBackupFolder;
+		File playersBackupFolder;
+		do {
+			String claimsFolderBackupPath = claimDataFolderPath;
+			if (i > 0)
+				claimsFolderBackupPath += String.valueOf(i);
+			claimsBackupFolder = new File(claimsFolderBackupPath);
+
+			String playersFolderBackupPath = playerDataFolderPath;
+			if (i > 0)
+				playersFolderBackupPath += String.valueOf(i);
+			playersBackupFolder = new File(playersFolderBackupPath);
+			i++;
+		} while (claimsBackupFolder.exists() || playersBackupFolder.exists());
+
+		File claimsFolder = new File(claimDataFolderPath);
+		File playersFolder = new File(playerDataFolderPath);
+
+		claimsFolder.renameTo(claimsBackupFolder);
+		playersFolder.renameTo(playersBackupFolder);
+
+		GriefPrevention.AddLogEntry("Backed your file system data up to " + claimsBackupFolder.getName() + " and " + playersBackupFolder.getName() + ".");
+		GriefPrevention.AddLogEntry("If your migration encountered any problems, you can restore those data with a quick copy/paste.");
+		GriefPrevention.AddLogEntry("When you're satisfied that all your data have been safely migrated, consider deleting those folders.");
+	}
+
+	void readClaim(File SourceFile) {
+		// reads a single Claim.
+		// loads this claim from the given file.
+		if (SourceFile.getPath().startsWith("_"))
+			return;
+		Long claimID;
+		try {
+			claimID = Long.parseLong(SourceFile.getName());
+		}
+
+		// because some older versions used a different file name pattern before
+		// claim IDs were introduced,
+		// those files need to be "converted" by renaming them to a unique ID
+		catch (Exception e) {
+			claimID = this.nextClaimID;
+			this.incrementNextClaimID();
+			File newFile = new File(claimDataFolderPath + File.separator + String.valueOf(this.nextClaimID));
+			SourceFile.renameTo(newFile);
+			SourceFile = newFile;
+		}
+		BufferedReader inStream = null;
+		try {
+			Claim topLevelClaim = null;
+			FileReader fr = new FileReader(SourceFile.getAbsolutePath());
+			inStream = new BufferedReader(fr);
+			String line = inStream.readLine();
+
+			while (line != null) {
+				Long usesubclaimid = null;
+				if (line.toUpperCase().startsWith("SUB:")) {
+					usesubclaimid = Long.parseLong(line.substring(4));
+					line = inStream.readLine(); // read to the next line.
+				}
+				// first line is lesser boundary corner location
+				String splitentry = line.split(";")[0];
+				// if the world doesn't exist yet, we need to create a
+				// DeferredWorldClaim instance and
+				// add it to the dataStore hashMap.
+				Location lesserBoundaryCorner = null;
+				Location greaterBoundaryCorner = null;
+				lesserBoundaryCorner = this.locationFromString(line);
+				// second line is greater boundary corner location
+				line = inStream.readLine();
+				greaterBoundaryCorner = this.locationFromString(line);
+
+				// third line is owner name
+				line = inStream.readLine();
+				String ownerName = line;
+
+				// is there PlayerData for this gai?
+
+				if (!hasPlayerData(ownerName) && GriefPrevention.instance.config_claims_deleteclaimswithunrecognizedowners) {
+					// PlayerData not found, don't load this claim.
+					GriefPrevention.AddLogEntry("discarded Claim belonging to " + ownerName + " Because there is no PlayerData for that Player.");
+					return;
+				}
+
+				// fourth line is list of builders
+				line = inStream.readLine();
+				String[] builderNames = line.split(";");
+
+				// fifth line is list of players who can access containers
+				line = inStream.readLine();
+				String[] containerNames = line.split(";");
+
+				// sixth line is list of players who can use buttons and
+				// switches
+				line = inStream.readLine();
+				String[] accessorNames = line.split(";");
+
+				// seventh line is list of players who can grant permissions
+				line = inStream.readLine();
+				if (line == null)
+					line = "";
+				String[] managerNames = line.split(";");
+
+				// Eighth line either contains whether the claim can ever be
+				// deleted, or the divider for the subclaims
+				boolean neverdelete = false;
+				line = inStream.readLine();
+				if (line == null)
+					line = "";
+				if (!line.contains("==========")) {
+					neverdelete = Boolean.parseBoolean(line);
+				}
+
+				// Sub claims below this line
+				while (line != null && !line.contains("=========="))
+					line = inStream.readLine();
+
+				// build a claim instance from those data
+				// if this is the first claim loaded from this file, it's the
+				// top level claim
+
+				if (topLevelClaim == null) {
+					// instantiate
+					topLevelClaim = new Claim(lesserBoundaryCorner, greaterBoundaryCorner, ownerName, builderNames, containerNames, accessorNames, managerNames, claimID, neverdelete);
+
+					// search for another claim overlapping this one
+
+					Claim conflictClaim = this.getClaimAt(topLevelClaim.lesserBoundaryCorner, true);
+
+					// if there is such a claim, delete this file and move on to
+					// the next
+					if (conflictClaim != null) {
+						// System.out.println("Deleting Claim File:" +
+						// SourceFile.getAbsolutePath() +
+						// " as it is overlapped by ID #" +
+						// conflictClaim.getID());
+						inStream.close();
+						SourceFile.delete();
+						line = null;
+						continue;
+					}
+
+					// otherwise, add this claim to the claims collection
+					else {
+						topLevelClaim.modifiedDate = new Date(SourceFile.lastModified());
+
+						this.claims.add(topLevelClaim);
+
+						topLevelClaim.inDataStore = true;
+					}
+				}
+
+				// otherwise there's already a top level claim, so this must be
+				// a subdivision of that top level claim
+				else {
+
+					// if it starts with "sub:" then it is a subid.
+					if (usesubclaimid == null) {
+
+						// otherwise, must be older file without subclaim ID.
+						// default to current count of children.
+						usesubclaimid = (long) topLevelClaim.children.size();
+						// System.out.println("Older file: Assigned SubID:" +
+						// usesubid +" with Parent claim:" + topLevelClaim);
+						// reset...
+					}
+					// as such, try to read in the subclaim ID.
+					Claim subdivision = new Claim(lesserBoundaryCorner, greaterBoundaryCorner, "--subdivision--", builderNames, containerNames, accessorNames, managerNames, null, neverdelete);
+					subdivision.subClaimid = usesubclaimid;
+					subdivision.modifiedDate = new Date(SourceFile.lastModified());
+					subdivision.parent = topLevelClaim;
+					topLevelClaim.children.add(subdivision);
+					subdivision.inDataStore = true;
+				}
+
+				// move up to the first line in the next subdivision
+				line = inStream.readLine();
+			}
+
+			inStream.close();
+		}
+		// We don't need to log any additional error messages for this error.
+		catch (WorldNotFoundException e) {
+			// Nothing to do here.
+		}
+
+		// if there's any problem with the file's content, log an error message
+		// and skip it
+		catch (Exception e) {
+			GriefPrevention.AddLogEntry("Unable to load data for claim \"" + SourceFile.getName() + "\": " + e.getClass().getName() + "-" + e.getMessage());
+			e.printStackTrace();
+		}
 
 		try {
-			// open the claim's file
-			File claimFile = new File(claimDataFolderPath + File.separator
-					+ claimID);
-			claimFile.createNewFile();
-			outStream = new BufferedWriter(new FileWriter(claimFile));
+			if (inStream != null)
+				inStream.close();
+		} catch (IOException exception) {
+		}
 
-			// write top level claim data to the file
-			this.writeClaimData(claim, outStream);
+	}
 
-			// for each subdivision
-			for (int i = 0; i < claim.children.size(); i++) {
+	// grants a group (players with a specific permission) bonus claim blocks as
+	// long as they're still members of the group
+	@Override
+	synchronized void saveGroupBonusBlocks(String groupName, int currentValue) {
+		// write changes to file to ensure they don't get lost
+		BufferedWriter outStream = null;
+		try {
+			// open the group's file
+			File groupDataFile = new File(playerDataFolderPath + File.separator + "$" + groupName);
+			groupDataFile.createNewFile();
+			outStream = new BufferedWriter(new FileWriter(groupDataFile));
 
-				// write the subdivision's data to the file
-				// write it's unique ID.
-				Claim childclaim = claim.children.get(i);
-				// Long childid = childclaim.getSubClaimID();
-				// childid = childid==null?childclaim.getID():childid;
-				// System.out.println("Attempting to write child claim: SubID: "
-				// + childid);
-
-				this.writeClaimData(childclaim, outStream);
-				// outStream.write("Sub:" + String.valueOf(childid));
-			}
+			// first line is number of bonus blocks
+			outStream.write(String.valueOf(currentValue));
+			outStream.newLine();
 		}
 
 		// if any problem, log it
 		catch (Exception e) {
-			GriefPrevention
-					.AddLogEntry("Unexpected exception saving data for claim \""
-							+ claimID + "\": " + e.getMessage());
+			GriefPrevention.AddLogEntry("Unexpected exception saving data for group \"" + groupName + "\": " + e.getMessage());
 		}
 
-		// close the file
 		try {
-			if (outStream != null)
+			// close the file
+			if (outStream != null) {
 				outStream.close();
+			}
 		} catch (IOException exception) {
 		}
 	}
 
+	// saves changes to player data. MUST be called after you're done making
+	// changes, otherwise a reload will lose them
+	@Override
+	synchronized public void savePlayerData(String playerName, PlayerData playerData) {
+		// never save data for the "administrative" account. an empty string for
+		// claim owner indicates administrative account
+		if (playerName.length() == 0)
+			return;
+
+		BufferedWriter outStream = null;
+		try {
+			// open the player's file
+			File playerDataFile = new File(playerDataFolderPath + File.separator + playerName);
+			playerDataFile.createNewFile();
+			outStream = new BufferedWriter(new FileWriter(playerDataFile));
+
+			// first line is last login timestamp
+			if (playerData.lastLogin == null)
+				playerData.lastLogin = new Date();
+			DateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss");
+			outStream.write(dateFormat.format(playerData.lastLogin));
+			outStream.newLine();
+
+			// second line is accrued claim blocks
+			outStream.write(String.valueOf(playerData.accruedClaimBlocks));
+			outStream.newLine();
+
+			// third line is bonus claim blocks
+			outStream.write(String.valueOf(playerData.bonusClaimBlocks));
+			outStream.newLine();
+
+			// fourth line is a double-semicolon-delimited list of claims
+			if (playerData.claims.size() > 0) {
+				outStream.write(this.locationToString(playerData.claims.get(0).getLesserBoundaryCorner()));
+				for (int i = 1; i < playerData.claims.size(); i++) {
+					outStream.write(";;" + this.locationToString(playerData.claims.get(i).getLesserBoundaryCorner()));
+				}
+			}
+			outStream.newLine();
+		}
+
+		// if any problem, log it
+		catch (Exception e) {
+			GriefPrevention.AddLogEntry("GriefPrevention: Unexpected exception saving data for player \"" + playerName + "\": " + e.getMessage());
+		}
+
+		try {
+			// close the file
+			if (outStream != null) {
+				outStream.close();
+			}
+		} catch (IOException exception) {
+		}
+	}
+
+	@Override
+	public void setNextClaimID(long nextClaimID2) {
+		// TODO Auto-generated method stub
+
+		File nextClaimIdFile = new File(nextClaimIdFilePath);
+		if (nextClaimIdFile.exists()) {
+			BufferedWriter outStream = null;
+			try {
+				outStream = new BufferedWriter(new FileWriter(nextClaimIdFile.getAbsolutePath()));
+
+				// read the id
+				outStream.write(Long.toString(nextClaimID2));
+
+				// try to parse into a long value
+				this.nextClaimID = nextClaimID2;
+			} catch (Exception e) {
+			}
+
+			try {
+				if (outStream != null)
+					outStream.close();
+			} catch (IOException exception) {
+			}
+		}
+
+	}
+
+	@Override
+	void WorldLoaded(World loaded) {
+
+		int claimsread = 0;
+		File claimDataFolder = new File(claimDataFolderPath);
+		File[] files = claimDataFolder.listFiles();
+		for (File iterate : files) {
+
+			if (getClaimWorld(iterate).equals(loaded.getName())) {
+				claimsread++;
+				readClaim(iterate);
+			}
+
+		}
+		// System.out.println("Read in " + claimsread + " Claims for world:" +
+		// loaded.getName());
+
+	}
+
 	// actually writes claim data to an output stream
-	synchronized private void writeClaimData(Claim claim,
-			BufferedWriter outStream) throws IOException {
+	synchronized private void writeClaimData(Claim claim, BufferedWriter outStream) throws IOException {
 		if (claim.parent != null) {
-			Long ChildID = claim.getSubClaimID() == null ? claim.getID()
-					: claim.getSubClaimID();
+			Long ChildID = claim.getSubClaimID() == null ? claim.getID() : claim.getSubClaimID();
 			outStream.write("sub:" + String.valueOf(ChildID));
 			outStream.newLine();
 
@@ -468,8 +736,7 @@ public class FlatFileDataStore extends DataStore {
 		outStream.newLine();
 
 		// second line is greater boundary corner location
-		outStream
-				.write(this.locationToString(claim.getGreaterBoundaryCorner()));
+		outStream.write(this.locationToString(claim.getGreaterBoundaryCorner()));
 		outStream.newLine();
 
 		// third line is owner name
@@ -516,210 +783,40 @@ public class FlatFileDataStore extends DataStore {
 		outStream.newLine();
 	}
 
-	// deletes a top level claim from the file system
 	@Override
-	synchronized void deleteClaimFromSecondaryStorage(Claim claim) {
+	synchronized void writeClaimToStorage(Claim claim) {
 		String claimID = String.valueOf(claim.id);
 
-		// remove from disk
-		File claimFile = new File(claimDataFolderPath + File.separator
-				+ claimID);
-		if (claimFile.exists()) {
-			// System.out.println("Deleting Claim ID #" + claimID);
-			// temporary stack trace.
-			// try { throw new Exception();}catch(Exception
-			// exx){exx.printStackTrace();}
-			if (!claimFile.delete()) {
-				GriefPrevention
-						.AddLogEntry("Error: Unable to delete claim file \""
-								+ claimFile.getAbsolutePath() + "\".");
-			}
-		}
-	}
-
-	private String getPlayerDataFile(String sPlayerName) {
-		return playerDataFolderPath + File.separator + sPlayerName;
-	}
-
-	@Override
-	public boolean hasPlayerData(String playerName) {
-		// TODO Auto-generated method stub
-		return new File(getPlayerDataFile(playerName)).exists();
-	}
-
-	@Override
-	public boolean deletePlayerData(String playerName) {
-		new File(getPlayerDataFile(playerName)).delete();
-		return !hasPlayerData(playerName);
-	}
-
-	@Override
-	synchronized PlayerData getPlayerDataFromStorage(String playerName) {
-		File playerFile = new File(getPlayerDataFile(playerName));
-
-		PlayerData playerData = new PlayerData();
-		playerData.playerName = playerName;
-
-		// if it doesn't exist as a file
-		if (!playerFile.exists()) {
-			// create a file with defaults, but only if the player has been
-			// online before.
-			Player playerobj = Bukkit.getPlayer(playerName);
-			if (playerobj == null) {
-				this.savePlayerData(playerName, playerData);
-			}
-
-			else if (playerobj.hasPlayedBefore() || playerobj.isOnline()) {
-				this.savePlayerData(playerName, playerData);
-			}
-		}
-
-		// otherwise, read the file
-		else {
-			BufferedReader inStream = null;
-			try {
-				inStream = new BufferedReader(new FileReader(
-						playerFile.getAbsolutePath()));
-
-				// first line is last login timestamp
-				String lastLoginTimestampString = inStream.readLine();
-
-				// convert that to a date and store it
-				DateFormat dateFormat = new SimpleDateFormat(
-						"yyyy.MM.dd.HH.mm.ss");
-				try {
-					playerData.lastLogin = dateFormat
-							.parse(lastLoginTimestampString);
-				} catch (ParseException parseException) {
-					GriefPrevention
-							.AddLogEntry("Unable to load last login for \""
-									+ playerFile.getName() + "\".");
-					playerData.lastLogin = null;
-				}
-
-				// second line is accrued claim blocks
-				String accruedBlocksString = inStream.readLine();
-
-				// convert that to a number and store it
-				playerData.accruedClaimBlocks = Integer
-						.parseInt(accruedBlocksString);
-
-				// third line is any bonus claim blocks granted by
-				// administrators
-				String bonusBlocksString = inStream.readLine();
-
-				// convert that to a number and store it
-				playerData.bonusClaimBlocks = Integer
-						.parseInt(bonusBlocksString);
-
-				// fourth line is a double-semicolon-delimited list of claims,
-				// which is currently ignored
-				// String claimsString = inStream.readLine();
-				inStream.readLine();
-
-				inStream.close();
-			}
-
-			// if there's any problem with the file's content, log an error
-			// message
-			catch (Exception e) {
-				GriefPrevention.AddLogEntry("Unable to load data for player \""
-						+ playerName + "\": " + e.getMessage());
-			}
-
-			try {
-				if (inStream != null)
-					inStream.close();
-			} catch (IOException exception) {
-			}
-		}
-
-		return playerData;
-	}
-
-	// saves changes to player data. MUST be called after you're done making
-	// changes, otherwise a reload will lose them
-	@Override
-	synchronized public void savePlayerData(String playerName,
-			PlayerData playerData) {
-		// never save data for the "administrative" account. an empty string for
-		// claim owner indicates administrative account
-		if (playerName.length() == 0)
-			return;
-
 		BufferedWriter outStream = null;
+
 		try {
-			// open the player's file
-			File playerDataFile = new File(playerDataFolderPath
-					+ File.separator + playerName);
-			playerDataFile.createNewFile();
-			outStream = new BufferedWriter(new FileWriter(playerDataFile));
+			// open the claim's file
+			File claimFile = new File(claimDataFolderPath + File.separator + claimID);
+			claimFile.createNewFile();
+			outStream = new BufferedWriter(new FileWriter(claimFile));
 
-			// first line is last login timestamp
-			if (playerData.lastLogin == null)
-				playerData.lastLogin = new Date();
-			DateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss");
-			outStream.write(dateFormat.format(playerData.lastLogin));
-			outStream.newLine();
+			// write top level claim data to the file
+			this.writeClaimData(claim, outStream);
 
-			// second line is accrued claim blocks
-			outStream.write(String.valueOf(playerData.accruedClaimBlocks));
-			outStream.newLine();
+			// for each subdivision
+			for (int i = 0; i < claim.children.size(); i++) {
 
-			// third line is bonus claim blocks
-			outStream.write(String.valueOf(playerData.bonusClaimBlocks));
-			outStream.newLine();
+				// write the subdivision's data to the file
+				// write it's unique ID.
+				Claim childclaim = claim.children.get(i);
+				// Long childid = childclaim.getSubClaimID();
+				// childid = childid==null?childclaim.getID():childid;
+				// System.out.println("Attempting to write child claim: SubID: "
+				// + childid);
 
-			// fourth line is a double-semicolon-delimited list of claims
-			if (playerData.claims.size() > 0) {
-				outStream.write(this.locationToString(playerData.claims.get(0)
-						.getLesserBoundaryCorner()));
-				for (int i = 1; i < playerData.claims.size(); i++) {
-					outStream.write(";;"
-							+ this.locationToString(playerData.claims.get(i)
-									.getLesserBoundaryCorner()));
-				}
+				this.writeClaimData(childclaim, outStream);
+				// outStream.write("Sub:" + String.valueOf(childid));
 			}
-			outStream.newLine();
 		}
 
 		// if any problem, log it
 		catch (Exception e) {
-			GriefPrevention
-					.AddLogEntry("GriefPrevention: Unexpected exception saving data for player \""
-							+ playerName + "\": " + e.getMessage());
-		}
-
-		try {
-			// close the file
-			if (outStream != null) {
-				outStream.close();
-			}
-		} catch (IOException exception) {
-		}
-	}
-
-	@Override
-	synchronized void incrementNextClaimID() {
-		// increment in memory
-		this.nextClaimID++;
-
-		BufferedWriter outStream = null;
-
-		try {
-			// open the file and write the new value
-			File nextClaimIdFile = new File(nextClaimIdFilePath);
-			nextClaimIdFile.createNewFile();
-			outStream = new BufferedWriter(new FileWriter(nextClaimIdFile));
-
-			outStream.write(String.valueOf(this.nextClaimID));
-		}
-
-		// if any problem, log it
-		catch (Exception e) {
-			GriefPrevention
-					.AddLogEntry("Unexpected exception saving next claim ID: "
-							+ e.getMessage());
+			GriefPrevention.AddLogEntry("Unexpected exception saving data for claim \"" + claimID + "\": " + e.getMessage());
 		}
 
 		// close the file
@@ -728,156 +825,6 @@ public class FlatFileDataStore extends DataStore {
 				outStream.close();
 		} catch (IOException exception) {
 		}
-	}
-
-	// grants a group (players with a specific permission) bonus claim blocks as
-	// long as they're still members of the group
-	@Override
-	synchronized void saveGroupBonusBlocks(String groupName, int currentValue) {
-		// write changes to file to ensure they don't get lost
-		BufferedWriter outStream = null;
-		try {
-			// open the group's file
-			File groupDataFile = new File(playerDataFolderPath + File.separator
-					+ "$" + groupName);
-			groupDataFile.createNewFile();
-			outStream = new BufferedWriter(new FileWriter(groupDataFile));
-
-			// first line is number of bonus blocks
-			outStream.write(String.valueOf(currentValue));
-			outStream.newLine();
-		}
-
-		// if any problem, log it
-		catch (Exception e) {
-			GriefPrevention
-					.AddLogEntry("Unexpected exception saving data for group \""
-							+ groupName + "\": " + e.getMessage());
-		}
-
-		try {
-			// close the file
-			if (outStream != null) {
-				outStream.close();
-			}
-		} catch (IOException exception) {
-		}
-	}
-
-	@Override
-	public List<PlayerData> getAllPlayerData() {
-		File playerDataFolder = new File(playerDataFolderPath);
-		File[] files = playerDataFolder.listFiles();
-		ArrayList<PlayerData> Buildresult = new ArrayList<PlayerData>();
-		for (int i = 0; i < files.length; i++) {
-			File file = files[i];
-			if (!file.isFile())
-				continue; // avoids folders
-
-			// all group data files start with a dollar sign. ignoring those,
-			// already handled above
-			if (file.getName().startsWith("$"))
-				continue;
-
-			String playerName = file.getName();
-			Buildresult.add(this.getPlayerData(playerName));
-
-		}
-		return Buildresult;
-	}
-
-	synchronized void migrateData(DataStore targetStore) {
-		ForceLoadAllClaims();
-
-		// migrate claims
-		for (Claim c : this.claims) {
-			GriefPrevention.AddLogEntry("Migrating Claim #" + c.getID());
-			targetStore.addClaim(c);
-		}
-
-		// migrate groups
-		Iterator<String> groupNamesEnumerator = this.permissionToBonusBlocksMap
-				.keySet().iterator();
-		while (groupNamesEnumerator.hasNext()) {
-			String groupName = groupNamesEnumerator.next();
-			targetStore.saveGroupBonusBlocks(groupName,
-					this.permissionToBonusBlocksMap.get(groupName));
-		}
-
-		// migrate players
-		for (PlayerData pdata : getAllPlayerData()) {
-			targetStore.playerNameToPlayerDataMap.put(pdata.playerName, pdata);
-
-		}
-
-		// migrate next claim ID
-		if (this.nextClaimID > targetStore.nextClaimID) {
-			targetStore.setNextClaimID(this.nextClaimID);
-		}
-
-		// rename player and claim data folders so the migration won't run again
-		int i = 0;
-		File claimsBackupFolder;
-		File playersBackupFolder;
-		do {
-			String claimsFolderBackupPath = claimDataFolderPath;
-			if (i > 0)
-				claimsFolderBackupPath += String.valueOf(i);
-			claimsBackupFolder = new File(claimsFolderBackupPath);
-
-			String playersFolderBackupPath = playerDataFolderPath;
-			if (i > 0)
-				playersFolderBackupPath += String.valueOf(i);
-			playersBackupFolder = new File(playersFolderBackupPath);
-			i++;
-		} while (claimsBackupFolder.exists() || playersBackupFolder.exists());
-
-		File claimsFolder = new File(claimDataFolderPath);
-		File playersFolder = new File(playerDataFolderPath);
-
-		claimsFolder.renameTo(claimsBackupFolder);
-		playersFolder.renameTo(playersBackupFolder);
-
-		GriefPrevention.AddLogEntry("Backed your file system data up to "
-				+ claimsBackupFolder.getName() + " and "
-				+ playersBackupFolder.getName() + ".");
-		GriefPrevention
-				.AddLogEntry("If your migration encountered any problems, you can restore those data with a quick copy/paste.");
-		GriefPrevention
-				.AddLogEntry("When you're satisfied that all your data have been safely migrated, consider deleting those folders.");
-	}
-
-	@Override
-	synchronized void close() {
-		super.close();
-	}
-
-	@Override
-	public void setNextClaimID(long nextClaimID2) {
-		// TODO Auto-generated method stub
-
-		File nextClaimIdFile = new File(nextClaimIdFilePath);
-		if (nextClaimIdFile.exists()) {
-			BufferedWriter outStream = null;
-			try {
-				outStream = new BufferedWriter(new FileWriter(
-						nextClaimIdFile.getAbsolutePath()));
-
-				// read the id
-				outStream.write(Long.toString(nextClaimID2));
-
-				// try to parse into a long value
-				this.nextClaimID = nextClaimID2;
-			} catch (Exception e) {
-			}
-
-			try {
-				if (outStream != null)
-					outStream.close();
-			} catch (IOException exception) {
-			}
-		}
-
 	}
 
 }

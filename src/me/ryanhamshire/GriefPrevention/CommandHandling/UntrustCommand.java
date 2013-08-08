@@ -14,8 +14,13 @@ import org.bukkit.entity.Player;
 public class UntrustCommand extends GriefPreventionCommand {
 
 	@Override
-	public boolean onCommand(CommandSender sender, Command command,
-			String label, String[] args) {
+	public String[] getLabels() {
+		// TODO Auto-generated method stub
+		return new String[] { "untrust" };
+	}
+
+	@Override
+	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		// TODO Auto-generated method stub
 		// requires exactly one parameter, the other player's name
 		if (args.length != 1)
@@ -25,8 +30,10 @@ public class UntrustCommand extends GriefPreventionCommand {
 		if (player == null)
 			return false;
 		// determine which claim the player is standing in
-		Claim claim = inst.dataStore
-				.getClaimAt(player.getLocation(), true /* ignore height */);
+		Claim claim = inst.dataStore.getClaimAt(player.getLocation(), true /*
+																			 * ignore
+																			 * height
+																			 */);
 
 		// bracket any permissions
 		if (args[0].contains(".")) {
@@ -41,20 +48,15 @@ public class UntrustCommand extends GriefPreventionCommand {
 			if (claim == null || claim.allowEdit(player) == null) {
 				clearPermissions = true;
 			} else {
-				GriefPrevention.sendMessage(player, TextMode.Err,
-						Messages.ClearPermsOwnerOnly);
+				GriefPrevention.sendMessage(player, TextMode.Err, Messages.ClearPermsOwnerOnly);
 				return true;
 			}
 		}
 
-		else if ((!args[0].startsWith("[") || !args[0].endsWith("]"))
-				&& !args[0].toUpperCase().startsWith("G:")
-				&& !args[0].startsWith("!")) {
+		else if ((!args[0].startsWith("[") || !args[0].endsWith("]")) && !args[0].toUpperCase().startsWith("G:") && !args[0].startsWith("!")) {
 			otherPlayer = inst.resolvePlayer(args[0]);
-			if (!clearPermissions && otherPlayer == null
-					&& !args[0].equals("public")) {
-				GriefPrevention.sendMessage(player, TextMode.Err,
-						Messages.PlayerNotFound);
+			if (!clearPermissions && otherPlayer == null && !args[0].equals("public")) {
+				GriefPrevention.sendMessage(player, TextMode.Err, Messages.PlayerNotFound);
 				return true;
 			}
 
@@ -65,16 +67,14 @@ public class UntrustCommand extends GriefPreventionCommand {
 			// make sure the group exists, otherwise show the message.
 			String groupname = args[0].substring(2);
 			if (!inst.config_player_groups.GroupExists(groupname)) {
-				GriefPrevention.sendMessage(player, TextMode.Err,
-						Messages.GroupNotFound);
+				GriefPrevention.sendMessage(player, TextMode.Err, Messages.GroupNotFound);
 				return true;
 			}
 		}
 
 		// if no claim here, apply changes to all his claims
 		if (claim == null) {
-			PlayerData playerData = inst.dataStore.getPlayerData(player
-					.getName());
+			PlayerData playerData = inst.dataStore.getPlayerData(player.getName());
 			for (int i = 0; i < playerData.claims.size(); i++) {
 				claim = playerData.claims.get(i);
 
@@ -101,24 +101,20 @@ public class UntrustCommand extends GriefPreventionCommand {
 
 			// confirmation message
 			if (!clearPermissions) {
-				GriefPrevention.sendMessage(player, TextMode.Success,
-						Messages.UntrustIndividualAllClaims, args[0]);
+				GriefPrevention.sendMessage(player, TextMode.Success, Messages.UntrustIndividualAllClaims, args[0]);
 			} else {
-				GriefPrevention.sendMessage(player, TextMode.Success,
-						Messages.UntrustEveryoneAllClaims);
+				GriefPrevention.sendMessage(player, TextMode.Success, Messages.UntrustEveryoneAllClaims);
 			}
 		}
 
 		// otherwise, apply changes to only this claim
 		else if (claim.allowGrantPermission(player) != null) {
-			GriefPrevention.sendMessage(player, TextMode.Err,
-					Messages.NoPermissionTrust, claim.getOwnerName());
+			GriefPrevention.sendMessage(player, TextMode.Err, Messages.NoPermissionTrust, claim.getOwnerName());
 		} else {
 			// if clearing all
 			if (clearPermissions) {
 				claim.clearPermissions();
-				GriefPrevention.sendMessage(player, TextMode.Success,
-						Messages.ClearPermissionsOneClaim);
+				GriefPrevention.sendMessage(player, TextMode.Success, Messages.ClearPermissionsOneClaim);
 			}
 
 			// otherwise individual permission drop
@@ -132,11 +128,9 @@ public class UntrustCommand extends GriefPreventionCommand {
 						args[0] = "the public";
 					}
 
-					GriefPrevention.sendMessage(player, TextMode.Success,
-							Messages.UntrustIndividualSingleClaim, args[0]);
+					GriefPrevention.sendMessage(player, TextMode.Success, Messages.UntrustIndividualSingleClaim, args[0]);
 				} else {
-					GriefPrevention.sendMessage(player, TextMode.Success,
-							Messages.UntrustOwnerOnly, claim.getOwnerName());
+					GriefPrevention.sendMessage(player, TextMode.Success, Messages.UntrustOwnerOnly, claim.getOwnerName());
 				}
 			}
 
@@ -145,12 +139,6 @@ public class UntrustCommand extends GriefPreventionCommand {
 		}
 
 		return true;
-	}
-
-	@Override
-	public String[] getLabels() {
-		// TODO Auto-generated method stub
-		return new String[] { "untrust" };
 	}
 
 }

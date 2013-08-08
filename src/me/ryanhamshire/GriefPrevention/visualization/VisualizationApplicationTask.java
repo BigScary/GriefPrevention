@@ -24,12 +24,11 @@ import org.bukkit.entity.Player;
 
 //applies a visualization for a player by sending him block change packets
 class VisualizationApplicationTask implements Runnable {
-	private Visualization visualization;
 	private Player player;
 	private PlayerData playerData;
+	private Visualization visualization;
 
-	public VisualizationApplicationTask(Player player, PlayerData playerData,
-			Visualization visualization) {
+	public VisualizationApplicationTask(Player player, PlayerData playerData, Visualization visualization) {
 		this.visualization = visualization;
 		this.playerData = playerData;
 		this.player = player;
@@ -42,8 +41,7 @@ class VisualizationApplicationTask implements Runnable {
 			VisualizationElement element = visualization.elements.get(i);
 
 			// send the player a fake block change event
-			player.sendBlockChange(element.location,
-					element.visualizedMaterial, element.visualizedData);
+			player.sendBlockChange(element.location, element.visualizedMaterial, element.visualizedData);
 		}
 
 		// remember the visualization applied to this player for later (so it

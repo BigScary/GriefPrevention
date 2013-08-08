@@ -24,11 +24,10 @@ import org.bukkit.Material;
 //represents a "fake" block sent to a player as part of a visualization
 public class VisualizationElement {
 	public Location location;
-	public Material visualizedMaterial;
 	public byte visualizedData;
+	public Material visualizedMaterial;
 
-	public VisualizationElement(Location location, Material visualizedMaterial,
-			byte visualizedData) {
+	public VisualizationElement(Location location, Material visualizedMaterial, byte visualizedData) {
 		this.location = location;
 		this.visualizedMaterial = visualizedMaterial;
 		this.visualizedData = visualizedData;

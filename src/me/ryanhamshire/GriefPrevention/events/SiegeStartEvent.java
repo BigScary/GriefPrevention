@@ -17,16 +17,22 @@ public class SiegeStartEvent extends Event implements Cancellable {
 	// Custom Event Requirements
 	private static final HandlerList handlers = new HandlerList();
 
-	@Override
-	public HandlerList getHandlers() {
-		return handlers;
-	}
-
 	public static HandlerList getHandlerList() {
 		return handlers;
 	}
 
+	boolean canceled = false;
+
 	SiegeData SiegeInfo;
+
+	public SiegeStartEvent(SiegeData sd) {
+		SiegeInfo = sd;
+	}
+
+	@Override
+	public HandlerList getHandlers() {
+		return handlers;
+	}
 
 	/**
 	 * returns the Information of the upcoming Siege.
@@ -36,12 +42,6 @@ public class SiegeStartEvent extends Event implements Cancellable {
 	public SiegeData getSiegeData() {
 		return SiegeInfo;
 	}
-
-	public SiegeStartEvent(SiegeData sd) {
-		SiegeInfo = sd;
-	}
-
-	boolean canceled = false;
 
 	public boolean isCancelled() {
 		return canceled;

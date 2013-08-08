@@ -7,55 +7,47 @@ import java.util.Vector;
 
 import me.ryanhamshire.GriefPrevention.Claim;
 import me.ryanhamshire.GriefPrevention.Debugger;
+import me.ryanhamshire.GriefPrevention.Debugger.DebugLevel;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import me.ryanhamshire.GriefPrevention.PlayerData;
 import me.ryanhamshire.GriefPrevention.Configuration.WorldConfig;
-import me.ryanhamshire.GriefPrevention.Debugger.DebugLevel;
 
 import org.bukkit.Chunk;
 import org.bukkit.World;
 
 public class WorldClaimCleanupTask implements Runnable {
+	private String CleanupWorldName;
+	private boolean flInitialized = false;
 	// Claim Cleanup has/will be refactored to working
 	// per world rather than globally.
 	// This decision was made because the previous logic was too unpredictable.
 	private int nextClaimIndex = 0;
-	private boolean flInitialized = false;
-	private String CleanupWorldName;
-	private WorldConfig wc = null;
 	private int TaskCookie = 0;
+	private WorldConfig wc = null;
+
+	public WorldClaimCleanupTask(String WorldCleanup) {
+		CleanupWorldName = WorldCleanup;
+		wc = GriefPrevention.instance.getWorldCfg(WorldCleanup);
+		Debugger.Write("WorldClaimCleanupTask started for world:" + WorldCleanup, DebugLevel.Verbose);
+	}
 
 	public int getTaskCookie() {
 		return TaskCookie;
 	}
 
-	public void setTaskCookie(int value) {
-		TaskCookie = value;
-	}
-
-	public WorldClaimCleanupTask(String WorldCleanup) {
-		CleanupWorldName = WorldCleanup;
-		wc = GriefPrevention.instance.getWorldCfg(WorldCleanup);
-		Debugger.Write("WorldClaimCleanupTask started for world:"
-				+ WorldCleanup, DebugLevel.Verbose);
-	}
-
 	public void run() {
 
 		// retrieve the claims mapped to our world.
-		List<Claim> WorldClaims = GriefPrevention.instance.dataStore
-				.getClaimArray().getWorldClaims(CleanupWorldName);
+		List<Claim> WorldClaims = GriefPrevention.instance.dataStore.getClaimArray().getWorldClaims(CleanupWorldName);
 		// if the list is null or empty, we have no work to do, so break out.
 
 		if (WorldClaims == null || WorldClaims.size() == 0)
 			return;
 
-		Debugger.Write("Claim Cleanup Running for World:" + CleanupWorldName,
-				DebugLevel.Verbose);
+		Debugger.Write("Claim Cleanup Running for World:" + CleanupWorldName, DebugLevel.Verbose);
 		if (!flInitialized) {
 			Random randomNumberGenerator = new Random();
-			this.nextClaimIndex = randomNumberGenerator
-					.nextInt(GriefPrevention.instance.dataStore.getClaimsSize());
+			this.nextClaimIndex = randomNumberGenerator.nextInt(GriefPrevention.instance.dataStore.getClaimsSize());
 			flInitialized = true;
 		}
 		nextClaimIndex = nextClaimIndex % (WorldClaims.size()) - 1;
@@ -74,14 +66,12 @@ public class WorldClaimCleanupTask implements Runnable {
 		boolean cleanupChunks = false;
 
 		// get data for the player, especially last login timestamp
-		PlayerData playerData = GriefPrevention.instance.dataStore
-				.getPlayerData(claim.getOwnerName());
+		PlayerData playerData = GriefPrevention.instance.dataStore.getPlayerData(claim.getOwnerName());
 
 		// determine area of the default chest claim
 		int areaOfDefaultClaim = 0;
 		if (wc.getAutomaticClaimsForNewPlayerRadius() >= 0) {
-			areaOfDefaultClaim = (int) Math.pow(
-					wc.getAutomaticClaimsForNewPlayerRadius() * 2 + 1, 2);
+			areaOfDefaultClaim = (int) Math.pow(wc.getAutomaticClaimsForNewPlayerRadius() * 2 + 1, 2);
 		}
 
 		// if he's been gone at least a week, if he has ONLY the new player
@@ -91,25 +81,18 @@ public class WorldClaimCleanupTask implements Runnable {
 			return;
 		sevenDaysAgo.add(Calendar.DATE, -wc.getChestClaimExpirationDays());
 
-		boolean newPlayerClaimsExpired = sevenDaysAgo.getTime().after(
-				playerData.lastLogin);
+		boolean newPlayerClaimsExpired = sevenDaysAgo.getTime().after(playerData.lastLogin);
 
 		// if only one claim, and the player hasn't played in a week
 		if (newPlayerClaimsExpired && playerData.claims.size() == 1) {
 
 			// if that's a chest claim and those are set to expire
-			if (claim.getArea() <= areaOfDefaultClaim && newPlayerClaimsExpired
-					&& wc.getChestClaimExpirationDays() > 0) {
-				Debugger.Write(
-						"Deleting Chest Claim owned by " + claim.getOwnerName()
-								+ " last login:"
-								+ playerData.lastLogin.toString(),
-						DebugLevel.Verbose);
+			if (claim.getArea() <= areaOfDefaultClaim && newPlayerClaimsExpired && wc.getChestClaimExpirationDays() > 0) {
+				Debugger.Write("Deleting Chest Claim owned by " + claim.getOwnerName() + " last login:" + playerData.lastLogin.toString(), DebugLevel.Verbose);
 				claim.removeSurfaceFluids(null);
 				GriefPrevention.instance.dataStore.deleteClaim(claim);
 				if (playerData.claims.size() == 0) {
-					GriefPrevention.instance.dataStore
-							.deletePlayerData(playerData.playerName);
+					GriefPrevention.instance.dataStore.deletePlayerData(playerData.playerName);
 				}
 
 				cleanupChunks = true;
@@ -119,8 +102,7 @@ public class WorldClaimCleanupTask implements Runnable {
 					GriefPrevention.instance.restoreClaim(claim, 0);
 				}
 
-				GriefPrevention.AddLogEntry(" " + claim.getOwnerName()
-						+ "'s new player claim expired.");
+				GriefPrevention.AddLogEntry(" " + claim.getOwnerName() + "'s new player claim expired.");
 			}
 		}
 
@@ -128,11 +110,9 @@ public class WorldClaimCleanupTask implements Runnable {
 		// without exceptions...
 		else if (wc.getClaimsExpirationDays() > 0) {
 			Calendar earliestPermissibleLastLogin = Calendar.getInstance();
-			earliestPermissibleLastLogin.add(Calendar.DATE,
-					-wc.getClaimsExpirationDays());
+			earliestPermissibleLastLogin.add(Calendar.DATE, -wc.getClaimsExpirationDays());
 
-			if (earliestPermissibleLastLogin.getTime().after(
-					playerData.lastLogin)) {
+			if (earliestPermissibleLastLogin.getTime().after(playerData.lastLogin)) {
 				// make a copy of this player's claim list
 				Vector<Claim> claims = new Vector<Claim>();
 				for (int i = 0; i < playerData.claims.size(); i++) {
@@ -140,14 +120,9 @@ public class WorldClaimCleanupTask implements Runnable {
 				}
 
 				// delete them
-				GriefPrevention.instance.dataStore.deleteClaimsForPlayer(
-						claim.getOwnerName(), true, false);
-				GriefPrevention
-						.AddLogEntry(" All of "
-								+ claim.getOwnerName()
-								+ "'s claims have expired. Removing all but the locked claims.");
-				GriefPrevention.instance.dataStore
-						.deletePlayerData(playerData.playerName);
+				GriefPrevention.instance.dataStore.deleteClaimsForPlayer(claim.getOwnerName(), true, false);
+				GriefPrevention.AddLogEntry(" All of " + claim.getOwnerName() + "'s claims have expired. Removing all but the locked claims.");
+				GriefPrevention.instance.dataStore.deletePlayerData(playerData.playerName);
 
 				for (int i = 0; i < claims.size(); i++) {
 					// if configured to do so, restore the land to natural
@@ -163,14 +138,10 @@ public class WorldClaimCleanupTask implements Runnable {
 			// if the player has been gone two weeks, scan claim content to
 			// assess player investment
 			Calendar earliestAllowedLoginDate = Calendar.getInstance();
-			earliestAllowedLoginDate.add(Calendar.DATE,
-					-wc.getUnusedClaimExpirationDays());
-			boolean needsInvestmentScan = earliestAllowedLoginDate.getTime()
-					.after(playerData.lastLogin);
-			boolean creativerules = GriefPrevention.instance
-					.creativeRulesApply(claim.getLesserBoundaryCorner());
-			boolean sizelimitreached = (creativerules && claim.getWidth() > wc
-					.getClaimCleanupMaximumSize());
+			earliestAllowedLoginDate.add(Calendar.DATE, -wc.getUnusedClaimExpirationDays());
+			boolean needsInvestmentScan = earliestAllowedLoginDate.getTime().after(playerData.lastLogin);
+			boolean creativerules = GriefPrevention.instance.creativeRulesApply(claim.getLesserBoundaryCorner());
+			boolean sizelimitreached = (creativerules && claim.getWidth() > wc.getClaimCleanupMaximumSize());
 
 			// avoid scanning large claims, locked claims, and administrative
 			// claims
@@ -184,8 +155,7 @@ public class WorldClaimCleanupTask implements Runnable {
 				minInvestment = wc.getClaimCleanupMaxInvestmentScore();
 				// if minInvestment is 0, assume no limitation and force the
 				// following conditions to clear the claim.
-				long investmentScore = minInvestment == 0 ? Long.MAX_VALUE
-						: claim.getPlayerInvestmentScore();
+				long investmentScore = minInvestment == 0 ? Long.MAX_VALUE : claim.getPlayerInvestmentScore();
 				cleanupChunks = true;
 				boolean removeClaim = false;
 
@@ -196,11 +166,8 @@ public class WorldClaimCleanupTask implements Runnable {
 				// investment score
 				// so 500 blocks of lava without anything built to offset all
 				// that potential mess would be cleaned up automatically
-				if (GriefPrevention.instance.creativeRulesApply(claim
-						.getLesserBoundaryCorner()) && investmentScore < -5000) {
-					Debugger.Write("Creative Rules World, InvestmentScore of "
-							+ investmentScore + " is below -5000",
-							DebugLevel.Verbose);
+				if (GriefPrevention.instance.creativeRulesApply(claim.getLesserBoundaryCorner()) && investmentScore < -5000) {
+					Debugger.Write("Creative Rules World, InvestmentScore of " + investmentScore + " is below -5000", DebugLevel.Verbose);
 					removeClaim = true;
 				}
 
@@ -208,19 +175,13 @@ public class WorldClaimCleanupTask implements Runnable {
 				// based on build investment is to be away for two weeks AND not
 				// build much of anything
 				else if (needsInvestmentScan && investmentScore < minInvestment) {
-					Debugger.Write("Investment Score (" + investmentScore
-							+ " does not meet threshold " + minInvestment,
-							DebugLevel.Verbose);
+					Debugger.Write("Investment Score (" + investmentScore + " does not meet threshold " + minInvestment, DebugLevel.Verbose);
 					removeClaim = true;
 				}
 
 				if (removeClaim) {
 					GriefPrevention.instance.dataStore.deleteClaim(claim);
-					GriefPrevention.AddLogEntry("Removed "
-							+ claim.getOwnerName()
-							+ "'s unused claim @ "
-							+ GriefPrevention.getfriendlyLocationString(claim
-									.getLesserBoundaryCorner()));
+					GriefPrevention.AddLogEntry("Removed " + claim.getOwnerName() + "'s unused claim @ " + GriefPrevention.getfriendlyLocationString(claim.getLesserBoundaryCorner()));
 
 					// if configured to do so, restore the claim area to natural
 					// state
@@ -233,10 +194,8 @@ public class WorldClaimCleanupTask implements Runnable {
 
 		// toss that player data out of the cache, it's probably not needed in
 		// memory right now
-		if (!GriefPrevention.instance.getServer()
-				.getOfflinePlayer(claim.getOwnerName()).isOnline()) {
-			GriefPrevention.instance.dataStore.clearCachedPlayerData(claim
-					.getOwnerName());
+		if (!GriefPrevention.instance.getServer().getOfflinePlayer(claim.getOwnerName()).isOnline()) {
+			GriefPrevention.instance.dataStore.clearCachedPlayerData(claim.getOwnerName());
 		}
 
 		// since we're potentially loading a lot of chunks to scan parts of the
@@ -251,5 +210,9 @@ public class WorldClaimCleanupTask implements Runnable {
 			}
 		}
 
+	}
+
+	public void setTaskCookie(int value) {
+		TaskCookie = value;
 	}
 }

@@ -9,17 +9,16 @@ public abstract class ClaimEvent extends Event {
 	// Custom Event Requirements
 	private static final HandlerList handlers = new HandlerList();
 
-	@Override
-	public HandlerList getHandlers() {
-		return handlers;
-	}
-
 	public static HandlerList getHandlerList() {
 		return handlers;
 
 	}
 
 	protected Claim claim;
+
+	protected ClaimEvent(Claim c) {
+		claim = c;
+	}
 
 	/**
 	 * the claim being affected
@@ -31,7 +30,8 @@ public abstract class ClaimEvent extends Event {
 
 	}
 
-	protected ClaimEvent(Claim c) {
-		claim = c;
+	@Override
+	public HandlerList getHandlers() {
+		return handlers;
 	}
 }

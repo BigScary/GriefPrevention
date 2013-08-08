@@ -3,6 +3,7 @@ package me.ryanhamshire.GriefPrevention.CommandHandling;
 import me.ryanhamshire.GriefPrevention.Claim;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import me.ryanhamshire.GriefPrevention.Messages;
+import me.ryanhamshire.GriefPrevention.PermNodes;
 import me.ryanhamshire.GriefPrevention.PlayerData;
 import me.ryanhamshire.GriefPrevention.TextMode;
 import me.ryanhamshire.GriefPrevention.events.ClaimTransferEvent;
@@ -20,8 +21,13 @@ import org.bukkit.entity.Player;
 public class TransferClaimCommand extends GriefPreventionCommand {
 
 	@Override
-	public boolean onCommand(CommandSender sender, Command command,
-			String label, String[] args) {
+	public String[] getLabels() {
+		// TODO Auto-generated method stub
+		return new String[] { "transferclaim" };
+	}
+
+	@Override
+	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		// if(args.length>2) return false;
 		GriefPrevention inst = GriefPrevention.instance;
 		String OriginalOwner;
@@ -34,8 +40,7 @@ public class TransferClaimCommand extends GriefPreventionCommand {
 		boolean toAdmin = false;
 		if (inclaim == null) {
 			// not inside a claim, so not valid.
-			GriefPrevention.sendMessage(player, TextMode.Err,
-					"There is no claim here.");
+			GriefPrevention.sendMessage(player, TextMode.Err, "There is no claim here.");
 
 		} else {
 			toAdmin = !inclaim.isAdminClaim();
@@ -49,10 +54,8 @@ public class TransferClaimCommand extends GriefPreventionCommand {
 			// claim must
 			// not be an admin claim.
 			// check permissions.
-			if (!(player.hasPermission("griefprevention.adminclaims") && player
-					.hasPermission("griefprevention.transferclaims"))) {
-				GriefPrevention.sendMessage(player, TextMode.Err,
-						Messages.NoPermissionForCommand);
+			if (!(player.hasPermission(PermNodes.AdminClaimsPermission) && player.hasPermission(PermNodes.TransferClaimsPermission))) {
+				GriefPrevention.sendMessage(player, TextMode.Err, Messages.NoPermissionForCommand);
 				return true;
 			}
 			// otherwise, the appropriate perms are present.
@@ -61,9 +64,7 @@ public class TransferClaimCommand extends GriefPreventionCommand {
 				// they have not been warned, tell them what will happen and how
 				// to proceed.
 				pd.warnedAboutMajorDeletion = true;
-				GriefPrevention
-						.sendMessage(player, TextMode.Info,
-								"use /TransferClaim again to make this claim an admin claim");
+				GriefPrevention.sendMessage(player, TextMode.Info, "use /TransferClaim again to make this claim an admin claim");
 				return true;
 
 			} else {
@@ -74,12 +75,9 @@ public class TransferClaimCommand extends GriefPreventionCommand {
 					String previousOwner = inclaim.getOwnerName();
 					try {
 						inst.dataStore.changeClaimOwner(inclaim, "");
-						GriefPrevention.sendMessage(player, TextMode.Success,
-								"This claim is now an administrator claim, and no longer belongs to "
-										+ previousOwner + ".");
+						GriefPrevention.sendMessage(player, TextMode.Success, "This claim is now an administrator claim, and no longer belongs to " + previousOwner + ".");
 					} catch (Exception exx) {
-						GriefPrevention.sendMessage(player, TextMode.Err,
-								"TransferClaim Exception " + exx.getMessage());
+						GriefPrevention.sendMessage(player, TextMode.Err, "TransferClaim Exception " + exx.getMessage());
 					}
 					return true;
 				}
@@ -91,27 +89,20 @@ public class TransferClaimCommand extends GriefPreventionCommand {
 			// this requires higher perms than giveclaim, FWIW.
 			String targetplayer = args[0];
 			// require perms.
-			if (!(player.hasPermission("griefprevention.adminclaims") && player
-					.hasPermission("griefprevention.transferclaims"))) {
-				GriefPrevention.sendMessage(player, TextMode.Err,
-						Messages.NoPermissionForCommand);
+			if (!(player.hasPermission(PermNodes.AdminClaimsPermission) && player.hasPermission(PermNodes.TransferClaimsPermission))) {
+				GriefPrevention.sendMessage(player, TextMode.Err, Messages.NoPermissionForCommand);
 				return true;
 			} else {
 				String previousOwner = inclaim.getOwnerName();
 
-				ClaimTransferEvent te = new ClaimTransferEvent(inclaim,
-						targetplayer);
+				ClaimTransferEvent te = new ClaimTransferEvent(inclaim, targetplayer);
 				Bukkit.getPluginManager().callEvent(te);
 				if (!te.isCancelled()) {
 					try {
 						inst.dataStore.changeClaimOwner(inclaim, targetplayer);
-						GriefPrevention.sendMessage(player, TextMode.Success,
-								"Claim ownership transferred from "
-										+ previousOwner + " to " + targetplayer
-										+ ".");
+						GriefPrevention.sendMessage(player, TextMode.Success, "Claim ownership transferred from " + previousOwner + " to " + targetplayer + ".");
 					} catch (Exception exx) {
-						GriefPrevention.sendMessage(player, TextMode.Err,
-								"TransferClaim Exception " + exx.getMessage());
+						GriefPrevention.sendMessage(player, TextMode.Err, "TransferClaim Exception " + exx.getMessage());
 					}
 				}
 
@@ -121,12 +112,6 @@ public class TransferClaimCommand extends GriefPreventionCommand {
 		}
 
 		return false;
-	}
-
-	@Override
-	public String[] getLabels() {
-		// TODO Auto-generated method stub
-		return new String[] { "transferclaim" };
 	}
 
 }

@@ -33,298 +33,7 @@ import org.bukkit.entity.Player;
  */
 public class ConfigData {
 
-	private String TemplateFile;
-	private WorldConfig SingleWorldConfig = null;
-	private String SingleWorldConfigLocation = null;
-	private String WorldConfigLocation = null;
-
-	/**
-	 * retrieves the Single World Configuration. This is set in the config.yml
-	 * by setting GriefPrevention.SingleWorldConfig to a filename.
-	 * 
-	 * @return WorldConfig instance holding configuration options
-	 */
-	public WorldConfig getSingleWorldConfiguration() {
-		return SingleWorldConfig;
-	}
-
-	public String getTemplateFile() {
-		return TemplateFile;
-	}
-
-	private HashMap<String, WorldConfig> WorldCfg = new HashMap<String, WorldConfig>();
-
-	// private WorldConfig DefaultSurvival = null;
-	// private WorldConfig DefaultCreative = null;
-	// private List<String> PvPEnabledWorlds = new ArrayList<String>();
-	// private List<String> CreativeWorldRules = new ArrayList<String>();
-	public Map<String, WorldConfig> getWorldConfigs() {
-		return Collections.unmodifiableMap(WorldCfg);
-
-	}
-
-	public List<WorldConfig> getCreativeRulesConfigs() {
-
-		ArrayList<WorldConfig> buildList = new ArrayList<WorldConfig>();
-		for (WorldConfig wcon : WorldCfg.values()) {
-			if (wcon.getCreativeRules())
-				buildList.add(wcon);
-		}
-		return buildList;
-
-	}
-
-	public WorldConfig getWorldConfig(String forWorld) {
-		if (this.SingleWorldConfig != null)
-			return SingleWorldConfig;
-		World Grabfor = Bukkit.getWorld(forWorld);
-		if (Grabfor == null)
-			return new WorldConfig(forWorld);
-
-		return getWorldConfig(Grabfor);
-	}
-
-	public List<String> GetWorldConfigNames() {
-		List<String> results = new ArrayList<String>();
-		File SourceFolder = new File(WorldConfigLocation);
-		for (File iterate : SourceFolder.listFiles()) {
-			if (iterate.getName().startsWith("_"))
-				continue;
-			if (iterate.getName().toUpperCase().endsWith(".YML")) {
-				String basename = iterate.getName().replaceFirst("[.][^.]+$",
-						"");
-				results.add(basename);
-			}
-		}
-		return results;
-
-	}
-
-	public List<String> GetWorldConfigurationFiles() {
-		List<String> ActFiles = new ArrayList<String>();
-		File SourceFolder = new File(WorldConfigLocation);
-
-		ActFiles.add(getTemplateFile());
-
-		// iterate through each file.
-		for (File iterate : SourceFolder.listFiles()) {
-			if (iterate.getName().startsWith("_"))
-				continue;
-			if (iterate.getName().toUpperCase().endsWith(".YML")) {
-				ActFiles.add(iterate.getPath());
-			}
-
-		}
-		return ActFiles;
-
-	}
-
-	public void AddContainerID(Player Invoker, World TargetWorld,
-			MaterialInfo mi) {
-		AddMaterialListItem(Invoker, TargetWorld,
-				"GriefPrevention.Mods.BlockIdsRequiringContainerTrust", mi);
-	}
-
-	public void RemoveContainerID(Player Invoker, World TargetWorld,
-			MaterialInfo mi) {
-		RemoveMaterialListItem(Invoker, TargetWorld,
-				"GriefPrevention.Mods.BlockIdsRequiringContainerTrust", mi);
-	}
-
-	// part of possible future feature to allow admins to add Container, Access,
-	// and other elements to the
-	// plugin configuration "on the fly"; for example a admin could use a
-	// certain tool, and left click would add it as a container and shift+left
-	// click would remove it
-	// (or something, eg. Left click add, Right click remove, shift on each
-	// would do the same for all worlds, that sort of thing).
-
-	public void AddMaterialListItem(Player Invoker, World TargetWorld,
-			String NodePath, MaterialInfo mi) {
-		// special method, loads in this world configuration, adds the given
-		// Container ID to the container ID listing,
-		// saves, and returns.
-		// first, we need to get our file.
-
-		String WorldTarget;
-		List<String> ActFiles = new ArrayList<String>();
-		if (TargetWorld != null) {
-			ActFiles.add(WorldConfig.getWorldConfig(TargetWorld.getName()));
-			WorldTarget = " World:" + TargetWorld.getName();
-
-		} else {
-			// if TargetWorld is null, we want to do this to <all configuration
-			// files>
-			ActFiles = GetWorldConfigurationFiles();
-			// System.out.println("Files:" + ActFiles.size());
-			WorldTarget = "All Worlds";
-		}
-
-		for (String iterate : ActFiles) {
-			// open this configuration...
-
-			YamlConfiguration yml = YamlConfiguration
-					.loadConfiguration(new File(iterate));
-			// GriefPrevention.Mods.BlockIdsRequiringContainerTrust
-			List<String> StringResult = yml.getStringList(NodePath);
-			// turn the list into a MaterialCollection.
-			MaterialCollection mc = new MaterialCollection();
-			GriefPrevention.instance.parseMaterialListFromConfig(StringResult,
-					mc);
-			if (mc.contains(mi)) {
-
-				continue;
-			}
-			mc.add(mi);
-			yml.set("GriefPrevention.Mods.BlockIdsRequiringContainerTrust",
-					mc.GetList());
-			// add to the end of this list.
-			// save the changed config.
-			try {
-				yml.save(iterate);
-			} catch (IOException exx) {
-
-			}
-			if (Invoker != null) {
-				Invoker.sendMessage(ChatColor.ITALIC
-						+ TextMode.Instr.toString() + "Block ID:"
-						+ mi.getTypeID() + " added to " + NodePath + " in "
-						+ WorldTarget);
-			}
-
-		}
-
-	}
-
-	public void RemoveMaterialListItem(Player Invoker, World TargetWorld,
-			String NodePath, MaterialInfo mi) {
-		// special method, loads in this world configuration, adds the given
-		// Container ID to the container ID listing,
-		// saves, and returns.
-		// first, we need to get our file.
-
-		String WorldTarget;
-		List<String> ActFiles = new ArrayList<String>();
-		if (TargetWorld != null) {
-			ActFiles.add(WorldConfig.getWorldConfig(TargetWorld.getName()));
-			WorldTarget = " World:" + TargetWorld.getName();
-
-		} else {
-			// if TargetWorld is null, we want to do this to <all configuration
-			// files>
-			ActFiles = GetWorldConfigurationFiles();
-			WorldTarget = "All Worlds";
-		}
-
-		for (String iterate : ActFiles) {
-			// open this configuration...
-			YamlConfiguration yml = YamlConfiguration
-					.loadConfiguration(new File(iterate));
-			// GriefPrevention.Mods.BlockIdsRequiringContainerTrust
-			List<String> StringResult = yml.getStringList(NodePath);
-			// turn the list into a MaterialCollection.
-			MaterialCollection mc = new MaterialCollection();
-			GriefPrevention.instance.parseMaterialListFromConfig(StringResult,
-					mc);
-			if (!mc.contains(mi)) {
-
-				continue;
-			}
-			mc.remove(mi);
-			yml.set(NodePath, mc.GetList());
-			// add to the end of this list.
-			if (Invoker != null) {
-				Invoker.sendMessage(ChatColor.ITALIC
-						+ TextMode.Instr.toString() + "Block ID:"
-						+ mi.getTypeID() + " removed from " + NodePath + " in "
-						+ iterate);
-			}
-		}
-
-	}
-
-	/**
-	 * retrieves the WorldConfiguration for the given world name. If the world
-	 * is not valid, a log entry will be posted, but the config should still be
-	 * loaded and returned.
-	 * 
-	 * @param worldName
-	 *            Name of world to get configuration of.
-	 * @return WorldConfig instance representing the configuration for the given
-	 *         world.
-	 */
-	public WorldConfig getWorldConfig(World grabfor) {
-		if (this.SingleWorldConfig != null)
-			return SingleWorldConfig;
-		String worldName = grabfor.getName();
-
-		// if it's not in the hashmap...
-		if (!WorldCfg.containsKey(worldName)) {
-			// special code: it's possible a configuration might already exist
-			// for this file, so we'll
-			// check
-			String checkyamlfile = WorldConfig.getWorldConfig(worldName);
-			// if it exists...
-			if (new File(checkyamlfile).exists()) {
-				// attempt to load the configuration from the given file.
-				YamlConfiguration existingcfg = YamlConfiguration
-						.loadConfiguration(new File(checkyamlfile));
-				YamlConfiguration outConfiguration = new YamlConfiguration();
-				// place it in the hashmap.
-				WorldCfg.put(worldName, new WorldConfig(worldName, existingcfg,
-						outConfiguration));
-				// try to save it. this can error out for who knows what reason.
-				// If it does, we'll
-				// squirt the issue to the log.
-				try {
-					outConfiguration.save(new File(checkyamlfile));
-				} catch (IOException iex) {
-					GriefPrevention.instance.getLogger().log(
-							Level.SEVERE,
-							"Failed to save World Config for world "
-									+ worldName);
-
-				}
-			} else {
-				// if the file doesn't exist, then we will go ahead and create a
-				// new configuration.
-				// set the input Yaml to default to the template.
-				// if the template file exists, load it's configuration and use
-				// the result as useSource.
-				// Otherwise, we create a blank configuration.
-				Debugger.Write("Failed to find world configuration for World "
-						+ worldName, DebugLevel.Errors);
-				File TemplFile = new File(TemplateFile);
-				FileConfiguration useSource = null;
-				if (TemplFile.exists()) {
-					useSource = YamlConfiguration.loadConfiguration(TemplFile);
-				} else {
-					Debugger.Write("Template file \"" + TemplateFile
-							+ " \"Not Found.", DebugLevel.Errors);
-					useSource = new YamlConfiguration();
-				}
-
-				// The target save location.
-				FileConfiguration Target = new YamlConfiguration();
-				// place it in the hashmap.
-				WorldCfg.put(worldName, new WorldConfig(grabfor.getName(),
-						useSource, Target));
-				try {
-					Target.save(new File(checkyamlfile));
-				} catch (IOException ioex) {
-					GriefPrevention.instance.getLogger().log(
-							Level.SEVERE,
-							"Failed to write world configuration to "
-									+ checkyamlfile);
-				}
-
-			}
-			// save target
-		}
-		// after the above logic, we know it's in the hashmap, so return that.
-		return WorldCfg.get(worldName);
-
-	}
+	private static final String NoneSpecifier = "<None>";
 
 	public static FileConfiguration createTargetConfiguration(String sName) {
 		return YamlConfiguration.loadConfiguration(new File(sName));
@@ -341,11 +50,18 @@ public class ConfigData {
 	 */
 	public static String getWorldConfigLocation(String sName) {
 
-		return DataStore.dataLayerFolderPath + File.separator + "WorldConfigs/"
-				+ sName + ".cfg";
+		return DataStore.dataLayerFolderPath + File.separator + "WorldConfigs/" + sName + ".cfg";
 	}
 
-	private static final String NoneSpecifier = "<None>";
+	private WorldConfig SingleWorldConfig = null;
+
+	private String SingleWorldConfigLocation = null;
+
+	private String TemplateFile;
+
+	private HashMap<String, WorldConfig> WorldCfg = new HashMap<String, WorldConfig>();
+
+	private String WorldConfigLocation = null;
 
 	/**
 	 * Constructs a new ConfigData instance from the given core configuration
@@ -362,30 +78,21 @@ public class ConfigData {
 		// core configuration is configuration that is Global.
 		// we try to avoid these now. Normally the primary interest is the
 		// GriefPrevention.WorldConfigFolder setting.
-		String DefaultConfigFolder = DataStore.dataLayerFolderPath
-				+ File.separator + "WorldConfigs" + File.separator;
+		String DefaultConfigFolder = DataStore.dataLayerFolderPath + File.separator + "WorldConfigs" + File.separator;
 		String DefaultTemplateFile = DefaultConfigFolder + "_template.cfg";
 		// Configurable template file.
-		TemplateFile = CoreConfig
-				.getString("GriefPrevention.WorldConfig.TemplateFile",
-						DefaultTemplateFile);
+		TemplateFile = CoreConfig.getString("GriefPrevention.WorldConfig.TemplateFile", DefaultTemplateFile);
 		if (!(new File(TemplateFile).exists())) {
 			TemplateFile = DefaultTemplateFile;
 
 		}
-		String SingleConfig = CoreConfig.getString(
-				"GriefPrevention.WorldConfig.SingleWorld", NoneSpecifier);
+		String SingleConfig = CoreConfig.getString("GriefPrevention.WorldConfig.SingleWorld", NoneSpecifier);
 		SingleWorldConfigLocation = SingleConfig;
-		if (!SingleConfig.equals(NoneSpecifier)
-				&& new File(NoneSpecifier).exists()) {
-			GriefPrevention
-					.AddLogEntry("SingleWorld Configuration Mode Enabled. File \""
-							+ SingleConfig + "\" will be used for all worlds.");
-			YamlConfiguration SingleReadConfig = YamlConfiguration
-					.loadConfiguration(new File(SingleConfig));
+		if (!SingleConfig.equals(NoneSpecifier) && new File(NoneSpecifier).exists()) {
+			GriefPrevention.AddLogEntry("SingleWorld Configuration Mode Enabled. File \"" + SingleConfig + "\" will be used for all worlds.");
+			YamlConfiguration SingleReadConfig = YamlConfiguration.loadConfiguration(new File(SingleConfig));
 			YamlConfiguration SingleTargetConfig = new YamlConfiguration();
-			this.SingleWorldConfig = new WorldConfig("Single World",
-					SingleReadConfig, SingleTargetConfig);
+			this.SingleWorldConfig = new WorldConfig("Single World", SingleReadConfig, SingleTargetConfig);
 			try {
 				SingleTargetConfig.save(SingleConfig);
 			} catch (IOException exx) {
@@ -398,16 +105,14 @@ public class ConfigData {
 		// configurable World Configuration folder.
 		// save the configuration.
 
-		WorldConfigLocation = CoreConfig
-				.getString("GriefPrevention.WorldConfigFolder");
+		WorldConfigLocation = CoreConfig.getString("GriefPrevention.WorldConfigFolder");
 		if (WorldConfigLocation == null || WorldConfigLocation.length() == 0) {
 			WorldConfigLocation = DefaultConfigFolder;
 		}
 		File ConfigLocation = new File(WorldConfigLocation);
 		if (!ConfigLocation.exists()) {
 			// if not found, create the directory.
-			GriefPrevention.instance.getLogger().log(Level.INFO,
-					"mkdirs() on " + ConfigLocation.getAbsolutePath());
+			GriefPrevention.instance.getLogger().log(Level.INFO, "mkdirs() on " + ConfigLocation.getAbsolutePath());
 			ConfigLocation.mkdirs();
 
 		}
@@ -453,6 +158,252 @@ public class ConfigData {
 		 * 
 		 * }
 		 */
+
+	}
+
+	public void AddContainerID(Player Invoker, World TargetWorld, MaterialInfo mi) {
+		AddMaterialListItem(Invoker, TargetWorld, "GriefPrevention.Mods.BlockIdsRequiringContainerTrust", mi);
+	}
+
+	public void AddMaterialListItem(Player Invoker, World TargetWorld, String NodePath, MaterialInfo mi) {
+		// special method, loads in this world configuration, adds the given
+		// Container ID to the container ID listing,
+		// saves, and returns.
+		// first, we need to get our file.
+
+		String WorldTarget;
+		List<String> ActFiles = new ArrayList<String>();
+		if (TargetWorld != null) {
+			ActFiles.add(WorldConfig.getWorldConfig(TargetWorld.getName()));
+			WorldTarget = " World:" + TargetWorld.getName();
+
+		} else {
+			// if TargetWorld is null, we want to do this to <all configuration
+			// files>
+			ActFiles = GetWorldConfigurationFiles();
+			// System.out.println("Files:" + ActFiles.size());
+			WorldTarget = "All Worlds";
+		}
+
+		for (String iterate : ActFiles) {
+			// open this configuration...
+
+			YamlConfiguration yml = YamlConfiguration.loadConfiguration(new File(iterate));
+			// GriefPrevention.Mods.BlockIdsRequiringContainerTrust
+			List<String> StringResult = yml.getStringList(NodePath);
+			// turn the list into a MaterialCollection.
+			MaterialCollection mc = new MaterialCollection();
+			GriefPrevention.instance.parseMaterialListFromConfig(StringResult, mc);
+			if (mc.contains(mi)) {
+
+				continue;
+			}
+			mc.add(mi);
+			yml.set("GriefPrevention.Mods.BlockIdsRequiringContainerTrust", mc.GetList());
+			// add to the end of this list.
+			// save the changed config.
+			try {
+				yml.save(iterate);
+			} catch (IOException exx) {
+
+			}
+			if (Invoker != null) {
+				Invoker.sendMessage(ChatColor.ITALIC + TextMode.Instr.toString() + "Block ID:" + mi.getTypeID() + " added to " + NodePath + " in " + WorldTarget);
+			}
+
+		}
+
+	}
+
+	/**
+	 * retrieves the Single World Configuration. This is set in the config.yml
+	 * by setting GriefPrevention.SingleWorldConfig to a filename.
+	 * 
+	 * @return WorldConfig instance holding configuration options
+	 */
+	public WorldConfig getSingleWorldConfiguration() {
+		return SingleWorldConfig;
+	}
+
+	public String getTemplateFile() {
+		return TemplateFile;
+	}
+
+	// part of possible future feature to allow admins to add Container, Access,
+	// and other elements to the
+	// plugin configuration "on the fly"; for example a admin could use a
+	// certain tool, and left click would add it as a container and shift+left
+	// click would remove it
+	// (or something, eg. Left click add, Right click remove, shift on each
+	// would do the same for all worlds, that sort of thing).
+
+	public WorldConfig getWorldConfig(String forWorld) {
+		if (this.SingleWorldConfig != null)
+			return SingleWorldConfig;
+		World Grabfor = Bukkit.getWorld(forWorld);
+		if (Grabfor == null)
+			return new WorldConfig(forWorld);
+
+		return getWorldConfig(Grabfor);
+	}
+
+	/**
+	 * retrieves the WorldConfiguration for the given world name. If the world
+	 * is not valid, a log entry will be posted, but the config should still be
+	 * loaded and returned.
+	 * 
+	 * @param worldName
+	 *            Name of world to get configuration of.
+	 * @return WorldConfig instance representing the configuration for the given
+	 *         world.
+	 */
+	public WorldConfig getWorldConfig(World grabfor) {
+		if (this.SingleWorldConfig != null)
+			return SingleWorldConfig;
+		String worldName = grabfor.getName();
+
+		// if it's not in the hashmap...
+		if (!WorldCfg.containsKey(worldName)) {
+			// special code: it's possible a configuration might already exist
+			// for this file, so we'll
+			// check
+			String checkyamlfile = WorldConfig.getWorldConfig(worldName);
+			// if it exists...
+			if (new File(checkyamlfile).exists()) {
+				// attempt to load the configuration from the given file.
+				YamlConfiguration existingcfg = YamlConfiguration.loadConfiguration(new File(checkyamlfile));
+				YamlConfiguration outConfiguration = new YamlConfiguration();
+				// place it in the hashmap.
+				WorldCfg.put(worldName, new WorldConfig(worldName, existingcfg, outConfiguration));
+				// try to save it. this can error out for who knows what reason.
+				// If it does, we'll
+				// squirt the issue to the log.
+				try {
+					outConfiguration.save(new File(checkyamlfile));
+				} catch (IOException iex) {
+					GriefPrevention.instance.getLogger().log(Level.SEVERE, "Failed to save World Config for world " + worldName);
+
+				}
+			} else {
+				// if the file doesn't exist, then we will go ahead and create a
+				// new configuration.
+				// set the input Yaml to default to the template.
+				// if the template file exists, load it's configuration and use
+				// the result as useSource.
+				// Otherwise, we create a blank configuration.
+				Debugger.Write("Failed to find world configuration for World " + worldName, DebugLevel.Errors);
+				File TemplFile = new File(TemplateFile);
+				FileConfiguration useSource = null;
+				if (TemplFile.exists()) {
+					useSource = YamlConfiguration.loadConfiguration(TemplFile);
+				} else {
+					Debugger.Write("Template file \"" + TemplateFile + " \"Not Found.", DebugLevel.Errors);
+					useSource = new YamlConfiguration();
+				}
+
+				// The target save location.
+				FileConfiguration Target = new YamlConfiguration();
+				// place it in the hashmap.
+				WorldCfg.put(worldName, new WorldConfig(grabfor.getName(), useSource, Target));
+				try {
+					Target.save(new File(checkyamlfile));
+				} catch (IOException ioex) {
+					GriefPrevention.instance.getLogger().log(Level.SEVERE, "Failed to write world configuration to " + checkyamlfile);
+				}
+
+			}
+			// save target
+		}
+		// after the above logic, we know it's in the hashmap, so return that.
+		return WorldCfg.get(worldName);
+
+	}
+
+	public List<String> GetWorldConfigNames() {
+		List<String> results = new ArrayList<String>();
+		File SourceFolder = new File(WorldConfigLocation);
+		for (File iterate : SourceFolder.listFiles()) {
+			if (iterate.getName().startsWith("_"))
+				continue;
+			if (iterate.getName().toUpperCase().endsWith(".YML")) {
+				String basename = iterate.getName().replaceFirst("[.][^.]+$", "");
+				results.add(basename);
+			}
+		}
+		return results;
+
+	}
+
+	// private WorldConfig DefaultSurvival = null;
+	// private WorldConfig DefaultCreative = null;
+	// private List<String> PvPEnabledWorlds = new ArrayList<String>();
+	// private List<String> CreativeWorldRules = new ArrayList<String>();
+	public Map<String, WorldConfig> getWorldConfigs() {
+		return Collections.unmodifiableMap(WorldCfg);
+
+	}
+
+	public List<String> GetWorldConfigurationFiles() {
+		List<String> ActFiles = new ArrayList<String>();
+		File SourceFolder = new File(WorldConfigLocation);
+
+		ActFiles.add(getTemplateFile());
+
+		// iterate through each file.
+		for (File iterate : SourceFolder.listFiles()) {
+			if (iterate.getName().startsWith("_"))
+				continue;
+			if (iterate.getName().toUpperCase().endsWith(".YML")) {
+				ActFiles.add(iterate.getPath());
+			}
+
+		}
+		return ActFiles;
+
+	}
+
+	public void RemoveContainerID(Player Invoker, World TargetWorld, MaterialInfo mi) {
+		RemoveMaterialListItem(Invoker, TargetWorld, "GriefPrevention.Mods.BlockIdsRequiringContainerTrust", mi);
+	}
+
+	public void RemoveMaterialListItem(Player Invoker, World TargetWorld, String NodePath, MaterialInfo mi) {
+		// special method, loads in this world configuration, adds the given
+		// Container ID to the container ID listing,
+		// saves, and returns.
+		// first, we need to get our file.
+
+		String WorldTarget;
+		List<String> ActFiles = new ArrayList<String>();
+		if (TargetWorld != null) {
+			ActFiles.add(WorldConfig.getWorldConfig(TargetWorld.getName()));
+			WorldTarget = " World:" + TargetWorld.getName();
+
+		} else {
+			// if TargetWorld is null, we want to do this to <all configuration
+			// files>
+			ActFiles = GetWorldConfigurationFiles();
+			WorldTarget = "All Worlds";
+		}
+
+		for (String iterate : ActFiles) {
+			// open this configuration...
+			YamlConfiguration yml = YamlConfiguration.loadConfiguration(new File(iterate));
+			// GriefPrevention.Mods.BlockIdsRequiringContainerTrust
+			List<String> StringResult = yml.getStringList(NodePath);
+			// turn the list into a MaterialCollection.
+			MaterialCollection mc = new MaterialCollection();
+			GriefPrevention.instance.parseMaterialListFromConfig(StringResult, mc);
+			if (!mc.contains(mi)) {
+
+				continue;
+			}
+			mc.remove(mi);
+			yml.set(NodePath, mc.GetList());
+			// add to the end of this list.
+			if (Invoker != null) {
+				Invoker.sendMessage(ChatColor.ITALIC + TextMode.Instr.toString() + "Block ID:" + mi.getTypeID() + " removed from " + NodePath + " in " + iterate);
+			}
+		}
 
 	}
 

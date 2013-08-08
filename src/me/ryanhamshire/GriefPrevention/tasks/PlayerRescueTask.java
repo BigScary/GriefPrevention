@@ -50,28 +50,21 @@ public class PlayerRescueTask implements Runnable {
 
 		// he no longer has a pending /trapped slash command, so he can try to
 		// use it again now
-		PlayerData playerData = GriefPrevention.instance.dataStore
-				.getPlayerData(player.getName());
+		PlayerData playerData = GriefPrevention.instance.dataStore.getPlayerData(player.getName());
 		playerData.pendingTrapped = false;
 
 		// if the player moved three or more blocks from where he used /trapped,
 		// admonish him and don't save him
 		if (player.getLocation().distance(this.location) > 3) {
-			GriefPrevention.sendMessage(player, TextMode.Err,
-					Messages.RescueAbortedMoved);
+			GriefPrevention.sendMessage(player, TextMode.Err, Messages.RescueAbortedMoved);
 			return;
 		}
 
 		// otherwise find a place to teleport him
-		Location destination = GriefPrevention.instance
-				.ejectPlayer(this.player);
+		Location destination = GriefPrevention.instance.ejectPlayer(this.player);
 
 		// log entry, in case admins want to investigate the "trap"
-		GriefPrevention.AddLogEntry("Rescued trapped player "
-				+ player.getName() + " from "
-				+ GriefPrevention.getfriendlyLocationString(this.location)
-				+ " to "
-				+ GriefPrevention.getfriendlyLocationString(destination) + ".");
+		GriefPrevention.AddLogEntry("Rescued trapped player " + player.getName() + " from " + GriefPrevention.getfriendlyLocationString(this.location) + " to " + GriefPrevention.getfriendlyLocationString(destination) + ".");
 
 		// timestamp this successful save so that he can't use /trapped again
 		// for a while

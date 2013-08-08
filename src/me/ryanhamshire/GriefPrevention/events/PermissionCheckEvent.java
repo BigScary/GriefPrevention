@@ -17,18 +17,25 @@ public class PermissionCheckEvent extends Event {
 	// Custom Event Requirements
 	private static final HandlerList handlers = new HandlerList();
 
-	@Override
-	public HandlerList getHandlers() {
-		return handlers;
-	}
-
 	public static HandlerList getHandlerList() {
 		return handlers;
 	}
 
-	private ClaimBehaviourData PermissionCheck;
 	private Player CheckPlayer;
+
+	private ClaimBehaviourData PermissionCheck;
 	private ClaimAllowanceConstants Result = null;
+
+	public PermissionCheckEvent(ClaimBehaviourData Permission, Player p) {
+		PermissionCheck = Permission;
+		CheckPlayer = p;
+
+	}
+
+	@Override
+	public HandlerList getHandlers() {
+		return handlers;
+	}
 
 	public ClaimBehaviourData getPermissionCheck() {
 		return PermissionCheck;
@@ -44,12 +51,6 @@ public class PermissionCheckEvent extends Event {
 
 	public void setResult(ClaimAllowanceConstants value) {
 		Result = value;
-	}
-
-	public PermissionCheckEvent(ClaimBehaviourData Permission, Player p) {
-		PermissionCheck = Permission;
-		CheckPlayer = p;
-
 	}
 
 }

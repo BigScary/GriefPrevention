@@ -18,32 +18,33 @@ public class ClaimResizeEvent extends PlayerClaimEvent implements Cancellable {
 	// Custom Event Requirements
 	private static final HandlerList handlers = new HandlerList();
 
-	@Override
-	public HandlerList getHandlers() {
-		return handlers;
-	}
-
 	public static HandlerList getHandlerList() {
 		return handlers;
 	}
 
-	private Claim claim;
-	private Location newLesserBoundaryCorner;
-	private Location newGreaterBoundaryCorner;
+	boolean canceled = false;
 
-	public Location getNewLesserBoundaryCorner() {
-		return newLesserBoundaryCorner;
+	private Claim claim;
+	private Location newGreaterBoundaryCorner;
+	private Location newLesserBoundaryCorner;
+
+	public ClaimResizeEvent(Claim oldclaim, Location newLesserBoundary, Location newGreaterBoundary, Player Resizer) {
+		super(oldclaim, Resizer);
+		newLesserBoundaryCorner = newLesserBoundary;
+		newGreaterBoundaryCorner = newGreaterBoundary;
+	}
+
+	@Override
+	public HandlerList getHandlers() {
+		return handlers;
 	}
 
 	public Location getNewGreaterBoundaryCorner() {
 		return newGreaterBoundaryCorner;
 	}
 
-	public ClaimResizeEvent(Claim oldclaim, Location newLesserBoundary,
-			Location newGreaterBoundary, Player Resizer) {
-		super(oldclaim, Resizer);
-		newLesserBoundaryCorner = newLesserBoundary;
-		newGreaterBoundaryCorner = newGreaterBoundary;
+	public Location getNewLesserBoundaryCorner() {
+		return newLesserBoundaryCorner;
 	}
 
 	/**
@@ -55,8 +56,6 @@ public class ClaimResizeEvent extends PlayerClaimEvent implements Cancellable {
 	public Player getResizer() {
 		return p;
 	}
-
-	boolean canceled = false;
 
 	public boolean isCancelled() {
 		return canceled;

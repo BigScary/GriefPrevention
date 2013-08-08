@@ -42,14 +42,11 @@ public class SecureClaimTask implements Runnable {
 			claim.doorsOpen = false;
 
 			// eject bad guys
-			Player[] onlinePlayers = GriefPrevention.instance.getServer()
-					.getOnlinePlayers();
+			Player[] onlinePlayers = GriefPrevention.instance.getServer().getOnlinePlayers();
 			for (int j = 0; j < onlinePlayers.length; j++) {
 				Player player = onlinePlayers[j];
-				if (claim.contains(player.getLocation(), false, false)
-						&& claim.allowAccess(player) != null) {
-					GriefPrevention.sendMessage(player, TextMode.Err,
-							Messages.SiegeDoorsLockedEjection);
+				if (claim.contains(player.getLocation(), false, false) && claim.allowAccess(player) != null) {
+					GriefPrevention.sendMessage(player, TextMode.Err, Messages.SiegeDoorsLockedEjection);
 					GriefPrevention.instance.ejectPlayer(player);
 				}
 			}

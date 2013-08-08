@@ -16,12 +16,19 @@ import org.bukkit.entity.Player;
 
 public class TrustCommands extends GriefPreventionCommand {
 
-	private void handleTrustCommand(Player player,
-			ClaimPermission permissionLevel, String recipientName) {
+	@Override
+	public String[] getLabels() {
+		// TODO Auto-generated method stub
+		return new String[] { "trust", "containertrust", "accesstrust", "permissiontrust" };
+	}
+
+	private void handleTrustCommand(Player player, ClaimPermission permissionLevel, String recipientName) {
 		GriefPrevention inst = GriefPrevention.instance;
 		// determine which claim the player is standing in
-		Claim claim = inst.dataStore
-				.getClaimAt(player.getLocation(), true /* ignore height */);
+		Claim claim = inst.dataStore.getClaimAt(player.getLocation(), true /*
+																			 * ignore
+																			 * height
+																			 */);
 
 		// validate player or group argument
 		String permission = null;
@@ -42,8 +49,7 @@ public class TrustCommands extends GriefPreventionCommand {
 		if (recipientName.startsWith("[") && recipientName.endsWith("]")) {
 			permission = recipientName.substring(1, recipientName.length() - 1);
 			if (permission == null || permission.isEmpty()) {
-				GriefPrevention.sendMessage(player, TextMode.Err,
-						Messages.InvalidPermissionID);
+				GriefPrevention.sendMessage(player, TextMode.Err, Messages.InvalidPermissionID);
 				return;
 			}
 		}
@@ -57,13 +63,10 @@ public class TrustCommands extends GriefPreventionCommand {
 			// addition: if it starts with G:, it indicates a group name, rather
 			// than a player name.
 
-			if (otherPlayer == null && !recipientName.equals("public")
-					&& !recipientName.equals("all")
-					&& !recipientName.toUpperCase().startsWith("G:"))
+			if (otherPlayer == null && !recipientName.equals("public") && !recipientName.equals("all") && !recipientName.toUpperCase().startsWith("G:"))
 
 			{
-				GriefPrevention.sendMessage(player, TextMode.Err,
-						Messages.PlayerNotFound);
+				GriefPrevention.sendMessage(player, TextMode.Err, Messages.PlayerNotFound);
 				return;
 			} else if (recipientName.toUpperCase().startsWith("G:")) {
 				// keep it as is.
@@ -90,8 +93,7 @@ public class TrustCommands extends GriefPreventionCommand {
 		} else {
 			// check permission here
 			if (claim.allowGrantPermission(player) != null) {
-				GriefPrevention.sendMessage(player, TextMode.Err,
-						Messages.NoPermissionTrust, claim.getOwnerName());
+				GriefPrevention.sendMessage(player, TextMode.Err, Messages.NoPermissionTrust, claim.getOwnerName());
 				return;
 			}
 
@@ -103,8 +105,7 @@ public class TrustCommands extends GriefPreventionCommand {
 			if (permissionLevel == null) {
 				errorMessage = claim.allowEdit(player);
 				if (errorMessage != null) {
-					errorMessage = "Only " + claim.getOwnerName()
-							+ " can grant /PermissionTrust here.";
+					errorMessage = "Only " + claim.getOwnerName() + " can grant /PermissionTrust here.";
 				}
 			}
 
@@ -126,8 +127,7 @@ public class TrustCommands extends GriefPreventionCommand {
 			// error message for trying to grant a permission the player doesn't
 			// have
 			if (errorMessage != null) {
-				GriefPrevention.sendMessage(player, TextMode.Err,
-						Messages.CantGrantThatPermission);
+				GriefPrevention.sendMessage(player, TextMode.Err, Messages.CantGrantThatPermission);
 				return;
 			}
 
@@ -137,8 +137,7 @@ public class TrustCommands extends GriefPreventionCommand {
 		// if we didn't determine which claims to modify, tell the player to be
 		// specific
 		if (targetClaims.size() == 0) {
-			GriefPrevention.sendMessage(player, TextMode.Err,
-					Messages.GrantPermissionNoClaim);
+			GriefPrevention.sendMessage(player, TextMode.Err, Messages.GrantPermissionNoClaim);
 			return;
 		}
 
@@ -146,9 +145,7 @@ public class TrustCommands extends GriefPreventionCommand {
 		if (targetClaims.size() > 1) {
 
 			if (!playerData.warnedAboutMajorDeletion) {
-				GriefPrevention.sendMessage(player, TextMode.Info,
-						"use the trust command again to give " + recipientName
-								+ " access to all your claims.");
+				GriefPrevention.sendMessage(player, TextMode.Info, "use the trust command again to give " + recipientName + " access to all your claims.");
 				playerData.warnedAboutMajorDeletion = true;
 			}
 
@@ -173,22 +170,17 @@ public class TrustCommands extends GriefPreventionCommand {
 
 		// notify player
 		if (recipientName.equals("public"))
-			recipientName = inst.dataStore
-					.getMessage(Messages.CollectivePublic);
+			recipientName = inst.dataStore.getMessage(Messages.CollectivePublic);
 		String permissionDescription;
 		if (permissionLevel == null) {
-			permissionDescription = inst.dataStore
-					.getMessage(Messages.PermissionsPermission);
+			permissionDescription = inst.dataStore.getMessage(Messages.PermissionsPermission);
 		} else if (permissionLevel == ClaimPermission.Build) {
-			permissionDescription = inst.dataStore
-					.getMessage(Messages.BuildPermission);
+			permissionDescription = inst.dataStore.getMessage(Messages.BuildPermission);
 		} else if (permissionLevel == ClaimPermission.Access) {
-			permissionDescription = inst.dataStore
-					.getMessage(Messages.AccessPermission);
+			permissionDescription = inst.dataStore.getMessage(Messages.AccessPermission);
 		} else // ClaimPermission.Inventory
 		{
-			permissionDescription = inst.dataStore
-					.getMessage(Messages.ContainersPermission);
+			permissionDescription = inst.dataStore.getMessage(Messages.ContainersPermission);
 		}
 
 		String location;
@@ -202,14 +194,11 @@ public class TrustCommands extends GriefPreventionCommand {
 		if (userecipientName.toUpperCase().startsWith("G:")) {
 			userecipientName = "Group " + userecipientName.substring(2);
 		}
-		GriefPrevention.sendMessage(player, TextMode.Success,
-				Messages.GrantPermissionConfirmation, recipientName,
-				permissionDescription, location);
+		GriefPrevention.sendMessage(player, TextMode.Success, Messages.GrantPermissionConfirmation, recipientName, permissionDescription, location);
 	}
 
 	@Override
-	public boolean onCommand(CommandSender sender, Command command,
-			String label, String[] args) {
+	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		// TODO Auto-generated method stub
 		Player player = (sender instanceof Player) ? (Player) sender : null;
 		if (command.getName().equalsIgnoreCase("trust") && player != null) {
@@ -222,16 +211,14 @@ public class TrustCommands extends GriefPreventionCommand {
 			this.handleTrustCommand(player, ClaimPermission.Build, args[0]);
 
 			return true;
-		} else if (command.getName().equalsIgnoreCase("accesstrust")
-				&& player != null) {
+		} else if (command.getName().equalsIgnoreCase("accesstrust") && player != null) {
 
 			if (args.length != 1)
 				return false;
 			this.handleTrustCommand(player, ClaimPermission.Access, args[0]);
 			return true;
 
-		} else if (command.getName().equalsIgnoreCase("containertrust")
-				&& player != null) {
+		} else if (command.getName().equalsIgnoreCase("containertrust") && player != null) {
 			// requires exactly one parameter, the other player's name
 			if (args.length != 1)
 				return false;
@@ -242,8 +229,7 @@ public class TrustCommands extends GriefPreventionCommand {
 		}
 
 		// permissiontrust <player>
-		else if (command.getName().equalsIgnoreCase("permissiontrust")
-				&& player != null) {
+		else if (command.getName().equalsIgnoreCase("permissiontrust") && player != null) {
 			// requires exactly one parameter, the other player's name
 			if (args.length != 1)
 				return false;
@@ -257,13 +243,6 @@ public class TrustCommands extends GriefPreventionCommand {
 		}
 
 		return false;
-	}
-
-	@Override
-	public String[] getLabels() {
-		// TODO Auto-generated method stub
-		return new String[] { "trust", "containertrust", "accesstrust",
-				"permissiontrust" };
 	}
 
 }

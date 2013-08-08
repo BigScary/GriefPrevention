@@ -12,8 +12,13 @@ import org.bukkit.entity.Player;
 public class SetBlockBankCommand extends GriefPreventionCommand {
 
 	@Override
-	public boolean onCommand(CommandSender sender, Command command,
-			String label, String[] args) {
+	public String[] getLabels() {
+		// TODO Auto-generated method stub
+		return new String[] { "setblockbank" };
+	}
+
+	@Override
+	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		// TODO Auto-generated method stub
 		// requires exactly two parameters, the other player's name and the
 		// adjustment
@@ -24,8 +29,7 @@ public class SetBlockBankCommand extends GriefPreventionCommand {
 		// find the specified player
 		OfflinePlayer targetPlayer = inst.resolvePlayer(args[0]);
 		if (targetPlayer == null) {
-			GriefPrevention.sendMessage(player, TextMode.Err, "Player \""
-					+ args[0] + "\" not found.");
+			GriefPrevention.sendMessage(player, TextMode.Err, "Player \"" + args[0] + "\" not found.");
 			return true;
 		}
 
@@ -37,26 +41,14 @@ public class SetBlockBankCommand extends GriefPreventionCommand {
 			return false; // causes usage to be displayed
 		}
 		// give blocks to player
-		PlayerData playerData = inst.dataStore.getPlayerData(targetPlayer
-				.getName());
+		PlayerData playerData = inst.dataStore.getPlayerData(targetPlayer.getName());
 		playerData.accruedClaimBlocks += adjustment;
 		inst.dataStore.savePlayerData(targetPlayer.getName(), playerData);
 
-		GriefPrevention.sendMessage(player, TextMode.Success, "Adjusted "
-				+ targetPlayer.getName() + "'s bonus claim blocks by "
-				+ adjustment + ".  New total bonus blocks: "
-				+ playerData.bonusClaimBlocks + ".");
-		GriefPrevention.AddLogEntry(player.getName() + " adjusted "
-				+ targetPlayer.getName() + "'s bonus claim blocks by "
-				+ adjustment + ".");
+		GriefPrevention.sendMessage(player, TextMode.Success, "Adjusted " + targetPlayer.getName() + "'s bonus claim blocks by " + adjustment + ".  New total bonus blocks: " + playerData.bonusClaimBlocks + ".");
+		GriefPrevention.AddLogEntry(player.getName() + " adjusted " + targetPlayer.getName() + "'s bonus claim blocks by " + adjustment + ".");
 
 		return true;
-	}
-
-	@Override
-	public String[] getLabels() {
-		// TODO Auto-generated method stub
-		return new String[] { "setblockbank" };
 	}
 
 }

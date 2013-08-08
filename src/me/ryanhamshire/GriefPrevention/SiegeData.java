@@ -20,17 +20,16 @@ package me.ryanhamshire.GriefPrevention;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.bukkit.entity.Player;
 
-import java.util.concurrent.ConcurrentHashMap;
-
 //information about an ongoing siege
 public class SiegeData {
-	public Player defender;
 	public Player attacker;
-	public ArrayList<Claim> claims;
 	public int checkupTaskID;
+	public ArrayList<Claim> claims;
+	public Player defender;
 	// number of containers that have been looted.
 	public int LootedContainers;
 	public Map<String, BrokenBlockInfo> SiegedBlocks = new ConcurrentHashMap<String, BrokenBlockInfo>();

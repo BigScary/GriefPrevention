@@ -1,19 +1,14 @@
 package me.ryanhamshire.GriefPrevention.events;
 
+import me.ryanhamshire.GriefPrevention.Claim;
+
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
-
-import me.ryanhamshire.GriefPrevention.Claim;
 
 public class ClaimTransferEvent extends ClaimEvent implements Cancellable {
 
 	// Custom Event Requirements
 	private static final HandlerList handlers = new HandlerList();
-
-	@Override
-	public HandlerList getHandlers() {
-		return handlers;
-	}
 
 	public static HandlerList getHandlerList() {
 		return handlers;
@@ -22,17 +17,18 @@ public class ClaimTransferEvent extends ClaimEvent implements Cancellable {
 
 	private boolean Cancelled = false;
 
-	public boolean isCancelled() {
-		// TODO Auto-generated method stub
-		return Cancelled;
-	}
-
-	public void setCancelled(boolean argument) {
-		Cancelled = argument;
-
-	}
-
 	private String TargetPlayer;
+
+	public ClaimTransferEvent(Claim c, String targetPlayer) {
+		super(c);
+		TargetPlayer = targetPlayer;
+		//
+	}
+
+	@Override
+	public HandlerList getHandlers() {
+		return handlers;
+	}
 
 	/**
 	 * returns the target player for the pending transfer.
@@ -43,10 +39,14 @@ public class ClaimTransferEvent extends ClaimEvent implements Cancellable {
 		return TargetPlayer;
 	}
 
-	public ClaimTransferEvent(Claim c, String targetPlayer) {
-		super(c);
-		TargetPlayer = targetPlayer;
-		//
+	public boolean isCancelled() {
+		// TODO Auto-generated method stub
+		return Cancelled;
+	}
+
+	public void setCancelled(boolean argument) {
+		Cancelled = argument;
+
 	}
 
 }

@@ -14,8 +14,13 @@ import org.bukkit.entity.Player;
 public class AbandonAllClaimsCommand extends GriefPreventionCommand {
 
 	@Override
-	public boolean onCommand(CommandSender sender, Command command,
-			String label, String[] args) {
+	public String[] getLabels() {
+		// TODO Auto-generated method stub
+		return new String[] { "abandonallclaims" };
+	}
+
+	@Override
+	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		// TODO Auto-generated method stub
 		GriefPrevention inst = GriefPrevention.instance;
 		if (args.length > 1)
@@ -30,8 +35,7 @@ public class AbandonAllClaimsCommand extends GriefPreventionCommand {
 		}
 
 		if (!wc.getAllowUnclaim()) {
-			GriefPrevention.sendMessage(player, TextMode.Err,
-					Messages.NoCreativeUnClaim);
+			GriefPrevention.sendMessage(player, TextMode.Err, Messages.NoCreativeUnClaim);
 			return true;
 		}
 
@@ -41,37 +45,25 @@ public class AbandonAllClaimsCommand extends GriefPreventionCommand {
 
 		// check count
 		if (originalClaimCount == 0) {
-			GriefPrevention.sendMessage(player, TextMode.Err,
-					Messages.YouHaveNoClaims);
+			GriefPrevention.sendMessage(player, TextMode.Err, Messages.YouHaveNoClaims);
 			return true;
 		}
 
 		// delete them
-		inst.dataStore.deleteClaimsForPlayer(player.getName(), false,
-				deletelocked);
+		inst.dataStore.deleteClaimsForPlayer(player.getName(), false, deletelocked);
 
 		// inform the player
 		int remainingBlocks = playerData.getRemainingClaimBlocks();
 		if (deletelocked) {
-			GriefPrevention.sendMessage(player, TextMode.Success,
-					Messages.SuccessfulAbandonIncludingLocked,
-					String.valueOf(remainingBlocks));
+			GriefPrevention.sendMessage(player, TextMode.Success, Messages.SuccessfulAbandonIncludingLocked, String.valueOf(remainingBlocks));
 		} else {
-			GriefPrevention.sendMessage(player, TextMode.Success,
-					Messages.SuccessfulAbandonExcludingLocked,
-					String.valueOf(remainingBlocks));
+			GriefPrevention.sendMessage(player, TextMode.Success, Messages.SuccessfulAbandonExcludingLocked, String.valueOf(remainingBlocks));
 		}
 
 		// revert any current visualization
 		Visualization.Revert(player);
 
 		return true;
-	}
-
-	@Override
-	public String[] getLabels() {
-		// TODO Auto-generated method stub
-		return new String[] { "abandonallclaims" };
 	}
 
 }

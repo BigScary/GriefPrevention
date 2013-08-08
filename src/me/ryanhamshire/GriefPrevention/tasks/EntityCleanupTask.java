@@ -18,6 +18,7 @@
 
 package me.ryanhamshire.GriefPrevention.tasks;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import me.ryanhamshire.GriefPrevention.Claim;
@@ -45,8 +46,14 @@ public class EntityCleanupTask implements Runnable {
 	}
 
 	public void run() {
-		List<WorldConfig> worlds = GriefPrevention.instance.Configuration
-				.getCreativeRulesConfigs();
+		List<WorldConfig> gotworlds = new ArrayList<WorldConfig>(GriefPrevention.instance.Configuration.getWorldConfigs().values());
+
+		List<WorldConfig> worlds = new ArrayList<WorldConfig>();
+		for (WorldConfig w : gotworlds) {
+			if (w.getEntityCleanupEnabled()) {
+				gotworlds.add(w);
+			}
+		}
 
 		for (WorldConfig worldconfiguration : worlds) {
 			World world = Bukkit.getWorld(worldconfiguration.getWorldName());
@@ -77,19 +84,15 @@ public class EntityCleanupTask implements Runnable {
 
 					// minecarts in motion must be occupied by a player
 					if (vehicle.getVelocity().lengthSquared() != 0) {
-						if (vehicle.isEmpty()
-								|| !(vehicle.getPassenger() instanceof Player)) {
+						if (vehicle.isEmpty() || !(vehicle.getPassenger() instanceof Player)) {
 							remove = true;
 						}
 					}
 
 					// stationary carts must be on rails
 					else {
-						Material material = world.getBlockAt(
-								vehicle.getLocation()).getType();
-						if (material != Material.RAILS
-								&& material != Material.POWERED_RAIL
-								&& material != Material.DETECTOR_RAIL) {
+						Material material = world.getBlockAt(vehicle.getLocation()).getType();
+						if (material != Material.RAILS && material != Material.POWERED_RAIL && material != Material.DETECTOR_RAIL) {
 							remove = true;
 						}
 					}
@@ -97,8 +100,7 @@ public class EntityCleanupTask implements Runnable {
 
 				// all non-player entities must be in claims
 				else if (!(entity instanceof Player)) {
-					Claim claim = GriefPrevention.instance.dataStore
-							.getClaimAt(entity.getLocation(), false);
+					Claim claim = GriefPrevention.instance.dataStore.getClaimAt(entity.getLocation(), false);
 					if (claim != null) {
 						cachedClaim = claim;
 					} else {
@@ -118,12 +120,10 @@ public class EntityCleanupTask implements Runnable {
 		int j = (int) (claims.length * this.percentageStart);
 		int k = (int) (claims.length * (this.percentageStart + .05));
 		for (; j < claims.length && j < k; j++) {
-			Claim claim = GriefPrevention.instance.dataStore
-					.getClaim(claims[j]);
+			Claim claim = GriefPrevention.instance.dataStore.getClaim(claims[j]);
 
 			// if it's a creative mode claim
-			if (GriefPrevention.instance.creativeRulesApply(claim
-					.getLesserBoundaryCorner())) {
+			if (GriefPrevention.instance.creativeRulesApply(claim.getLesserBoundaryCorner())) {
 				// check its entity count and remove any extras
 				claim.allowMoreEntities();
 			}
@@ -138,10 +138,6 @@ public class EntityCleanupTask implements Runnable {
 		}
 
 		EntityCleanupTask task = new EntityCleanupTask(nextRunPercentageStart);
-		GriefPrevention.instance
-				.getServer()
-				.getScheduler()
-				.scheduleSyncDelayedTask(GriefPrevention.instance, task,
-						20L * 60 * 1);
+		GriefPrevention.instance.getServer().getScheduler().scheduleSyncDelayedTask(GriefPrevention.instance, task, 20L * 60 * 1);
 	}
 }

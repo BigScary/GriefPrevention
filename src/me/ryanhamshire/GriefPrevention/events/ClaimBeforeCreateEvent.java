@@ -12,28 +12,27 @@ import org.bukkit.event.HandlerList;
  * have an ID. If you need to process events for new claims as they are made,
  * consider using the ClaimAfterCreateEvent.
  */
-public class ClaimBeforeCreateEvent extends PlayerClaimEvent implements
-		Cancellable {
+public class ClaimBeforeCreateEvent extends PlayerClaimEvent implements Cancellable {
 
 	// Custom Event Requirements
 	private static final HandlerList handlers = new HandlerList();
-
-	@Override
-	public HandlerList getHandlers() {
-		return handlers;
-	}
 
 	public static HandlerList getHandlerList() {
 		return handlers;
 
 	}
 
+	boolean canceled = false;
+
 	public ClaimBeforeCreateEvent(Claim claim, Player p) {
 		super(claim, p);
 
 	}
 
-	boolean canceled = false;
+	@Override
+	public HandlerList getHandlers() {
+		return handlers;
+	}
 
 	public boolean isCancelled() {
 		return canceled;

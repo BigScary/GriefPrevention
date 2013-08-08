@@ -19,14 +19,11 @@ public class ClaimDeletedEvent extends Event implements Cancellable {
 	// Custom Event Requirements
 	private static final HandlerList handlers = new HandlerList();
 
-	@Override
-	public HandlerList getHandlers() {
-		return handlers;
-	}
-
 	public static HandlerList getHandlerList() {
 		return handlers;
 	}
+
+	boolean canceled = false;
 
 	private Claim claim;
 	private Player player;
@@ -45,6 +42,11 @@ public class ClaimDeletedEvent extends Event implements Cancellable {
 		return claim;
 	}
 
+	@Override
+	public HandlerList getHandlers() {
+		return handlers;
+	}
+
 	/**
 	 * returns the player deleting the Claim.
 	 * 
@@ -53,8 +55,6 @@ public class ClaimDeletedEvent extends Event implements Cancellable {
 	public Player getPlayer() {
 		return player;
 	}
-
-	boolean canceled = false;
 
 	public boolean isCancelled() {
 		return canceled;

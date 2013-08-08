@@ -17,52 +17,51 @@ public class MovementWatcher implements Listener {
 
 	private class LastMoveData {
 		private boolean Forced = false;
-		private Player player;
-		private long lasttick;
 		private Claim LastClaim;
+		private long lasttick;
+		private Player player;
+
+		public LastMoveData(Claim cClaim, Player pPlayer, int pTick, boolean pForced) {
+			player = pPlayer;
+			lasttick = pTick;
+			LastClaim = cClaim;
+			Forced = pForced;
+		}
 
 		public boolean getForced() {
 			return Forced;
-		}
-
-		public long getLastTick() {
-			return lasttick;
-		}
-
-		public void setLastTick(long newvalue) {
-			lasttick = newvalue;
-		}
-
-		public void setLastTick() {
-			lasttick = new Date().getTime();
-		}
-
-		public Player getPlayer() {
-			return player;
 		}
 
 		public Claim getLastClaim() {
 			return LastClaim;
 		}
 
+		public long getLastTick() {
+			return lasttick;
+		}
+
+		public Player getPlayer() {
+			return player;
+		}
+
 		public void setLastClaim(Claim pValue) {
 			LastClaim = pValue;
 		}
 
-		public LastMoveData(Claim cClaim, Player pPlayer, int pTick,
-				boolean pForced) {
-			player = pPlayer;
-			lasttick = pTick;
-			LastClaim = cClaim;
-			Forced = pForced;
+		public void setLastTick() {
+			lasttick = new Date().getTime();
+		}
+
+		public void setLastTick(long newvalue) {
+			lasttick = newvalue;
 		}
 	}
 
-	java.util.concurrent.ConcurrentHashMap<String, LastMoveData> MoveData = new ConcurrentHashMap<String, LastMoveData>();
-	private int CallCount = 0;
 	private static final int CallCountMod = 10;
 	private static final int mscalldiff = 750; // called for different players
 												// 4000 ms apart.
+	private int CallCount = 0;
+	java.util.concurrent.ConcurrentHashMap<String, LastMoveData> MoveData = new ConcurrentHashMap<String, LastMoveData>();
 
 	public MovementWatcher() {
 		GriefPrevention.AddLogEntry("MovementWatcher Created.");
@@ -88,9 +87,7 @@ public class MovementWatcher implements Listener {
 			if (!MoveData.containsKey(pName)) {
 				// if not present, add it in and force it to be handled.
 				doHandle = true;
-				MoveData.put(pName,
-						Acquired = (new LastMoveData(null, pme.getPlayer(), 0,
-								true)));
+				MoveData.put(pName, Acquired = (new LastMoveData(null, pme.getPlayer(), 0, true)));
 			} else {
 				// grab the item from the HashMap and make the appropriate
 				// comparisons.
@@ -107,8 +104,7 @@ public class MovementWatcher implements Listener {
 			if (doHandle) {
 
 				// get the player's current location.
-				Claim CurrClaim = GriefPrevention.instance.dataStore
-						.getClaimAt(pme.getTo(), true);
+				Claim CurrClaim = GriefPrevention.instance.dataStore.getClaimAt(pme.getTo(), true);
 				// if forced to handle it or CurrClaim is different from the
 				// previous one...
 				if (Acquired.Forced || Acquired.LastClaim != CurrClaim) {
@@ -119,16 +115,14 @@ public class MovementWatcher implements Listener {
 						// System.out.println("firing claim exit.");
 						// if it is not null we are leaving a claim, so fire the
 						// exit event.
-						ClaimExitEvent cex = new ClaimExitEvent(
-								Acquired.getLastClaim(), pme.getPlayer());
+						ClaimExitEvent cex = new ClaimExitEvent(Acquired.getLastClaim(), pme.getPlayer());
 						Bukkit.getPluginManager().callEvent(cex);
 					}
 
 					// if the new claim is not null, then fire an enter event.
 					if (CurrClaim != null) {
 						// System.out.println("firing claim enter.");
-						ClaimEnterEvent cee = new ClaimEnterEvent(CurrClaim,
-								pme.getPlayer());
+						ClaimEnterEvent cee = new ClaimEnterEvent(CurrClaim, pme.getPlayer());
 						Bukkit.getPluginManager().callEvent(cee);
 
 					}

@@ -15,22 +15,22 @@ public class GPUnloadEvent extends Event {
 	// Custom Event Requirements
 	private static final HandlerList handlers = new HandlerList();
 
-	@Override
-	public HandlerList getHandlers() {
-		return handlers;
-	}
-
 	public static HandlerList getHandlerList() {
 		return handlers;
 	}
 
 	private GriefPrevention _Instance;
 
-	public GriefPrevention getInstance() {
-		return _Instance;
-	}
-
 	public GPUnloadEvent(GriefPrevention newInstance) {
 		_Instance = newInstance;
+	}
+
+	@Override
+	public HandlerList getHandlers() {
+		return handlers;
+	}
+
+	public GriefPrevention getInstance() {
+		return _Instance;
 	}
 }

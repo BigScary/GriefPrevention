@@ -28,15 +28,29 @@ import org.bukkit.entity.Player;
 //need a task for this because async threads (like the chat event handlers) can't kick or ban.
 //but they CAN schedule a task to run in the main thread to do that job
 public class PlayerKickBanTask implements Runnable {
-	// player to kick or ban
-	private Player player;
-
 	// ban message. if null, don't ban
 	private String banReason;
+
+	// player to kick or ban
+	private Player player;
 
 	public PlayerKickBanTask(Player player, String banReason) {
 		this.player = player;
 		this.banReason = banReason;
+	}
+
+	public void run() {
+		WorldConfig wc = GriefPrevention.instance.getWorldCfg(player.getWorld());
+		String kickcommands = wc.getSpamKickCommand();
+		String bancommands = wc.getSpamBanCommand();
+
+		if (this.banReason != null) {
+			// ban
+			// GriefPrevention.instance.getServer().getOfflinePlayer(this.player.getName()).setBanned(true);
+			runCommands(bancommands, this.player.getName());
+		} else if (this.player.isOnline()) {
+			runCommands(kickcommands, this.player.getName());
+		}
 	}
 
 	private void runCommands(String cmds, String... replacements) {
@@ -57,20 +71,5 @@ public class PlayerKickBanTask implements Runnable {
 
 		}
 
-	}
-
-	public void run() {
-		WorldConfig wc = GriefPrevention.instance
-				.getWorldCfg(player.getWorld());
-		String kickcommands = wc.getSpamKickCommand();
-		String bancommands = wc.getSpamBanCommand();
-
-		if (this.banReason != null) {
-			// ban
-			// GriefPrevention.instance.getServer().getOfflinePlayer(this.player.getName()).setBanned(true);
-			runCommands(bancommands, this.player.getName());
-		} else if (this.player.isOnline()) {
-			runCommands(kickcommands, this.player.getName());
-		}
 	}
 }

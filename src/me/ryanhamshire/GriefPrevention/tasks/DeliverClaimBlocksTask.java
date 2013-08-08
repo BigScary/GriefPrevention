@@ -31,8 +31,7 @@ import org.bukkit.entity.Player;
 //runs every 5 minutes in the main thread, grants blocks per hour / 12 to each online player who appears to be actively playing
 public class DeliverClaimBlocksTask implements Runnable {
 	public void run() {
-		Player[] players = GriefPrevention.instance.getServer()
-				.getOnlinePlayers();
+		Player[] players = GriefPrevention.instance.getServer().getOnlinePlayers();
 
 		// ensure players get at least 1 block (if accrual is totally disabled,
 		// this task won't even be scheduled)
@@ -42,12 +41,10 @@ public class DeliverClaimBlocksTask implements Runnable {
 		// for each online player
 		for (Player player : players) {
 
-			WorldConfig wc = GriefPrevention.instance.getWorldCfg(player
-					.getWorld());
+			WorldConfig wc = GriefPrevention.instance.getWorldCfg(player.getWorld());
 			if (wc.getClaimBlocksAccruedPerHour() == 0)
 				break; // if not set to accrue, don't accrue.
-			int accruedBlocks = Math.max(1,
-					(int) (wc.getClaimBlocksAccruedPerHour() / 12));
+			int accruedBlocks = Math.max(1, (int) (wc.getClaimBlocksAccruedPerHour() / 12));
 
 			DataStore dataStore = GriefPrevention.instance.dataStore;
 			PlayerData playerData = dataStore.getPlayerData(player.getName());
@@ -59,11 +56,7 @@ public class DeliverClaimBlocksTask implements Runnable {
 				// if he's not in a vehicle and has moved at least three blocks
 				// since the last check
 				// and he's not being pushed around by fluids
-				if (!player.isInsideVehicle()
-						&& (lastLocation == null || lastLocation
-								.distanceSquared(player.getLocation()) >= wc
-								.getafkDistanceCheck())
-						&& !player.getLocation().getBlock().isLiquid()) {
+				if (!player.isInsideVehicle() && (lastLocation == null || lastLocation.distanceSquared(player.getLocation()) >= wc.getafkDistanceCheck()) && !player.getLocation().getBlock().isLiquid()) {
 					// if player is over accrued limit, accrued limit was
 					// probably reduced in config file AFTER he accrued
 					// in that case, leave his blocks where they are

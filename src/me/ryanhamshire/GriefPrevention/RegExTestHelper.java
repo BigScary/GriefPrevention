@@ -15,59 +15,37 @@ import org.bukkit.configuration.file.FileConfiguration;
  */
 public class RegExTestHelper {
 
-	private String InclusionPattern;
-	private String ExclusionPattern;
-	private Pattern Include = Pattern.compile(".*");
+	public static RegExTestHelper DefaultAccess = new RegExTestHelper("\\sbutton\\s|\\sswitch\\s|\\sDoor\\s|\\sTrapdoor\\s", "");
+	/**
+	 * Current Default for Container Matcher.
+	 */
+	public static RegExTestHelper DefaultContainers = new RegExTestHelper("\\schest\\s|\\schests\\s|\\sfurnace\\s|" + "\\sgrinder\\s|\\sextruder\\s|\\smachine\\s|\\sengine\\s|\\sturtle\\s|\\saccumulator\\s|\\sprecipitator\\s|\\sAssembler\\s|\\sinfuser\\s|\\smachine\\s|\\sreceptacle\\s|\\s.*chest\\s|" + "\\sTank\\s|\\sCrucible\\s|smelter\\s|\\sworkbench\\s|\\stable\\s|" +
+
+	"//sAutoCrafter//s|//sCharger//s|//sIceGen//s|//sSawmill//s|//sTransposer//s|//sWaterGen//s" + "//s.*Shelf//s|//s.*Case//s|//s.*Rack//s|//s.*Label//s|//s.*Desk//s|//s.*Stand//s", "");
+	public static RegExTestHelper DefaultTrash = new RegExTestHelper("\\sOre\\z|\\sdirt\\s", "");
 	private Pattern Exclude;
 
-	public String getInclusionPattern() {
-		return InclusionPattern;
-	}
+	private String ExclusionPattern;
 
-	public String getExclusionPattern() {
-		return ExclusionPattern;
-	}
+	private Pattern Include = Pattern.compile(".*");
 
-	public void setInclusionPattern(String value) {
-		InclusionPattern = value;
+	private String InclusionPattern;
+
+	public RegExTestHelper(FileConfiguration Source, FileConfiguration Target, String NodePath, RegExTestHelper Default) {
+		// NodePath.IncludeRE
+		// NodePath.ExcludeRE
+		InclusionPattern = Source.getString(NodePath + ".IncludeRE", Default.getInclusionPattern());
+		ExclusionPattern = Source.getString(NodePath + ".ExcludeRE", Default.getExclusionPattern());
 		recompile();
+		Target.set(NodePath + ".IncludeRE", InclusionPattern);
+		Target.set(NodePath + ".ExcludeRE", ExclusionPattern);
+
 	}
 
-	public void setExclusionPattern(String value) {
-		ExclusionPattern = value;
+	public RegExTestHelper(String IncludePattern, String ExcludePattern) {
+		InclusionPattern = IncludePattern;
+		ExclusionPattern = ExcludePattern;
 		recompile();
-	}
-
-	private void recompile() {
-		try {
-			Include = Pattern.compile(InclusionPattern,
-					Pattern.CASE_INSENSITIVE);
-			if (ExclusionPattern == null || ExclusionPattern.length() == 0)
-				return;
-			Exclude = Pattern.compile(ExclusionPattern,
-					Pattern.CASE_INSENSITIVE);
-
-		} catch (Exception exx) {
-			exx.printStackTrace();
-		} finally {
-			Debugger.Write("recompiled regex: Include=" + InclusionPattern
-					+ " Exclude=" + ExclusionPattern, DebugLevel.Informational);
-		}
-	}
-
-	public boolean match(String teststring) {
-
-		// return false if inclusion is null.
-		if (Include == null)
-			return false;
-		// otherwise, return true if the the inclusion string matches and the
-		// exclusion string is either null or doesn't match.
-		return Include.matcher(teststring).find()
-				&& (Exclude == null || !Exclude.matcher(teststring).find());
-	}
-
-	public boolean included(String teststring) {
-		return !(Include == null) && Include.matcher(teststring).find();
 	}
 
 	/**
@@ -78,46 +56,53 @@ public class RegExTestHelper {
 	 * @return
 	 */
 	public boolean excluded(String teststring) {
-		return included(teststring)
-				&& (!(Exclude == null) || Exclude.matcher(teststring).find());
+		return included(teststring) && (!(Exclude == null) || Exclude.matcher(teststring).find());
 	}
 
-	public RegExTestHelper(String IncludePattern, String ExcludePattern) {
-		InclusionPattern = IncludePattern;
-		ExclusionPattern = ExcludePattern;
+	public String getExclusionPattern() {
+		return ExclusionPattern;
+	}
+
+	public String getInclusionPattern() {
+		return InclusionPattern;
+	}
+
+	public boolean included(String teststring) {
+		return !(Include == null) && Include.matcher(teststring).find();
+	}
+
+	public boolean match(String teststring) {
+
+		// return false if inclusion is null.
+		if (Include == null)
+			return false;
+		// otherwise, return true if the the inclusion string matches and the
+		// exclusion string is either null or doesn't match.
+		return Include.matcher(teststring).find() && (Exclude == null || !Exclude.matcher(teststring).find());
+	}
+
+	private void recompile() {
+		try {
+			Include = Pattern.compile(InclusionPattern, Pattern.CASE_INSENSITIVE);
+			if (ExclusionPattern == null || ExclusionPattern.length() == 0)
+				return;
+			Exclude = Pattern.compile(ExclusionPattern, Pattern.CASE_INSENSITIVE);
+
+		} catch (Exception exx) {
+			exx.printStackTrace();
+		} finally {
+			Debugger.Write("recompiled regex: Include=" + InclusionPattern + " Exclude=" + ExclusionPattern, DebugLevel.Informational);
+		}
+	}
+
+	public void setExclusionPattern(String value) {
+		ExclusionPattern = value;
 		recompile();
 	}
 
-	/**
-	 * Current Default for Container Matcher.
-	 */
-	public static RegExTestHelper DefaultContainers = new RegExTestHelper(
-			"\\schest\\s|\\schests\\s|\\sfurnace\\s|"
-					+ "\\sgrinder\\s|\\sextruder\\s|\\smachine\\s|\\sengine\\s|\\sturtle\\s|\\saccumulator\\s|\\sprecipitator\\s|\\sAssembler\\s|\\sinfuser\\s|\\smachine\\s|\\sreceptacle\\s|\\s.*chest\\s|"
-					+ "\\sTank\\s|\\sCrucible\\s|smelter\\s|\\sworkbench\\s|\\stable\\s|"
-					+
-
-					"//sAutoCrafter//s|//sCharger//s|//sIceGen//s|//sSawmill//s|//sTransposer//s|//sWaterGen//s"
-					+ "//s.*Shelf//s|//s.*Case//s|//s.*Rack//s|//s.*Label//s|//s.*Desk//s|//s.*Stand//s",
-			"");
-
-	public static RegExTestHelper DefaultAccess = new RegExTestHelper(
-			"\\sbutton\\s|\\sswitch\\s|\\sDoor\\s|\\sTrapdoor\\s", "");
-	public static RegExTestHelper DefaultTrash = new RegExTestHelper(
-			"\\sOre\\z|\\sdirt\\s", "");
-
-	public RegExTestHelper(FileConfiguration Source, FileConfiguration Target,
-			String NodePath, RegExTestHelper Default) {
-		// NodePath.IncludeRE
-		// NodePath.ExcludeRE
-		InclusionPattern = Source.getString(NodePath + ".IncludeRE",
-				Default.getInclusionPattern());
-		ExclusionPattern = Source.getString(NodePath + ".ExcludeRE",
-				Default.getExclusionPattern());
+	public void setInclusionPattern(String value) {
+		InclusionPattern = value;
 		recompile();
-		Target.set(NodePath + ".IncludeRE", InclusionPattern);
-		Target.set(NodePath + ".ExcludeRE", ExclusionPattern);
-
 	}
 
 }

@@ -16,23 +16,23 @@ public class SiegeEndEvent extends Event {
 	// Custom Event Requirements
 	private static final HandlerList handlers = new HandlerList();
 
-	@Override
-	public HandlerList getHandlers() {
-		return handlers;
-	}
-
 	public static HandlerList getHandlerList() {
 		return handlers;
 	}
 
 	SiegeData SiegeInfo;
 
-	public SiegeData getSiegeData() {
-		return SiegeInfo;
-	}
-
 	public SiegeEndEvent(SiegeData sd) {
 		SiegeInfo = sd;
+	}
+
+	@Override
+	public HandlerList getHandlers() {
+		return handlers;
+	}
+
+	public SiegeData getSiegeData() {
+		return SiegeInfo;
 	}
 
 }

@@ -14,8 +14,13 @@ import org.bukkit.entity.Player;
 public class ClearManagersCommand extends GriefPreventionCommand {
 
 	@Override
-	public boolean onCommand(CommandSender sender, Command command,
-			String label, String[] args) {
+	public String[] getLabels() {
+		// TODO Auto-generated method stub
+		return new String[] { "clearmanagers" };
+	}
+
+	@Override
+	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		// TODO Auto-generated method stub
 		DataStore dataStore = GriefPrevention.instance.dataStore;
 		if (!(sender instanceof Player))
@@ -25,39 +30,27 @@ public class ClearManagersCommand extends GriefPreventionCommand {
 		PlayerData pdata = dataStore.getPlayerData(player.getName());
 		if (claimatpos != null) {
 			if (claimatpos.isAdminClaim()) {
-				GriefPrevention.sendMessage(player, TextMode.Err,
-						Messages.ClearManagersNotAdmin);
+				GriefPrevention.sendMessage(player, TextMode.Err, Messages.ClearManagersNotAdmin);
 				return true;
 			}
-			if (pdata.ignoreClaims
-					|| claimatpos.getOwnerName().equalsIgnoreCase(
-							player.getName())) {
+			if (pdata.ignoreClaims || claimatpos.getOwnerName().equalsIgnoreCase(player.getName())) {
 				for (String currmanager : claimatpos.getManagerList()) {
 					claimatpos.removeManager(currmanager);
 					return true;
 				}
-				GriefPrevention.sendMessage(player, TextMode.Err,
-						Messages.ClearManagersSuccess);
+				GriefPrevention.sendMessage(player, TextMode.Err, Messages.ClearManagersSuccess);
 				return true;
 			} else {
 				// nope
-				GriefPrevention.sendMessage(player, TextMode.Err,
-						Messages.ClearManagersNotOwned);
+				GriefPrevention.sendMessage(player, TextMode.Err, Messages.ClearManagersNotOwned);
 				return true;
 			}
 
 		} else {
-			GriefPrevention.sendMessage(player, TextMode.Err,
-					Messages.ClearManagersNotFound);
+			GriefPrevention.sendMessage(player, TextMode.Err, Messages.ClearManagersNotFound);
 			return true;
 		}
 
-	}
-
-	@Override
-	public String[] getLabels() {
-		// TODO Auto-generated method stub
-		return new String[] { "clearmanagers" };
 	}
 
 }

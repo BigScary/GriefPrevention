@@ -9,17 +9,23 @@ public abstract class PlayerClaimEvent extends ClaimEvent {
 	// Custom Event Requirements
 	private static final HandlerList handlers = new HandlerList();
 
-	@Override
-	public HandlerList getHandlers() {
-		return handlers;
-	}
-
 	public static HandlerList getHandlerList() {
 		return handlers;
 
 	}
 
 	protected Player p;
+
+	protected PlayerClaimEvent(Claim pClaim, Player pPlayer) {
+		super(pClaim);
+		p = pPlayer;
+
+	}
+
+	@Override
+	public HandlerList getHandlers() {
+		return handlers;
+	}
 
 	/**
 	 * returns the relevant player for this event.
@@ -28,11 +34,5 @@ public abstract class PlayerClaimEvent extends ClaimEvent {
 	 */
 	public Player getPlayer() {
 		return p;
-	}
-
-	protected PlayerClaimEvent(Claim pClaim, Player pPlayer) {
-		super(pClaim);
-		p = pPlayer;
-
 	}
 }

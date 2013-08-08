@@ -13,8 +13,13 @@ import org.bukkit.entity.Player;
 public class DeathBlowCommand extends GriefPreventionCommand {
 
 	@Override
-	public boolean onCommand(CommandSender sender, Command command,
-			String label, String[] args) {
+	public String[] getLabels() {
+		// TODO Auto-generated method stub
+		return new String[] { "deathblow" };
+	}
+
+	@Override
+	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		// deathblow <player> [recipientPlayer]
 
 		// requires at least one parameter, the target player's name
@@ -25,8 +30,7 @@ public class DeathBlowCommand extends GriefPreventionCommand {
 		// try to find that player
 		Player targetPlayer = inst.getServer().getPlayer(args[0]);
 		if (targetPlayer == null) {
-			GriefPrevention.sendMessage(player, TextMode.Err,
-					Messages.PlayerNotFound);
+			GriefPrevention.sendMessage(player, TextMode.Err, Messages.PlayerNotFound);
 			return true;
 		}
 
@@ -35,8 +39,7 @@ public class DeathBlowCommand extends GriefPreventionCommand {
 		if (args.length > 1) {
 			recipientPlayer = inst.getServer().getPlayer(args[1]);
 			if (recipientPlayer == null) {
-				GriefPrevention.sendMessage(player, TextMode.Err,
-						Messages.PlayerNotFound);
+				GriefPrevention.sendMessage(player, TextMode.Err, Messages.PlayerNotFound);
 				return true;
 			}
 		}
@@ -63,22 +66,13 @@ public class DeathBlowCommand extends GriefPreventionCommand {
 
 		// log entry
 		if (player != null) {
-			GriefPrevention.AddLogEntry(player.getName()
-					+ " used /DeathBlow to kill " + targetPlayer.getName()
-					+ ".");
+			GriefPrevention.AddLogEntry(player.getName() + " used /DeathBlow to kill " + targetPlayer.getName() + ".");
 		} else {
-			GriefPrevention.AddLogEntry("Killed " + targetPlayer.getName()
-					+ ".");
+			GriefPrevention.AddLogEntry("Killed " + targetPlayer.getName() + ".");
 		}
 
 		return true;
 
-	}
-
-	@Override
-	public String[] getLabels() {
-		// TODO Auto-generated method stub
-		return new String[] { "deathblow" };
 	}
 
 }

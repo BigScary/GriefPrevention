@@ -6,8 +6,13 @@ import org.bukkit.command.CommandSender;
 public class TransferClaimBlocksCommand extends GriefPreventionCommand {
 
 	@Override
-	public boolean onCommand(CommandSender sender, Command command,
-			String label, String[] args) {
+	public String[] getLabels() {
+		// TODO Auto-generated method stub
+		return new String[] { "transferclaimblocks" };
+	}
+
+	@Override
+	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		// TODO Auto-generated method stub
 		if (args.length < 3) {
 			return false;
@@ -23,12 +28,6 @@ public class TransferClaimBlocksCommand extends GriefPreventionCommand {
 		CommandHandler.transferClaimBlocks(sourcename, targetname, desiredxfer);
 
 		return true;
-	}
-
-	@Override
-	public String[] getLabels() {
-		// TODO Auto-generated method stub
-		return new String[] { "transferclaimblocks" };
 	}
 
 }

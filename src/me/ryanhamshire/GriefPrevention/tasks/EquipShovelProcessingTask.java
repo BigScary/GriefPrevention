@@ -42,31 +42,25 @@ public class EquipShovelProcessingTask implements Runnable {
 		// if he logged out, don't do anything
 		if (!player.isOnline())
 			return;
-		WorldConfig wc = GriefPrevention.instance
-				.getWorldCfg(player.getWorld());
+		WorldConfig wc = GriefPrevention.instance.getWorldCfg(player.getWorld());
 		// if he's not holding the golden shovel anymore, do nothing
 		if (player.getItemInHand().getType() != wc.getClaimsModificationTool())
 			return;
 
-		PlayerData playerData = GriefPrevention.instance.dataStore
-				.getPlayerData(player.getName());
+		PlayerData playerData = GriefPrevention.instance.dataStore.getPlayerData(player.getName());
 
 		int remainingBlocks = playerData.getRemainingClaimBlocks();
 
 		// if in basic claims mode...
 		if (playerData.shovelMode == ShovelMode.Basic) {
 			// tell him how many claim blocks he has available
-			GriefPrevention.sendMessage(player, TextMode.Instr,
-					Messages.RemainingBlocks, String.valueOf(remainingBlocks));
+			GriefPrevention.sendMessage(player, TextMode.Instr, Messages.RemainingBlocks, String.valueOf(remainingBlocks));
 
 			// link to a video demo of land claiming, based on world type
-			if (GriefPrevention.instance.creativeRulesApply(player
-					.getLocation())) {
-				GriefPrevention.sendMessage(player, TextMode.Instr,
-						Messages.CreativeBasicsDemoAdvertisement);
+			if (GriefPrevention.instance.creativeRulesApply(player.getLocation())) {
+				GriefPrevention.sendMessage(player, TextMode.Instr, Messages.CreativeBasicsDemoAdvertisement);
 			} else {
-				GriefPrevention.sendMessage(player, TextMode.Instr,
-						Messages.SurvivalBasicsDemoAdvertisement);
+				GriefPrevention.sendMessage(player, TextMode.Instr, Messages.SurvivalBasicsDemoAdvertisement);
 			}
 		}
 	}

@@ -20,5 +20,5 @@ package me.ryanhamshire.GriefPrevention;
 
 //enumeration for golden shovel modes
 public enum ShovelMode {
-	Basic, Admin, Subdivide, RestoreNature, RestoreNatureAggressive, RestoreNatureFill
+	Admin, Basic, RestoreNature, RestoreNatureAggressive, RestoreNatureFill, Subdivide
 }

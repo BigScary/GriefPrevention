@@ -24,43 +24,25 @@ public class WorldWatcher implements Listener {
 	// public HashMap<String,List<UnloadedClaimData>> DeferredLoad = new
 	// HashMap<String,List<UnloadedClaimData>>();
 	public Set<World> LoadedWorlds = new HashSet<World>();
+	HashSet<World> storedloaded = new HashSet<World>(); // temp debugger...
+
 	public Map<String, WorldClaimCleanupTask> WorldClaimTasks = new HashMap<String, WorldClaimCleanupTask>();
+
+	public HashMap<String, Queue<Runnable>> WorldLoadDelegates = new HashMap<String, Queue<Runnable>>();
+
+	public void AddDelegate(String worldname, Runnable addthis) {
+		if (!WorldLoadDelegates.containsKey(worldname)) {
+			WorldLoadDelegates.put(worldname, new ArrayBlockingQueue<Runnable>(40));
+
+		}
+		WorldLoadDelegates.get(worldname).add(addthis);
+	}
 
 	private Location Correspond(Location Source, World Target) {
 		// System.out.println("Creating corresponding location, Source is in " +
 		// Source.getWorld().getName() + " And target is in " + Target.getName()
 		// + " Equal:" + Source.getWorld().equals(Target));
 		return new Location(Target, Source.getX(), Source.getY(), Source.getZ());
-	}
-
-	public HashMap<String, Queue<Runnable>> WorldLoadDelegates = new HashMap<String, Queue<Runnable>>();
-
-	public void AddDelegate(String worldname, Runnable addthis) {
-		if (!WorldLoadDelegates.containsKey(worldname)) {
-			WorldLoadDelegates.put(worldname, new ArrayBlockingQueue<Runnable>(
-					40));
-
-		}
-		WorldLoadDelegates.get(worldname).add(addthis);
-	}
-
-	HashSet<World> storedloaded = new HashSet<World>(); // temp debugger...
-
-	@EventHandler
-	public void WorldUnload(WorldUnloadEvent event) {
-		if (LoadedWorlds.contains(event.getWorld())) {
-			// stop world claim cleanup.
-
-			WorldClaimCleanupTask wtask = WorldClaimTasks.remove(event
-					.getWorld().getName());
-			// stop the task.
-			Bukkit.getScheduler().cancelTask(wtask.getTaskCookie());
-			// that oughta do it.
-
-			GriefPrevention.instance.dataStore.WorldUnloaded(event.getWorld());
-			LoadedWorlds.remove(event.getWorld());
-
-		}
 	}
 
 	@EventHandler
@@ -75,10 +57,8 @@ public class WorldWatcher implements Listener {
 				r.run();
 				randelegates++;
 			}
-			if (randelegates > 0
-					&& GriefPrevention.instance.DebuggingLevel == DebugLevel.Verbose) {
-				System.out.println("Ran " + randelegates
-						+ " WorldLoad Delegates.");
+			if (randelegates > 0 && GriefPrevention.instance.DebuggingLevel == DebugLevel.Verbose) {
+				System.out.println("Ran " + randelegates + " WorldLoad Delegates.");
 			}
 		}
 
@@ -87,17 +67,31 @@ public class WorldWatcher implements Listener {
 		LoadedWorlds.add(event.getWorld());
 		// start the cleanup listener for this world.
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(event.getWorld());
-		WorldClaimCleanupTask createdTask = new WorldClaimCleanupTask(event
-				.getWorld().getName());
+		WorldClaimCleanupTask createdTask = new WorldClaimCleanupTask(event.getWorld().getName());
 		WorldClaimTasks.put(event.getWorld().getName(), createdTask);
 		if (wc.getClaimCleanupEnabled()) {
-			int taskCookie = Bukkit.getScheduler().scheduleSyncRepeatingTask(
-					GriefPrevention.instance, createdTask, 300, 300);
+			int taskCookie = Bukkit.getScheduler().scheduleSyncRepeatingTask(GriefPrevention.instance, createdTask, 300, 300);
 			createdTask.setTaskCookie(taskCookie);
 		}
 
 		// 10 minutes, ** make configurable...*
 
+	}
+
+	@EventHandler
+	public void WorldUnload(WorldUnloadEvent event) {
+		if (LoadedWorlds.contains(event.getWorld())) {
+			// stop world claim cleanup.
+
+			WorldClaimCleanupTask wtask = WorldClaimTasks.remove(event.getWorld().getName());
+			// stop the task.
+			Bukkit.getScheduler().cancelTask(wtask.getTaskCookie());
+			// that oughta do it.
+
+			GriefPrevention.instance.dataStore.WorldUnloaded(event.getWorld());
+			LoadedWorlds.remove(event.getWorld());
+
+		}
 	}
 
 }

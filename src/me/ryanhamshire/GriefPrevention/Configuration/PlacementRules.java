@@ -3,9 +3,13 @@ package me.ryanhamshire.GriefPrevention.Configuration;
 import java.util.ArrayList;
 import java.util.List;
 
+import me.ryanhamshire.GriefPrevention.Debugger;
+import me.ryanhamshire.GriefPrevention.Debugger.DebugLevel;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import me.ryanhamshire.GriefPrevention.TextMode;
+
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
@@ -19,16 +23,15 @@ import org.bukkit.entity.Player;
 public class PlacementRules {
 	// above and below placement rules.
 
+	public enum SeaLevelOverrideTypes
+	{
+		None,
+		Offset,
+		Absolute
+	}
+	
 	public enum BasicPermissionConstants {
-		Deny, Allow;
-
-		public boolean Allowed() {
-			return this == Allow;
-		}
-
-		public boolean Denied() {
-			return !Allowed();
-		}
+		Allow, Deny;
 
 		public static BasicPermissionConstants fromBoolean(boolean value) {
 			return value ? Allow : Deny;
@@ -46,97 +49,48 @@ public class PlacementRules {
 			}
 			return null;
 		}
-	}
 
-	private BasicPermissionConstants AboveSeaLevel;
-	private BasicPermissionConstants BelowSeaLevel;
+		public boolean Allowed() {
+			return this == Allow;
+		}
 
-	/**
-	 * returns whether this placement rule allows Action above sea level.
-	 * 
-	 * @return
-	 */
-	public BasicPermissionConstants getAboveSeaLevel() {
-		return AboveSeaLevel;
-	}
-
-	/**
-	 * returns whether this placement rule allows Action below sea level.
-	 * 
-	 * @return
-	 */
-	public BasicPermissionConstants getBelowSeaLevel() {
-		return BelowSeaLevel;
+		public boolean Denied() {
+			return !Allowed();
+		}
 	}
 
 	public static PlacementRules AboveOnly = new PlacementRules(true, false);
 	public static PlacementRules BelowOnly = new PlacementRules(false, true);
+
 	public static PlacementRules Both = new PlacementRules(true, true);
+
 	public static PlacementRules Neither = new PlacementRules(false, false);
+
+	private BasicPermissionConstants AboveSeaLevel;
+	private BasicPermissionConstants BelowSeaLevel;
 	private List<String> RequiredPermissions = new ArrayList<String>();
-
-	public List<String> getRequiredPermissions() {
-		return RequiredPermissions;
-	}
-
-	public PlacementRules setRequiredPermissions(String... requiredperms) {
-		List<String> makelist = new ArrayList<String>();
-		PlacementRules cdc = new PlacementRules(this);
-		for (String perm : requiredperms) {
-			if (perm.contains(";")) {
-				for (String addperm : perm.split(";")) {
-					makelist.add(addperm);
-
-				}
-			} else
-				makelist.add(perm);
+	private int SeaLevelOffset = 0;
+	public int getSeaLevelOffset() { return SeaLevelOffset;}
+	private SeaLevelOverrideTypes SeaLevelType;
+	public SeaLevelOverrideTypes getSeaLevelType(){ return SeaLevelType;}
+	public String getSeaLevelOffsetString(){
+		
+		if(SeaLevelType==SeaLevelOverrideTypes.Offset){
+			return ((SeaLevelOffset>0)?"+":"-") + String.valueOf(SeaLevelOffset).trim();
 		}
-		cdc.RequiredPermissions = makelist;
-		// System.out.println("Set to have " + cdc.RequiredPermissions.size() +
-		// " perms");
-		return cdc;
-	}
-
-	public PlacementRules setRequiredPermissions(List<String> requiredperms) {
-		PlacementRules cdc = new PlacementRules(this);
-		List<String> madeperms = new ArrayList<String>();
-		for (String iterate : requiredperms) {
-			madeperms.add(iterate);
+		else if(SeaLevelType==SeaLevelOverrideTypes.Absolute){
+			return String.valueOf(SeaLevelOffset).trim();
 		}
-		cdc.RequiredPermissions = madeperms;
-		return cdc;
+		else {return "0";}
 	}
-
-	@Override
-	public String toString() {
-		if (AboveSeaLevel.Allowed() && BelowSeaLevel.Denied())
-			return "Only Above Sea Level";
-		if (AboveSeaLevel.Denied() && BelowSeaLevel.Allowed())
-			return "Only Below Sea Level";
-		if (AboveSeaLevel.Allowed() && BelowSeaLevel.Allowed())
-			return "Anywhere";
-		return "Nowhere";
-	}
-
-	public PlacementRules(PlacementRules CopySource) {
-		this.AboveSeaLevel = CopySource.AboveSeaLevel;
-		this.BelowSeaLevel = CopySource.BelowSeaLevel;
+	public PlacementRules(BasicPermissionConstants Above, BasicPermissionConstants Below) {
+		AboveSeaLevel = Above;
+		BelowSeaLevel = Below;
 	}
 
 	public PlacementRules(boolean Above, boolean Below) {
 		AboveSeaLevel = BasicPermissionConstants.fromBoolean(Above);
 		BelowSeaLevel = BasicPermissionConstants.fromBoolean(Below);
-	}
-
-	public PlacementRules(BasicPermissionConstants Above,
-			BasicPermissionConstants Below) {
-		AboveSeaLevel = Above;
-		BelowSeaLevel = Below;
-	}
-
-	@Override
-	public Object clone() {
-		return new PlacementRules(this);
 	}
 
 	/**
@@ -153,13 +107,10 @@ public class PlacementRules {
 	 * @param Defaults
 	 *            instance containing Default settings to default to.
 	 */
-	public PlacementRules(FileConfiguration Source, FileConfiguration Target,
-			String NodePath, PlacementRules Defaults) {
+	public PlacementRules(FileConfiguration Source, FileConfiguration Target, String NodePath, PlacementRules Defaults) {
 
-		String sAboveSeaLevel = Source.getString(NodePath + ".AboveSeaLevel",
-				Defaults.AboveSeaLevel.name());
-		String sBelowSeaLevel = Source.getString(NodePath + ".BelowSeaLevel",
-				Defaults.BelowSeaLevel.name());
+		String sAboveSeaLevel = Source.getString(NodePath + ".AboveSeaLevel", Defaults.AboveSeaLevel.name());
+		String sBelowSeaLevel = Source.getString(NodePath + ".BelowSeaLevel", Defaults.BelowSeaLevel.name());
 		AboveSeaLevel = BasicPermissionConstants.fromString(sAboveSeaLevel);
 		BelowSeaLevel = BasicPermissionConstants.fromString(sBelowSeaLevel);
 		if (AboveSeaLevel == null)
@@ -169,8 +120,7 @@ public class PlacementRules {
 		Target.set(NodePath + ".AboveSeaLevel", AboveSeaLevel.name());
 		Target.set(NodePath + ".BelowSeaLevel", BelowSeaLevel.name());
 		if (Source.contains(NodePath + ".RequiredPermissions")) {
-			this.RequiredPermissions = Source.getStringList(NodePath
-					+ ".RequiredPermissions");
+			this.RequiredPermissions = Source.getStringList(NodePath + ".RequiredPermissions");
 		} else {
 			// System.out.println("RequiredPerms setting to item with " +
 			// Defaults.RequiredPermissions.size() + " Elements.");
@@ -183,9 +133,67 @@ public class PlacementRules {
 		if (RequiredPermissions.size() > 0) {
 			Target.set(NodePath + ".RequiredPermissions", RequiredPermissions);
 		}
+		//attempt to read SeaLevel override value.
+		//parse rules: if it starts with a + or -, it's an offset. if it's a plain value, it's an absolute sea level,
+		String sealevelvalue = Source.getString(NodePath + ".SeaLevel",Defaults.getSeaLevelOffsetString());
+		//System.out.println("Sealevel value:" + sealevelvalue);
+		//if it starts with a + or a -, it's an offset.
+		
+		if(sealevelvalue.startsWith("+") || sealevelvalue.startsWith("-")){
+			//offset.
+			
+			try {
+				this.SeaLevelOffset = Integer.parseInt(sealevelvalue);
+				this.SeaLevelType = SeaLevelOverrideTypes.Offset;
+			}
+			catch(NumberFormatException nfe){
+				GriefPrevention.AddLogEntry("Parse Error reading SeaLevelOverride Type:");
+				nfe.printStackTrace();
+				SeaLevelOffset=0;
+				
+			}
+		}
+		else{
+			
+			try {
+				SeaLevelOffset = Integer.parseInt(sealevelvalue);
+				SeaLevelType = SeaLevelOverrideTypes.Absolute;
+			}
+			catch(NumberFormatException nfe){
+				GriefPrevention.AddLogEntry("Parse Error reading SeaLevelOverride Type:");
+				nfe.printStackTrace();
+				SeaLevelOffset=0;
+			}
+			
+			
+		}
+		if(SeaLevelOffset!=0){
+			Debugger.Write("SeaLevelOffset read in." + this.getSeaLevelType().name() + " " + this.getSeaLevelOffsetString(), DebugLevel.Verbose);
+			Target.set(NodePath + ".SeaLevel",this.getSeaLevelOffsetString());
+			
+		}
+		
+		
 
 	}
 
+	public PlacementRules(PlacementRules CopySource) {
+		this.AboveSeaLevel = CopySource.AboveSeaLevel;
+		this.BelowSeaLevel = CopySource.BelowSeaLevel;
+	}
+
+	private int getSeaLevel(World w){
+		int currentresult = GriefPrevention.instance.getSeaLevel(w);
+		if(this.SeaLevelOffset!=0){
+			if(this.SeaLevelType == SeaLevelOverrideTypes.Absolute){
+				return this.SeaLevelOffset;
+			}
+			else {
+				return currentresult +this.SeaLevelOffset;
+			}
+		}
+		return currentresult;
+	}
 	/**
 	 * determines if this Placementrule allows for the given location.
 	 * 
@@ -193,10 +201,8 @@ public class PlacementRules {
 	 * @return
 	 */
 	public boolean Allow(Location Target, Player p, boolean ShowMessages) {
-		int SeaLevelofWorld = GriefPrevention.instance.getSeaLevel(Target
-				.getWorld());
-		boolean result = (AboveSeaLevel.Allowed() && (Target.getBlockY() >= SeaLevelofWorld))
-				|| (BelowSeaLevel.Allowed() && (Target.getBlockY() < SeaLevelofWorld));
+		int SeaLevelofWorld = getSeaLevel(Target.getWorld());
+		boolean result = (AboveSeaLevel.Allowed() && (Target.getBlockY() >= SeaLevelofWorld)) || (BelowSeaLevel.Allowed() && (Target.getBlockY() < SeaLevelofWorld));
 		Player RelevantPlayer = p;
 
 		if (RelevantPlayer != null && RequiredPermissions.size() > 0) {
@@ -217,18 +223,12 @@ public class PlacementRules {
 					buildpermnames.append(",");
 				}
 
-				String uselisting = buildpermnames.toString().substring(0,
-						buildpermnames.length() - 1);
+				String uselisting = buildpermnames.toString().substring(0, buildpermnames.length() - 1);
 				if (ShowMessages) {
 					if (RequiredPermissions.size() == 1) {
-						GriefPrevention.sendMessage(RelevantPlayer,
-								TextMode.Err, "You need " + uselisting
-										+ " Permission for that Action.");
+						GriefPrevention.sendMessage(RelevantPlayer, TextMode.Err, "You need " + uselisting + " Permission for that Action.");
 					} else {
-						GriefPrevention.sendMessage(RelevantPlayer,
-								TextMode.Err,
-								"You need " + uselisting.replace(",", " or ")
-										+ " Permission for that Action");
+						GriefPrevention.sendMessage(RelevantPlayer, TextMode.Err, "You need " + uselisting.replace(",", " or ") + " Permission for that Action");
 					}
 				}
 				result = false;
@@ -239,6 +239,72 @@ public class PlacementRules {
 		// SeaLevelofWorld + " Allow:" + result);
 		return result;
 
+	}
+
+	@Override
+	public Object clone() {
+		return new PlacementRules(this);
+	}
+
+	/**
+	 * returns whether this placement rule allows Action above sea level.
+	 * 
+	 * @return
+	 */
+	public BasicPermissionConstants getAboveSeaLevel() {
+		return AboveSeaLevel;
+	}
+
+	/**
+	 * returns whether this placement rule allows Action below sea level.
+	 * 
+	 * @return
+	 */
+	public BasicPermissionConstants getBelowSeaLevel() {
+		return BelowSeaLevel;
+	}
+
+	public List<String> getRequiredPermissions() {
+		return RequiredPermissions;
+	}
+
+	public PlacementRules setRequiredPermissions(List<String> requiredperms) {
+		PlacementRules cdc = new PlacementRules(this);
+		List<String> madeperms = new ArrayList<String>();
+		for (String iterate : requiredperms) {
+			madeperms.add(iterate);
+		}
+		cdc.RequiredPermissions = madeperms;
+		return cdc;
+	}
+
+	public PlacementRules setRequiredPermissions(String... requiredperms) {
+		List<String> makelist = new ArrayList<String>();
+		PlacementRules cdc = new PlacementRules(this);
+		for (String perm : requiredperms) {
+			if (perm.contains(";")) {
+				for (String addperm : perm.split(";")) {
+					makelist.add(addperm);
+
+				}
+			} else
+				makelist.add(perm);
+		}
+		cdc.RequiredPermissions = makelist;
+		// System.out.println("Set to have " + cdc.RequiredPermissions.size() +
+		// " perms");
+		return cdc;
+	}
+
+	@Override
+	public String toString() {
+		if (AboveSeaLevel.Allowed() && BelowSeaLevel.Denied())
+			return "Only Above Sea Level";
+		if (AboveSeaLevel.Denied() && BelowSeaLevel.Allowed())
+			return "Only Below Sea Level";
+		if (AboveSeaLevel.Allowed() && BelowSeaLevel.Allowed())
+			return "Anywhere";
+		return "Nowhere";
 	}
 
 }

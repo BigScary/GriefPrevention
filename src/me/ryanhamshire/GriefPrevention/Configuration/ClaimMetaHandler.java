@@ -7,12 +7,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
-
 import me.ryanhamshire.GriefPrevention.Claim;
 import me.ryanhamshire.GriefPrevention.DataStore;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
+
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 
 /**
  * When it comes to handling extra information on a per-claim basis, the current
@@ -57,24 +57,15 @@ public class ClaimMetaHandler {
 		MetaFolder = SourcePath;
 	}
 
-	public String getClaimTag(Claim c) {
-		if (c.parent != null)
-			return c.parent.getID() + "-" + String.valueOf(c.getSubClaimID());
-		else
-			return String.valueOf(c.getID());
-	}
-
 	public Claim getClaimFromTag(String tag) {
 		String[] splitval = tag.split("-");
 		if (splitval.length == 1)
-			return GriefPrevention.instance.dataStore.getClaim(Long
-					.parseLong(splitval[0]));
+			return GriefPrevention.instance.dataStore.getClaim(Long.parseLong(splitval[0]));
 		else {
 
 			long parentID = Long.parseLong(splitval[0]);
 			long subid = Long.parseLong(splitval[1]);
-			Claim parentclaim = GriefPrevention.instance.dataStore
-					.getClaim(parentID);
+			Claim parentclaim = GriefPrevention.instance.dataStore.getClaim(parentID);
 			if (parentclaim == null)
 				return null;
 
@@ -106,6 +97,67 @@ public class ClaimMetaHandler {
 		return getClaimMeta(PluginKey, useclaimkey);
 	}
 
+	private FileConfiguration getClaimMeta(String PluginKey, String ClaimKey) {
+		// find the Plugin key folder.
+		String ClaimMeta = getClaimMetaFile(PluginKey, ClaimKey);
+		// if the file exists...
+		if (new File(ClaimMeta).exists()) {
+			return YamlConfiguration.loadConfiguration(new File(ClaimMeta));
+		} else {
+			// no file. SAD FACE.
+			// return a new configuration.
+			return new YamlConfiguration();
+		}
+
+	}
+
+	// retrieves the name of the appropriate claim file, making sure that the
+	// path exists.
+	private String getClaimMetaFile(String PluginKey, String ClaimKey) {
+		String PluginFolder = MetaFolder + "/" + PluginKey;
+		// make sure that directory exists...
+		File pfolder = new File(PluginFolder);
+		if (!pfolder.exists()) {
+			pfolder.mkdirs();
+		}
+
+		// now add the Claim Key to the path.
+		String ClaimMeta = PluginFolder + "/" + ClaimKey + ".yml";
+		return ClaimMeta;
+	}
+
+	public List<Claim> getClaimsForKey(String PluginKey) {
+
+		File PluginFolder = new File(MetaFolder + "/" + PluginKey + "/");
+		if (!PluginFolder.exists())
+			return new ArrayList<Claim>();
+		else {
+			ArrayList<Claim> resultvalue = new ArrayList<Claim>();
+			// if the folder does exist, read each one. return it as a list.
+			if (PluginFolder.isDirectory()) {
+				for (File iteratefile : PluginFolder.listFiles()) {
+					if (iteratefile.getName().toUpperCase().endsWith(".YML")) {
+						String basename = iteratefile.getName().substring(0, iteratefile.getName().lastIndexOf(".") + 1);
+						Claim gotfromtag = getClaimFromTag(basename);
+						if (gotfromtag != null) {
+							resultvalue.add(gotfromtag);
+						}
+					}
+				}
+
+			}
+			return resultvalue;
+		}
+
+	}
+
+	public String getClaimTag(Claim c) {
+		if (c.parent != null)
+			return c.parent.getID() + "-" + String.valueOf(c.getSubClaimID());
+		else
+			return String.valueOf(c.getID());
+	}
+
 	/**
 	 * retrieves a list of All Meta Keys currently registered.
 	 * 
@@ -133,47 +185,6 @@ public class ClaimMetaHandler {
 		}
 	}
 
-	public List<Claim> getClaimsForKey(String PluginKey) {
-
-		File PluginFolder = new File(MetaFolder + "/" + PluginKey + "/");
-		if (!PluginFolder.exists())
-			return new ArrayList<Claim>();
-		else {
-			ArrayList<Claim> resultvalue = new ArrayList<Claim>();
-			// if the folder does exist, read each one. return it as a list.
-			if (PluginFolder.isDirectory()) {
-				for (File iteratefile : PluginFolder.listFiles()) {
-					if (iteratefile.getName().toUpperCase().endsWith(".YML")) {
-						String basename = iteratefile.getName().substring(0,
-								iteratefile.getName().lastIndexOf(".") + 1);
-						Claim gotfromtag = getClaimFromTag(basename);
-						if (gotfromtag != null) {
-							resultvalue.add(gotfromtag);
-						}
-					}
-				}
-
-			}
-			return resultvalue;
-		}
-
-	}
-
-	// retrieves the name of the appropriate claim file, making sure that the
-	// path exists.
-	private String getClaimMetaFile(String PluginKey, String ClaimKey) {
-		String PluginFolder = MetaFolder + "/" + PluginKey;
-		// make sure that directory exists...
-		File pfolder = new File(PluginFolder);
-		if (!pfolder.exists()) {
-			pfolder.mkdirs();
-		}
-
-		// now add the Claim Key to the path.
-		String ClaimMeta = PluginFolder + "/" + ClaimKey + ".yml";
-		return ClaimMeta;
-	}
-
 	/**
 	 * sets the ClaimMeta data of a given claim for the given PluginKey to a
 	 * given FileConfiguration.
@@ -190,34 +201,17 @@ public class ClaimMetaHandler {
 		if (c.parent == null)
 			useclaimkey = String.valueOf(c.getID());
 		if (c.parent != null)
-			useclaimkey = String.valueOf(c.parent.getID()) + "-"
-					+ String.valueOf(c.getSubClaimID());
+			useclaimkey = String.valueOf(c.parent.getID()) + "-" + String.valueOf(c.getSubClaimID());
 		setClaimMeta(PluginKey, useclaimkey, result);
 	}
 
-	public void setClaimMeta(String PluginKey, String ClaimKey,
-			FileConfiguration result) {
+	public void setClaimMeta(String PluginKey, String ClaimKey, FileConfiguration result) {
 		String ClaimMeta = getClaimMetaFile(PluginKey, ClaimKey);
 		try {
 			result.save(ClaimMeta);
 		} catch (IOException iox) {
-			GriefPrevention.instance.getLogger().log(Level.SEVERE,
-					"Failed to save Claim Meta to file," + ClaimMeta);
+			GriefPrevention.instance.getLogger().log(Level.SEVERE, "Failed to save Claim Meta to file," + ClaimMeta);
 			iox.printStackTrace();
-		}
-
-	}
-
-	private FileConfiguration getClaimMeta(String PluginKey, String ClaimKey) {
-		// find the Plugin key folder.
-		String ClaimMeta = getClaimMetaFile(PluginKey, ClaimKey);
-		// if the file exists...
-		if (new File(ClaimMeta).exists()) {
-			return YamlConfiguration.loadConfiguration(new File(ClaimMeta));
-		} else {
-			// no file. SAD FACE.
-			// return a new configuration.
-			return new YamlConfiguration();
 		}
 
 	}

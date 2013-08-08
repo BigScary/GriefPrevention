@@ -14,8 +14,13 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class CleanClaimCommand extends GriefPreventionCommand {
-	private void HandleClaimClean(Claim c, MaterialInfo source,
-			MaterialInfo target, Player player) {
+	@Override
+	public String[] getLabels() {
+		// TODO Auto-generated method stub
+		return new String[] { "cleanclaim" };
+	}
+
+	private void HandleClaimClean(Claim c, MaterialInfo source, MaterialInfo target, Player player) {
 		Location lesser = c.getLesserBoundaryCorner();
 		Location upper = c.getGreaterBoundaryCorner();
 		// System.out.println("HandleClaimClean:" + source.typeID + " to " +
@@ -24,13 +29,10 @@ public class CleanClaimCommand extends GriefPreventionCommand {
 		for (int x = lesser.getBlockX(); x <= upper.getBlockX(); x++) {
 			for (int y = 0; y <= 255; y++) {
 				for (int z = lesser.getBlockZ(); z <= upper.getBlockZ(); z++) {
-					Location createloc = new Location(lesser.getWorld(), x, y,
-							z);
+					Location createloc = new Location(lesser.getWorld(), x, y, z);
 					Block acquired = lesser.getWorld().getBlockAt(createloc);
-					if (acquired.getTypeId() == source.typeID
-							&& acquired.getData() == source.data) {
-						acquired.setTypeIdAndData(target.typeID, target.data,
-								true);
+					if (acquired.getTypeId() == source.typeID && acquired.getData() == source.data) {
+						acquired.setTypeIdAndData(target.typeID, target.data, true);
 
 					}
 
@@ -41,8 +43,7 @@ public class CleanClaimCommand extends GriefPreventionCommand {
 	}
 
 	@Override
-	public boolean onCommand(CommandSender sender, Command command,
-			String label, String[] args) {
+	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		if (!(sender instanceof Player))
 			return false;
 		Player player = (Player) sender;
@@ -58,26 +59,22 @@ public class CleanClaimCommand extends GriefPreventionCommand {
 		if (source == null) {
 			Material attemptparse = Material.valueOf(args[0]);
 			if (attemptparse != null) {
-				source = new MaterialInfo(attemptparse.getId(), (byte) 0,
-						args[0]);
+				source = new MaterialInfo(attemptparse.getId(), (byte) 0, args[0]);
 			} else {
 				player.sendMessage("Failed to parse Source Material," + args[0]);
 				return true;
 			}
 
 		}
-		MaterialInfo target = new MaterialInfo(Material.AIR.getId(), (byte) 0,
-				"Air");
+		MaterialInfo target = new MaterialInfo(Material.AIR.getId(), (byte) 0, "Air");
 		if (args.length > 1) {
 			target = MaterialInfo.fromString(args[1]);
 			if (target == null) {
 				Material attemptparse = Material.valueOf(args[1]);
 				if (attemptparse != null) {
-					target = new MaterialInfo(attemptparse.getId(), (byte) 0,
-							args[1]);
+					target = new MaterialInfo(attemptparse.getId(), (byte) 0, args[1]);
 				} else {
-					player.sendMessage("Failed to parse Target Material,"
-							+ args[1]);
+					player.sendMessage("Failed to parse Target Material," + args[1]);
 				}
 			}
 
@@ -86,20 +83,12 @@ public class CleanClaimCommand extends GriefPreventionCommand {
 		PlayerData pd = dataStore.getPlayerData(player.getName());
 		Claim retrieveclaim = dataStore.getClaimAt(player.getLocation(), true);
 		if (retrieveclaim != null) {
-			if (pd.ignoreClaims
-					|| retrieveclaim.getOwnerName().equalsIgnoreCase(
-							player.getName())) {
+			if (pd.ignoreClaims || retrieveclaim.getOwnerName().equalsIgnoreCase(player.getName())) {
 				HandleClaimClean(retrieveclaim, source, target, player);
 				return true;
 			}
 		}
 		return false;
-	}
-
-	@Override
-	public String[] getLabels() {
-		// TODO Auto-generated method stub
-		return new String[] { "cleanclaim" };
 	}
 
 }
