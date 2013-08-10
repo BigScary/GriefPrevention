@@ -278,7 +278,7 @@ public class BlockEventHandler implements Listener {
 		if (spreadEvent.getFace() == BlockFace.DOWN)
 			return;
 
-		System.out.println("onBlockFromTo:" + spreadEvent.getBlock().getLocation().toString() + " Type:" + spreadEvent.getBlock().getType().name());
+		
 		// from where?
 		Block fromBlock = spreadEvent.getBlock();
 		if (fromBlock == null)
