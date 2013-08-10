@@ -81,7 +81,7 @@ public class PlacementRules {
 	public String getSeaLevelOffsetString(){
 		
 		if(SeaLevelType==SeaLevelOverrideTypes.Offset){
-			return ((SeaLevelOffset>0)?"+":"-") + String.valueOf(SeaLevelOffset).trim();
+			return ((SeaLevelOffset>0)?"+":"-") + String.valueOf(Math.abs(SeaLevelOffset)).trim();
 		}
 		else if(SeaLevelType==SeaLevelOverrideTypes.Absolute){
 			return String.valueOf(SeaLevelOffset).trim();
