@@ -26,6 +26,7 @@ public class DeathBlowCommand extends GriefPreventionCommand {
 		if (args.length < 1)
 			return false;
 		Player player = (sender instanceof Player) ? (Player) sender : null;
+		if(player!=null) if(!EnsurePermission(player,command.getName())) return true;
 		GriefPrevention inst = GriefPrevention.instance;
 		// try to find that player
 		Player targetPlayer = inst.getServer().getPlayer(args[0]);

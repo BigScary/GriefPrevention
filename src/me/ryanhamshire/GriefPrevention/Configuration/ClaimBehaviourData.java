@@ -161,6 +161,10 @@ public class ClaimBehaviourData {
 	private PlacementRules Wilderness;
 
 
+	private boolean RequireSiege;
+	
+	public boolean getRequireSiege(){ return RequireSiege;}
+	
 	public ClaimBehaviourData setSeaLevelOffsets(PlacementRules.SeaLevelOverrideTypes useType,int Offset){
 		Claims.setSeaLevelOffset(useType, Offset);
 		Wilderness.setSeaLevelOffset(useType, Offset);
@@ -173,6 +177,7 @@ public class ClaimBehaviourData {
 		this.Claims = (PlacementRules) Source.Claims.clone();
 		this.Wilderness = (PlacementRules) Source.Wilderness.clone();
 		this.ClaimBehaviour = Source.ClaimBehaviour;
+		this.RequireSiege = this.getRequireSiege();
 	
 	}
 
@@ -184,6 +189,7 @@ public class ClaimBehaviourData {
 		Wilderness = new PlacementRules(Source, outConfig, NodePath + ".Wilderness", Defaults.getWildernessRules());
 		Claims = new PlacementRules(Source, outConfig, NodePath + ".Claims", Defaults.getClaimsRules());
 		String strmode = Source.getString(NodePath + ".Claims.ClaimControl", Defaults.getBehaviourMode().name());
+		RequireSiege = Source.getBoolean(NodePath + ".Claims.OnlySiege",false);
 		// check for a requiredpermissions entry. If there isn't one, though,
 		// don't save it.
 
@@ -192,7 +198,9 @@ public class ClaimBehaviourData {
 			
 		ClaimBehaviour = ClaimBehaviourMode.parseMode(strmode);
 
+		
 		outConfig.set(NodePath + ".Claims.ClaimControl", ClaimBehaviour.name());
+		if(RequireSiege) outConfig.set(NodePath + ".Claims.OnlySiege",RequireSiege);
 
 	}
 
@@ -291,6 +299,13 @@ public class ClaimBehaviourData {
 				if (!this.ClaimBehaviour.PerformTest(position, RelevantPlayer, ShowMessages))
 					return returned = ClaimAllowanceConstants.Deny;
 
+				//if siege is required..
+				if(this.getRequireSiege()){
+					if(testclaim.siegeData==null){
+						//no siege, so cannot do the action.
+						return ClaimAllowanceConstants.Deny;
+					}
+				}
 				boolean varresult = this.Claims.Allow(position, RelevantPlayer, ShowMessages);
 
 				return returned = (varresult ? ClaimAllowanceConstants.Allow : ClaimAllowanceConstants.Deny);

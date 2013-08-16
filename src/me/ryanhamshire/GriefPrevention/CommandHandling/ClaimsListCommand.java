@@ -26,6 +26,9 @@ public class ClaimsListCommand extends GriefPreventionCommand {
 		if (args.length > 1)
 			return false;
 		Player player = (sender instanceof Player) ? (Player) sender : null;
+		if(player!=null){
+			if(!EnsurePermission(player,command.getName())) return true;
+		}
 		GriefPrevention inst = GriefPrevention.instance;
 		// player whose claims will be listed
 		OfflinePlayer otherPlayer;

@@ -2,6 +2,7 @@ package me.ryanhamshire.GriefPrevention.CommandHandling;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 public class TransferClaimBlocksCommand extends GriefPreventionCommand {
 
@@ -16,6 +17,9 @@ public class TransferClaimBlocksCommand extends GriefPreventionCommand {
 		// TODO Auto-generated method stub
 		if (args.length < 3) {
 			return false;
+		}
+		if(sender instanceof Player){
+			if(!EnsurePermission((Player)sender, label)) return true;
 		}
 		String sourcename = args[0];
 		String targetname = args[1];

@@ -27,6 +27,9 @@ public class SiegeCommand extends GriefPreventionCommand {
 		GriefPrevention inst = GriefPrevention.instance;
 		DataStore dataStore = inst.dataStore;
 
+		if(player!=null){
+			if(!EnsurePermission(player, label)) return true;
+		}
 		if (!inst.siegeEnabledForWorld(player.getWorld())) {
 			GriefPrevention.sendMessage(player, TextMode.Err, Messages.NonSiegeWorld);
 			return true;

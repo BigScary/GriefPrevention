@@ -26,6 +26,7 @@ public class TrustListCommand extends GriefPreventionCommand {
 		Player player = (sender instanceof Player) ? (Player) sender : null;
 		if (player == null)
 			return false;
+		if(!EnsurePermission(player, label)) return true;
 		GriefPrevention inst = GriefPrevention.instance;
 
 		Claim claim = inst.dataStore.getClaimAt(player.getLocation(), true);

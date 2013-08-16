@@ -145,11 +145,16 @@ public class Claim {
 	 */
 	public boolean neverdelete = false;
 
+	@Deprecated
+	/**
+	 * @deprecated Use the getOwnerName() Method in preference to this field.
+	 */
+	public String ownerName;
 	/**
 	 * ownername. for admin claims, this is the empty string use getOwnerName()
 	 * to get a friendly name (will be "an administrator" for admin claims)
 	 */
-	private String ownerName;
+	private String claimOwnerName;
 
 	/**
 	 * parent claim only used for claim subdivisions. top level claims have null
@@ -215,8 +220,8 @@ public class Claim {
 		this.greaterBoundaryCorner = greaterBoundaryCorner;
 
 		// owner
-		this.ownerName = ownerName;
-
+		this.claimOwnerName = ownerName;
+		ownerName = claimOwnerName;
 		// other permissions
 		for (int i = 0; i < builderNames.length; i++) {
 			String name = builderNames[i];
@@ -291,7 +296,7 @@ public class Claim {
 		}
 
 		// claim owner and admins in ignoreclaims mode have access
-		if (this.ownerName.equals(player.getName()) || GriefPrevention.instance.dataStore.getPlayerData(player.getName()).ignoreClaims)
+		if (this.claimOwnerName.equals(player.getName()) || GriefPrevention.instance.dataStore.getPlayerData(player.getName()).ignoreClaims)
 			return null;
 
 		// look for explicit individual access, inventory, or build permission
@@ -386,7 +391,7 @@ public class Claim {
 			// custom error messages for siege mode
 			if (!breakable) {
 				return GriefPrevention.instance.dataStore.getMessage(Messages.NonSiegeMaterial);
-			} else if (this.ownerName.equals(player.getName())) {
+			} else if (this.claimOwnerName.equals(player.getName())) {
 				return GriefPrevention.instance.dataStore.getMessage(Messages.NoOwnerBuildUnderSiege);
 			} else {
 
@@ -436,7 +441,7 @@ public class Claim {
 		}
 
 		// owners can make changes, or admins with ignore claims mode enabled
-		if (this.ownerName.equals(player.getName()) || GriefPrevention.instance.dataStore.getPlayerData(player.getName()).ignoreClaims)
+		if (this.claimOwnerName.equals(player.getName()) || GriefPrevention.instance.dataStore.getPlayerData(player.getName()).ignoreClaims)
 			return null;
 
 		// anyone with explicit build permission can make changes
@@ -483,7 +488,7 @@ public class Claim {
 		}
 
 		// owner and administrators in ignoreclaims mode have access
-		if (this.ownerName.equals(player.getName()) || GriefPrevention.instance.dataStore.getPlayerData(player.getName()).ignoreClaims)
+		if (this.claimOwnerName.equals(player.getName()) || GriefPrevention.instance.dataStore.getPlayerData(player.getName()).ignoreClaims)
 			return null;
 
 		// admin claims need adminclaims permission only.
@@ -545,7 +550,7 @@ public class Claim {
 		}
 
 		// no resizing, deleting, and so forth while under siege
-		if (this.ownerName.equals(player.getName())) {
+		if (this.claimOwnerName.equals(player.getName())) {
 			if (this.siegeData != null) {
 				return GriefPrevention.instance.dataStore.getMessage(Messages.NoModifyDuringSiege);
 			}
@@ -901,10 +906,10 @@ public class Claim {
 		if (this.parent != null)
 			return this.parent.getOwnerName();
 
-		if (this.ownerName.length() == 0)
+		if (this.claimOwnerName.length() == 0)
 			return GriefPrevention.instance.dataStore.getMessage(Messages.OwnerNameForAdminClaims);
 
-		return this.ownerName;
+		return this.claimOwnerName;
 	}
 
 	@Deprecated
@@ -1157,7 +1162,7 @@ public class Claim {
 	 * @return
 	 */
 	public boolean isAdminClaim() {
-		return (this.ownerName == null || this.ownerName.isEmpty());
+		return (this.claimOwnerName == null || this.claimOwnerName.isEmpty());
 	}
 
 	/**
@@ -1385,7 +1390,8 @@ public class Claim {
 		if (this.parent != null)
 			this.parent.setOwnerName(value);
 
-		this.ownerName = value;
+		this.claimOwnerName = value;
+		ownerName = value;
 	}
 
 	/**

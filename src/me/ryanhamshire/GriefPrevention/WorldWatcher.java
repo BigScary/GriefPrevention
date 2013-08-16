@@ -70,7 +70,7 @@ public class WorldWatcher implements Listener {
 		WorldClaimCleanupTask createdTask = new WorldClaimCleanupTask(event.getWorld().getName());
 		WorldClaimTasks.put(event.getWorld().getName(), createdTask);
 		if (wc.getClaimCleanupEnabled()) {
-			int taskCookie = Bukkit.getScheduler().scheduleSyncRepeatingTask(GriefPrevention.instance, createdTask, 300, 300);
+			int taskCookie = Bukkit.getScheduler().scheduleSyncRepeatingTask(GriefPrevention.instance, createdTask, 60*5*20, 60*5*10);
 			createdTask.setTaskCookie(taskCookie);
 		}
 

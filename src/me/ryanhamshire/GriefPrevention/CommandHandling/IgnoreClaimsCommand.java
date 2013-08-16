@@ -22,7 +22,9 @@ public class IgnoreClaimsCommand extends GriefPreventionCommand {
 		// TODO Auto-generated method stub
 		if (!(sender instanceof Player))
 			return false;
+		
 		Player player = (Player) sender;
+		if(!EnsurePermission(player,command.getName())) return true;
 		PlayerData playerData = GriefPrevention.instance.dataStore.getPlayerData(player.getName());
 
 		playerData.ignoreClaims = !playerData.ignoreClaims;

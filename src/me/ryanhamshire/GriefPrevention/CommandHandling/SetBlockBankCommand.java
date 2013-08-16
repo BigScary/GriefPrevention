@@ -27,6 +27,9 @@ public class SetBlockBankCommand extends GriefPreventionCommand {
 		GriefPrevention inst = GriefPrevention.instance;
 		Player player = (sender instanceof Player) ? (Player) sender : null;
 		// find the specified player
+		if(player!=null){
+			if(!EnsurePermission(player, label)) return true;
+		}
 		OfflinePlayer targetPlayer = inst.resolvePlayer(args[0]);
 		if (targetPlayer == null) {
 			GriefPrevention.sendMessage(player, TextMode.Err, "Player \"" + args[0] + "\" not found.");

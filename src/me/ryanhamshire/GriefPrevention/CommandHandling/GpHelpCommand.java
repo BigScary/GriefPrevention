@@ -3,6 +3,7 @@ package me.ryanhamshire.GriefPrevention.CommandHandling;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 public class GpHelpCommand extends GriefPreventionCommand {
 	private static final String[] ClaimsHelp = new String[] { ChatColor.AQUA + "-----=GriefPrevention Claims=------", ChatColor.YELLOW + " GriefPrevention uses Claims to allow you to claim areas and prevent ", ChatColor.YELLOW + "other players from messing with your stuff without your permission.", ChatColor.YELLOW + "Claims are created by either placing your first Chest or by using the", ChatColor.YELLOW + "Claim creation tool, which is by default a Golden Shovel.", ChatColor.YELLOW + "You can resize your claims by using a Golden Shovel on a corner, or", ChatColor.YELLOW + "by defining a new claim that encompasses it. The original claim", ChatColor.YELLOW + "Will be resized. you can use trust commands to give other players abilities", ChatColor.YELLOW + "In your claim. See /gphelp trust for more information" };
@@ -20,6 +21,8 @@ public class GpHelpCommand extends GriefPreventionCommand {
 	private void handleHelp(CommandSender p, String Topic) {
 		if (p == null)
 			return;
+		
+		
 		String[] uselines;
 		if (Topic.equalsIgnoreCase("claims"))
 			uselines = ClaimsHelp;
@@ -39,7 +42,8 @@ public class GpHelpCommand extends GriefPreventionCommand {
 		// TODO Auto-generated method stub
 		// TODO Auto-generated method stub
 		if (sender != null) {
-
+			if(sender instanceof Player)
+				if(!EnsurePermission((Player)sender,command.getName())) return true;
 			String topic = "index";
 			if (args.length > 0)
 				topic = args[0];
@@ -48,6 +52,7 @@ public class GpHelpCommand extends GriefPreventionCommand {
 		}
 
 		return true;
-	}
+	
 
-}
+	}
+	}

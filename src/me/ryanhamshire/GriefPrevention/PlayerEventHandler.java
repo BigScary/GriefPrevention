@@ -438,7 +438,7 @@ class PlayerEventHandler implements Listener {
 			}
 		} else if (newItemStack.getType() == wc.getAdministrationTool()) {
 			// make sure they have permission.
-			if (player.hasPermission(PermNodes.AdministrationPermission)) {
+			if (player.hasPermission(PermNodes.AdminToolPermission)) {
 				GriefPrevention.sendMessage(player, TextMode.Info, "GriefPrevention Admin tool selected. Left-Click to add to container list. Shift Left-click to add to only the current world.");
 			}
 
@@ -713,7 +713,9 @@ class PlayerEventHandler implements Listener {
 		PlayerData playerData = this.dataStore.getPlayerData(event.getEntity().getName());
 		long now = Calendar.getInstance().getTimeInMillis();
 		if (now - playerData.lastDeathTimeStamp < wc.getSpamDeathMessageCooldownSeconds() * 1000) {
-			event.setDeathMessage("");
+			event.setDeathMessage("\b\b");
+			
+			
 		}
 
 		playerData.lastDeathTimeStamp = now;
@@ -906,7 +908,7 @@ class PlayerEventHandler implements Listener {
 
 		else if (event.getClickedBlock() != null && event.getClickedBlock().getType() != Material.AIR && event.getItem() != null && wc.getAdministrationTool() == event.getItem().getType()) {
 
-			if (player.hasPermission(PermNodes.AdministrationPermission)) {
+			if (player.hasPermission(PermNodes.AdminToolPermission)) {
 				// if shifting, add to all worlds...
 				if (event.getAction() == Action.LEFT_CLICK_BLOCK) {
 					if (player.isSneaking()) {

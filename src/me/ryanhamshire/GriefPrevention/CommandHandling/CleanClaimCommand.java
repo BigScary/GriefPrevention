@@ -46,11 +46,13 @@ public class CleanClaimCommand extends GriefPreventionCommand {
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		if (!(sender instanceof Player))
 			return false;
-		Player player = (Player) sender;
+		Player player =(sender instanceof Player)?(Player) sender:null;
 		GriefPrevention inst = GriefPrevention.instance;
 		DataStore dataStore = inst.dataStore;
 		// TODO Auto-generated method stub
 		// source is first arg; target is second arg.
+		if(player==null) return false;
+		if(!EnsurePermission(player,command.getName())) return true;
 		player.sendMessage("cleanclaim command..." + args.length);
 		if (args.length == 0) {
 			return true;

@@ -25,6 +25,9 @@ public class BuySellClaimBlocks extends GriefPreventionCommand {
 		Player player = (sender instanceof Player) ? (Player) sender : null;
 		if (player == null)
 			return false;
+		
+		if(!EnsurePermission(player,command.getName())) return true;
+		
 		GriefPrevention inst = GriefPrevention.instance;
 		if (command.getName().equalsIgnoreCase("buyclaimblocks") && player != null) {
 			// if economy is disabled, don't do anything
@@ -32,7 +35,7 @@ public class BuySellClaimBlocks extends GriefPreventionCommand {
 				GriefPrevention.sendMessage(player, TextMode.Err, Messages.BuySellNotConfigured);
 				return true;
 			}
-			if (!player.hasPermission(PermNodes.BuySellClaimBlocks)) {
+			if (!player.hasPermission(PermNodes.BuyClaimBlocks)) {
 				GriefPrevention.sendMessage(player, TextMode.Err, Messages.NoPermissionForCommand);
 				return true;
 			}
@@ -110,7 +113,7 @@ public class BuySellClaimBlocks extends GriefPreventionCommand {
 				return true;
 			}
 
-			if (!player.hasPermission(PermNodes.BuySellClaimBlocks)) {
+			if (!player.hasPermission(PermNodes.SellClaimBlocks)) {
 				GriefPrevention.sendMessage(player, TextMode.Err, Messages.NoPermissionForCommand);
 				return true;
 			}
