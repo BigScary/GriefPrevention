@@ -951,11 +951,13 @@ class PlayerEventHandler implements Listener {
 
 			// block container use while under siege, so players can't hide
 			// items from attackers
-			if (playerData.siegeData != null) {
+			/*if (playerData.siegeData != null) {
 				GriefPrevention.sendMessage(player, TextMode.Err, Messages.SiegeNoContainers);
 				event.setCancelled(true);
 				return;
-			}
+			}*/
+			//Above block commented out: prevention of containers during a siege should now be the default
+			//setting for some rules.
 
 			// special Chest looting behaviour.
 			Claim cc = this.dataStore.getClaimAt(clickedBlock.getLocation(), true);

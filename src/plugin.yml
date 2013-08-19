@@ -10,174 +10,301 @@ commands:
    setclaimblocks:
       description: sets the claim blocks for a player to a specific value.
       usage: /SetClaimBlocks <player> <amount>
-      permission: griefprevention.setclaimblocks
+      permission: griefprevention.commands.setclaimblocks
    claiminfo:
       description: displays advanced information about a claim.
       usage: /ClaimInfo [claimid]
-      permission: griefprevention.claiminfo
+      permission: griefprevention.commands.claiminfo
    cleanclaim:
       description: cleans all of a given material from a owned claim. target material defaults to AIR.
       usage: /CleanClaim <source> <target>
-      permission: griefprevention.cleanclaim
+      permission: griefprevention.commands.cleanclaim
    clearmanagers:
       description: Clears all managers on a claim.
       usage: /ClearManagers
-      permission: griefprevention.claims
+      permission: griefprevention.commands.clearmanagers
    abandonclaim:
       description: Deletes a claim.
       usage: /AbandonClaim
-      permission: griefprevention.claims
+      permission: griefprevention.commands.abandonclaim
    abandontoplevelclaim:
       description: Deletes a claim and all its subdivisions.
       usage: /AbandonTopLevelClaim
-      permission: griefprevention.claims
+      permission: griefprevention.commands.abandontoplevelclaim
    abandonallclaims:
       description: Deletes ALL your claims.
       usage: /AbandonAllClaims
-      permission: griefprevention.claims
+      permission: griefprevention.commands.abandonallclaims
    trust:
       description: Grants a player full access to your claim(s).
       usage: /Trust <player>  Grants a player permission to build.  See also /UnTrust, /ContainerTrust, /AccessTrust, and /PermissionTrust.
       aliases: tr
-      permission: griefprevention.claims
+      permission: griefprevention.commands.trust
    untrust:
       description: Revokes a player's access to your claim(s).
       usage: /UnTrust <player>
       aliases: ut
-      permission: griefprevention.claims
+      permission: griefprevention.commands.untrust
    containertrust:
       description: Grants a player access to your containers.
       usage: /ContainerTrust <player>.  Grants a player access to your inventory, bed, and buttons/levers.
       aliases: ct
-      permission: griefprevention.claims
+      permission: griefprevention.commands.containertrust
    accesstrust:
       description: Grants a player entry to your claim(s) and use of your bed.
       usage: /AccessTrust <player>.  Grants a player access to your bed, buttons, and levers.
       aliases: at
-      permission: griefprevention.claims
+      permission: griefprevention.commands.accesstrust
    permissiontrust:
       description: Grants a player permission to grant his level of permission to others.
       usage: /PermissionTrust <player>.  Permits a player to share his permission level with others.
       aliases: pt
-      permission: griefprevention.claims
+      permission: griefprevention.commands.permissiontrust
    subdivideclaims:
       description: Switches the shovel tool to subdivision mode, used to subdivide your claims.
       usage: /SubdivideClaims
       aliases: sc
-      permission: griefprevention.claims
+      permission: griefprevention.commands.subdivideclaims
    adjustbonusclaimblocks:
       description: Adds or subtracts bonus claim blocks for a player.
       usage: /AdjustBonusClaimBlocks <player> <amount>
-      permission: griefprevention.adjustclaimblocks
+      permission: griefprevention.commands.adjustbonusclaimblocks
       aliases: acb
    transferclaimblocks:
       description: transfers claim blocks from one player to another.
       usage: /TransferClaimBlocks <sourceplayer> <targetplayer> <amount>
-      permission: griefprevention.transferclaimblocks
+      permission: griefprevention.commands.transferclaimblocks
    setblockbank:
       description: Set the player's accrued blocks bank to the specified amount.
       usage: /SetBlockBank <player> <amount>
-      permission: griefprevention.setblockbank
+      permission: griefprevention.commands.setblockbank
       aliases: sbb
    deleteclaim:
       description: Deletes the claim you're standing in, even if it's not your claim.
       usage: /DeleteClaim
-      permission: griefprevention.deleteclaims
+      permission: griefprevention.commands.deleteclaim
       aliases: dc   
    deleteallclaims:
       description: Deletes all of another player's claims.
       usage: /DeleteAllClaims <player>
-      permission: griefprevention.deleteclaims
+      permission: griefprevention.commands.deleteallclaims
    resetclaims:
       description: Deletes all of another player's claims AND resets their accrued block bank to the initial value.
       usage: /ResetClaims <player>
-      permission: griefprevention.resetclaims
+      permission: griefprevention.commands.resetclaims
    adminclaims:
       description: Switches the shovel tool to administrative claims mode.
       usage: /AdminClaims
-      permission: griefprevention.adminclaims
+      permission: griefprevention.commands.adminclaims
       aliases: ac
    restorenature:
       description: Switches the shovel tool to restoration mode.
       usage: /RestoreNature 
-      permission: griefprevention.restorenature
+      permission: griefprevention.commands.restorenature
       aliases: rn
    restorenatureaggressive:
       description: Switches the shovel tool to aggressive restoration mode.
       usage: /RestoreNatureAggressive 
-      permission: griefprevention.restorenatureaggressive
+      permission: griefprevention.commands.restorenatureaggressive
       aliases: rna
    restorenaturefill:
       description: Switches the shovel tool to fill mode.
       usage: /RestoreNatureFill <radius> 
-      permission: griefprevention.restorenatureaggressive
+      permission: griefprevention.commands.restorenaturefill
       aliases: rnf
    basicclaims:
       description: Switches the shovel tool back to basic claims mode.
       usage: /BasicClaims
       aliases: bc
-      permission: griefprevention.claims
+      permission: griefprevention.commands.basicclaims
    buyclaimblocks:
       description: Purchases additional claim blocks with server money.  Doesn't work on servers without a Vault-compatible economy plugin.
       usage: /BuyClaimBlocks <numberOfBlocks>
       aliases: buyclaim   
-      permission: griefprevention.buysellclaimblocks
+      permission: griefprevention.commands.buysellclaimblocks
    sellclaimblocks:
       description: Sells your claim blocks for server money.  Doesn't work on servers without a Vault-compatible economy plugin.
       usage: /SellClaimBlocks <numberOfBlocks>
       aliases: sellclaim
-      permission: griefprevention.buysellclaimblocks
+      permission: griefprevention.commands.sellclaimblocks
    trapped:
       description: Ejects you to nearby unclaimed land.  Has a substantial cooldown period.
       usage: /Trapped
+      permission: griefprevention.commands.trapped
    trustlist:
       description: Lists permissions for the claim you're standing in.
       usage: /TrustList
-      permission: griefprevention.claims
+      permission: griefprevention.commands.trustlist
    siege:
       description: Initiates a siege versus another player.
       usage: /Siege <playerName>
+      permission: griefprevention.commands.siege
    ignoreclaims:
       description: Toggles ignore claims mode.
       usage: /IgnoreClaims
-      permission: griefprevention.ignoreclaims
+      permission: griefprevention.commands.ignoreclaims
       aliases: ic
    deletealladminclaims:
       description: Deletes all administrative claims.
       usage: /DeleteAllAdminClaims
-      permission: griefprevention.adminclaims
+      permission: griefprevention.commands.deletealladminclaims
    transferclaim:
       description: Converts an administrative claim to a private claim or a private claim to an administrative claim.
       usage: /TransferClaim [targetplayer]
-      permission: griefprevention.transferclaims
+      permission: griefprevention.commands.transferclaim
    giveclaim:
       description: Gives a claim to another player. Requires AdminClaims permission to give a claim that doesn't belong to the player.
       usage: /GiveClaim <TargetPlayer>
-      permission: griefprevention.giveclaim
+      permission: griefprevention.commands.giveclaim
    deathblow:
       description: Kills a player, optionally giving his inventory to another player.
       usage: /DeathBlow <player> [recipientPlayer]
-      permission: griefprevention.deathblow
+      permission: griefprevention.commands.deathblow
    claimslist:
       description: Lists information about a player's claim blocks and claims.
       usage: /ClaimsList or /ClaimsList <player>
+      permission: griefprevention.commands.claimslist
    claimexplosions:
       description: Toggles whether explosives may be used in a specific land claim.
       usage: /ClaimExplosions
+      permission: griefprevention.commands.claimexplosions
    lockclaim:
       description: Locks the claim from accidental mass/automatic deletion.
       usage: /LockClaim
+      permission: griefprevention.commands.lockclaim
    unlockclaim:
       description: Unlocks a previously locked claim.
       usage: /UnlockClaim
+      permission: griefprevention.commands.unlockclaim
    gpreload:
       description: reloads GP configuration.
       usage: /gpreload
+      permission: griefprevention.commands.gpreload
 permissions:
-    griefprevention.cleanclaim:
-        description: Allows the use of the cleanclaim command to cleanup owned claims.
-    griefprevention.reload:
-        description: Allows the use of the /gpreload command to reload configuration data without a server restart.
+    griefprevention.basicclaimcommands:
+        description: Grants access to Basic GriefPrevention claim commands.
+        children:
+            griefprevention.commands.trust: true
+            griefprevention.commands.untrust: true
+            griefprevention.commands.accesstrust: true
+            griefprevention.commands.containertrust: true
+            griefprevention.commands.permissiontrust: true
+    griefprevention.commands.setclaimblocks:
+        description: Grants access to the setclaimblocks command.
+        default: op
+    griefprevention.commands.claiminfo:
+        description: Grants access to the claiminfo command.
+        default: op
+    griefprevention.commands.cleanclaim:
+        description: Grants access to the cleanclaim command.
+        default: op
+    griefprevention.commands.clearmanagers:
+        description: Grants access to the clearmanagers command.
+        default: true
+    griefprevention.commands.abandonclaim:
+        description: Grants access to the abandonclaim command.
+        default: true
+    griefprevention.commands.abandontoplevelclaim:
+        description: Grants access to the abandontoplevelclaim command.
+        default: true
+    griefprevention.commands.abandonallclaims:
+        description: grants access ot the abandonallclaims command.
+        default: true
+    griefprevention.commands.trust:
+        description: grants access to the trust command.
+        default: true
+    griefprevention.commands.untrust:
+        description: grants access to the untrust command.
+        default: true
+    griefprevention.commands.containertrust:
+        description: grants access to the container trust command.
+        default: true
+    griefprevention.commands.accesstrust:
+        description: grants access to the accesstrust command.
+        default: true
+    griefprevention.commands.permissiontrust:
+        description: grants access to the permissiontrust command.
+        default: true
+    griefprevention.commands.subdivideclaims:
+        description: grants access to the subdivideclaims command.
+        default: true
+    griefprevention.commands.adjustbonusclaimblocks:
+        description: grants access to the adjustbonusclaimblocks command.
+        default: op
+    griefprevention.commands.transferclaimblocks:
+        description: grants access to the transferclaimblocks command.
+        default: op
+    griefprevention.commands.setblockbank:
+        description: grants access to the setblockbank command.
+        default: op
+    griefprevention.commands.deleteclaim:
+        description: grants access to the deleteclaim command.
+        default: op
+    griefprevention.commands.deleteallclaims:
+        description: grants access to the deleteallclaims command.
+        default: op
+    griefprevention.commands.resetclaims:
+        description: grants access to the resetclaims command.
+        default: op
+    griefprevention.commands.adminclaims:
+        description: grants access to the adminclaims command.
+        default: op
+    griefprevention.commands.restorenature:
+        description: grants access to the restorenature command.
+        default: op
+    griefprevention.commands.restorenatureaggressive:
+        description: grants access to the restorenatureaggressive command.
+        default: op
+    griefprevention.commands.restorenaturefill:
+        description: grants access to the restorenaturefill command.
+        default: op
+    griefprevention.commands.basicclaims:
+        description: grants access to the basicclaims command.
+        default: true
+    griefprevention.commands.buyclaimblocks:
+        description: grants access to the buyclaimblocks command
+        default: true
+    griefprevention.commands.sellclaimblocks:
+        description: grants access to the sellclaimblocks command
+        default: true
+    griefprevention.commands.trapped:
+        description: grants access to the trapped command.
+        default: true
+    griefprevention.commands.trustlist:
+        description: grants access to the trustlist command.
+        default: true
+    griefprevention.commands.siege:
+        description: grants access to the siege command.
+        default: true
+    griefprevention.commands.ignoreclaims:
+        description: grants access to the ignoreclaims command.
+        default: op
+    griefprevention.commands.deletealladminclaims:
+        description: grants access to the deletealladminclaims command.
+        default: op
+    griefprevention.commands.transferclaim:
+        description: grants access to the transferclaim command.
+        default: op
+    griefprevention.commands.giveclaim:
+        description: grants access to the giveclaim command.
+        default: true
+    griefprevention.commands.deathblow:
+        description: grants access to the deathblow command.
+        default: op
+    griefprevention.commands.claimslist:
+        description: grants access to the claimslist command.
+        default: true
+    griefprevention.commands.claimexplosions:
+        description: grants access to th claimexplosions command.
+        default: true
+    griefprevention.commands.lockclaim:
+        description: grants access to the lockclaim command.
+        default: true
+    griefprevention.commands.unlockclaim:
+        description: grants access to the unlockclaim command.
+        default: true
+    griefprevention.commands.gpreload:
+        description: grants access to the gpreload command.
         default: op
     griefprevention.ignoreclaimslimit:
         description: Allows creation of more claims than any configured per-player limit.
@@ -188,20 +315,7 @@ permissions:
     griefprevention.admin.*:
         description: Grants all administrative functionality.
         children:
-            griefprevention.restorenature: true
-            griefprevention.restorenatureaggressive: true
-            griefprevention.ignoreclaims: true
-            griefprevention.adminclaims: true
-            griefprevention.adjustclaimblocks: true
-            griefprevention.transferclaimblocks: true
-            griefprevention.deleteclaims: true
-            griefprevention.spam: true
-            griefprevention.lava: true
-            griefprevention.eavesdrop: true
-            griefprevention.admineavesdrop: true
-            griefprevention.deathblow: true
-            griefprevention.adminlock: true
-            griefprevention.lock: true
+            griefprevention.commands.*: true
     griefprevention.restorenature:
         description: Grants permission to use /RestoreNature.
         default: op
@@ -214,42 +328,24 @@ permissions:
     griefprevention.deleteclaims:
         description: Grants permission to delete other players' claims.
         default: op
-    griefprevention.adjustclaimblocks:
-        description: Grants permission to add or remove bonus blocks from a player's account.
-        default: op
-    griefprevention.giveclaimblocks:
-        description: Grants permission to give claim blocks to another player.
-        default: false
-    griefprevention.transferclaimblocks:
-        description: Grants permission to transfer claim blocks from one player to another.
-        default: op
     griefprevention.spam:
         description: Grants permission to send messages commands rapidly.
         default: op
-    griefprevention.loginspam:
+    griefprevention.spam.login:
         description: Grants permission to log in rapidly.
         default: op
-    griefprevention.lava:
+    griefprevention.placement.lava:
         description: Grants permission to place lava near the surface and outside of claims.
         default: op
-    griefprevention.eavesdrop:
+    griefprevention.placement.water:
+        description: Grants permission to place water near the surface and outside of claims.
+        default: true
+    griefprevention.eavesdrop.standard:
         description: Allows a player to see whispered chat messages (/tell).
         default: op
-    griefprevention.admineavesdrop:
+    griefprevention.eavesdrop.admin:
         description: Allows a player to see all whispered chat messages (/tell).
         default: op
-    griefprevention.restorenatureaggressive:
-        description: Grants access to /RestoreNatureAggressive and /RestoreNatureFill.
-        default: op
-    griefprevention.deathblow:
-        description: Grants access to /DeathBlow.
-        default: op
-    griefprevention.claims:
-        description: Grants access to claim-related slash commands.
-        default: true
-    griefprevention.buysellclaimblocks:
-        description: Grants access to claim block buy/sell commands.
-        default: true
     griefprevention.lock:
         description: Grants permission to use the lock/unlock commands on your own claims.
         default: op

@@ -6,6 +6,7 @@ import java.util.List;
 import me.ryanhamshire.GriefPrevention.Debugger;
 import me.ryanhamshire.GriefPrevention.Debugger.DebugLevel;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
+import me.ryanhamshire.GriefPrevention.PlayerData;
 import me.ryanhamshire.GriefPrevention.TextMode;
 
 import org.bukkit.Location;
@@ -59,17 +60,27 @@ public class PlacementRules {
 		}
 	}
 
+	
+	
 	public static PlacementRules AboveOnly = new PlacementRules(true, false);
 	public static PlacementRules BelowOnly = new PlacementRules(false, true);
 
 	public static PlacementRules Both = new PlacementRules(true, true);
 
 	public static PlacementRules Neither = new PlacementRules(false, false);
-
+    
+	
+	
+	
 	private BasicPermissionConstants AboveSeaLevel;
 	private BasicPermissionConstants BelowSeaLevel;
 	private List<String> RequiredPermissions = new ArrayList<String>();
 	private int SeaLevelOffset = 0;
+	/**
+	 * whether players that would otherwise be denied the action can
+	 * 
+	 */
+
 	public PlacementRules setSeaLevelOffset(SeaLevelOverrideTypes useType,int value){
 		SeaLevelType = useType;
 		SeaLevelOffset = value;
@@ -178,6 +189,11 @@ public class PlacementRules {
 			
 		}
 		
+	
+		
+		//tada.
+		
+		
 		
 
 	}
@@ -212,6 +228,8 @@ public class PlacementRules {
 		boolean result = (AboveSeaLevel.Allowed() && (Target.getBlockY() >= SeaLevelofWorld)) || (BelowSeaLevel.Allowed() && (Target.getBlockY() < SeaLevelofWorld));
 		Player RelevantPlayer = p;
 
+		
+		
 		if (RelevantPlayer != null && RequiredPermissions.size() > 0) {
 			// the player has to have at least one of the permissions, or we
 			// will be forced to deny it.

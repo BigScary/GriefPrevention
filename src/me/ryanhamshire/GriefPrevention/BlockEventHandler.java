@@ -109,13 +109,19 @@ public class BlockEventHandler implements Listener {
 
 		}
 
+		
+		if(wc.getBreakBlockRules().Allowed(block.getLocation(), player).Denied()){
+			breakEvent.setCancelled(true);
+			return;
+		}
+		
 		Claim claim = this.dataStore.getClaimAt(block.getLocation(), true);
 		// make sure the player is allowed to break at the location
 
 		// if there's a claim here
 		if (claim != null) {
 
-			// if the claim is under siege...
+			
 
 			if // if breaking UNDER the claim and the player has permission to
 				// build in the claim
@@ -497,14 +503,22 @@ public class BlockEventHandler implements Listener {
 			}
 		}
 
+		
+		
 		// make sure the player is allowed to build at the location
-		String noBuildReason = GriefPrevention.instance.allowBuild(player, block.getLocation());
+		/*String noBuildReason = GriefPrevention.instance.allowBuild(player, block.getLocation());
 		if (noBuildReason != null) {
 			GriefPrevention.sendMessage(player, TextMode.Err, noBuildReason);
 			placeEvent.setCancelled(true);
 			return;
 		}
-
+*/
+		if(wc.getPlaceBlockRules().Allowed(block.getLocation(),player).Denied()){
+			placeEvent.setCancelled(true);
+			return;
+		}
+		
+		
 		// if the block is being placed within an existing claim
 		PlayerData playerData = this.dataStore.getPlayerData(player.getName());
 		Claim claim = this.dataStore.getClaimAt(block.getLocation(), true);

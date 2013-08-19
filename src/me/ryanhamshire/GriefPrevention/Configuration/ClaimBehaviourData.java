@@ -2,6 +2,7 @@ package me.ryanhamshire.GriefPrevention.Configuration;
 
 import me.ryanhamshire.GriefPrevention.Claim;
 import me.ryanhamshire.GriefPrevention.Debugger;
+
 import me.ryanhamshire.GriefPrevention.Debugger.DebugLevel;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import me.ryanhamshire.GriefPrevention.Messages;
@@ -30,7 +31,31 @@ public class ClaimBehaviourData {
 		}
 
 	}
-
+	//enum for "overriding" the default permissions during PvP or during a siege.
+	
+		public enum SiegePVPOverrideConstants{
+			/**
+			 * Default Constant. no special provisions or action occurs during PvP or Siege.
+			 */
+		     None,
+		     /**
+		      * Allows this Permission during a siege or PvP.
+		      */
+		     Allow,
+		     /**
+		      * Denies this permission during a siege or PvP.
+		      */
+		     Deny,
+		     /**
+		      * Similar to Allow, but will only prevent Siege and PVP related logic. For example
+		      * during a siege of PVP, chests are normally inaccessible. By adding
+		      * AllowPermission to SiegeDefenderOverride, the Siege or PVP Logic will not be taken into account.
+		      */
+		     AllowRequireAccess,
+		     
+		     AllowRequireBuild,
+		     AllowRequireOwner
+		}
 	public enum ClaimBehaviourMode {
 		Disabled, RequireAccess, RequireBuild, RequireContainer, RequireManager, RequireNone, RequireOwner;
 
@@ -161,9 +186,27 @@ public class ClaimBehaviourData {
 	private PlacementRules Wilderness;
 
 
-	private boolean RequireSiege;
+	private SiegePVPOverrideConstants SiegeAttackerOverride = SiegePVPOverrideConstants.None;
+	private SiegePVPOverrideConstants SiegeDefenderOverride = SiegePVPOverrideConstants.None;
 	
-	public boolean getRequireSiege(){ return RequireSiege;}
+	//PvP Overrides can only apply to Claims currently.
+	//Attacker and Defender refers to the Attacker and Defender- the Attacker is the person with higher Permissions
+	//on a claim.
+	
+	private SiegePVPOverrideConstants PvPOverride = SiegePVPOverrideConstants.None;
+	
+	
+	public ClaimBehaviourData setSiegeOverrides(SiegePVPOverrideConstants Attacker,SiegePVPOverrideConstants Defender){
+		
+		SiegeAttackerOverride = Attacker;
+		SiegeDefenderOverride = Defender;
+		return this;
+	}
+	public ClaimBehaviourData setPVPOverride(SiegePVPOverrideConstants newPVP){
+		this.PvPOverride = newPVP;
+		return this;
+	}
+	
 	
 	public ClaimBehaviourData setSeaLevelOffsets(PlacementRules.SeaLevelOverrideTypes useType,int Offset){
 		Claims.setSeaLevelOffset(useType, Offset);
@@ -177,7 +220,9 @@ public class ClaimBehaviourData {
 		this.Claims = (PlacementRules) Source.Claims.clone();
 		this.Wilderness = (PlacementRules) Source.Wilderness.clone();
 		this.ClaimBehaviour = Source.ClaimBehaviour;
-		this.RequireSiege = this.getRequireSiege();
+		this.PvPOverride = Source.PvPOverride;
+		this.SiegeAttackerOverride = Source.SiegeAttackerOverride;
+		this.SiegeDefenderOverride = Source.SiegeDefenderOverride;
 	
 	}
 
@@ -189,18 +234,46 @@ public class ClaimBehaviourData {
 		Wilderness = new PlacementRules(Source, outConfig, NodePath + ".Wilderness", Defaults.getWildernessRules());
 		Claims = new PlacementRules(Source, outConfig, NodePath + ".Claims", Defaults.getClaimsRules());
 		String strmode = Source.getString(NodePath + ".Claims.ClaimControl", Defaults.getBehaviourMode().name());
-		RequireSiege = Source.getBoolean(NodePath + ".Claims.OnlySiege",false);
+		
 		// check for a requiredpermissions entry. If there isn't one, though,
 		// don't save it.
 
 	
+		//check for siege and PVP options.
+		//NodePath + ".Claims.SiegeAttacker"
+		//NodePath + ".Claims.SiegeDefender"
+		//NodePath + ".PVP"
+		//retrieve each. Set the value. Then if it's not the default, save them back.
+		String SAttacker = Source.getString(NodePath + ".Claims.SiegeAttacker","None");
+		String SDefender = Source.getString(NodePath + ".Claims.SiegeDefender","None");
+		String PVPProvision = Source.getString(NodePath + ".PVP","None");
+		
+		
+		//parse each.
+		try {this.SiegeAttackerOverride = SiegePVPOverrideConstants.valueOf(SAttacker);}
+		catch(Exception sAtt){this.SiegeAttackerOverride = SiegePVPOverrideConstants.None;}
+		try {this.SiegeDefenderOverride = SiegePVPOverrideConstants.valueOf(SDefender);}
+		catch(Exception sDef){this.SiegeDefenderOverride = SiegePVPOverrideConstants.None;}
+		try {this.PvPOverride = SiegePVPOverrideConstants.valueOf(PVPProvision);}
+		catch(Exception sPVP){this.PvPOverride = SiegePVPOverrideConstants.None;}
+		
+		//save each back. If they are none, however, don't save.
+		if(SiegeAttackerOverride != SiegePVPOverrideConstants.None){
+			outConfig.set(NodePath + ".Claims.SiegeAttacker", SiegeAttackerOverride.name());
+		}
+		if(SiegeDefenderOverride != SiegePVPOverrideConstants.None){
+			outConfig.set(NodePath + ".Claims.SiegeDefender",SiegeDefenderOverride.name());
+		}
+		if(PvPOverride != SiegePVPOverrideConstants.None){
+			outConfig.set(NodePath + ".PVP", PvPOverride);
+		}
 		
 			
 		ClaimBehaviour = ClaimBehaviourMode.parseMode(strmode);
 
 		
 		outConfig.set(NodePath + ".Claims.ClaimControl", ClaimBehaviour.name());
-		if(RequireSiege) outConfig.set(NodePath + ".Claims.OnlySiege",RequireSiege);
+		
 
 	}
 
@@ -292,6 +365,26 @@ public class ClaimBehaviourData {
 			}
 			// check permissions if there is a player involved and we have them.
 
+			
+			//check pvp...
+			if(pd!=null && pd.inPvpCombat()){
+				
+				if(this.PvPOverride!=SiegePVPOverrideConstants.None){
+					
+					if(PvPOverride == SiegePVPOverrideConstants.Allow){
+						return ClaimAllowanceConstants.Allow;
+					}
+					else if(PvPOverride == SiegePVPOverrideConstants.Deny){
+						return ClaimAllowanceConstants.Deny;
+					}
+						
+				}
+				
+				
+				
+			}
+			
+			
 			Claim testclaim = GriefPrevention.instance.dataStore.getClaimAt(position, true);
 			if (testclaim != null) {
 				if (ignoringclaims)
@@ -299,13 +392,66 @@ public class ClaimBehaviourData {
 				if (!this.ClaimBehaviour.PerformTest(position, RelevantPlayer, ShowMessages))
 					return returned = ClaimAllowanceConstants.Deny;
 
-				//if siege is required..
-				if(this.getRequireSiege()){
-					if(testclaim.siegeData==null){
-						//no siege, so cannot do the action.
-						return ClaimAllowanceConstants.Deny;
+				//if the claim is under siege, apply the siege overrides, if available.
+				
+				if(testclaim.siegeData != null){
+					
+					SiegePVPOverrideConstants useval = SiegePVPOverrideConstants.None;
+					//siege overrides only apply to players being sieged, or those attacking.
+					if(testclaim.siegeData.attacker == RelevantPlayer){
+						useval = this.SiegeAttackerOverride;
 					}
+					else if(testclaim.siegeData.defender == RelevantPlayer){
+						useval = this.SiegeDefenderOverride;
+					}
+					
+					//if not set to none...
+					if(useval!=SiegePVPOverrideConstants.None){
+						
+						if(useval == SiegePVPOverrideConstants.Allow){
+							return ClaimAllowanceConstants.Allow;
+							
+						}
+						else if(useval == SiegePVPOverrideConstants.AllowRequireAccess){
+							//return allow, if the player has Access trust.
+							String AccessResult = testclaim.allowAccess(RelevantPlayer);
+							if(null==AccessResult){
+								return ClaimAllowanceConstants.Allow;
+							}  else {
+								if(ShowMessages) GriefPrevention.sendMessage(RelevantPlayer, TextMode.Err, AccessResult);
+								return ClaimAllowanceConstants.Deny;
+							}
+						}
+						else if(useval == SiegePVPOverrideConstants.AllowRequireBuild){
+							//return allow if player has build trust.
+							String BuildResult = testclaim.allowBuild(RelevantPlayer);
+							if(null == BuildResult){
+								return ClaimAllowanceConstants.Allow;
+							} else {
+								if(ShowMessages) GriefPrevention.sendMessage(RelevantPlayer, TextMode.Err, BuildResult);
+								return ClaimAllowanceConstants.Deny;
+							}
+						}
+						else if(useval == SiegePVPOverrideConstants.AllowRequireOwner){
+							if(testclaim.getOwnerName().equals(RelevantPlayer.getName())){
+								return ClaimAllowanceConstants.Allow;
+							}
+							else {
+								if(ShowMessages) GriefPrevention.sendMessage(RelevantPlayer,TextMode.Err,Messages.NotYourClaim);
+								return ClaimAllowanceConstants.Deny;
+							}
+						}
+						else if(useval == SiegePVPOverrideConstants.Deny){
+							return ClaimAllowanceConstants.Deny;
+						}
+						
+						
+					}
+					
 				}
+				
+				
+				
 				boolean varresult = this.Claims.Allow(position, RelevantPlayer, ShowMessages);
 
 				return returned = (varresult ? ClaimAllowanceConstants.Allow : ClaimAllowanceConstants.Deny);

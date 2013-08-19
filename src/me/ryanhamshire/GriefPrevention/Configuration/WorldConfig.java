@@ -13,6 +13,7 @@ import me.ryanhamshire.GriefPrevention.MaterialCollection;
 import me.ryanhamshire.GriefPrevention.MaterialInfo;
 import me.ryanhamshire.GriefPrevention.PermNodes;
 import me.ryanhamshire.GriefPrevention.Configuration.ClaimBehaviourData.ClaimBehaviourMode;
+import me.ryanhamshire.GriefPrevention.Configuration.ClaimBehaviourData.SiegePVPOverrideConstants;
 import me.ryanhamshire.GriefPrevention.Configuration.PlacementRules.SeaLevelOverrideTypes;
 import me.ryanhamshire.GriefPrevention.tasks.DeliverClaimBlocksTask;
 
@@ -442,6 +443,11 @@ public class WorldConfig {
 															// remove partially
 															// cut trees
 
+	
+	private ClaimBehaviourData PlaceBlockRules;
+	private ClaimBehaviourData BreakBlockRules;
+	public ClaimBehaviourData getPlaceBlockRules(){ return PlaceBlockRules;}
+	public ClaimBehaviourData getBreakBlockRules(){ return BreakBlockRules;}
 	private ClaimBehaviourData ContainersRules;
 
 	private ClaimBehaviourData CreatureDamage;
@@ -654,6 +660,12 @@ public class WorldConfig {
 		this.config_afkDistanceCheck = config.getInt("GriefPrevention.AFKDistance", 3);
 		this.SilverfishBreakRules = new ClaimBehaviourData("Silverfish Break", config, outConfig, "GriefPrevention.Rules.SilverfishBreak", new ClaimBehaviourData("Silverfish Break", PlacementRules.Both, PlacementRules.Neither, ClaimBehaviourMode.Disabled));
 
+		
+		//placement requires build permission by default, and isn't allowed during PVP or Siege.
+		
+		this.PlaceBlockRules = new ClaimBehaviourData("Block Placement",PlacementRules.Both,PlacementRules.Both,ClaimBehaviourMode.RequireBuild).setPVPOverride(SiegePVPOverrideConstants.Deny).setSiegeOverrides(SiegePVPOverrideConstants.Deny, SiegePVPOverrideConstants.Deny);
+		this.BreakBlockRules = new ClaimBehaviourData("Block Breaking",PlacementRules.Both,PlacementRules.Both,ClaimBehaviourMode.RequireBuild).setPVPOverride(SiegePVPOverrideConstants.Deny).setSiegeOverrides(SiegePVPOverrideConstants.Deny, SiegePVPOverrideConstants.Deny);
+		
 		this.CreeperExplosionsBehaviour = new ClaimBehaviourData("Creeper Explosions", config, outConfig, "GriefPrevention.Rules.CreeperExplosions", new ClaimBehaviourData("Creeper Explosions", PlacementRules.Both, PlacementRules.Both, ClaimBehaviourMode.Disabled).setSeaLevelOffsets(SeaLevelOverrideTypes.Offset,-1));
 		this.WitherExplosionBehaviour = new ClaimBehaviourData("Wither Explosions", config, outConfig, "GriefPrevention.Rules.WitherExplosions", new ClaimBehaviourData("Wither Explosions", PlacementRules.Neither, PlacementRules.Neither, ClaimBehaviourMode.Disabled).setSeaLevelOffsets(SeaLevelOverrideTypes.Offset,-1));
 
@@ -714,13 +726,14 @@ public class WorldConfig {
 
 		this.BlockTweakRules = new ClaimBehaviourData("Block Tweaking", config, outConfig, "GriefPrevention.Rules.BlockTweaking", ClaimBehaviourData.getAll("Block Tweaking").setBehaviourMode(ClaimBehaviourMode.RequireAccess));
 
-		this.ContainersRules = new ClaimBehaviourData("Containers", config, outConfig, "GriefPrevention.Rules.Containers", ClaimBehaviourData.getAll("Containers").setBehaviourMode(ClaimBehaviourMode.RequireContainer)); // defaults
-																																																							// to
-																																																							// only
-																																																							// allowing
-																																																							// theft
-																																																							// outside
-																																																							// claims.
+		this.ContainersRules = new ClaimBehaviourData("Containers", config, outConfig, "GriefPrevention.Rules.Containers", ClaimBehaviourData.getAll("Containers").setBehaviourMode(ClaimBehaviourMode.RequireContainer).setPVPOverride(SiegePVPOverrideConstants.Deny).setSiegeOverrides(SiegePVPOverrideConstants.Deny, SiegePVPOverrideConstants.Deny)); 
+		// defaults
+		// to
+		// only
+		// allowing
+		// theft
+		// outside
+		// claims.
 
 		this.CreatureDamage = new ClaimBehaviourData("Creature Damage", config, outConfig, "GriefPrevention.Rules.CreatureDamage", ClaimBehaviourData.getAll("Creature Damage").setBehaviourMode(ClaimBehaviourMode.RequireContainer));
 

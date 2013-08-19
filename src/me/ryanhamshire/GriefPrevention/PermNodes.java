@@ -33,7 +33,7 @@ public class PermNodes {
 	public static final String SpamPermission = "griefprevention.spam.chat";
 	
 
-	public static final String commandpermission = "griefprevention.commands.{0}";
+	public static final String commandpermission = "griefprevention.commands.%s";
 	
 	public static String getCommandPermission(String CommandName){
 		return String.format(commandpermission, CommandName.toLowerCase());
