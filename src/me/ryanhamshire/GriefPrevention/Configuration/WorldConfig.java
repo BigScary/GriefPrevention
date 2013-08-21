@@ -274,12 +274,11 @@ public class WorldConfig {
 
 	private boolean config_entitycleanup_enabled;
 
-	private boolean config_fireDestroys; // whether fire destroys blocks outside
-											// of claims
-
-	private boolean config_fireSpreads; // whether fire spreads outside of
-										// claims
-
+	
+	
+	
+	
+	
 	private int config_message_cooldown_claims = 0; // claims cooldown. 0= no
 													// cooldown.
 
@@ -511,8 +510,37 @@ public class WorldConfig {
 														// IronGolems can be
 														// spawned.
 
+	
+	
+	
+	
 	private List<ItemUsageRules> ItemRules;
 
+	
+	//Fire options
+	
+	//Option pertains to the <origin> of a fire spread event.
+	private ClaimBehaviourData FireSpreadOriginBehaviour;
+	
+	public ClaimBehaviourData getFireSpreadOriginBehaviour(){ return FireSpreadOriginBehaviour;}
+	
+	
+	//target of a fire spread event.
+	private ClaimBehaviourData FireSpreadTargetBehaviour;
+	
+	public ClaimBehaviourData getFireSpreadTargetBehaviour(){
+		return FireSpreadTargetBehaviour;
+		
+	}
+	
+	//fire destroying a block.
+	private ClaimBehaviourData FireDestroyBehaviour;
+	
+	public ClaimBehaviourData getFireDestroyBehaviour(){
+		
+		return FireDestroyBehaviour;
+		
+	}
 	private ClaimBehaviourData LavaBucketEmptyBehaviour;
 
 	private ClaimBehaviourData LavaBucketFillBehaviour;
@@ -666,7 +694,13 @@ public class WorldConfig {
 		this.PlaceBlockRules = new ClaimBehaviourData("Block Placement",PlacementRules.Both,PlacementRules.Both,ClaimBehaviourMode.RequireBuild).setPVPOverride(SiegePVPOverrideConstants.Deny).setSiegeOverrides(SiegePVPOverrideConstants.Deny, SiegePVPOverrideConstants.Deny);
 		this.BreakBlockRules = new ClaimBehaviourData("Block Breaking",PlacementRules.Both,PlacementRules.Both,ClaimBehaviourMode.RequireBuild).setPVPOverride(SiegePVPOverrideConstants.Deny).setSiegeOverrides(SiegePVPOverrideConstants.Deny, SiegePVPOverrideConstants.Deny);
 		
-		this.CreeperExplosionsBehaviour = new ClaimBehaviourData("Creeper Explosions", config, outConfig, "GriefPrevention.Rules.CreeperExplosions", new ClaimBehaviourData("Creeper Explosions", PlacementRules.Both, PlacementRules.Both, ClaimBehaviourMode.Disabled).setSeaLevelOffsets(SeaLevelOverrideTypes.Offset,-1));
+		
+		this.FireDestroyBehaviour = new ClaimBehaviourData("Fire Destruction",config,outConfig,"GriefPrevention.Rules.FireDestroys",new ClaimBehaviourData("GriefPrevention.Rules.FireDestroys",PlacementRules.Neither,PlacementRules.Neither,ClaimBehaviourMode.Disabled));
+		
+		this.FireSpreadOriginBehaviour = new ClaimBehaviourData("Fire Spread Origin",config,outConfig,"GriefPrevention.Rules.FireSpreadOrigin",new ClaimBehaviourData("GriefPrevention.Rules.FireSpreadOrigin",PlacementRules.Neither,PlacementRules.Neither,ClaimBehaviourMode.Disabled));
+		this.FireSpreadTargetBehaviour = new ClaimBehaviourData("Fire Spread Target",config,outConfig,"GriefPrevention.Rules.FireSpreadTarget",new ClaimBehaviourData("GriefPrevention.Rules.FireSpreadOrigin",PlacementRules.Neither,PlacementRules.Neither,ClaimBehaviourMode.Disabled));
+		
+		this.CreeperExplosionsBehaviour = new ClaimBehaviourData("Creeper Explosions", config, outConfig, "GriefPrevention.Rules.CreeperExplosions", new ClaimBehaviourData("Creeper Explosions", PlacementRules.AboveOnly , PlacementRules.Both, ClaimBehaviourMode.Disabled).setSeaLevelOffsets(SeaLevelOverrideTypes.Offset,-1));
 		this.WitherExplosionBehaviour = new ClaimBehaviourData("Wither Explosions", config, outConfig, "GriefPrevention.Rules.WitherExplosions", new ClaimBehaviourData("Wither Explosions", PlacementRules.Neither, PlacementRules.Neither, ClaimBehaviourMode.Disabled).setSeaLevelOffsets(SeaLevelOverrideTypes.Offset,-1));
 
 		this.TNTExplosionsBehaviour = new ClaimBehaviourData("TNT Explosions", config, outConfig, "GriefPrevention.Rules.TNTExplosions",
@@ -675,15 +709,15 @@ public class WorldConfig {
 
 		this.OtherExplosionBehaviour = new ClaimBehaviourData("Other Explosions", config, outConfig, "GriefPrevention.Rules.OtherExplosions", ClaimBehaviourData.getAll("Other Explosions").setSeaLevelOffsets(SeaLevelOverrideTypes.Offset, -1));
 
-		this.CreeperExplosionBlockDamageBehaviour = new ClaimBehaviourData("Creeper Explosion Damage", config, outConfig, "GriefPrevention.Rules.BlockDamageCreeperExplosion", new ClaimBehaviourData("Creeper Explosion Damage", PlacementRules.Both, PlacementRules.Neither, ClaimBehaviourMode.Disabled).setSeaLevelOffsets(SeaLevelOverrideTypes.Offset, -1));
+		this.CreeperExplosionBlockDamageBehaviour = new ClaimBehaviourData("Creeper Explosion Damage", config, outConfig, "GriefPrevention.Rules.BlockDamageCreeperExplosion", new ClaimBehaviourData("Creeper Explosion Damage", PlacementRules.AboveOnly, PlacementRules.Neither, ClaimBehaviourMode.Disabled).setSeaLevelOffsets(SeaLevelOverrideTypes.Offset, -1));
 
-		this.WitherExplosionBlockDamageBehaviour = new ClaimBehaviourData("Wither Explosion Damage", config, outConfig, "GriefPrevention.Rules.BlockDamageWitherExplosions", new ClaimBehaviourData("Wither Explosion Damage", PlacementRules.Both, PlacementRules.Neither, ClaimBehaviourMode.Disabled).setSeaLevelOffsets(SeaLevelOverrideTypes.Offset, -1));
+		this.WitherExplosionBlockDamageBehaviour = new ClaimBehaviourData("Wither Explosion Damage", config, outConfig, "GriefPrevention.Rules.BlockDamageWitherExplosions", new ClaimBehaviourData("Wither Explosion Damage", PlacementRules.AboveOnly, PlacementRules.Neither, ClaimBehaviourMode.Disabled).setSeaLevelOffsets(SeaLevelOverrideTypes.Offset, -1));
 
-		this.WitherEatBehaviour = new ClaimBehaviourData("Wither Eating", config, outConfig, "GriefPrevention.Rules.WitherEating", new ClaimBehaviourData("Wither Eating", PlacementRules.Both, PlacementRules.Neither, ClaimBehaviourMode.Disabled));
+		this.WitherEatBehaviour = new ClaimBehaviourData("Wither Eating", config, outConfig, "GriefPrevention.Rules.WitherEating", new ClaimBehaviourData("Wither Eating", PlacementRules.AboveOnly, PlacementRules.Neither, ClaimBehaviourMode.Disabled));
 
 		this.TNTExplosionBlockDamageBehaviour = new ClaimBehaviourData("TNT Explosion Damage", config, outConfig, "GriefPrevention.Rules.BlockDamageTNTExplosions", ClaimBehaviourData.getOutsideClaims("TNT Explosion Damage").setSeaLevelOffsets(SeaLevelOverrideTypes.Offset, -1));
 
-		this.OtherExplosionBlockDamageBehaviour = new ClaimBehaviourData("Other Explosion Damage", config, outConfig, "GriefPrevention.Rules.BlockDamageOtherExplosions", ClaimBehaviourData.getOutsideClaims("Other Explosion Damage").setSeaLevelOffsets(SeaLevelOverrideTypes.Offset, -1));
+		this.OtherExplosionBlockDamageBehaviour = new ClaimBehaviourData("Other Explosion Damage", config, outConfig, "GriefPrevention.Rules.BlockDamageOtherExplosions", ClaimBehaviourData.getOutsideClaims("Other Explosion Damage").getAboveSeaLevel("Other Explosion Damange").setSeaLevelOffsets(SeaLevelOverrideTypes.Offset, -1));
 
 		ClaimBehaviourData WaterRequire = new ClaimBehaviourData("Water Placement", PlacementRules.BelowOnly, PlacementRules.Both, ClaimBehaviourMode.RequireBuild);
 		ClaimBehaviourData LavaRequire = new ClaimBehaviourData("Lava Placement", PlacementRules.BelowOnly, PlacementRules.Both, ClaimBehaviourMode.RequireBuild).setWildernessRequiredPermission(PermNodes.LavaPermission);
@@ -1021,8 +1055,8 @@ public class WorldConfig {
 		// config.getBoolean("GriefPrevention.LimitSurfaceWaterBuckets", true);
 		this.config_blockSkyTrees = config.getBoolean("GriefPrevention.LimitSkyTrees", true);
 
-		this.config_fireSpreads = config.getBoolean("GriefPrevention.FireSpreads", false);
-		this.config_fireDestroys = config.getBoolean("GriefPrevention.FireDestroys", false);
+		//this.config_fireSpreads = config.getBoolean("GriefPrevention.FireSpreads", false);
+		//this.config_fireDestroys = config.getBoolean("GriefPrevention.FireDestroys", false);
 
 		this.config_addItemsToClaimedChests = config.getBoolean("GriefPrevention.AddItemsToClaimedChests", true);
 		this.config_eavesdrop = config.getBoolean("GriefPrevention.Eavesdrop.Enabled", false);
@@ -1284,8 +1318,7 @@ public class WorldConfig {
 
 		outConfig.set("GriefPrevention.LimitSkyTrees", this.config_blockSkyTrees);
 
-		outConfig.set("GriefPrevention.FireSpreads", this.config_fireSpreads);
-		outConfig.set("GriefPrevention.FireDestroys", this.config_fireDestroys);
+		
 
 		outConfig.set("GriefPrevention.AddItemsToClaimedChests", this.config_addItemsToClaimedChests);
 
@@ -1647,9 +1680,7 @@ public class WorldConfig {
 		return FenceGates;
 	}
 
-	public boolean getFireDestroys() {
-		return config_fireDestroys;
-	}
+	
 
 	public ClaimBehaviourData getFireExtinguishing() {
 		return FireExtinguishing;
@@ -1659,9 +1690,7 @@ public class WorldConfig {
 		return FireSetting;
 	}
 
-	public boolean getFireSpreads() {
-		return config_fireSpreads;
-	}
+	
 
 	// than this many more claim blocks, the first corner will be reset. This is
 	// a "hack" for

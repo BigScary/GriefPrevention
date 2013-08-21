@@ -150,7 +150,7 @@ public class BlockEventHandler implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onBlockBurn(BlockBurnEvent burnEvent) {
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(burnEvent.getBlock().getWorld().getName());
-		if (!wc.getFireDestroys()) {
+		if (wc.getFireDestroyBehaviour().Allowed(burnEvent.getBlock().getLocation(), null).Denied()) {
 			burnEvent.setCancelled(true);
 			Block block = burnEvent.getBlock();
 			Block[] adjacentBlocks = new Block[] { block.getRelative(BlockFace.UP), block.getRelative(BlockFace.DOWN), block.getRelative(BlockFace.NORTH), block.getRelative(BlockFace.SOUTH), block.getRelative(BlockFace.EAST), block.getRelative(BlockFace.WEST) };
@@ -329,11 +329,19 @@ public class BlockEventHandler implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onBlockIgnite(BlockIgniteEvent igniteEvent) {
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(igniteEvent.getBlock().getWorld());
-		if (!wc.getFireSpreads() && igniteEvent.getCause() != IgniteCause.FLINT_AND_STEEL && igniteEvent.getCause() != IgniteCause.FIREBALL && igniteEvent.getCause() != IgniteCause.LIGHTNING) {
+		boolean TargetAllowed = igniteEvent.getIgnitingBlock()==null?true:
+			wc.getFireSpreadTargetBehaviour().Allowed(igniteEvent.getIgnitingBlock().getLocation(), null).Allowed();
+		
+		
+		
+		
+		if (!TargetAllowed && igniteEvent.getCause() != IgniteCause.FLINT_AND_STEEL && igniteEvent.getCause() != IgniteCause.FIREBALL && igniteEvent.getCause() != IgniteCause.LIGHTNING) {
 			igniteEvent.setCancelled(true);
 		}
 	}
 
+	
+	
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onBlockPhysics(BlockPhysicsEvent event) {
 
@@ -655,8 +663,17 @@ public class BlockEventHandler implements Listener {
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(spreadEvent.getBlock().getWorld());
 		if (spreadEvent.getSource().getType() != Material.FIRE)
 			return;
+		
 
-		if (!wc.getFireSpreads()) {
+		 
+		//changed to support Source and Target checking for Fire spread.
+		
+		
+		
+		if (!(
+				wc.getFireSpreadOriginBehaviour().Allowed(spreadEvent.getSource().getLocation(), null).Allowed() ||
+				wc.getFireSpreadTargetBehaviour().Allowed(spreadEvent.getBlock().getLocation(),null).Allowed()
+				)) {
 			spreadEvent.setCancelled(true);
 
 			Block underBlock = spreadEvent.getSource().getRelative(BlockFace.DOWN);
