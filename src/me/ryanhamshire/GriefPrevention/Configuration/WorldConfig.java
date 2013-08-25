@@ -802,7 +802,7 @@ public class WorldConfig {
 
 		// breeding can only occur in claims and requires Access Trust by
 		// default.
-		this.BreedingRules = new ClaimBehaviourData("Animal Breeding", config, outConfig, "GriefPrevention.Rules.Breeding", ClaimBehaviourData.getInsideClaims("Animal Breeding").setBehaviourMode(ClaimBehaviourMode.RequireAccess));
+		this.BreedingRules = new ClaimBehaviourData("Animal Breeding", config, outConfig, "GriefPrevention.Rules.Breeding", ClaimBehaviourData.getInsideClaims("Animal Breeding").setBehaviourMode(ClaimBehaviourMode.RequireAccess)).setTameableAllowOwner(true);
 
 		// TamingRules is for taming Ocelots and Wolves by using Fish and Bones
 		// respectively,
@@ -815,7 +815,7 @@ public class WorldConfig {
 		// this is for using leads either on animals or on fences.
 		// defaults to working everywhere but requires access trust within a
 		// claim.
-		this.LeadUsageRules = new ClaimBehaviourData("Lead Usage", config, outConfig, "GriefPrevention.Rules.LeadUsage", ClaimBehaviourData.getAll("Lead Usage").setBehaviourMode(ClaimBehaviourMode.RequireAccess));
+		this.LeadUsageRules = new ClaimBehaviourData("Lead Usage", config, outConfig, "GriefPrevention.Rules.LeadUsage", ClaimBehaviourData.getAll("Lead Usage").setBehaviourMode(ClaimBehaviourMode.RequireAccess)).setTameableAllowOwner(true);
 
 		// EquineInventoryRules is for opening horse inventories.
 		// This is a tricky one since horses and donkeys don't actually have
@@ -823,18 +823,18 @@ public class WorldConfig {
 		// we will make this simply default to working everywhere but requiring
 		// container trust within a claim.
 
-		this.EquineInventoryRules = new ClaimBehaviourData("Equine Inventory", config, outConfig, "GriefPrevention.Rules.EquineInventory", ClaimBehaviourData.getNone("Equine Inventory"));
+		this.EquineInventoryRules = new ClaimBehaviourData("Equine Inventory", config, outConfig, "GriefPrevention.Rules.EquineInventory", ClaimBehaviourData.getNone("Equine Inventory")).setTameableAllowOwner(true);
 
 		// Name Tag usage.
 		// Will work in the wild. Requires Container trust inside of claims.
-		this.NameTagUsageRules = new ClaimBehaviourData("Name Tags", config, outConfig, "GriefPrevention.Rules.NameTags", ClaimBehaviourData.getAll("Nem Tags").setBehaviourMode(ClaimBehaviourMode.RequireContainer));
+		this.NameTagUsageRules = new ClaimBehaviourData("Name Tags", config, outConfig, "GriefPrevention.Rules.NameTags", ClaimBehaviourData.getAll("Name Tags").setBehaviourMode(ClaimBehaviourMode.RequireContainer)).setTameableAllowOwner(true);
 
 		// FeedingRules
 		// this applies to feeding wheat, apples, and hay blocks to tamed
 		// horses,
 		// meat to tamed wolves and fish to tamed cats.
 
-		this.FeedingRules = new ClaimBehaviourData("Feeding", config, outConfig, "GriefPrevention.Rules.Feeding", ClaimBehaviourData.getAll("Feeding").setBehaviourMode(ClaimBehaviourMode.RequireAccess));
+		this.FeedingRules = new ClaimBehaviourData("Feeding", config, outConfig, "GriefPrevention.Rules.Feeding", ClaimBehaviourData.getAll("Feeding").setBehaviourMode(ClaimBehaviourMode.RequireAccess)).setTameableAllowOwner(true);
 
 		// Dispenser rules.
 		this.DispenserLavaBehaviour = new ClaimBehaviourData("Lava Dispensing", config, outConfig, "GriefPrevention.Rules.Dispensers.Lava", ClaimBehaviourData.getInsideClaims("Lava Dispensing"));
@@ -858,29 +858,7 @@ public class WorldConfig {
 		this.DispenserSnowballBehaviour = new ClaimBehaviourData("Snowball Dispensing", config, outConfig, "GriefPrevention.Rules.Dispensers.Snowballs", ClaimBehaviourData.getAll("Snowball Dispensing"));
 		this.DispenserEggBehaviour = new ClaimBehaviourData("Egg Dispensing", config, outConfig, "GriefPrevention.Rules.Dispensers.Eggs", ClaimBehaviourData.getInsideClaims("Egg Dispensing"));
 		this.DispenserMiscBehaviour = new ClaimBehaviourData("Misc Dispensing", config, outConfig, "GriefPrevention.Rules.Dispensers.Misc", ClaimBehaviourData.getAll("Misc Dispensing"));
-		/*
-		 * private ClaimBehaviourData ContainerTheft; public ClaimBehaviourData
-		 * getContainerTheft(){ return ContainerTheft;} private
-		 * ClaimBehaviourData CreatureDamage; public ClaimBehaviourData
-		 * getCreatureDamage(){return CreatureDamage;} private
-		 * ClaimBehaviourData WoodenDoors; public ClaimBehaviourData
-		 * getWoodenDoors(){ return WoodenDoors;} private ClaimBehaviourData
-		 * TrapDoors; public ClaimBehaviourData getTrapDoors(){ return
-		 * TrapDoors;} private ClaimBehaviourData FenceGates; public
-		 * ClaimBehaviourData getFenceGates(){ return FenceGates;} private
-		 * ClaimBehaviourData EnderPearlOrigins; public ClaimBehaviourData
-		 * getEnderPearlOrigins(){ return EnderPearlOrigins;} private
-		 * ClaimBehaviourData EnderPearlTargets; public ClaimBehaviourData
-		 * getEnderPearlTargets(){return EnderPearlTargets;} private
-		 * ClaimBehaviourData StonePressurePlates; public ClaimBehaviourData
-		 * getStonePressurePlates(){ return StonePressurePlates;} private
-		 * ClaimBehaviourData WoodPressurePlates; public ClaimBehaviourData
-		 * getWoodPressurePlates(){ return WoodPressurePlates;} private
-		 * ClaimBehaviourData WoodenButton; public ClaimBehaviourData
-		 * getWoodenButton(){ return WoodenButton;} private ClaimBehaviourData
-		 * StoneButton; public ClaimBehaviourData getStoneButton(){ return
-		 * StoneButton;}
-		 */
+		
 		this.config_entityClaimLimit = config.getInt("GriefPrevention.Claims.EntityLimit", 0);
 		outConfig.set("GriefPrevention.Claims.EntityLimit", 0);
 

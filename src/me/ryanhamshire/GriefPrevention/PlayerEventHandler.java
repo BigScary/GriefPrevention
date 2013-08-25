@@ -647,6 +647,8 @@ class PlayerEventHandler implements Listener {
 		event.setCancelled(this.handlePlayerChat(player, message, event));
 	}
 
+	
+	
 	// when a player uses a slash command...
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
 	synchronized void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event) {
@@ -1912,7 +1914,7 @@ class PlayerEventHandler implements Listener {
 							return;
 						}
 					}
-					if (wc.getLeadUsageRules().Allowed(entity.getLocation(), player).Denied()) {
+					if (wc.getLeadUsageRules().Allowed(entity, player).Denied()) {
 						event.setCancelled(true);
 						return;
 					}
@@ -1922,7 +1924,8 @@ class PlayerEventHandler implements Listener {
 							return;
 						}
 					}
-					if (wc.getNameTagUsageRules().Allowed(entity.getLocation(), player).Denied()) {
+					if (wc.getNameTagUsageRules().Allowed(entity, player).Denied())
+							{
 						event.setCancelled(true);
 						return;
 					}
@@ -1934,14 +1937,14 @@ class PlayerEventHandler implements Listener {
 
 				if (h.isTamed() && handItem.getType() == Material.GOLDEN_APPLE) {
 					// if horse is tamed, apply breeding rules.
-					if (wc.getBreedingRules().Allowed(h.getLocation(), player).Denied()) {
+					if (wc.getBreedingRules().Allowed(h, player).Denied()) {
 						event.setCancelled(true);
 						return;
 					}
 
 				} else if (handItem.getType() == Material.WHEAT || handItem.getType() == Material.HAY_BLOCK || handItem.getType() == Material.APPLE || handItem.getType() == Material.GOLDEN_APPLE) {
 					// apply feeding rules.
-					if (wc.getFeedingRules().Allowed(h.getLocation(), player).Denied()) {
+					if (wc.getFeedingRules().Allowed(h, player).Denied()) {
 						event.setCancelled(true);
 						return;
 					}
@@ -1964,7 +1967,7 @@ class PlayerEventHandler implements Listener {
 						// if the EquineInventoryRules/ContainerRules are set to
 						// allow.
 						if (player.isSneaking()) {
-							if (wc.getEquineInventoryRules().Allowed(h.getLocation(), player).Denied())
+							if (wc.getEquineInventoryRules().Allowed(h, player).Denied())
 								event.setCancelled(true);
 							return;
 
@@ -2096,7 +2099,7 @@ class PlayerEventHandler implements Listener {
 					// if the entity is an animal, apply container rules
 					else if (entity instanceof Animals) {
 						if (claim.allowContainers(player) != null) {
-							GriefPrevention.sendMessage(player, TextMode.Err, Messages.NoDamageClaimedEntity);
+							GriefPrevention.sendMessage(player, TextMode.Err, Messages.NoDamageClaimedEntity,claim.getOwnerName());
 							event.setCancelled(true);
 						}
 					}

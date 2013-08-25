@@ -360,6 +360,8 @@ class EntityEventHandler implements Listener {
 							if (arrow != null)
 								arrow.remove();
 
+							String Claimowner = claim.getOwnerName();
+							if(Claimowner==null || Claimowner.length()==0) Claimowner="Administrator";
 							GriefPrevention.sendMessage(attacker, TextMode.Err, Messages.NoDamageClaimedEntity, claim.getOwnerName());
 						}
 
@@ -989,6 +991,8 @@ class EntityEventHandler implements Listener {
 				String noContainersReason = claim.allowContainers(attacker);
 				if (noContainersReason != null) {
 					event.setCancelled(true);
+					String useOwner = claim.getOwnerName();
+					if(useOwner==null || useOwner.length()==0) useOwner="Administrator";
 					GriefPrevention.sendMessage(attacker, TextMode.Err, Messages.NoDamageClaimedEntity, claim.getOwnerName());
 				}
 

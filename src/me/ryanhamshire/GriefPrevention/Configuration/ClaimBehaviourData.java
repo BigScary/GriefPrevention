@@ -13,8 +13,10 @@ import me.ryanhamshire.GriefPrevention.events.PermissionCheckEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 //this enum is used for some of the configuration options.
+import org.bukkit.entity.Tameable;
 
 //holds data pertaining to an option and where it works. 
 //used primarily for information on explosions.
@@ -185,6 +187,7 @@ public class ClaimBehaviourData {
 
 	private PlacementRules Wilderness;
 
+	private boolean TameableAllowOwner = false;
 
 	private SiegePVPOverrideConstants SiegeAttackerOverride = SiegePVPOverrideConstants.None;
 	private SiegePVPOverrideConstants SiegeDefenderOverride = SiegePVPOverrideConstants.None;
@@ -195,7 +198,8 @@ public class ClaimBehaviourData {
 	
 	private SiegePVPOverrideConstants PvPOverride = SiegePVPOverrideConstants.None;
 	
-	
+	public boolean getTameableAllowOwner(){ return TameableAllowOwner;}
+	public ClaimBehaviourData setTameableAllowOwner(boolean value){ TameableAllowOwner = value; return this;}
 	public ClaimBehaviourData setSiegeOverrides(SiegePVPOverrideConstants Attacker,SiegePVPOverrideConstants Defender){
 		
 		SiegeAttackerOverride = Attacker;
@@ -223,6 +227,7 @@ public class ClaimBehaviourData {
 		this.PvPOverride = Source.PvPOverride;
 		this.SiegeAttackerOverride = Source.SiegeAttackerOverride;
 		this.SiegeDefenderOverride = Source.SiegeDefenderOverride;
+		this.TameableAllowOwner = Source.getTameableAllowOwner();
 	
 	}
 
@@ -237,7 +242,10 @@ public class ClaimBehaviourData {
 		
 		// check for a requiredpermissions entry. If there isn't one, though,
 		// don't save it.
-
+		TameableAllowOwner = Source.getBoolean(NodePath + ".Claims.TameableAllowOwner",Defaults.getTameableAllowOwner());
+		
+		
+		if(TameableAllowOwner) outConfig.set(NodePath + ".Claims.TameableAllowOwner", TameableAllowOwner);
 	
 		//check for siege and PVP options.
 		//NodePath + ".Claims.SiegeAttacker"
@@ -282,6 +290,33 @@ public class ClaimBehaviourData {
 		Claims = pClaims;
 		this.ClaimBehaviour = behaviourmode;
 		BehaviourName = pName;
+		
+		
+	}
+	
+	public ClaimAllowanceConstants Allowed(Entity Target,Player RelevantPlayer){
+		return Allowed(Target,RelevantPlayer,false);
+	}
+	/**
+	 * Entity overload for Allowed method.
+	 * @param Target Target Entity. 
+	 * @param RelevantPlayer Player performing this action.
+	 * @return Whether this action is allowed, returning a number of ClaimAllowance values.
+	 */
+	public ClaimAllowanceConstants Allowed(Entity Target,Player RelevantPlayer,boolean ShowMessages){
+		
+		if(!this.TameableAllowOwner || RelevantPlayer==null || !(Target instanceof Tameable)){
+			return Allowed(Target.getLocation(),RelevantPlayer,ShowMessages);
+			
+		}
+		
+			Tameable testTamed = (Tameable)Target;
+			if(testTamed.getOwner().getName().equalsIgnoreCase(RelevantPlayer.getName()))
+				return ClaimAllowanceConstants.Allow_Forced;
+			else
+				return Allowed(Target.getLocation(),RelevantPlayer,ShowMessages);
+			
+		
 		
 		
 	}

@@ -384,10 +384,11 @@ public class BlockEventHandler implements Listener {
 			Block block = blocks.get(i);
 			claim = this.dataStore.getClaimAt(block.getLocation(), false);
 			if (claim != null && !claim.getOwnerName().equals(pistonClaimOwnerName)) {
+				System.out.println("Piston Extension cancelled!");
 				event.setCancelled(true);
-				event.getBlock().getWorld().createExplosion(event.getBlock().getLocation(), 0);
+				/*event.getBlock().getWorld().createExplosion(event.getBlock().getLocation(), 0);
 				event.getBlock().getWorld().dropItem(event.getBlock().getLocation(), new ItemStack(event.getBlock().getType()));
-				event.getBlock().setType(Material.AIR);
+				event.getBlock().setType(Material.AIR);*/
 				return;
 			}
 		}
@@ -428,10 +429,11 @@ public class BlockEventHandler implements Listener {
 				// if pushing this block will change ownership, cancel the event
 				// and take away the piston (for performance reasons)
 				if (!newOwnerName.equals(originalOwnerName)) {
+					System.out.println("Piston Extension cancelled!");
 					event.setCancelled(true);
-					event.getBlock().getWorld().createExplosion(event.getBlock().getLocation(), 0);
+					/*event.getBlock().getWorld().createExplosion(event.getBlock().getLocation(), 0);
 					event.getBlock().getWorld().dropItem(event.getBlock().getLocation(), new ItemStack(event.getBlock().getType()));
-					event.getBlock().setType(Material.AIR);
+					event.getBlock().setType(Material.AIR);*/
 					return;
 				}
 
