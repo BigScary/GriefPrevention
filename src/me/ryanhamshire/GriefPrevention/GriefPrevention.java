@@ -122,7 +122,7 @@ public class GriefPrevention extends JavaPlugin {
 
 	/**
 	 * Creates a friendly Location string for the given Location.
-	 * 
+	 *
 	 * @param location
 	 *            Location to retrieve a string for.
 	 * @return a formatted String to be shown to a user or for a log file
@@ -439,7 +439,7 @@ public class GriefPrevention extends JavaPlugin {
 
 	/**
 	 * helper method to get Breeding Item for a given entity.
-	 * 
+	 *
 	 * @param forEntity
 	 *            Entity to retrieve.
 	 * @return Appropriate material for specified entity, or null if none are
@@ -471,7 +471,7 @@ public class GriefPrevention extends JavaPlugin {
 	 * to claims. Many plugins use their own special methods of indexing
 	 * per-claim, so I thought it made sense to add a sort of "official" API to
 	 * it, so that they are all consistent.
-	 * 
+	 *
 	 * @return ClaimMetaHandler object.
 	 */
 	public ClaimMetaHandler getMetaHandler() {
@@ -539,7 +539,7 @@ public class GriefPrevention extends JavaPlugin {
 	 * plugins/GriefPreventionData/WorldConfigs folder. If a file is not
 	 * present, the template will be used and a new file will be created for the
 	 * given name.
-	 * 
+	 *
 	 * @param worldname
 	 *            Name of world to get configuration for.
 	 * @return WorldConfig representing the configuration of the given world.
@@ -556,7 +556,7 @@ public class GriefPrevention extends JavaPlugin {
 	 * configured in config.yml, and defaults to _template.cfg in the given
 	 * folder. if no template is found, a default, empty configuration is
 	 * created and returned.
-	 * 
+	 *
 	 * @param world
 	 *            World to retrieve configuration for.
 	 * @return WorldConfig representing the configuration of the given world.
@@ -750,23 +750,26 @@ public class GriefPrevention extends JavaPlugin {
 		GPUnloadEvent uevent = new GPUnloadEvent(this);
 		Bukkit.getPluginManager().callEvent(uevent);
 		// save data for any online players
-		Player[] players = this.getServer().getOnlinePlayers();
-		for (int i = 0; i < players.length; i++) {
-			Player player = players[i];
-			String playerName = player.getName();
-			PlayerData playerData = this.dataStore.getPlayerData(playerName);
-			this.dataStore.savePlayerData(playerName, playerData);
-		}
-		for (World iterate : Bukkit.getWorlds()) {
-			ww.WorldUnload(new WorldUnloadEvent(iterate));
-		}
-		ww = null;
-		ww = null;
-		this.dataStore.close();
-		// instance=null;
+        if (this.dataStore != null)
+        {
+            Player[] players = this.getServer().getOnlinePlayers();
+            for (int i = 0; i < players.length; i++) {
+                Player player = players[i];
+                String playerName = player.getName();
+                PlayerData playerData = this.dataStore.getPlayerData(playerName);
+                this.dataStore.savePlayerData(playerName, playerData);
+            }
+            for (World iterate : Bukkit.getWorlds()) {
+                ww.WorldUnload(new WorldUnloadEvent(iterate));
+            }
+            this.dataStore.close();
+        }
+        else
+            GriefPrevention.AddLogEntry("ERROR: DataStore is not configured correctly, no data is being saved. Please fix your config!");
+        ww = null;
+        dataStore = null;
 
-		this.cmdHandler = null;
-		dataStore = null;
+        this.cmdHandler = null;
 
 		AddLogEntry("GriefPrevention disabled.");
 	}
