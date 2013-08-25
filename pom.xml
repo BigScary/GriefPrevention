@@ -2,19 +2,40 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>me.ryanhamshire</groupId>
     <artifactId>GriefPrevention</artifactId>
-    <version>7.8</version>
+    <version>7.8-SNAPSHOT</version>
     <name>GriefPrevention</name>
+
+    <properties>
+        <!-- Versions of dependencies, just update the version numbers here -->
+        <mc-ver>1.6.2</mc-ver>
+        <bukkit-ver>R0.1</bukkit-ver>
+        <vault-ver>1.2.16</vault-ver>
+    </properties>
+
     <repositories>
         <repository>
             <id>bukkit-repo</id>
             <url>http://repo.bukkit.org/content/groups/public</url>
         </repository>
-			<repository>
-				<id>vault-repo</id>
-				<url>http://maven.sk89q.com/repo/net/milkbowl/vault/Vault/</url>
-			</repository>
+        <repository>
+            <id>vault-repo</id>
+            <url>http://maven.sk89q.com/repo/</url>
+        </repository>
     </repositories>
+
     <build>
+        <sourceDirectory>src</sourceDirectory>
+        <defaultGoal>package</defaultGoal>
+        <resources>
+            <resource>
+                <targetPath>.</targetPath>
+                <directory>${basedir}</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>plugin.yml</include>
+                </includes>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -27,18 +48,19 @@
             </plugin>
         </plugins>
     </build>
+
     <dependencies>
         <dependency>
             <groupId>org.bukkit</groupId>
             <artifactId>bukkit</artifactId>
-            <version>1.5.2-R1.1-SNAPSHOT</version>
+            <version>${mc-ver}-${bukkit-ver}</version>
             <type>jar</type>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>net.milkbowl.vault</groupId>
             <artifactId>Vault</artifactId>
-            <version>LATEST</version>
+            <version>${vault-ver}</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
