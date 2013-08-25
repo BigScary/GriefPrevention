@@ -210,14 +210,16 @@ public class DatabaseDataStore extends DataStore {
 			Class.forName("com.mysql.jdbc.Driver");
 		} catch (Exception e) {
 			GriefPrevention.AddLogEntry("ERROR: Unable to load Java's mySQL database driver.  Check to make sure you've installed it properly.");
-			throw e;
+			e.printStackTrace();
+            throw e;
 		}
 
 		try {
 			this.refreshDataConnection();
 		} catch (Exception e2) {
 			GriefPrevention.AddLogEntry("ERROR: Unable to connect to database.  Check your config file settings.");
-			throw e2;
+            e2.printStackTrace();
+            throw e2;
 		}
 		GriefPrevention.AddLogEntry("Java MySQL driver loaded and connection established.");
 		try {
@@ -251,7 +253,8 @@ public class DatabaseDataStore extends DataStore {
 		} catch (Exception e3) {
 			GriefPrevention.AddLogEntry("ERROR: Unable to create the necessary database table.  Details:");
 			GriefPrevention.AddLogEntry(e3.getMessage());
-			throw e3;
+            e3.printStackTrace();
+            throw e3;
 		}
 
 		// load group data into memory
