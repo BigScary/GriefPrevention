@@ -2,7 +2,7 @@ target/
 bin/
 *.class
 *~
+
 #IntelliJ
 .idea
 *.iml
-
