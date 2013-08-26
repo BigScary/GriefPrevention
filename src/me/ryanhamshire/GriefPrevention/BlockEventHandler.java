@@ -95,6 +95,7 @@ public class BlockEventHandler implements Listener {
 		Debugger.Write("onBlockBreak", DebugLevel.Verbose);
 		Debugger.Write("Block broken:" + breakEvent.getBlock().getType().name(), DebugLevel.Verbose);
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(breakEvent.getBlock().getWorld());
+		if(!wc.getClaimsEnabled()) return;
 		Player player = breakEvent.getPlayer();
 		Block block = breakEvent.getBlock();
 
