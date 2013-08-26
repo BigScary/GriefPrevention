@@ -647,14 +647,17 @@ public abstract class DataStore {
 		saveClaim(claim);
 	}
 
-	protected void ForceLoadAllClaims() {
+	protected static void ForceLoadAllClaims(DataStore... LoadTargets) {
 		// force all claims to load.
 		// we do this by simply loading all worlds.
 		for (String iterate : GriefPrevention.instance.Configuration.GetWorldConfigNames()) {
 			GriefPrevention.AddLogEntry("Force-loading World:" + iterate);
 			World loadedworld = Bukkit.getServer().createWorld(new WorldCreator(iterate));
 			// we need to call the WorldLoaded() method manually.
-			this.WorldLoaded(loadedworld);
+			for(DataStore ds:LoadTargets){
+				ds.WorldLoaded(loadedworld);
+			}
+			
 
 		}
 
@@ -1452,6 +1455,7 @@ public abstract class DataStore {
 	 */
 	public abstract void savePlayerData(String playerName, PlayerData playerData);
 
+	public abstract long getNextClaimID();
 	public abstract void setNextClaimID(long nextClaimID2);
 
 	/**
@@ -1540,4 +1544,26 @@ public abstract class DataStore {
 
 	abstract void writeClaimToStorage(Claim claim);
 
+	
+	
+	public static void migrateData(DataStore Source,DataStore Target){
+		
+		//migrate from the given Source to the given Target.
+		//first try to force all claims to be loaded.
+		ForceLoadAllClaims();
+		//transfer players.
+		for(PlayerData p:Source.getAllPlayerData()){
+			
+		}
+		
+		
+		//now transfer claims.
+		for(Claim c:Source.claims){
+			Target.addClaim(c);
+		}
+		
+		
+		
+	}
+	
 }

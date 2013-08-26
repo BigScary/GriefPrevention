@@ -44,9 +44,9 @@ import org.bukkit.entity.Player;
 
 //manages data stored in the file system
 public class FlatFileDataStore extends DataStore {
-	private final static String claimDataFolderPath = dataLayerFolderPath + File.separator + "ClaimData";
-	private final static String nextClaimIdFilePath = claimDataFolderPath + File.separator + "_nextClaimID";
-	private final static String playerDataFolderPath = dataLayerFolderPath + File.separator + "PlayerData";
+	public final static String claimDataFolderPath = dataLayerFolderPath + File.separator + "ClaimData";
+	public final static String nextClaimIdFilePath = claimDataFolderPath + File.separator + "_nextClaimID";
+	public final static String playerDataFolderPath = dataLayerFolderPath + File.separator + "PlayerData";
 
 	private static FileConfiguration getSourceCfg() {
 		File f = new File(DataStore.dataLayerFolderPath + "flat.yml");
@@ -677,6 +677,9 @@ public class FlatFileDataStore extends DataStore {
 		}
 	}
 
+	public long getNextClaimID(){
+		return this.nextClaimID;
+	}
 	@Override
 	public void setNextClaimID(long nextClaimID2) {
 		// TODO Auto-generated method stub
@@ -723,6 +726,18 @@ public class FlatFileDataStore extends DataStore {
 
 	}
 
+	
+	synchronized public static void migrateData(DataStore Source,DataStore Target){
+		
+		//before we migrate, we want to FORCE all worlds to be loaded, to make sure all data is in memory to be transferred.
+		//we do this by iterating through the names of configuration files and forcing all those worlds to exist.
+		
+		
+		
+		
+		
+	}
+	
 	// actually writes claim data to an output stream
 	synchronized private void writeClaimData(Claim claim, BufferedWriter outStream) throws IOException {
 		if (claim.parent != null) {

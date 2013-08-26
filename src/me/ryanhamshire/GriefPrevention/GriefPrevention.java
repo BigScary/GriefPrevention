@@ -745,7 +745,8 @@ public class GriefPrevention extends JavaPlugin {
 		// cancel ALL pending tasks.
 		Bukkit.getScheduler().cancelTasks(this);
 
-		this.dataStore.saveClaimData();
+		
+		if(dataStore!=null) this.dataStore.saveClaimData();
 
 		GPUnloadEvent uevent = new GPUnloadEvent(this);
 		Bukkit.getPluginManager().callEvent(uevent);

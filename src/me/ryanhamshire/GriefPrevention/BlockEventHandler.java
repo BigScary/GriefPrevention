@@ -474,6 +474,7 @@ public class BlockEventHandler implements Listener {
 		Player player = placeEvent.getPlayer();
 		Block block = placeEvent.getBlock();
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(block.getWorld());
+		if(!wc.getClaimsEnabled()) return;
 		boolean theftallowed = wc.getContainersRules().Allowed(block.getLocation(), player, false).Allowed();
 		if (wc.getApplyTrashBlockRules()) {
 			// if set, then we only allow Trash Blocks to be placed, and only in

@@ -345,6 +345,11 @@ public class DatabaseDataStore extends DataStore {
 		}
 	}
 
+	public synchronized long getNextClaimID(){
+		
+		return this.nextClaimID;
+		
+	}
 	// sets the next claim ID. used by incrementNextClaimID() above, and also
 	// while migrating data from a flat file data store
 	@Override
