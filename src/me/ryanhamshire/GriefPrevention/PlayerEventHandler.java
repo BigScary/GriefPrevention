@@ -715,7 +715,7 @@ class PlayerEventHandler implements Listener {
 		PlayerData playerData = this.dataStore.getPlayerData(event.getEntity().getName());
 		long now = Calendar.getInstance().getTimeInMillis();
 		if (now - playerData.lastDeathTimeStamp < wc.getSpamDeathMessageCooldownSeconds() * 1000) {
-			event.setDeathMessage("\b\b");
+			event.setDeathMessage("");
 			
 			
 		}
