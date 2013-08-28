@@ -154,7 +154,7 @@ public class Claim {
 	 * ownername. for admin claims, this is the empty string use getOwnerName()
 	 * to get a friendly name (will be "an administrator" for admin claims)
 	 */
-	private String claimOwnerName;
+	String claimOwnerName;
 
 	/**
 	 * parent claim only used for claim subdivisions. top level claims have null

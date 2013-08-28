@@ -484,7 +484,7 @@ public class DatabaseDataStore extends DataStore {
 	synchronized private void writeClaimData(Claim claim) throws SQLException {
 		String lesserCornerString = this.locationToString(claim.getLesserBoundaryCorner());
 		String greaterCornerString = this.locationToString(claim.getGreaterBoundaryCorner());
-		String owner = claim.ownerName; //we need the direct name, so Admin Claims aren't lost.
+		String owner = claim.claimOwnerName; //we need the direct name, so Admin Claims aren't lost.
 
 		ArrayList<String> builders = new ArrayList<String>();
 		ArrayList<String> containers = new ArrayList<String>();

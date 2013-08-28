@@ -756,7 +756,7 @@ public class FlatFileDataStore extends DataStore {
 		outStream.newLine();
 
 		// third line is owner name
-		outStream.write(claim.ownerName);
+		outStream.write(claim.claimOwnerName);
 		outStream.newLine();
 
 		ArrayList<String> builders = new ArrayList<String>();
