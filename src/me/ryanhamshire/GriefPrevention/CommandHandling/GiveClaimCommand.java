@@ -38,10 +38,13 @@ public class GiveClaimCommand extends GriefPreventionCommand {
 		// if it's not null, make sure they have either have giveclaim
 		// permission or adminclaims permission.
 
-		if (!(source.hasPermission(PermNodes.GiveClaimsPermission) || source.hasPermission(PermNodes.AdminClaimsPermission))) {
+		if ((source.hasPermission(PermNodes.GiveClaimsPermission) || source.hasPermission(PermNodes.AdminClaimsPermission))) {
 
 			// find the claim at the players location.
 			Claim claimtogive = dataStore.getClaimAt(source.getLocation(), true);
+			if(claimtogive==null){
+				GriefPrevention.sendMessage(source, TextMode.Err, "You must be in a claim to give away claims.");
+			}
 			// if the owner is not the source, they have to have adminclaims
 			// permission too.
 			if (!claimtogive.getOwnerName().equalsIgnoreCase(source.getName())) {

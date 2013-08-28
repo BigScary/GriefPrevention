@@ -309,16 +309,16 @@ public class ClaimBehaviourData {
 			return Allowed(Target.getLocation(),RelevantPlayer,ShowMessages);
 			
 		}
-		
+		else if(!(((Tameable)Target).getOwner()==null)){
 			Tameable testTamed = (Tameable)Target;
 			if(testTamed.getOwner().getName().equalsIgnoreCase(RelevantPlayer.getName()))
 				return ClaimAllowanceConstants.Allow_Forced;
 			else
 				return Allowed(Target.getLocation(),RelevantPlayer,ShowMessages);
 			
+		}
 		
-		
-		
+		return Allowed(Target.getLocation(),RelevantPlayer,ShowMessages);
 	}
 	/**
 	 * returns whether this Behaviour is allowed at the given location. if the

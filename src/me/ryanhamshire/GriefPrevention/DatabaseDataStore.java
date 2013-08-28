@@ -407,6 +407,7 @@ public class DatabaseDataStore extends DataStore {
 					Location lesserBoundaryCorner = this.locationFromString(lesserCornerString);
 					Location greaterBoundaryCorner = this.locationFromString(greaterCornerString);
 
+					
 					Claim topLevelClaim = new Claim(lesserBoundaryCorner, greaterBoundaryCorner, ownerName, builderNames, containerNames, accessorNames, managerNames, claimID, neverdelete);
 
 					// search for another claim overlapping this one
@@ -483,7 +484,7 @@ public class DatabaseDataStore extends DataStore {
 	synchronized private void writeClaimData(Claim claim) throws SQLException {
 		String lesserCornerString = this.locationToString(claim.getLesserBoundaryCorner());
 		String greaterCornerString = this.locationToString(claim.getGreaterBoundaryCorner());
-		String owner = claim.getOwnerName();
+		String owner = claim.ownerName; //we need the direct name, so Admin Claims aren't lost.
 
 		ArrayList<String> builders = new ArrayList<String>();
 		ArrayList<String> containers = new ArrayList<String>();

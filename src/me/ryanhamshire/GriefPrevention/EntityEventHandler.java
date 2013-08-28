@@ -150,6 +150,7 @@ class EntityEventHandler implements Listener {
 		if (!wc.getClaimsEnabled())
 			return;
 		// environmental damage
+		
 		if (event.getEntity() instanceof Hanging) { // hanging objects are not
 													// destroyed by explosions
 													// inside claims.

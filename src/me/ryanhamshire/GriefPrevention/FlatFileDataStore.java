@@ -41,6 +41,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 //manages data stored in the file system
 public class FlatFileDataStore extends DataStore {
@@ -755,16 +756,16 @@ public class FlatFileDataStore extends DataStore {
 		outStream.newLine();
 
 		// third line is owner name
-		outStream.write(claim.getOwnerName());
+		outStream.write(claim.ownerName);
 		outStream.newLine();
 
 		ArrayList<String> builders = new ArrayList<String>();
 		ArrayList<String> containers = new ArrayList<String>();
 		ArrayList<String> accessors = new ArrayList<String>();
 		ArrayList<String> managers = new ArrayList<String>();
-
+		
 		claim.getPermissions(builders, containers, accessors, managers);
-
+		
 		// fourth line is list of players with build permission
 		for (int i = 0; i < builders.size(); i++) {
 			outStream.write(builders.get(i) + ";");

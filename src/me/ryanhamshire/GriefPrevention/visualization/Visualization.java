@@ -147,7 +147,7 @@ public class Visualization {
 
 		if (visualizationType == VisualizationType.Claim) {
 			cornerMaterial = Material.GLOWSTONE;
-			accentMaterial = Material.GOLD_BLOCK;
+			accentMaterial = claim.isAdminClaim()?Material.EMERALD_BLOCK: Material.GOLD_BLOCK;
 		}
 
 		else if (visualizationType == VisualizationType.Subdivision) {
