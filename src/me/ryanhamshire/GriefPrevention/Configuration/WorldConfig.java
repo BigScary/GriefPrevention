@@ -129,11 +129,7 @@ public class WorldConfig {
 																// nature when
 																// abandoned.
 
-	// private boolean config_naturerestorecleanup_enabled;
-	// private boolean config_claims_AllowEnvironmentalVehicleDamage; //whether
-	// Entities can take damage from the environment in a claim.
-	// public boolean claims_AllowEnvironmentalVehicleDamage(){return
-	// config_claims_AllowEnvironmentalVehicleDamage;}
+
 	private double config_claims_AbandonReturnRatio; // return ratio when
 														// abandoning a claim-
 														// .80 will result in
@@ -744,7 +740,8 @@ public class WorldConfig {
 
 		this.VehicleDamage = new ClaimBehaviourData("Vehicle Damage", config, outConfig, "GriefPrevention.Rules.VehicleDamage", ClaimBehaviourData.getAll("Vehicle Damage").setBehaviourMode(ClaimBehaviourMode.RequireContainer));
 
-		this.EnvironmentalVehicleDamage = new ClaimBehaviourData("Vehicle Damage", config, outConfig, "GriefPrevention.Rules.EnvironmentalVehicleDamage", ClaimBehaviourData.getOutsideClaims("Environmental Vehicle Damage"));
+		this.EnvironmentalVehicleDamage = new ClaimBehaviourData("Environmental Vehicle Damage", config, outConfig, "GriefPrevention.Rules.EnvironmentalVehicleDamage", ClaimBehaviourData.getOutsideClaims("Environmental Vehicle Damage"));
+		System.out.println(pName + ",Environmental Vehicle Damage:" + this.getEnvironmentalVehicleDamage().toString());
 		
 		this.ZombieDoorBreaking = new ClaimBehaviourData("Zombie Door Breaking", config, outConfig, "GriefPrevention.Rules.ZombieDoorBreaking", ClaimBehaviourData.getNone("Zombie Door Breaking"));
 
@@ -1651,7 +1648,7 @@ public class WorldConfig {
 	}
 
 	public ClaimBehaviourData getEnvironmentalVehicleDamage(){
-		return EnvironmentalVehicleDamage;
+		return this.EnvironmentalVehicleDamage ;
 	}
 	public ClaimBehaviourData getEquineInventoryRules() {
 		return EquineInventoryRules;

@@ -538,8 +538,9 @@ class EntityEventHandler implements Listener {
 			usebehaviour = wc.getCreeperExplosionBlockDamageBehaviour();
 		else if (isWither)
 			usebehaviour = wc.getWitherExplosionBlockDamageBehaviour();
-		else if (isTNT)
+		else if (isTNT){
 			usebehaviour = wc.getTNTExplosionBlockDamageBehaviour();
+		}
 		else
 			usebehaviour = wc.getOtherExplosionBlockDamageBehaviour();
 		Claim claimpos = null;
@@ -952,11 +953,13 @@ class EntityEventHandler implements Listener {
 	// when a vehicle is damaged
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
 	public void onVehicleDamage(VehicleDamageEvent event) {
-		WorldConfig wc = new WorldConfig(event.getVehicle().getWorld());
+		
+		WorldConfig wc = GriefPrevention.instance.getWorldCfg(event.getVehicle().getWorld());
+		
 		if (!wc.getClaimsEnabled())
 			return;
 		// all of this is anti theft code
-
+                
 		// determine which player is attacking, if any
 		Player attacker = null;
 		Entity damageSource = event.getAttacker();
@@ -976,10 +979,10 @@ class EntityEventHandler implements Listener {
 		// if Damage source is unspecified and we allow environmental damage,
 		// don't cancel the event.
 		if(attacker==null && wc.getEnvironmentalVehicleDamage().Allowed(event.getVehicle().getLocation(), null,false).Denied()){
+			
 			event.setCancelled(true);
 			return;
-			
-		}else if (wc.getVehicleDamage().Allowed(event.getVehicle().getLocation(), attacker, true).Denied()) {
+		}else if (attacker!=null && wc.getVehicleDamage().Allowed(event.getVehicle().getLocation(), attacker, true).Denied()) {
 			event.setCancelled(true);
 			return;
 		}

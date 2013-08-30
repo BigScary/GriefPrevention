@@ -319,6 +319,7 @@ public class ClaimBehaviourData {
 		}
 		
 		return Allowed(Target.getLocation(),RelevantPlayer,ShowMessages);
+		
 	}
 	/**
 	 * returns whether this Behaviour is allowed at the given location. if the
@@ -514,8 +515,8 @@ public class ClaimBehaviourData {
 
 			return (returned = ClaimAllowanceConstants.Allow);
 		} finally {
-			// System.out.println("ClaimBehaviourData returning:\"" +
-			// returned.name() + "\"" + " For " + BehaviourName);
+			 
+			 
 			Debugger.Write("ClaimBehaviourData returning:\"" + returned.name() + "\"" + " For " + BehaviourName, DebugLevel.Verbose);
 		}
 	}
@@ -592,7 +593,7 @@ public class ClaimBehaviourData {
 
 	@Override
 	public String toString() {
-		return BehaviourName + " in the wilderness " + getWildernessRules().toString() + " and in claims " + getClaimsRules().toString();
+		return BehaviourName + " in the wilderness " + getWildernessRules().toString() + " and in claims " + getClaimsRules().toString() + " Required Trust Level:" + this.getBehaviourMode().name();
 
 	}
 }
