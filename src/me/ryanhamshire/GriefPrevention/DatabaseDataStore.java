@@ -249,6 +249,8 @@ public class DatabaseDataStore extends DataStore {
 				if (!tempresult.next()) {
 					statement.execute("ALTER TABLE griefprevention_claimdata ADD neverdelete BOOLEAN NOT NULL DEFAULT 0;");
 				}
+				
+				
 			}
 		} catch (Exception e3) {
 			GriefPrevention.AddLogEntry("ERROR: Unable to create the necessary database table.  Details:");

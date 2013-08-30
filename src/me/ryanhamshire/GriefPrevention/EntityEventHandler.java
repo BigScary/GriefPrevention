@@ -452,7 +452,7 @@ class EntityEventHandler implements Listener {
 				return;
 			}
 		}
-		// if it is an ocelot or wolf, and the owner is under seige,
+		// if it is an ocelot or wolf, and the owner is under Siege,
 		// inform the owner of the casualty on the line of battle.
 
 		else if (entity instanceof Wolf || entity instanceof Ocelot) {

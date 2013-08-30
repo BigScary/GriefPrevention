@@ -967,9 +967,9 @@ class PlayerEventHandler implements Listener {
 
 			if (cc != null && cc.doorsOpen) {
 
-				if ((cc.LootedChests++) <= wc.getSeigeLootChests() && wc.getSeigeLootChests() > 0) {
+				if ((cc.LootedChests++) <= wc.getSiegeLootChests() && wc.getSiegeLootChests() > 0) {
 					// tell the player how many more chests they can loot.
-					player.sendMessage(ChatColor.YELLOW + " You may loot " + (wc.getSeigeLootChests() - cc.LootedChests) + " more chests");
+					player.sendMessage(ChatColor.YELLOW + " You may loot " + (wc.getSiegeLootChests() - cc.LootedChests) + " more chests");
 					return;
 				}
 

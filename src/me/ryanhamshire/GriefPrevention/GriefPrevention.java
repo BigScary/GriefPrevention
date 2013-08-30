@@ -1194,7 +1194,7 @@ public class GriefPrevention extends JavaPlugin {
 
 	// checks whether players siege in a world
 	public boolean siegeEnabledForWorld(World world) {
-		return this.getWorldCfg(world).getSeigeEnabled();
+		return this.getWorldCfg(world).getSiegeEnabled();
 	}
 
 }

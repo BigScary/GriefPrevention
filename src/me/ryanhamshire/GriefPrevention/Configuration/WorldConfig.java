@@ -81,7 +81,7 @@ public class WorldConfig {
 	private boolean claims_enabled;
 
 	// private members followed by their read-only accessor.
-	private boolean claims_Seige_Enabled;
+	private boolean claims_Siege_Enabled;
 
 	private boolean config_addItemsToClaimedChests; // whether players may add
 													// items to claimed chests
@@ -354,11 +354,11 @@ public class WorldConfig {
 	private boolean config_pvp_punishLogout; // whether to kill players who log
 												// out during PvP combat
 
-	private int config_pvp_Seige_Loot_Chests; // defaults to 0, above zero means
+	private int config_pvp_Siege_Loot_Chests; // defaults to 0, above zero means
 												// that a player is allowed to
 												// look into and take items from
 												// X chests on a claim they
-												// seige.
+												// Siege.
 
 	private int config_seaLevelOverride;
 
@@ -901,8 +901,8 @@ public class WorldConfig {
 
 		this.InsufficientSneakResetBound = config.getInt("GriefPrevention.Claims.InsufficientSneakResetBound", 0);
 		outConfig.set("GriefPrevention.Claims.InsufficientSneakResetBound", this.InsufficientSneakResetBound);
-		this.claims_Seige_Enabled = config.getBoolean("GriefPrevention.Siege.Enabled", isPvP);
-		outConfig.set("GriefPrevention.Siege.Enabled", claims_Seige_Enabled);
+		this.claims_Siege_Enabled = config.getBoolean("GriefPrevention.Siege.Enabled", isPvP);
+		outConfig.set("GriefPrevention.Siege.Enabled", claims_Siege_Enabled);
 
 		this.Siege_TamedAnimalDistance = config.getInt("GriefPrevention.Claims.SiegeTamedAnimalDistance", 20);
 		outConfig.set("GriefPrevention.Claims.SiegeTamedAnimalDistance", Siege_TamedAnimalDistance);
@@ -952,8 +952,8 @@ public class WorldConfig {
 
 		outConfig.set("GriefPrevention.Claims.PerPlayerLimit", config_claims_perplayer_claim_limit);
 
-		this.config_pvp_Seige_Loot_Chests = config.getInt("GriefPrevention.Claims.SeigeLootChests", 0);
-		outConfig.set("GriefPrevention.Claims.SeigeLootChests", config_pvp_Seige_Loot_Chests);
+		this.config_pvp_Siege_Loot_Chests = config.getInt("GriefPrevention.Claims.SiegeLootChests", 0);
+		outConfig.set("GriefPrevention.Claims.SiegeLootChests", config_pvp_Siege_Loot_Chests);
 
 		this.config_claims_automaticClaimsForNewPlayersRadius = config.getInt("GriefPrevention.Claims.AutomaticNewPlayerClaimsRadius", 4);
 		this.config_claims_claimsExtendIntoGroundDistance = config.getInt("GriefPrevention.Claims.ExtendIntoGroundDistance", 5);
@@ -1804,16 +1804,16 @@ public class WorldConfig {
 	}
 
 	/**
-	 * Returns whether Seige is Enabled for this world.
+	 * Returns whether Siege is Enabled for this world.
 	 * 
 	 * @return
 	 */
-	public boolean getSeigeEnabled() {
-		return claims_Seige_Enabled;
+	public boolean getSiegeEnabled() {
+		return claims_Siege_Enabled;
 	}
 
-	public int getSeigeLootChests() {
-		return config_pvp_Seige_Loot_Chests;
+	public int getSiegeLootChests() {
+		return config_pvp_Siege_Loot_Chests;
 	}
 
 	public ClaimBehaviourData getShearingRules() {
