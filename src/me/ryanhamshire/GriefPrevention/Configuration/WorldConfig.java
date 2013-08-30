@@ -742,7 +742,7 @@ public class WorldConfig {
 
 		VillagerTrades = new ClaimBehaviourData("Villager Trading", config, outConfig, "GriefPrevention.Rules.VillagerTrading", ClaimBehaviourData.getInsideClaims("Villager Trading").setBehaviourMode(ClaimBehaviourMode.RequireContainer));
 
-		this.VehicleDamage = new ClaimBehaviourData("Vehicle Damage", config, outConfig, "GriefPrevention.Rules.EnvironmentalVehicleDamage", ClaimBehaviourData.getAll("Vehicle Damage").setBehaviourMode(ClaimBehaviourMode.RequireContainer));
+		this.VehicleDamage = new ClaimBehaviourData("Vehicle Damage", config, outConfig, "GriefPrevention.Rules.VehicleDamage", ClaimBehaviourData.getAll("Vehicle Damage").setBehaviourMode(ClaimBehaviourMode.RequireContainer));
 
 		this.EnvironmentalVehicleDamage = new ClaimBehaviourData("Vehicle Damage", config, outConfig, "GriefPrevention.Rules.EnvironmentalVehicleDamage", ClaimBehaviourData.getOutsideClaims("Environmental Vehicle Damage"));
 		
