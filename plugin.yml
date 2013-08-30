@@ -121,7 +121,7 @@ commands:
       description: Purchases additional claim blocks with server money.  Doesn't work on servers without a Vault-compatible economy plugin.
       usage: /BuyClaimBlocks <numberOfBlocks>
       aliases: buyclaim   
-      permission: griefprevention.commands.buysellclaimblocks
+      permission: griefprevention.commands.buyclaimblocks
    sellclaimblocks:
       description: Sells your claim blocks for server money.  Doesn't work on servers without a Vault-compatible economy plugin.
       usage: /SellClaimBlocks <numberOfBlocks>
@@ -294,9 +294,6 @@ permissions:
     griefprevention.commands.claimslist:
         description: grants access to the claimslist command.
         default: true
-    griefprevention.commands.claimexplosions:
-        description: grants access to th claimexplosions command.
-        default: true
     griefprevention.commands.lockclaim:
         description: grants access to the lockclaim command.
         default: true
@@ -305,27 +302,21 @@ permissions:
         default: true
     griefprevention.commands.gpreload:
         description: grants access to the gpreload command.
-        default: op
-    griefprevention.ignoreclaimslimit:
+        default: false
+    griefprevention.claims.ignorelimit:
         description: Allows creation of more claims than any configured per-player limit.
-        default: op
-    griefprevention.createclaims:
+        default: false
+    griefprevention.claims.create:
         description: Grants permission to create claims.
-        default: op
+        default: true
     griefprevention.admin.*:
         description: Grants all administrative functionality.
         children:
             griefprevention.commands.*: true
-    griefprevention.restorenature:
-        description: Grants permission to use /RestoreNature.
-        default: op
-    griefprevention.ignoreclaims:
-        description: Grants permission to use /IgnoreClaims.
-        default: op
-    griefprevention.adminclaims:
+    griefprevention.admin.claims:
         description: Grants permission to create administrative claims.
         default: op
-    griefprevention.deleteclaims:
+    griefprevention.claims.delete:
         description: Grants permission to delete other players' claims.
         default: op
     griefprevention.spam:
@@ -343,12 +334,12 @@ permissions:
     griefprevention.eavesdrop.standard:
         description: Allows a player to see whispered chat messages (/tell).
         default: op
-    griefprevention.eavesdrop.admin:
+    griefprevention.admin.eavesdrop:
         description: Allows a player to see all whispered chat messages (/tell).
         default: op
-    griefprevention.lock:
+    griefprevention.claims.lock:
         description: Grants permission to use the lock/unlock commands on your own claims.
         default: op
-    griefprevention.adminlock:
+    griefprevention.admin.lock:
         description: Grants permission to use the lock/unlock commands on any claim.
         default: op

@@ -490,8 +490,10 @@ public class WorldConfig {
 
 	private ClaimBehaviourData EnderPearlTargets;
 
-	private ClaimBehaviourData EnvironmentalVehicleDamage;
+	private ClaimBehaviourData VehicleDamage;
 
+	private ClaimBehaviourData EnvironmentalVehicleDamage;
+	
 	private ClaimBehaviourData EquineInventoryRules;
 
 	private ClaimBehaviourData FeedingRules;
@@ -740,8 +742,10 @@ public class WorldConfig {
 
 		VillagerTrades = new ClaimBehaviourData("Villager Trading", config, outConfig, "GriefPrevention.Rules.VillagerTrading", ClaimBehaviourData.getInsideClaims("Villager Trading").setBehaviourMode(ClaimBehaviourMode.RequireContainer));
 
-		this.EnvironmentalVehicleDamage = new ClaimBehaviourData("Environmental Vehicle Damage", config, outConfig, "GriefPrevention.Rules.EnvironmentalVehicleDamage", ClaimBehaviourData.getOutsideClaims("Environmental Vehicle Damage"));
+		this.VehicleDamage = new ClaimBehaviourData("Vehicle Damage", config, outConfig, "GriefPrevention.Rules.EnvironmentalVehicleDamage", ClaimBehaviourData.getAll("Vehicle Damage").setBehaviourMode(ClaimBehaviourMode.RequireContainer));
 
+		this.EnvironmentalVehicleDamage = new ClaimBehaviourData("Vehicle Damage", config, outConfig, "GriefPrevention.Rules.EnvironmentalVehicleDamage", ClaimBehaviourData.getOutsideClaims("Environmental Vehicle Damage"));
+		
 		this.ZombieDoorBreaking = new ClaimBehaviourData("Zombie Door Breaking", config, outConfig, "GriefPrevention.Rules.ZombieDoorBreaking", ClaimBehaviourData.getNone("Zombie Door Breaking"));
 
 		SheepShearingRules = new ClaimBehaviourData("Sheep Shearing", config, outConfig, "GriefPrevention.Rules.SheepShearing", ClaimBehaviourData.getAll("Sheep Shearing").setBehaviourMode(ClaimBehaviourMode.RequireContainer));
@@ -1642,10 +1646,13 @@ public class WorldConfig {
 		return config_entitycleanup_enabled;
 	}
 
-	public ClaimBehaviourData getEnvironmentalVehicleDamage() {
-		return EnvironmentalVehicleDamage;
+	public ClaimBehaviourData getVehicleDamage() {
+		return VehicleDamage;
 	}
 
+	public ClaimBehaviourData getEnvironmentalVehicleDamage(){
+		return EnvironmentalVehicleDamage;
+	}
 	public ClaimBehaviourData getEquineInventoryRules() {
 		return EquineInventoryRules;
 	}

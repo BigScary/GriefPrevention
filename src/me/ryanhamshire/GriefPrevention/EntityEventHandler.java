@@ -26,6 +26,7 @@ import me.ryanhamshire.GriefPrevention.Configuration.ClaimBehaviourData;
 import me.ryanhamshire.GriefPrevention.Configuration.ClaimBehaviourData.ClaimAllowanceConstants;
 import me.ryanhamshire.GriefPrevention.Configuration.WorldConfig;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -54,6 +55,7 @@ import org.bukkit.entity.minecart.ExplosiveMinecart;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.entity.EntityBreakDoorEvent;
@@ -70,6 +72,7 @@ import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.hanging.HangingBreakEvent;
 import org.bukkit.event.hanging.HangingPlaceEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.vehicle.VehicleDamageEvent;
 import org.bukkit.inventory.meta.BookMeta;
 
@@ -619,8 +622,15 @@ class EntityEventHandler implements Listener {
 
 			}
 		}
-		if (grabplayer != null)
-			pdata = GriefPrevention.instance.dataStore.getPlayerData(grabplayer.getName());
+		if (grabplayer != null){
+			PlayerInteractEvent pie = new PlayerInteractEvent(grabplayer, Action.PHYSICAL, grabplayer.getItemInHand(), null, null);
+			Bukkit.getPluginManager().callEvent(pie);
+			if(pie.isCancelled()){ 
+				event.setCancelled(true);
+				return;
+			}
+		}
+		/*	pdata = GriefPrevention.instance.dataStore.getPlayerData(grabplayer.getName());
 		if (event.getBlock().getType() == Material.STONE_PLATE) {
 			if (grabplayer != null) {
 				pdata.PlateData.put(event.getBlock().getLocation().toString(), pdata.new PressurePlateData(event.getBlock().getLocation()));
@@ -639,7 +649,7 @@ class EntityEventHandler implements Listener {
 				event.setCancelled(true);
 				return;
 			}
-		}
+		}*/
 
 		if (!wc.creaturesTrampleCrops() && event.getBlock().getType() == Material.SOIL) {
 			event.setCancelled(true);
@@ -965,44 +975,22 @@ class EntityEventHandler implements Listener {
 		}
 		// if Damage source is unspecified and we allow environmental damage,
 		// don't cancel the event.
-		else if (damageSource == null && wc.getEnvironmentalVehicleDamage().Allowed(event.getVehicle().getLocation(), attacker, false).Allowed()) {
+		if(attacker==null && wc.getEnvironmentalVehicleDamage().Allowed(event.getVehicle().getLocation(), null,false).Denied()){
+			event.setCancelled(true);
+			return;
+			
+		}else if (wc.getVehicleDamage().Allowed(event.getVehicle().getLocation(), attacker, true).Denied()) {
+			event.setCancelled(true);
 			return;
 		}
+		
 		// NOTE: vehicles can be pushed around.
 		// so unless precautions are taken by the owner, a resourceful thief
 		// might find ways to steal anyway
-		Claim cachedClaim = null;
-		PlayerData playerData = null;
-		if (attacker != null) {
-			playerData = this.dataStore.getPlayerData(attacker.getName());
-			cachedClaim = playerData.lastClaim;
-		}
+	
 
-		Claim claim = this.dataStore.getClaimAt(event.getVehicle().getLocation(), false);
 
-		// if it's claimed
-		if (claim != null) {
-			// if damaged by anything other than a player, or a cactus,
-			if (attacker == null) {
-				event.setCancelled(true);
-			}
-
-			// otherwise the player damaging the entity must have permission
-			else {
-				String noContainersReason = claim.allowContainers(attacker);
-				if (noContainersReason != null) {
-					event.setCancelled(true);
-					String useOwner = claim.getOwnerName();
-					if(useOwner==null || useOwner.length()==0) useOwner="Administrator";
-					GriefPrevention.sendMessage(attacker, TextMode.Err, Messages.NoDamageClaimedEntity, claim.getOwnerName());
-				}
-
-				// cache claim for later
-				if (playerData != null) {
-					playerData.lastClaim = claim;
-				}
-			}
-		}
+		
 	}
 
 	// don't allow zombies to break down doors

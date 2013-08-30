@@ -566,7 +566,7 @@ public class DatabaseDataStore extends DataStore {
 	}
 
 	@Override
-	synchronized void writeClaimToStorage(Claim claim) // see datastore.cs. this
+	synchronized void writeClaimToStorage(Claim claim) // see datastore.java. this
 														// will ALWAYS be a top
 														// level claim
 	{

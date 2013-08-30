@@ -1024,7 +1024,7 @@ class PlayerEventHandler implements Listener {
 		if (useRule != null) {
 
 			// stone and wood pressure plates must exceed the timeout to show a
-			// message,
+			// message.
 			boolean doshowmessage = true;
 			Calendar fiveseccal = Calendar.getInstance();
 			fiveseccal.add(Calendar.SECOND, -1);
@@ -1540,7 +1540,9 @@ class PlayerEventHandler implements Listener {
 						}
 
 						// remove surface fluids about to be unclaimed
-						oldClaim.removeSurfaceFluids(newClaim);
+						if(oldClaim.parent!=null){
+						    oldClaim.removeSurfaceFluids(newClaim);
+						}
 					}
 				}
 
