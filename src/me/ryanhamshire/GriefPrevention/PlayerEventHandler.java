@@ -1493,7 +1493,12 @@ class PlayerEventHandler implements Listener {
 					}
 					// make sure player has enough blocks to make up the
 					// difference
-					if (!playerData.claimResizing.isAdminClaim() && player.getName().equals(playerData.claimResizing.getOwnerName())) {
+					if (!playerData.claimResizing.isAdminClaim()) {
+						
+						if(!player.getName().equals(playerData.claimResizing.getOwnerName()))
+						{
+							playerData = GriefPrevention.instance.dataStore.getPlayerData(playerData.claimResizing.getOwnerName());
+						}
 						int newArea = newWidth * newHeight;
 						int blocksRemainingAfter = playerData.getRemainingClaimBlocks() + playerData.claimResizing.getArea() - newArea;
 

@@ -48,8 +48,8 @@ public class AbandonAllClaimsCommand extends GriefPreventionCommand {
 		PlayerData playerData = inst.dataStore.getPlayerData(player.getName());
 		int originalClaimCount = playerData.claims.size();
 
-		if(!playerData.warnedAboutMajorDeletion){
-			playerData.warnedAboutMajorDeletion= true;
+		if(!playerData.getWarned("AbandonAllClaims")){
+			playerData.setWarned("AbandonAllClaims");
 		    GriefPrevention.sendMessage(player, TextMode.Warn, "Are you sure? Issue /abandonallclaims command again to confirm.");
 		    return true;
 		}

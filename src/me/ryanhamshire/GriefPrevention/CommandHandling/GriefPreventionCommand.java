@@ -16,7 +16,7 @@ public abstract class GriefPreventionCommand implements CommandExecutor {
 	public abstract boolean onCommand(CommandSender sender, Command command, String label, String[] args);
 
 	public boolean EnsurePermission(Player p,String commandLabel){
-		
+		if(p==null) return false;
 		
 		String checknode = PermNodes.getCommandPermission(commandLabel);
 		

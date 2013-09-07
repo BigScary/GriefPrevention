@@ -144,9 +144,13 @@ public class TrustCommands extends GriefPreventionCommand {
 		// if number of target claims is greater than 1, require 'warning' flag.
 		if (targetClaims.size() > 1) {
 
-			if (!playerData.warnedAboutMajorDeletion) {
+			if (!playerData.getWarned("trust")) {
 				GriefPrevention.sendMessage(player, TextMode.Info, "use the trust command again to give " + recipientName + " access to all your claims.");
-				playerData.warnedAboutMajorDeletion = true;
+				playerData.setWarned("trust");
+				return;
+			}
+			else {
+				playerData.setWarned("trust",false);
 			}
 
 		}

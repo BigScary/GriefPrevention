@@ -63,6 +63,11 @@ public class ConfigData {
 
 	private String WorldConfigLocation = null;
 
+	
+	private int SiegeCooldownSeconds = 1000 * 60 * 60; //default: one hour.
+	
+	public int getSiegeCooldownSeconds(){ return SiegeCooldownSeconds;}
+	
 	/**
 	 * Constructs a new ConfigData instance from the given core configuration
 	 * location and the passed in target out configuration.
@@ -98,6 +103,7 @@ public class ConfigData {
 			} catch (IOException exx) {
 			}
 		}
+		this.SiegeCooldownSeconds = CoreConfig.getInt("GriefPrevention.Siege.CooldownTime",1000 * 60 * 60);
 		outConfig.set("GriefPrevention.WorldConfig.SingleWorld", SingleConfig);
 		outConfig.set("GriefPrevention.WorldConfig.TemplateFile", TemplateFile);
 		// check for appropriate configuration in given FileConfiguration. Note

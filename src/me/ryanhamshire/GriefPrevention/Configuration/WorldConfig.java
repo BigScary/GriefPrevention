@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import me.ryanhamshire.GriefPrevention.DataStore;
 import me.ryanhamshire.GriefPrevention.Debugger;
@@ -21,6 +22,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -641,6 +643,7 @@ public class WorldConfig {
 
 	private ClaimBehaviourData ZombieDoorBreaking;
 
+	
 	public WorldConfig(String worldname) {
 		this(worldname, new YamlConfiguration(), ConfigData.createTargetConfiguration(worldname));
 	}
@@ -2034,5 +2037,32 @@ public class WorldConfig {
 	public ClaimBehaviourData getZombieDoorBreaking() {
 		return ZombieDoorBreaking;
 	}
-
+/**
+ * Creates a FileConfiguration based on a Parent set of Configuration Options and a child set of 
+ * Configuration Options.
+ * @param Parent Parent FileConfiguration. 
+ * @param Child Child FileConfiguration.
+ * @return Upmarked FileConfiguration that uses inherited values from the Parent where specified in the Child configuration,
+ *  as well as defaulting to the Parent Configuration where the Child configuration doesn't specify.
+ */
+	public static FileConfiguration InheritTraits(FileConfiguration Parent,FileConfiguration Child){
+	return null;
+		
+		
+		
+		
+		
+	}
+	
+	private static void InheritSection(ConfigurationSection Parent,ConfigurationSection Child,ConfigurationSection Target){
+		
+		//dupe values.
+		
+		
+		
+		Set<String> childsections = Child.getKeys(false);
+	
+		
+		
+	}
 }

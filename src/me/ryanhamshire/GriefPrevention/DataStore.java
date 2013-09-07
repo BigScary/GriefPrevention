@@ -514,6 +514,7 @@ public abstract class DataStore {
 			}
 		}
 
+		
 		// if the attacker won, plan to open the doors for looting
 		if (siegeData.attacker.getName().equals(winnerName)) {
 			grantAccess = true;
@@ -527,7 +528,10 @@ public abstract class DataStore {
 
 		// start a cooldown for this attacker/defender pair
 		Long now = Calendar.getInstance().getTimeInMillis();
-		Long cooldownEnd = now + 1000 * 60 * 60; // one hour from now
+		Long cooldownEnd = now + GriefPrevention.instance.Configuration.getSiegeCooldownSeconds(); // one hour from now
+		
+		
+		
 		this.siegeCooldownRemaining.put(siegeData.attacker.getName() + "_" + siegeData.defender.getName(), cooldownEnd);
 
 		// if there are blocks queued up to revert, do so.
@@ -1182,6 +1186,7 @@ public abstract class DataStore {
 		this.addDefault(defaults, Messages.CreateClaimTooFewBlocks, "That claim would require too many blocks. You need {0} more.", "0:Numberof minimum claim blocks");
 		this.addDefault(defaults, Messages.ResizeNeedMoreBlocks, "The resized claim would be too large. You need {0} more claim blocks.", "0:number of claim blocks required");
 		this.addDefault(defaults, Messages.ResizeTooFewBlocks, "That claim would not take up enough space. Claims must use at least {0} Blocks.", "0:Minimum blocks in a claim");
+		this.addDefault(defaults, Messages.ConfirmationReset, "Confirmation for {0} Reset.", "0:Name of confirmation flag");
 		// load the config file
 		FileConfiguration config = YamlConfiguration.loadConfiguration(new File(messagesFilePath));
 

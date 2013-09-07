@@ -49,12 +49,12 @@ public class DeleteClaimCommand extends GriefPreventionCommand {
 				// permission
 				if (!claim.isAdminClaim() || player.hasPermission(PermNodes.AdminClaimsPermission)) {
 					PlayerData playerData = inst.dataStore.getPlayerData(player.getName());
-					if (claim.children.size() > 0 && !playerData.warnedAboutMajorDeletion) {
+					if (claim.children.size() > 0 && !playerData.getWarned("AbandonClaim")) {
 						GriefPrevention.sendMessage(player, TextMode.Warn, Messages.DeletionSubdivisionWarning);
-						playerData.warnedAboutMajorDeletion = true;
-					} else if (claim.neverdelete && !playerData.warnedAboutMajorDeletion) {
+						playerData.setWarned("AbandonClaim");
+					} else if (claim.neverdelete && !playerData.getWarned("AbandonClaim")) {
 						GriefPrevention.sendMessage(player, TextMode.Warn, Messages.DeleteLockedClaimWarning);
-						playerData.warnedAboutMajorDeletion = true;
+						playerData.setWarned("AbandonClaim");
 					} else {
 						claim.removeSurfaceFluids(null);
 						inst.dataStore.deleteClaim(claim);
@@ -70,7 +70,7 @@ public class DeleteClaimCommand extends GriefPreventionCommand {
 						// revert any current visualization
 						Visualization.Revert(player);
 
-						playerData.warnedAboutMajorDeletion = false;
+						playerData.setWarned("AbandonClaim",false);
 					}
 				} else {
 					GriefPrevention.sendMessage(player, TextMode.Err, Messages.CantDeleteAdminClaim);

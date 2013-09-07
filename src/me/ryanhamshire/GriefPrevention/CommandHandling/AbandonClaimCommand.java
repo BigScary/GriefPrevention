@@ -56,23 +56,23 @@ public class AbandonClaimCommand extends GriefPreventionCommand {
 
 		// if the claim is locked, let's warn the player and give them a chance
 		// to back out
-		else if (!playerData.warnedAboutMajorDeletion && claim.neverdelete) {
+		else if (!playerData.getWarned("AbandonClaim") && claim.neverdelete) {
 			GriefPrevention.sendMessage(player, TextMode.Warn, Messages.ConfirmAbandonLockedClaim);
-			playerData.warnedAboutMajorDeletion = true;
+			playerData.setWarned("AbandonClaim");
 		}
 		// if auto-restoration is enabled,
-		else if (!playerData.warnedAboutMajorDeletion && wc.getClaimsAbandonNatureRestoration()) {
+		else if (!playerData.getWarned("AbandonClaim") && wc.getClaimsAbandonNatureRestoration()) {
 			GriefPrevention.sendMessage(player, TextMode.Warn, Messages.AbandonClaimRestoreWarning);
-			playerData.warnedAboutMajorDeletion = true;
-		} else if (!playerData.warnedAboutMajorDeletion && costoverhead != claimarea) {
-			playerData.warnedAboutMajorDeletion = true;
+			playerData.setWarned("AbandonClaim");
+		} else if (!playerData.getWarned("AbandonClaim") && costoverhead != claimarea) {
+			playerData.setWarned("AbandonClaim");
 			GriefPrevention.sendMessage(player, TextMode.Warn, Messages.AbandonCostWarning, String.valueOf(costoverhead));
 		}
 		// if the claim has lots of surface water or some surface lava, warn the
 		// player it will be cleaned up
-		else if (!playerData.warnedAboutMajorDeletion && claim.hasSurfaceFluids() && claim.parent == null) {
+		else if (!playerData.getWarned("AbandonClaim") && claim.hasSurfaceFluids() && claim.parent == null) {
 			GriefPrevention.sendMessage(player, TextMode.Warn, Messages.ConfirmFluidRemoval);
-			playerData.warnedAboutMajorDeletion = true;
+			playerData.setWarned("AbandonClaim");
 		}
 
 		else {
@@ -115,7 +115,7 @@ public class AbandonClaimCommand extends GriefPreventionCommand {
 			// revert any current visualization
 			Visualization.Revert(player);
 
-			playerData.warnedAboutMajorDeletion = false;
+			playerData.setWarned("AbandonClaim",false);
 		}
 
 		return true;

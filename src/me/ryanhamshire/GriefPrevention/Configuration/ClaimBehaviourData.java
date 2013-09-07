@@ -191,7 +191,12 @@ public class ClaimBehaviourData {
 
 	private SiegePVPOverrideConstants SiegeAttackerOverride = SiegePVPOverrideConstants.None;
 	private SiegePVPOverrideConstants SiegeDefenderOverride = SiegePVPOverrideConstants.None;
+	private SiegePVPOverrideConstants SiegeBystanderOverride = SiegePVPOverrideConstants.None;
 	
+	
+	public SiegePVPOverrideConstants getSiegeAttackerOverride(){ return SiegeAttackerOverride;}
+	public SiegePVPOverrideConstants getSiegeDefenderOverride(){ return SiegeDefenderOverride;}
+	public SiegePVPOverrideConstants getSiegeBystanderOverride(){ return SiegeBystanderOverride;}
 	//PvP Overrides can only apply to Claims currently.
 	//Attacker and Defender refers to the Attacker and Defender- the Attacker is the person with higher Permissions
 	//on a claim.
@@ -201,9 +206,13 @@ public class ClaimBehaviourData {
 	public boolean getTameableAllowOwner(){ return TameableAllowOwner;}
 	public ClaimBehaviourData setTameableAllowOwner(boolean value){ TameableAllowOwner = value; return this;}
 	public ClaimBehaviourData setSiegeOverrides(SiegePVPOverrideConstants Attacker,SiegePVPOverrideConstants Defender){
+		return setSiegeOverrides(Attacker,Defender,SiegeBystanderOverride);
+	}
+	public ClaimBehaviourData setSiegeOverrides(SiegePVPOverrideConstants Attacker,SiegePVPOverrideConstants Defender,SiegePVPOverrideConstants ByStander){
 		
 		SiegeAttackerOverride = Attacker;
 		SiegeDefenderOverride = Defender;
+		SiegeBystanderOverride = ByStander;
 		return this;
 	}
 	public ClaimBehaviourData setPVPOverride(SiegePVPOverrideConstants newPVP){
@@ -254,6 +263,7 @@ public class ClaimBehaviourData {
 		//retrieve each. Set the value. Then if it's not the default, save them back.
 		String SAttacker = Source.getString(NodePath + ".Claims.SiegeAttacker","None");
 		String SDefender = Source.getString(NodePath + ".Claims.SiegeDefender","None");
+		String SBystander = Source.getString(NodePath + ".Claims.SiegeBystander","None");
 		String PVPProvision = Source.getString(NodePath + ".PVP","None");
 		
 		
@@ -262,6 +272,10 @@ public class ClaimBehaviourData {
 		catch(Exception sAtt){this.SiegeAttackerOverride = SiegePVPOverrideConstants.None;}
 		try {this.SiegeDefenderOverride = SiegePVPOverrideConstants.valueOf(SDefender);}
 		catch(Exception sDef){this.SiegeDefenderOverride = SiegePVPOverrideConstants.None;}
+		
+		try {this.SiegeBystanderOverride = SiegePVPOverrideConstants.valueOf(SBystander);}
+		catch(Exception sBy){ this.SiegeBystanderOverride = SiegePVPOverrideConstants.None;}
+		
 		try {this.PvPOverride = SiegePVPOverrideConstants.valueOf(PVPProvision);}
 		catch(Exception sPVP){this.PvPOverride = SiegePVPOverrideConstants.None;}
 		
@@ -271,6 +285,9 @@ public class ClaimBehaviourData {
 		}
 		if(SiegeDefenderOverride != SiegePVPOverrideConstants.None){
 			outConfig.set(NodePath + ".Claims.SiegeDefender",SiegeDefenderOverride.name());
+		}
+		if(SiegeBystanderOverride != SiegePVPOverrideConstants.None){
+			outConfig.set(NodePath + ".Claims.SiegeBystander", SiegeBystanderOverride.name());
 		}
 		if(PvPOverride != SiegePVPOverrideConstants.None){
 			outConfig.set(NodePath + ".PVP", PvPOverride);
@@ -433,12 +450,17 @@ public class ClaimBehaviourData {
 				if(testclaim.siegeData != null){
 					
 					SiegePVPOverrideConstants useval = SiegePVPOverrideConstants.None;
-					//siege overrides only apply to players being sieged, or those attacking.
-					if(testclaim.siegeData.attacker == RelevantPlayer){
+					//siege overrides apply to players being seiged or attacking, but also
+					//another set applies to bystanders who happen to be in the claim (and are not the attacker or defender).
+					
+					if(testclaim.siegeData.attacker.getName() == RelevantPlayer.getName()){
 						useval = this.SiegeAttackerOverride;
 					}
-					else if(testclaim.siegeData.defender == RelevantPlayer){
+					else if(testclaim.siegeData.defender.getName() == RelevantPlayer.getName()){
 						useval = this.SiegeDefenderOverride;
+					}
+					else {
+						useval = this.SiegeBystanderOverride;
 					}
 					
 					//if not set to none...

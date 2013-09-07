@@ -61,10 +61,10 @@ public class TransferClaimCommand extends GriefPreventionCommand {
 			}
 			// otherwise, the appropriate perms are present.
 			// make sure that they have been warned.
-			if (!pd.warnedAboutMajorDeletion) {
+			if (!pd.getWarned("TransferClaim")) {
 				// they have not been warned, tell them what will happen and how
 				// to proceed.
-				pd.warnedAboutMajorDeletion = true;
+				pd.setWarned("TransferClaim");
 				GriefPrevention.sendMessage(player, TextMode.Info, "use /TransferClaim again to make this claim an admin claim");
 				return true;
 

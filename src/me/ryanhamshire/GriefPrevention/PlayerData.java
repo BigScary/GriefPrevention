@@ -157,11 +157,43 @@ public class PlayerData {
 	public boolean spamWarned = false; // whether the player recently received a
 										// warning
 
+	public int Confirmtimeoutseconds = 20;
 	// number of blocks placed outside claims before next warning
 	int unclaimedBlockPlacementsUntilWarning = 1;
 
+	//
+	private HashMap<String,Boolean> ConfirmationWarnings = new HashMap<String,Boolean>();
+	public boolean getWarned(String pName){
+		return ConfirmationWarnings.containsKey(pName);
+	}
+	public void setWarned(final String pName){
+		setWarned(pName,true);
+	}
+	public void setWarned(final String pName,final boolean pValue){
+		if(!pValue) ConfirmationWarnings.remove(pName);
+		if(pValue){
+			ConfirmationWarnings.put(pName, pValue);
+			//setup a reset delegate.
+			Bukkit.getScheduler().scheduleSyncDelayedTask(GriefPrevention.instance, new Runnable(){
+				public void run(){
+					if(!ConfirmationWarnings.containsKey(pName)) return;
+					ConfirmationWarnings.remove(pName);
+
+					Player p = Bukkit.getPlayer(playerName);
+					if(p!=null){
+						GriefPrevention.sendMessage(p,TextMode.Info, Messages.ConfirmationReset,pName);
+					}
+					
+				}
+				
+				
+			}
+			,Confirmtimeoutseconds*20);
+		}
+	}
+	
 	// safety confirmation for deleting multi-subdivision claims
-	public boolean warnedAboutMajorDeletion = false;
+	//public boolean warnedAboutMajorDeletion = false;
 
 	PlayerData() {
 		// default last login date value to a year ago to ensure a brand new

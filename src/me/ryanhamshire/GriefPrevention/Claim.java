@@ -561,7 +561,7 @@ public class Claim {
 
 		// permission inheritance for subdivisions
 		if (this.parent != null)
-			return this.parent.allowBuild(player);
+			return this.parent.allowEdit(player);
 
 		// error message if all else fails
 		return GriefPrevention.instance.dataStore.getMessage(Messages.OnlyOwnersModifyClaims, this.getOwnerName());
