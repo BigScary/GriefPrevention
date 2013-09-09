@@ -102,6 +102,7 @@ public class TransferClaimCommand extends GriefPreventionCommand {
 					try {
 						inst.dataStore.changeClaimOwner(inclaim, targetplayer);
 						GriefPrevention.sendMessage(player, TextMode.Success, "Claim ownership transferred from " + previousOwner + " to " + targetplayer + ".");
+						pd.setWarned("TransferClaim",false);
 					} catch (Exception exx) {
 						GriefPrevention.sendMessage(player, TextMode.Err, "TransferClaim Exception " + exx.getMessage());
 					}

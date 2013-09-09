@@ -245,6 +245,8 @@ public class GriefPrevention extends JavaPlugin {
 
 	private String config_Storage_Kind; // currently supported:flat and mysql.
 
+	
+	
 	public ConfigData Configuration = null;
 
 	// this handles data storage, like player and region data
@@ -285,9 +287,9 @@ public class GriefPrevention extends JavaPlugin {
 				return reason;
 			}
 
-			else if (wc.getApplyTrashBlockRules() && wc.getClaimsEnabled()) {
+		/*	else if (wc.getApplyTrashBlockRules() && wc.getClaimsEnabled()) {
 				return this.dataStore.getMessage(Messages.NoBuildOutsideClaims) + "  " + this.dataStore.getMessage(Messages.SurvivalBasicsDemoAdvertisement);
-			}
+			}*/
 
 			// but it's fine in survival mode
 			else {
@@ -323,12 +325,12 @@ public class GriefPrevention extends JavaPlugin {
 			}
 
 			// no building in survival wilderness when that is configured
-			else if (wc.getApplyTrashBlockRules() && wc.getClaimsEnabled()) {
+			/*else if (wc.getApplyTrashBlockRules() && wc.getClaimsEnabled()) {
 				if (wc.getTrashBlockPlacementBehaviour().Allowed(location, player).Denied())
 					return this.dataStore.getMessage(Messages.NoBuildOutsideClaims) + "  " + this.dataStore.getMessage(Messages.SurvivalBasicsDemoAdvertisement);
 				else
 					return null;
-			}
+			}*/
 
 			else {
 				// but it's fine in creative

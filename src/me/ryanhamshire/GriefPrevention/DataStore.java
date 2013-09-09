@@ -1358,12 +1358,13 @@ public abstract class DataStore {
 			return res;
 		}
 
+		String PreviousOwner = claim.claimOwnerName;
 		// remove old claim. We don't raise an event for this!
 		this.deleteClaim(claim, false, claimcreator);
 
 		// try to create this new claim, ignoring the original when checking for
 		// overlap
-		CreateClaimResult result = this.createClaim(claim.getLesserBoundaryCorner().getWorld(), newx1, newx2, newy1, newy2, newz1, newz2, claim.getOwnerName(), claim.parent, claim.id, claim.neverdelete, claim, claimcreator, false);
+		CreateClaimResult result = this.createClaim(claim.getLesserBoundaryCorner().getWorld(), newx1, newx2, newy1, newy2, newz1, newz2, PreviousOwner, claim.parent, claim.id, claim.neverdelete, claim, claimcreator, false);
 
 		// if succeeded
 		if (result.succeeded == CreateClaimResult.Result.Success) {
@@ -1549,24 +1550,33 @@ public abstract class DataStore {
 
 	abstract void writeClaimToStorage(Claim claim);
 
-	
-	
 	public static void migrateData(DataStore Source,DataStore Target){
+		migrateData(new DataStore[]{Source},new DataStore[]{Target});
+	}
+	
+	public static void migrateData(DataStore[] Sources,DataStore[] Targets){
 		
 		//migrate from the given Source to the given Target.
-		//first try to force all claims to be loaded.
-		ForceLoadAllClaims();
-		//transfer players.
-		for(PlayerData p:Source.getAllPlayerData()){
+		//first try to force all claims to be loaded in the Source DataStore.
+		for(DataStore Source:Sources){
 			
+				
+			ForceLoadAllClaims(Source);
+			
+			for(DataStore Target:Targets){
+				//transfer claims from Source to target.
+				for(Claim cc:Source.claims){
+					Target.addClaim(cc);
+				}
+				
+				for(PlayerData p:Source.getAllPlayerData()){
+					//save this PlayerData into the target.
+					
+				    Target.savePlayerData(p.playerName, p);
+				    
+				}
+			}
 		}
-		
-		
-		//now transfer claims.
-		for(Claim c:Source.claims){
-			Target.addClaim(c);
-		}
-		
 		
 		
 	}

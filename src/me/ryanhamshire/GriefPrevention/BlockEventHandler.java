@@ -476,7 +476,7 @@ public class BlockEventHandler implements Listener {
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(block.getWorld());
 		if(!wc.getClaimsEnabled()) return;
 		boolean theftallowed = wc.getContainersRules().Allowed(block.getLocation(), player, false).Allowed();
-		if (wc.getApplyTrashBlockRules()) {
+		/*if (wc.getApplyTrashBlockRules()) {
 			// if set, then we only allow Trash Blocks to be placed, and only in
 			// the allowed places.
 			Claim testclaim = GriefPrevention.instance.dataStore.getClaimAt(block.getLocation(), true);
@@ -487,7 +487,7 @@ public class BlockEventHandler implements Listener {
 					}
 				}
 			}
-		}
+		}*/
 		// if placed block is fire, make sure FireSetting is allowed in that
 		// location.
 		if (block.getType() == Material.FIRE) {

@@ -142,7 +142,7 @@ public class WorldConfig {
 	private boolean config_claims_allowUnclaim; // whether players may unclaim
 												// land (resize or abandon)
 
-	private boolean config_claims_ApplyTrashBlockRules; // whether players can
+	//private boolean config_claims_ApplyTrashBlockRules; // whether players can
 														// build in survival
 														// worlds outside their
 														// claimed areas
@@ -692,8 +692,8 @@ public class WorldConfig {
 		
 		//placement requires build permission by default, and isn't allowed during PVP or Siege.
 		
-		this.PlaceBlockRules = new ClaimBehaviourData("Block Placement",PlacementRules.Both,PlacementRules.Both,ClaimBehaviourMode.RequireBuild).setPVPOverride(SiegePVPOverrideConstants.Deny).setSiegeOverrides(SiegePVPOverrideConstants.Deny, SiegePVPOverrideConstants.Deny);
-		this.BreakBlockRules = new ClaimBehaviourData("Block Breaking",PlacementRules.Both,PlacementRules.Both,ClaimBehaviourMode.RequireBuild).setPVPOverride(SiegePVPOverrideConstants.Deny).setSiegeOverrides(SiegePVPOverrideConstants.Deny, SiegePVPOverrideConstants.Deny);
+		this.PlaceBlockRules = new ClaimBehaviourData("Block Placement",config,outConfig,"GriefPrevention.Rules.BlockPlacement",new ClaimBehaviourData("Block Placement",PlacementRules.Both,PlacementRules.Both,ClaimBehaviourMode.RequireBuild).setPVPOverride(SiegePVPOverrideConstants.Deny).setSiegeOverrides(SiegePVPOverrideConstants.Deny, SiegePVPOverrideConstants.Deny));
+		this.BreakBlockRules = new ClaimBehaviourData("Block Breaking",config,outConfig,"GriefPrevention.Rules.BlockBreaking",new ClaimBehaviourData("Block Placement",PlacementRules.Both,PlacementRules.Both,ClaimBehaviourMode.RequireBuild).setPVPOverride(SiegePVPOverrideConstants.Deny).setSiegeOverrides(SiegePVPOverrideConstants.Deny, SiegePVPOverrideConstants.Deny));
 		
 		
 		this.FireDestroyBehaviour = new ClaimBehaviourData("Fire Destruction",config,outConfig,"GriefPrevention.Rules.FireDestroys",new ClaimBehaviourData("GriefPrevention.Rules.FireDestroys",PlacementRules.Neither,PlacementRules.Neither,ClaimBehaviourMode.Disabled));
@@ -966,7 +966,7 @@ public class WorldConfig {
 		this.config_claims_maxDepth = config.getInt("GriefPrevention.Claims.MaximumDepth", 0);
 		this.config_claims_trappedCooldownMinutes = config.getInt("GriefPrevention.Claims.TrappedCommandCooldownMinutes", 8 * 60);
 
-		this.config_claims_ApplyTrashBlockRules = config.getBoolean("GriefPrevention.Claims.NoSurvivalBuildingOutsideClaims", false);
+		//this.config_claims_ApplyTrashBlockRules = config.getBoolean("GriefPrevention.Claims.NoSurvivalBuildingOutsideClaims", false);
 		this.config_claims_warnOnBuildOutside = config.getBoolean("GriefPrevention.Claims.WarnWhenBuildingOutsideClaims", true);
 		this.config_claims_allowUnclaim = config.getBoolean("GriefPrevention.Claims.AllowUnclaimingLand", true);
 		this.config_claims_autoRestoreUnclaimed = config.getBoolean("GriefPrevention.Claims.AutoRestoreUnclaimedLand", true);
@@ -1273,7 +1273,7 @@ public class WorldConfig {
 		outConfig.set("GriefPrevention.Claims.TrappedCommandCooldownMinutes", this.config_claims_trappedCooldownMinutes);
 		outConfig.set("GriefPrevention.Claims.InvestigationTool", this.config_claims_investigationTool.name());
 		outConfig.set("GriefPrevention.Claims.ModificationTool", this.config_claims_modificationTool.name());
-		outConfig.set("GriefPrevention.Claims.NoSurvivalBuildingOutsideClaims", this.config_claims_ApplyTrashBlockRules);
+		
 		outConfig.set("GriefPrevention.Claims.WarnWhenBuildingOutsideClaims", this.config_claims_warnOnBuildOutside);
 		outConfig.set("GriefPrevention.Claims.AllowUnclaimingLand", this.config_claims_allowUnclaim);
 		outConfig.set("GriefPrevention.Claims.AutoRestoreUnclaimedLand", this.config_claims_autoRestoreUnclaimed);
@@ -1388,9 +1388,7 @@ public class WorldConfig {
 		return config_claims_allowUnclaim;
 	}
 
-	public boolean getApplyTrashBlockRules() {
-		return config_claims_ApplyTrashBlockRules;
-	}
+	
 
 	public ClaimBehaviourData getArrowWoodenButtonRules() {
 		return ArrowWoodenButtonRules;

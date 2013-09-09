@@ -1519,6 +1519,14 @@ class PlayerEventHandler implements Listener {
 							}
 						}
 					}
+					else{
+						//admin claim
+						if(!player.hasPermission(PermNodes.AdminClaimsPermission)){
+							GriefPrevention.sendMessage(player, TextMode.Err, "You do not have permission to modify Administrator claims.");
+							playerData.claimResizing=null;
+							return;
+						}
+					}
 				}
 
 				// special rules for making a top-level claim smaller. to check
