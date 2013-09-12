@@ -1494,16 +1494,33 @@ class PlayerEventHandler implements Listener {
 					// make sure player has enough blocks to make up the
 					// difference
 					if (!playerData.claimResizing.isAdminClaim()) {
+						PlayerData pdata = playerData;
+						//if the claim is owned by another player, than
+						// we want to change THEIR claim blocks.
+						// (this is why you should only give manager trust to players you uh... trust.
+						// This could also be made an option, such that whether a player resizing another
+						// players claim takes the difference in size from their claim blocks or the owner.
 						
+						//pdata is the PlayerData of the player who's claim is being resized,
+						//playerData is the playerData of the player resizing the claim. We need
+						//the latter since we need the claimResizing field to access the claim itself.
+						//Don't access the claimResizing of the pdata field!
 						if(!player.getName().equals(playerData.claimResizing.getOwnerName()))
 						{
-							playerData = GriefPrevention.instance.dataStore.getPlayerData(playerData.claimResizing.getOwnerName());
+							pdata = GriefPrevention.instance.dataStore.getPlayerData(pdata.claimResizing.getOwnerName());
 						}
 						int newArea = newWidth * newHeight;
-						int blocksRemainingAfter = playerData.getRemainingClaimBlocks() + playerData.claimResizing.getArea() - newArea;
+						int blocksRemainingAfter = pdata.getRemainingClaimBlocks() + playerData.claimResizing.getArea() - newArea;
 
 						if (blocksRemainingAfter < 0) {
+							
+							if(player.getName().equals(playerData.claimResizing.getOwnerName())){
 							GriefPrevention.sendMessage(player, TextMode.Err, Messages.ResizeNeedMoreBlocks, String.valueOf(Math.abs(blocksRemainingAfter)));
+							}
+							else {
+								GriefPrevention.sendMessage(player, TextMode.Err, Messages.OtherPlayerResizeInsufficientWorldBlocks,pdata.playerName);
+								
+							}
 							return;
 						} else if (wc.getClaims_maxBlocks() > 0) { // or if
 																	// there is
@@ -1512,9 +1529,13 @@ class PlayerEventHandler implements Listener {
 																	// setting
 																	// on the
 																	// world...
-							int worldblocksafter = playerData.getTotalClaimBlocksinWorld(player.getWorld()) + playerData.claimResizing.getArea() - newArea;
+							int worldblocksafter = pdata.getTotalClaimBlocksinWorld(player.getWorld()) + playerData.claimResizing.getArea() - newArea;
 							if (worldblocksafter < 0) {
+								
 								GriefPrevention.sendMessage(player, TextMode.Err, Messages.InsufficientWorldBlocks, String.valueOf(Math.abs(worldblocksafter)));
+								
+								
+								
 								return;
 							}
 						}
@@ -1566,7 +1587,19 @@ class PlayerEventHandler implements Listener {
 				if (result.succeeded == CreateClaimResult.Result.Success) {
 
 					// inform and show the player
+					
+					
+					if(result.claim.getOwnerName().equals(player.getName())){
+						//they are resizing their own claim.
 					GriefPrevention.sendMessage(player, TextMode.Success, Messages.ClaimResizeSuccess, String.valueOf(playerData.getRemainingClaimBlocks()));
+					}
+					else {
+						//resizing another claim.
+						PlayerData otherplayer = GriefPrevention.instance.dataStore.getPlayerData(result.claim.getOwnerName());
+						GriefPrevention.sendMessage(player, TextMode.Success, Messages.ClaimResizedOtherPlayer,result.claim.getOwnerName(),String.valueOf(otherplayer.getRemainingClaimBlocks()));
+					}
+					
+					
 					Visualization visualization = Visualization.FromClaim(result.claim, clickedBlock.getY(), VisualizationType.Claim, player.getLocation());
 					Visualization.Apply(player, visualization);
 

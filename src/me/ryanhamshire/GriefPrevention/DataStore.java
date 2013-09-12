@@ -1187,6 +1187,8 @@ public abstract class DataStore {
 		this.addDefault(defaults, Messages.ResizeNeedMoreBlocks, "The resized claim would be too large. You need {0} more claim blocks.", "0:number of claim blocks required");
 		this.addDefault(defaults, Messages.ResizeTooFewBlocks, "That claim would not take up enough space. Claims must use at least {0} Blocks.", "0:Minimum blocks in a claim");
 		this.addDefault(defaults, Messages.ConfirmationReset, "Confirmation for {0} Reset.", "0:Name of confirmation flag");
+		this.addDefault(defaults, Messages.OtherPlayerResizeInsufficientWorldBlocks, "{0} Doesn't have enough claim blocks for that.", "0:Player that needs more claim blocks");
+		this.addDefault(defaults, Messages.ClaimResizedOtherPlayer, "{0}'s Claim has been resized. They now have {1} Claim Blocks left.", "0:Owner of claim;1:Claim blocks remaining.");
 		// load the config file
 		FileConfiguration config = YamlConfiguration.loadConfiguration(new File(messagesFilePath));
 
