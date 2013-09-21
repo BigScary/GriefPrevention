@@ -302,7 +302,7 @@ permissions:
         default: true
     griefprevention.commands.gpreload:
         description: grants access to the gpreload command.
-        default: false
+        default: op
     griefprevention.claims.ignorelimit:
         description: Allows creation of more claims than any configured per-player limit.
         default: false

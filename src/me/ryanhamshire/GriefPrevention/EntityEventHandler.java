@@ -101,9 +101,7 @@ class EntityEventHandler implements Listener {
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
 	public void onEntityChangeBlock(EntityChangeBlockEvent event) {
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(event.getEntity().getWorld());
-		if (!wc.getClaimsEnabled())
-			return;
-
+		if(!wc.Enabled()) return;
 		if (event.getEntityType() == EntityType.ENDERMAN) {
 
 			// if the enderman is holding something, this is a placement.
@@ -150,7 +148,7 @@ class EntityEventHandler implements Listener {
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
 	public void onEntityDamage(EntityDamageEvent event) {
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(event.getEntity().getWorld());
-		if (!wc.getClaimsEnabled())
+		if (!wc.Enabled())
 			return;
 		// environmental damage
 		
@@ -415,7 +413,7 @@ class EntityEventHandler implements Listener {
 	@EventHandler
 	public void onEntityDeath(EntityDeathEvent event) {
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(event.getEntity().getWorld());
-		if (!wc.getClaimsEnabled())
+		if (!wc.Enabled())
 			return;
 		LivingEntity entity = event.getEntity();
 
@@ -500,7 +498,7 @@ class EntityEventHandler implements Listener {
 		List<Block> blocks = explodeEvent.blockList();
 		Location location = explodeEvent.getLocation();
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(location.getWorld());
-		if (!wc.getClaimsEnabled())
+		if (!wc.Enabled())
 			return;
 		Claim claimatEntity = GriefPrevention.instance.dataStore.getClaimAt(location, true);
 		// quickest exit: if we are inside a claim and allowExplosions is false,
@@ -580,7 +578,7 @@ class EntityEventHandler implements Listener {
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
 	public void onEntityInteract(EntityInteractEvent event) {
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(event.getEntity().getWorld());
-		if (!wc.getClaimsEnabled())
+		if (!wc.Enabled())
 			return;
 		Player grabplayer = null;
 		PlayerData pdata = null;
@@ -662,7 +660,7 @@ class EntityEventHandler implements Listener {
 	public void onEntityPickup(EntityChangeBlockEvent event) {
 		// FEATURE: endermen don't steal claimed blocks
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(event.getEntity().getWorld());
-		if (!wc.getClaimsEnabled())
+		if (!wc.Enabled())
 			return;
 		// if its an enderman
 		if (event.getEntity() instanceof Enderman) {
@@ -680,7 +678,7 @@ class EntityEventHandler implements Listener {
 		LivingEntity entity = event.getEntity();
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(entity.getWorld());
 		// these rules apply only to creative worlds
-
+		if(!wc.Enabled()) return;
 		// chicken eggs and breeding could potentially make a mess in the
 		// wilderness, once griefers get involved
 		SpawnReason reason = event.getSpawnReason();
@@ -743,7 +741,7 @@ class EntityEventHandler implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onExpBottle(ExpBottleEvent event) {
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(event.getEntity().getWorld());
-		if (!wc.getClaimsEnabled())
+		if (!wc.Enabled())
 			return;
 		// if in a creative world, cancel the event (don't drop exp on the
 		// ground)
@@ -757,7 +755,7 @@ class EntityEventHandler implements Listener {
 	public void onHangingBreak(HangingBreakEvent event) {
 		// FEATURE: claimed paintings are protected from breakage
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(event.getEntity().getWorld());
-		if (!wc.getClaimsEnabled())
+		if (!wc.Enabled())
 			return;
 		// only allow players to break paintings, not anything else (like water
 		// and explosions)
@@ -870,7 +868,7 @@ class EntityEventHandler implements Listener {
 		// spawned item.
 
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(event.getLocation().getWorld());
-		if (!wc.getClaimsEnabled())
+		if (!wc.Enabled())
 			return;
 
 		Block centerblock = event.getEntity().getLocation().getBlock();
@@ -918,7 +916,7 @@ class EntityEventHandler implements Listener {
 		// FEATURE: similar to above, placing a painting requires build
 		// permission in the claim
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(event.getEntity().getWorld());
-		if (!wc.getClaimsEnabled())
+		if (!wc.Enabled())
 			return;
 		// if the player doesn't have permission, don't allow the placement
 		String noBuildReason = GriefPrevention.instance.allowBuild(event.getPlayer(), event.getEntity().getLocation());
@@ -956,7 +954,7 @@ class EntityEventHandler implements Listener {
 		
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(event.getVehicle().getWorld());
 		
-		if (!wc.getClaimsEnabled())
+		if (!wc.Enabled())
 			return;
 		// all of this is anti theft code
                 
@@ -1000,7 +998,7 @@ class EntityEventHandler implements Listener {
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
 	public void onZombieBreakDoor(EntityBreakDoorEvent event) {
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(event.getEntity().getWorld());
-		if (!wc.getClaimsEnabled())
+		if (!wc.Enabled())
 			return;
 		if (!wc.getZombieDoorBreaking().Allowed(event.getEntity().getLocation(), null).Allowed())
 			event.setCancelled(true);

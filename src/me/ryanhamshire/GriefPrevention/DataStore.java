@@ -717,6 +717,8 @@ public abstract class DataStore {
 		// GriefPrevention.getfriendlyLocationString(location) +
 		// " Ignoreheight:" + ignoreHeight,DebugLevel.Verbose);
 
+		WorldConfig wc = GriefPrevention.instance.getWorldCfg(location.getWorld());
+		if(!wc.getClaimsEnabled()) return null;
 		// create a temporary "fake" claim in memory for comparison purposes
 		Claim tempClaim = new Claim();
 		tempClaim.lesserBoundaryCorner = location;
@@ -789,11 +791,13 @@ public abstract class DataStore {
 
 	synchronized public Set<Claim> getClaimsIn(Location Lesser, Location Greater, boolean Inclusive) {
 
+		WorldConfig wc = GriefPrevention.instance.getWorldCfg(Greater.getWorld());
+		if(!wc.getClaimsEnabled()) return new HashSet<Claim>();
 		if (Lesser == null)
 			throw new IllegalArgumentException("Lesser");
 		if (Greater == null)
 			throw new IllegalArgumentException("Greater");
-		WorldConfig wc = GriefPrevention.instance.getWorldCfg(Lesser.getWorld());
+		
 		int LessX = Math.min(Lesser.getBlockX(), Greater.getBlockX());
 		int LessY = Math.min(Lesser.getBlockY(), Greater.getBlockY());
 		int LessZ = Math.min(Lesser.getBlockZ(), Greater.getBlockZ());
@@ -839,6 +843,8 @@ public abstract class DataStore {
 	 */
 	synchronized public List<Claim> getClaimsInChunk(Chunk target) {
 
+		WorldConfig wc = GriefPrevention.instance.getWorldCfg(target.getWorld());
+		if(!wc.getClaimsEnabled()) return new ArrayList<Claim>();
 		String chunkstr = this.getChunk(target);
 		return claims.getClaims(chunkstr);
 

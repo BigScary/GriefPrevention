@@ -460,10 +460,11 @@ class PlayerEventHandler implements Listener {
 		if (player == null || block == null)
 			return;
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(block.getWorld());
-
 		if (wc == null) {
 			bedEvent.setCancelled(true);
 		}
+		if(!wc.Enabled()) return;
+		
 		if (!wc.getClaimsEnabled())
 			return;
 		ClaimAllowanceConstants resultdata = wc.getBeds().Allowed(block.getLocation(), bedEvent.getPlayer(), false);
@@ -486,7 +487,7 @@ class PlayerEventHandler implements Listener {
 		Player player = bucketEvent.getPlayer();
 		Block block = bucketEvent.getBlockClicked().getRelative(bucketEvent.getBlockFace());
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(block.getWorld());
-		if (!wc.getClaimsEnabled())
+		if (!wc.Enabled())
 			return;
 		int minLavaDistance = 10;
 
@@ -601,7 +602,7 @@ class PlayerEventHandler implements Listener {
 			Player player = bucketEvent.getPlayer();
 			Block block = bucketEvent.getBlockClicked();
 			WorldConfig wc = GriefPrevention.instance.getWorldCfg(block.getWorld());
-			if (!wc.getClaimsEnabled())
+			if (!wc.Enabled())
 				return;
 			// make sure the player is allowed to build at the location
 			// String noBuildReason =
@@ -636,6 +637,8 @@ class PlayerEventHandler implements Listener {
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
 	synchronized void onPlayerChat(AsyncPlayerChatEvent event) {
 
+		WorldConfig wc = GriefPrevention.instance.getWorldCfg(event.getPlayer().getWorld());
+		if(!wc.Enabled()) return;
 		Player player = event.getPlayer();
 		if (!player.isOnline()) {
 			event.setCancelled(true);
@@ -658,7 +661,7 @@ class PlayerEventHandler implements Listener {
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(event.getPlayer().getWorld());
 		if (wc == null)
 			return;
-		if (!wc.getClaimsEnabled())
+		if (!wc.Enabled())
 			return;
 		// if eavesdrop enabled, eavesdrop
 		List<String> WhisperCommands = wc.eavesdrop_whisperCommands();
@@ -708,7 +711,7 @@ class PlayerEventHandler implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST)
 	void onPlayerDeath(PlayerDeathEvent event) {
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(event.getEntity().getWorld());
-		if (!wc.getClaimsEnabled())
+		if (!wc.Enabled())
 			return;
 		// FEATURE: prevent death message spam by implementing a
 		// "cooldown period" for death messages
@@ -728,7 +731,7 @@ class PlayerEventHandler implements Listener {
 		String playerName = player.getName();
 		PlayerData playerData = this.dataStore.getPlayerData(playerName);
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(player.getWorld());
-		if (!wc.getClaimsEnabled())
+		if (!wc.Enabled())
 			return;
 		// FEATURE: claims where players have allowed explosions will revert
 		// back to not allowing them when the owner logs out
@@ -760,7 +763,7 @@ class PlayerEventHandler implements Listener {
 	public void onPlayerDropItem(PlayerDropItemEvent event) {
 		Player player = event.getPlayer();
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(player.getWorld());
-		if (!wc.getClaimsEnabled())
+		if (!wc.Enabled())
 			return;
 		// in creative worlds, dropping items is blocked
 		if (wc.getCreativeRules()) {
@@ -800,7 +803,7 @@ class PlayerEventHandler implements Listener {
 		Debugger.Write("onPlayerInteract: Item:" + ItemName, DebugLevel.Verbose);
 
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(player.getWorld());
-		if (!wc.getClaimsEnabled())
+		if (!wc.Enabled())
 			return;
 		// determine target block. FEATURE: shovel and stick can be used from a
 		// distance away
@@ -1936,7 +1939,7 @@ class PlayerEventHandler implements Listener {
 			}
 
 			WorldConfig wc = GriefPrevention.instance.getWorldCfg(player.getWorld());
-			if (!wc.getClaimsEnabled())
+			if (!wc.Enabled())
 				return;
 			PlayerData playerData = this.dataStore.getPlayerData(player.getName());
 
@@ -2165,7 +2168,7 @@ class PlayerEventHandler implements Listener {
 		Player player = event.getPlayer();
 		String playerName = player.getName();
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(player.getWorld());
-
+		if(!wc.Enabled()) return;
 		// note login time
 		long now = new Date().getTime();
 		final PlayerData playerData = this.dataStore.getPlayerData(playerName);
@@ -2260,7 +2263,7 @@ class PlayerEventHandler implements Listener {
 	void onPlayerLogin(PlayerLoginEvent event) {
 		Player player = event.getPlayer();
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(player.getWorld());
-
+		if(!wc.Enabled()) return;
 		// all this is anti-spam code
 		if (wc.getSpamProtectionEnabled()) {
 			// FEATURE: login cooldown to prevent login/logout spam with custom
@@ -2311,7 +2314,7 @@ class PlayerEventHandler implements Listener {
 		// has bestowed it.
 		Player player = event.getPlayer();
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(player.getWorld());
-		if (!wc.getClaimsEnabled())
+		if (!wc.Enabled())
 			return;
 		if (!event.getPlayer().getWorld().getPVP())
 			return;
@@ -2344,8 +2347,9 @@ class PlayerEventHandler implements Listener {
 	void onPlayerQuit(PlayerQuitEvent event) {
 
 		Player player = event.getPlayer();
-		// WorldConfig wc =
-		// GriefPrevention.instance.getWorldCfg(player.getWorld());
+		WorldConfig wc =
+		 GriefPrevention.instance.getWorldCfg(player.getWorld());
+		if(!wc.Enabled()) return;
 		PlayerData playerData = this.dataStore.getPlayerData(player.getName());
 
 		// if banned, add IP to the temporary IP ban list
@@ -2369,6 +2373,10 @@ class PlayerEventHandler implements Listener {
 	// when a player spawns, conditionally apply temporary pvp protection
 	@EventHandler(ignoreCancelled = true)
 	void onPlayerRespawn(PlayerRespawnEvent event) {
+		WorldConfig wc = GriefPrevention.instance.getWorldCfg(event.getPlayer().getWorld());
+		if(!wc.Enabled()) return;
+			
+		
 		PlayerData playerData = GriefPrevention.instance.dataStore.getPlayerData(event.getPlayer().getName());
 		playerData.lastSpawn = Calendar.getInstance().getTimeInMillis();
 		GriefPrevention.instance.checkPvpProtectionNeeded(event.getPlayer());
@@ -2378,7 +2386,7 @@ class PlayerEventHandler implements Listener {
 	public void onPlayerShearEntity(PlayerShearEntityEvent event) {
 
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(event.getEntity().getWorld());
-		if (!wc.getClaimsEnabled())
+		if (!wc.Enabled())
 			return;
 		Player player = event.getPlayer();
 		Entity entity = event.getEntity();
@@ -2393,7 +2401,7 @@ class PlayerEventHandler implements Listener {
 	public void onPlayerTeleport(PlayerTeleportEvent event) {
 		Player player = event.getPlayer();
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(player.getWorld());
-		if (!wc.getClaimsEnabled())
+		if (!wc.Enabled())
 			return;
 		PlayerData playerData = this.dataStore.getPlayerData(player.getName());
 

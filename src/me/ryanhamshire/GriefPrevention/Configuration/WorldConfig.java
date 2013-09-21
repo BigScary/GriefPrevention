@@ -1479,7 +1479,7 @@ public class WorldConfig {
 	 * @return
 	 */
 	public boolean getClaimsEnabled() {
-		return claims_enabled;
+		return claims_enabled | this.Enabled(); //Enabled also causes this to be set.
 	}
 
 	public int getClaimsExpirationDays() {

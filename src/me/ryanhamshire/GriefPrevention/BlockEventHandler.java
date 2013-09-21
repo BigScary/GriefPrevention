@@ -95,7 +95,7 @@ public class BlockEventHandler implements Listener {
 		Debugger.Write("onBlockBreak", DebugLevel.Verbose);
 		Debugger.Write("Block broken:" + breakEvent.getBlock().getType().name(), DebugLevel.Verbose);
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(breakEvent.getBlock().getWorld());
-		if(!wc.getClaimsEnabled()) return;
+		if(!wc.Enabled()) return;
 		Player player = breakEvent.getPlayer();
 		Block block = breakEvent.getBlock();
 
@@ -151,6 +151,7 @@ public class BlockEventHandler implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onBlockBurn(BlockBurnEvent burnEvent) {
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(burnEvent.getBlock().getWorld().getName());
+		if(!wc.Enabled()) return;
 		if (wc.getFireDestroyBehaviour().Allowed(burnEvent.getBlock().getLocation(), null).Denied()) {
 			burnEvent.setCancelled(true);
 			Block block = burnEvent.getBlock();
@@ -184,7 +185,7 @@ public class BlockEventHandler implements Listener {
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(event.getBlock().getLocation().getWorld());
 		// if placing items in protected chests isn't enabled, none of this code
 		// needs to run
-
+		if(!wc.Enabled()) return;
 		if (!wc.getAddItemsToClaimedChests())
 			return;
 
@@ -278,8 +279,7 @@ public class BlockEventHandler implements Listener {
 			return;
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(spreadEvent.getBlock().getWorld());
 		// don't track fluid movement in worlds where claims are not enabled
-		if (!wc.getClaimsEnabled())
-			return;
+		if(!wc.Enabled()) return;
 
 		// always allow fluids to flow straight down
 		if (spreadEvent.getFace() == BlockFace.DOWN)
@@ -330,6 +330,7 @@ public class BlockEventHandler implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onBlockIgnite(BlockIgniteEvent igniteEvent) {
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(igniteEvent.getBlock().getWorld());
+		if(!wc.Enabled()) return;
 		boolean TargetAllowed = igniteEvent.getIgnitingBlock()==null?true:
 			wc.getFireSpreadTargetBehaviour().Allowed(igniteEvent.getIgnitingBlock().getLocation(), null).Allowed();
 		
@@ -357,6 +358,8 @@ public class BlockEventHandler implements Listener {
 	public void onBlockPistonExtend(BlockPistonExtendEvent event) {
 		List<Block> blocks = event.getBlocks();
 
+		WorldConfig wc = GriefPrevention.instance.getWorldCfg(event.getBlock().getWorld());
+		if(!wc.Enabled()) return;
 		// if no blocks moving, then only check to make sure we're not pushing
 		// into a claim from outside
 		// this avoids pistons breaking non-solids just inside a claim, like
@@ -442,12 +445,18 @@ public class BlockEventHandler implements Listener {
 	}
 
 	// blocks theft by pulling blocks out of a claim (again pistons)
+	boolean retracting=false;
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
 	public void onBlockPistonRetract(BlockPistonRetractEvent event) {
 		// we only care about sticky pistons
+		WorldConfig wc = GriefPrevention.instance.getWorldCfg(event.getBlock().getWorld());
+		if(!wc.Enabled()) return;
 		if (!event.isSticky())
 			return;
 
+		if(retracting) return;
+		retracting=true;
+		try {	
 		// who owns the moving block, if anyone?
 		String movingBlockOwnerName = "_";
 		Claim movingBlockClaim = this.dataStore.getClaimAt(event.getRetractLocation(), false);
@@ -466,6 +475,10 @@ public class BlockEventHandler implements Listener {
 		if (!pistonOwnerName.equals(movingBlockOwnerName)) {
 			event.setCancelled(true);
 		}
+		}
+		finally {
+		retracting=false;
+		}
 	}
 
 	// when a player places a block...
@@ -474,7 +487,7 @@ public class BlockEventHandler implements Listener {
 		Player player = placeEvent.getPlayer();
 		Block block = placeEvent.getBlock();
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(block.getWorld());
-		if(!wc.getClaimsEnabled()) return;
+		if(!wc.Enabled()) return;
 		boolean theftallowed = wc.getContainersRules().Allowed(block.getLocation(), player, false).Allowed();
 		/*if (wc.getApplyTrashBlockRules()) {
 			// if set, then we only allow Trash Blocks to be placed, and only in
@@ -664,6 +677,7 @@ public class BlockEventHandler implements Listener {
 	public void onBlockSpread(BlockSpreadEvent spreadEvent) {
 
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(spreadEvent.getBlock().getWorld());
+		if(!wc.Enabled()) return; 
 		if (spreadEvent.getSource().getType() != Material.FIRE)
 			return;
 		
@@ -706,11 +720,14 @@ public class BlockEventHandler implements Listener {
 	public void onDispense(BlockDispenseEvent dispenseEvent) {
 
 		// from where?
+		WorldConfig wc = GriefPrevention.instance.getWorldCfg(dispenseEvent.getBlock().getWorld());
+		if(!wc.Enabled()) return;
 		Block fromBlock = dispenseEvent.getBlock();
 		if (fromBlock.getType().equals(Material.DROPPER))
 			return;
-		WorldConfig wc = GriefPrevention.instance.getWorldCfg(fromBlock.getLocation().getWorld());
+		
 
+		
 		// to where?
 		Vector velocity = dispenseEvent.getVelocity();
 		int xChange = 0;
@@ -810,6 +827,8 @@ public class BlockEventHandler implements Listener {
 	}
 
 	public void onPortalCreate(PortalCreateEvent event) {
+		WorldConfig wc = GriefPrevention.instance.getWorldCfg(event.getWorld());
+		if(!wc.Enabled()) return;
 		if (event.getReason() == CreateReason.OBC_DESTINATION) {
 
 			// if a portal is being created, make sure none of the destination
@@ -838,6 +857,7 @@ public class BlockEventHandler implements Listener {
 		if (player == null)
 			return;
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(event.getPlayer().getWorld());
+		if(!wc.Enabled()) return;
 		StringBuilder lines = new StringBuilder();
 		boolean notEmpty = false;
 		for (String iterateLine : event.getLines()) {
@@ -869,10 +889,13 @@ public class BlockEventHandler implements Listener {
 
 	@EventHandler(ignoreCancelled = true)
 	public void onTreeGrow(StructureGrowEvent growEvent) {
+		WorldConfig wc = GriefPrevention.instance.getWorldCfg(growEvent.getWorld());
+		if(!wc.Enabled()) return;
 		Location rootLocation = growEvent.getLocation();
 		Claim rootClaim = this.dataStore.getClaimAt(rootLocation, false);
 		String rootOwnerName = null;
 
+		;
 		// who owns the spreading block, if anyone?
 		if (rootClaim != null) {
 			// tree growth in subdivisions is dependent on who owns the top
