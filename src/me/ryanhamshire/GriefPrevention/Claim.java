@@ -431,13 +431,10 @@ public class Claim {
 
 		// no building while under siege
 		if (this.siegeData != null) {
-            //EXCEPT for the attacker. They can build, but only if siege is enabled.
-            if(wc.getSiegeBlockRevert() && player.getName().equals(this.siegeData.attacker.getName())){
-                return "";
-            }
-            else {
+
+
 			return GriefPrevention.instance.dataStore.getMessage(Messages.NoBuildUnderSiege, this.siegeData.attacker.getName());
-            }
+
 		}
 
 		// no building while in pvp combat
