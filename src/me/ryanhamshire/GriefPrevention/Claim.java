@@ -418,7 +418,7 @@ public class Claim {
 		// mods can make this happen somehow)
 		if (player == null)
 			return "";
-
+        WorldConfig wc = GriefPrevention.instance.getWorldCfg(player.getWorld());
 		// when a player tries to build in a claim, if he's under siege, the
 		// siege may extend to include the new claim
 		GriefPrevention.instance.dataStore.tryExtendSiege(player, this);
@@ -431,7 +431,13 @@ public class Claim {
 
 		// no building while under siege
 		if (this.siegeData != null) {
+            //EXCEPT for the attacker. They can build, but only if siege is enabled.
+            if(wc.getSiegeBlockRevert() && player.getName().equals(this.siegeData.attacker.getName())){
+                return "";
+            }
+            else {
 			return GriefPrevention.instance.dataStore.getMessage(Messages.NoBuildUnderSiege, this.siegeData.attacker.getName());
+            }
 		}
 
 		// no building while in pvp combat

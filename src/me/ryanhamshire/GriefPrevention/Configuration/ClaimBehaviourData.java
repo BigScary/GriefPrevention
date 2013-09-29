@@ -466,17 +466,17 @@ public class ClaimBehaviourData {
 					SiegePVPOverrideConstants useval = SiegePVPOverrideConstants.None;
 					//siege overrides apply to players being seiged or attacking, but also
 					//another set applies to bystanders who happen to be in the claim (and are not the attacker or defender).
-					
-					if(testclaim.siegeData.attacker.getName() == RelevantPlayer.getName()){
-						useval = this.SiegeAttackerOverride;
-					}
-					else if(testclaim.siegeData.defender.getName() == RelevantPlayer.getName()){
-						useval = this.SiegeDefenderOverride;
-					}
-					else {
-						useval = this.SiegeBystanderOverride;
-					}
-					
+				    if(RelevantPlayer!=null){
+                        if(testclaim.siegeData.attacker!=null && testclaim.siegeData.attacker.getName() == RelevantPlayer.getName()){
+                            useval = this.SiegeAttackerOverride;
+                        }
+                        else if(testclaim.siegeData.defender!=null && testclaim.siegeData.defender.getName() == RelevantPlayer.getName()){
+                            useval = this.SiegeDefenderOverride;
+                        }
+                        else {
+                            useval = this.SiegeBystanderOverride;
+                        }
+                    }
 					//if not set to none...
 					if(useval!=SiegePVPOverrideConstants.None){
 						
@@ -505,7 +505,7 @@ public class ClaimBehaviourData {
 							}
 						}
 						else if(useval == SiegePVPOverrideConstants.AllowRequireOwner){
-							if(testclaim.getOwnerName().equals(RelevantPlayer.getName())){
+							if(RelevantPlayer!=null && testclaim.getOwnerName().equals(RelevantPlayer.getName())){
 								return ClaimAllowanceConstants.Allow;
 							}
 							else {

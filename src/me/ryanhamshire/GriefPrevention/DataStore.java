@@ -716,7 +716,7 @@ public abstract class DataStore {
 		// Debugger.Write("Looking for Claim at:" +
 		// GriefPrevention.getfriendlyLocationString(location) +
 		// " Ignoreheight:" + ignoreHeight,DebugLevel.Verbose);
-
+        if(location==null) return null;
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(location.getWorld());
 		if(!wc.getClaimsEnabled()) return null;
 		// create a temporary "fake" claim in memory for comparison purposes
