@@ -71,7 +71,37 @@ import org.bukkit.util.Vector;
  */
 public class BlockEventHandler implements Listener {
 
-	private static PotionEffectType[] PositiveEffectsArray = new PotionEffectType[] { PotionEffectType.HEAL, PotionEffectType.ABSORPTION, PotionEffectType.DAMAGE_RESISTANCE, PotionEffectType.INVISIBILITY, PotionEffectType.NIGHT_VISION, PotionEffectType.FAST_DIGGING, PotionEffectType.FIRE_RESISTANCE, PotionEffectType.HEALTH_BOOST, PotionEffectType.REGENERATION, PotionEffectType.SATURATION, PotionEffectType.JUMP, PotionEffectType.SPEED, PotionEffectType.WATER_BREATHING };
+	public static PotionEffectType[] PositiveEffectsArray;
+    public static PotionEffectType[] NegativeEffectsArray;
+    static {
+        List<PotionEffectType> PositiveEffects = new ArrayList<PotionEffectType>();
+        try {PositiveEffects.add(PotionEffectType.HEAL);} catch(NoSuchFieldError nsfe){}
+        try {PositiveEffects.add(PotionEffectType.DAMAGE_RESISTANCE);} catch(NoSuchFieldError nsfe){}
+        try {PositiveEffects.add(PotionEffectType.INVISIBILITY);} catch(NoSuchFieldError nsfe){}
+        try {PositiveEffects.add(PotionEffectType.NIGHT_VISION);} catch(NoSuchFieldError nsfe){}
+        try {PositiveEffects.add(PotionEffectType.FAST_DIGGING);} catch(NoSuchFieldError nsfe){}
+        try {PositiveEffects.add(PotionEffectType.FIRE_RESISTANCE);} catch(NoSuchFieldError nsfe){}
+        try {PositiveEffects.add(PotionEffectType.HEALTH_BOOST);} catch(NoSuchFieldError nsfe){}
+        try {PositiveEffects.add(PotionEffectType.REGENERATION);} catch(NoSuchFieldError nsfe){}
+        try {PositiveEffects.add(PotionEffectType.SATURATION);} catch(NoSuchFieldError nsfe){}
+        try {PositiveEffects.add(PotionEffectType.JUMP);} catch(NoSuchFieldError nsfe){}
+        try {PositiveEffects.add(PotionEffectType.SPEED);} catch(NoSuchFieldError nsfe){}
+        try {PositiveEffects.add(PotionEffectType.WATER_BREATHING);} catch(NoSuchFieldError nsfe){}
+
+        PositiveEffects.toArray(PositiveEffectsArray);
+        List<PotionEffectType> NegativeEffects = new ArrayList<PotionEffectType>();
+        try {NegativeEffects.add(PotionEffectType.HARM);} catch(NoSuchFieldError nsfe){}
+        try {NegativeEffects.add(PotionEffectType.BLINDNESS);} catch(NoSuchFieldError nsfe){}
+        try {NegativeEffects.add(PotionEffectType.CONFUSION);} catch(NoSuchFieldError nsfe){}
+        try {NegativeEffects.add(PotionEffectType.HUNGER);} catch(NoSuchFieldError nsfe){}
+        try {NegativeEffects.add(PotionEffectType.POISON);} catch(NoSuchFieldError nsfe){}
+        try {NegativeEffects.add(PotionEffectType.WEAKNESS);} catch(NoSuchFieldError nsfe){}
+        try {NegativeEffects.add(PotionEffectType.SLOW);} catch(NoSuchFieldError nsfe){}
+        try {NegativeEffects.add(PotionEffectType.WITHER);} catch(NoSuchFieldError nsfe){}
+        NegativeEffects.toArray(NegativeEffectsArray);
+
+
+    }
 	// convenience reference to singleton datastore
 	private DataStore dataStore;
 	// ensures fluids don't flow out of claims, unless into another claim where

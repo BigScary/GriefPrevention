@@ -440,11 +440,12 @@ public class WorldConfig {
 															// remove partially
 															// cut trees
 
-	
+    private ClaimBehaviourMode SiegeDefender = ClaimBehaviourMode.RequireOwner; //applicable Trust level of defender.
 	private ClaimBehaviourData PlaceBlockRules;
 	private ClaimBehaviourData BreakBlockRules;
 	public ClaimBehaviourData getPlaceBlockRules(){ return PlaceBlockRules;}
 	public ClaimBehaviourData getBreakBlockRules(){ return BreakBlockRules;}
+    public ClaimBehaviourMode getSiegeDefendable(){ return SiegeDefender;}
 	private ClaimBehaviourData ContainersRules;
 
 	private ClaimBehaviourData CreatureDamage;
@@ -688,7 +689,9 @@ public class WorldConfig {
 		// read in the data for TNT explosions and Golem/Wither placements.
 		this.config_afkDistanceCheck = config.getInt("GriefPrevention.AFKDistance", 3);
 		this.SilverfishBreakRules = new ClaimBehaviourData("Silverfish Break", config, outConfig, "GriefPrevention.Rules.SilverfishBreak", new ClaimBehaviourData("Silverfish Break", PlacementRules.Both, PlacementRules.Neither, ClaimBehaviourMode.Disabled));
-
+        String SiegeDefenderStr = config.getString("GriefPrevention.SiegeDefendable",ClaimBehaviourMode.RequireOwner.name());
+        ClaimBehaviourMode ccm = ClaimBehaviourMode.parseMode(SiegeDefenderStr);
+        if(ccm==null) SiegeDefender = ClaimBehaviourMode.RequireOwner; else SiegeDefender = ccm;
 		
 		//placement requires build permission by default, and isn't allowed during PVP or Siege.
 		

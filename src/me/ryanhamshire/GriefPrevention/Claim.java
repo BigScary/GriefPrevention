@@ -1211,7 +1211,10 @@ public class Claim {
 		return PlayerinList(managers, player);
 		// return managers.contains(player);
 	}
-
+    public boolean isManager(Player player){
+        if(player==null) return false;
+        return PlayerinList(managers,player.getName());
+    }
 	/**
 	 * Distance check for claims, distance in this case is a band around the
 	 * outside of the claim rather then euclidean distance.

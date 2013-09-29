@@ -15,7 +15,7 @@ public class PermNodes {
 	public static final String ClaimsPermission = "griefprevention.claims.allow";
 	public static final String IgnoreClaimsLimitPermission = "griefprevention.claims.ignorelimit";
 	public static final String GiveClaimsPermission = "griefprevention.claims.give";
-	public static final String CreateClaimsPermission = "GriefPrevention.claims.create";
+	public static final String CreateClaimsPermission = "griefprevention.claims.create";
 	public static final String DeleteClaimsPermission = "griefprevention.claims.delete";
 	public static final String IgnoreClaimsPermission = "griefprevention.claims.ignore";
 	public static final String InvestigateAreaPermission = "griefprevention.claims.investigatearea";

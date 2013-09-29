@@ -78,7 +78,7 @@ public class AbandonClaimCommand extends GriefPreventionCommand {
 		else {
 			// delete it
 			// Only do water/lava cleanup when it's a top level claim.
-			if (claim.parent == null) {
+			if (claim.parent == null && wc.getCreativeRules()) {
 				claim.removeSurfaceFluids(null);
 			}
 			// retrieve area of this claim...

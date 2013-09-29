@@ -1,6 +1,7 @@
 package me.ryanhamshire.GriefPrevention.CommandHandling;
 
 import me.ryanhamshire.GriefPrevention.Claim;
+import me.ryanhamshire.GriefPrevention.Configuration.WorldConfig;
 import me.ryanhamshire.GriefPrevention.DataStore;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import me.ryanhamshire.GriefPrevention.Messages;
@@ -75,12 +76,12 @@ public class SiegeCommand extends GriefPreventionCommand {
 		else {
 			return false;
 		}
-		/*
-		 * //defender cannot be attacker.
-		 * if(defender.getName().equalsIgnoreCase(attacker.getName())){
-		 * GriefPrevention.sendMessage(player, TextMode.Err,
-		 * Messages.CantSiegeYourself); return true; }
-		 */
+
+		  //defender cannot be attacker.
+		  if(defender.getName().equalsIgnoreCase(attacker.getName())){
+		  GriefPrevention.sendMessage(player, TextMode.Err,
+		  Messages.CantSiegeYourself); return true; }
+
 		// revert this commented out block...
 
 		// victim must not be under siege already
@@ -90,6 +91,8 @@ public class SiegeCommand extends GriefPreventionCommand {
 			return true;
 		}
 
+
+
 		// victim must not be pvp immune
 		if (defenderData.pvpImmune) {
 			GriefPrevention.sendMessage(player, TextMode.Err, Messages.NoSiegeDefenseless);
@@ -97,12 +100,14 @@ public class SiegeCommand extends GriefPreventionCommand {
 		}
 
 		Claim defenderClaim = inst.dataStore.getClaimAt(defender.getLocation(), false);
+        WorldConfig wc = GriefPrevention.instance.getWorldCfg(defender.getLocation().getWorld());
+		// make sure they have the appropriate permissions.
+        if(!wc.getSiegeDefendable().hasAccess(defender,defenderClaim)){
+            GriefPrevention.sendMessage(player, TextMode.Err, Messages.NotSiegableThere, defender.getName());
+            return true;
+        }
 
-		// defender must have some level of permission there to be protected
-		if (defenderClaim == null || defenderClaim.allowAccess(defender) != null) {
-			GriefPrevention.sendMessage(player, TextMode.Err, Messages.NotSiegableThere, defender.getName());
-			return true;
-		}
+
 
 		// attacker must be close to the claim he wants to siege
 		if (!defenderClaim.isNear(attacker.getLocation(), 25)) {

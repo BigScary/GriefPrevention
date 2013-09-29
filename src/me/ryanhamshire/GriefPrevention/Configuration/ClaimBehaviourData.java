@@ -57,11 +57,25 @@ public class ClaimBehaviourData {
 		     
 		     AllowRequireBuild,
 		     AllowRequireOwner
+
 		}
 	public enum ClaimBehaviourMode {
 		Disabled, RequireAccess, RequireBuild, RequireContainer, RequireManager, RequireNone, RequireOwner;
+        public boolean hasAccess(Player p,Claim toClaim){
 
-		public static ClaimBehaviourMode parseMode(String name) {
+            if(this==Disabled) return false; //Disabled so no Access anywhere no matter what.
+            if(this==RequireNone) return true;
+            if(this==RequireAccess) return toClaim.allowAccess(p)==null;
+            if(this==RequireBuild) return toClaim.allowBuild(p) == null;
+            if(this==RequireContainer) return toClaim.allowContainers(p)==null;
+            if(this==RequireManager) return toClaim.isManager(p);
+            if(this==RequireOwner) return toClaim.getOwnerName().equals(p.getName());
+
+            return false;
+
+        }
+
+        public static ClaimBehaviourMode parseMode(String name) {
 			// System.out.println("Looking for " + name);
 			for (ClaimBehaviourMode cb : ClaimBehaviourMode.values()) {
 				// System.out.println("Comparing " + cb.name() + " to " + name);

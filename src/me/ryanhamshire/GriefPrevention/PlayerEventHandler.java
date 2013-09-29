@@ -1263,7 +1263,10 @@ class PlayerEventHandler implements Listener {
 				GriefPrevention.sendMessage(player, TextMode.Err, Messages.TooFarAway);
 				return;
 			}
-
+            if(!player.hasPermission(PermNodes.ClaimsPermission)){
+                GriefPrevention.sendMessage(player,TextMode.Err,"You do not have permission to create claims.");
+                return;
+            }
 			// if the player is in restore nature mode, do only that
 			String playerName = player.getName();
 			playerData = this.dataStore.getPlayerData(player.getName());
