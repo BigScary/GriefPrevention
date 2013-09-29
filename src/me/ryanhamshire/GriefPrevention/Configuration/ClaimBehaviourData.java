@@ -456,27 +456,29 @@ public class ClaimBehaviourData {
 			if (testclaim != null) {
 				if (ignoringclaims)
 					return ClaimAllowanceConstants.Allow;
-				if (!this.ClaimBehaviour.PerformTest(position, RelevantPlayer, ShowMessages))
-					return returned = ClaimAllowanceConstants.Deny;
+
 
 				//if the claim is under siege, apply the siege overrides, if available.
 				
 				if(testclaim.siegeData != null){
-					
+
 					SiegePVPOverrideConstants useval = SiegePVPOverrideConstants.None;
 					//siege overrides apply to players being seiged or attacking, but also
 					//another set applies to bystanders who happen to be in the claim (and are not the attacker or defender).
 				    if(RelevantPlayer!=null){
-                        if(testclaim.siegeData.attacker!=null && testclaim.siegeData.attacker.getName() == RelevantPlayer.getName()){
+                        if(testclaim.siegeData.attacker!=null && testclaim.siegeData.attacker.getName().equals(RelevantPlayer.getName())){
                             useval = this.SiegeAttackerOverride;
+
                         }
-                        else if(testclaim.siegeData.defender!=null && testclaim.siegeData.defender.getName() == RelevantPlayer.getName()){
+                        else if(testclaim.siegeData.defender!=null && testclaim.siegeData.defender.getName().equals(RelevantPlayer.getName())){
+
                             useval = this.SiegeDefenderOverride;
                         }
                         else {
                             useval = this.SiegeBystanderOverride;
                         }
                     }
+
 					//if not set to none...
 					if(useval!=SiegePVPOverrideConstants.None){
 						
@@ -521,14 +523,16 @@ public class ClaimBehaviourData {
 					}
 					
 				}
-				
+				else if (!this.ClaimBehaviour.PerformTest(position, RelevantPlayer, ShowMessages))
+                        return returned = ClaimAllowanceConstants.Deny;
+
 				
 				
 				boolean varresult = this.Claims.Allow(position, RelevantPlayer, ShowMessages);
 
 				return returned = (varresult ? ClaimAllowanceConstants.Allow : ClaimAllowanceConstants.Deny);
-			}
 
+            }
 			// retrieve the appropriate Sea Level for this world.
 			/*
 			 * int sealevel =

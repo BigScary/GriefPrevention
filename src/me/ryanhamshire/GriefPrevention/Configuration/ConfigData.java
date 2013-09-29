@@ -104,6 +104,7 @@ public class ConfigData {
 			}
 		}
 		this.SiegeCooldownSeconds = CoreConfig.getInt("GriefPrevention.Siege.CooldownTime",1000 * 60 * 60);
+        outConfig.set("GriefPrevention.Siege.CooldownTime",SiegeCooldownSeconds);
 		outConfig.set("GriefPrevention.WorldConfig.SingleWorld", SingleConfig);
 		outConfig.set("GriefPrevention.WorldConfig.TemplateFile", TemplateFile);
 		// check for appropriate configuration in given FileConfiguration. Note

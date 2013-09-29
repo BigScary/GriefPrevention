@@ -12,10 +12,11 @@ public class PermNodes {
 	public static final String AdminLockPermission = "griefprevention.admin.lock";
 	public static final String BuyClaimBlocks = "griefprevention.claimblocks.buy";
 	public static final String SellClaimBlocks = "griefprevention.claimblocks.sell";
-	public static final String ClaimsPermission = "griefprevention.claims.allow";
+
 	public static final String IgnoreClaimsLimitPermission = "griefprevention.claims.ignorelimit";
 	public static final String GiveClaimsPermission = "griefprevention.claims.give";
-	public static final String CreateClaimsPermission = "griefprevention.claims.create";
+	public static final String CreateClaimsPermission = "griefprevention.claims.chestcreate";
+    public static final String CreateClaimsShovelPermission = "griefprevention.claims.toolcreate";
 	public static final String DeleteClaimsPermission = "griefprevention.claims.delete";
 	public static final String IgnoreClaimsPermission = "griefprevention.claims.ignore";
 	public static final String InvestigateAreaPermission = "griefprevention.claims.investigatearea";

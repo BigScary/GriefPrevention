@@ -1263,7 +1263,7 @@ class PlayerEventHandler implements Listener {
 				GriefPrevention.sendMessage(player, TextMode.Err, Messages.TooFarAway);
 				return;
 			}
-            if(!player.hasPermission(PermNodes.ClaimsPermission)){
+            if(!player.hasPermission(PermNodes.CreateClaimsShovelPermission)){
                 GriefPrevention.sendMessage(player,TextMode.Err,"You do not have permission to create claims.");
                 return;
             }

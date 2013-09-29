@@ -87,7 +87,7 @@ public class BlockEventHandler implements Listener {
         try {PositiveEffects.add(PotionEffectType.JUMP);} catch(NoSuchFieldError nsfe){}
         try {PositiveEffects.add(PotionEffectType.SPEED);} catch(NoSuchFieldError nsfe){}
         try {PositiveEffects.add(PotionEffectType.WATER_BREATHING);} catch(NoSuchFieldError nsfe){}
-
+        PositiveEffectsArray = new PotionEffectType[PositiveEffects.size()];
         PositiveEffects.toArray(PositiveEffectsArray);
         List<PotionEffectType> NegativeEffects = new ArrayList<PotionEffectType>();
         try {NegativeEffects.add(PotionEffectType.HARM);} catch(NoSuchFieldError nsfe){}
@@ -98,6 +98,7 @@ public class BlockEventHandler implements Listener {
         try {NegativeEffects.add(PotionEffectType.WEAKNESS);} catch(NoSuchFieldError nsfe){}
         try {NegativeEffects.add(PotionEffectType.SLOW);} catch(NoSuchFieldError nsfe){}
         try {NegativeEffects.add(PotionEffectType.WITHER);} catch(NoSuchFieldError nsfe){}
+        NegativeEffectsArray = new PotionEffectType[NegativeEffects.size()];
         NegativeEffects.toArray(NegativeEffectsArray);
 
 
@@ -142,6 +143,7 @@ public class BlockEventHandler implements Listener {
 
 		
 		if(wc.getBreakBlockRules().Allowed(block.getLocation(), player).Denied()){
+            System.out.println("BreakBlock Rules blocked break.");
 			breakEvent.setCancelled(true);
 			return;
 		}
@@ -613,9 +615,9 @@ public class BlockEventHandler implements Listener {
 			// if the player doesn't have any claims yet, automatically create a
 			// claim centered at the chest
 			if (playerData.claims.size() == 0) {
-				// make sure they have GriefPrevention.Claims permissions!
+				// make sure they have permission to create claims.
 
-				if (!player.hasPermission(PermNodes.ClaimsPermission)) {
+				if (!player.hasPermission(PermNodes.CreateClaimsPermission)) {
 					// no message is sent, because players may not be aware.
 					return;
 

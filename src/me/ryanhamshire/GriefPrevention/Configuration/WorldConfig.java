@@ -696,7 +696,7 @@ public class WorldConfig {
 		//placement requires build permission by default, and isn't allowed during PVP or Siege.
 		
 		this.PlaceBlockRules = new ClaimBehaviourData("Block Placement",config,outConfig,"GriefPrevention.Rules.BlockPlacement",new ClaimBehaviourData("Block Placement",PlacementRules.Both,PlacementRules.Both,ClaimBehaviourMode.RequireBuild).setPVPOverride(SiegePVPOverrideConstants.Deny).setSiegeOverrides(SiegePVPOverrideConstants.Deny, SiegePVPOverrideConstants.Deny));
-		this.BreakBlockRules = new ClaimBehaviourData("Block Breaking",config,outConfig,"GriefPrevention.Rules.BlockBreaking",new ClaimBehaviourData("Block Placement",PlacementRules.Both,PlacementRules.Both,ClaimBehaviourMode.RequireBuild).setPVPOverride(SiegePVPOverrideConstants.Deny).setSiegeOverrides(SiegePVPOverrideConstants.Deny, SiegePVPOverrideConstants.Deny));
+		this.BreakBlockRules = new ClaimBehaviourData("Block Breaking",config,outConfig,"GriefPrevention.Rules.BlockBreaking",new ClaimBehaviourData("Block Placement",PlacementRules.Both,PlacementRules.Both,ClaimBehaviourMode.RequireBuild).setPVPOverride(SiegePVPOverrideConstants.Deny).setSiegeOverrides(SiegePVPOverrideConstants.Allow, SiegePVPOverrideConstants.Deny));
 		
 		
 		this.FireDestroyBehaviour = new ClaimBehaviourData("Fire Destruction",config,outConfig,"GriefPrevention.Rules.FireDestroys",new ClaimBehaviourData("GriefPrevention.Rules.FireDestroys",PlacementRules.Neither,PlacementRules.Neither,ClaimBehaviourMode.Disabled));

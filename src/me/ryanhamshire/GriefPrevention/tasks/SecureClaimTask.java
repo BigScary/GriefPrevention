@@ -50,6 +50,7 @@ public class SecureClaimTask implements Runnable {
 					GriefPrevention.instance.ejectPlayer(player);
 				}
 			}
+            claim.siegeData=null;
 		}
 	}
 }
