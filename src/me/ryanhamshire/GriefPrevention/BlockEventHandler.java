@@ -134,17 +134,14 @@ public class BlockEventHandler implements Listener {
 		// if the block is a trash block....
 		if (wc.getTrashBlocks().contains(breakEvent.getBlock().getType())) {
 			// and if this location is applicable for trash block placement...
-			if (wc.getTrashBlockPlacementBehaviour().Allowed(breakEvent.getBlock().getLocation(), player, false).Allowed())
-				;
+			if (wc.getTrashBlockPlacementBehaviour().Allowed(breakEvent.getBlock().getLocation(), player, false).Allowed());
+
 			// allow it with abandon...
 			return;
 
 		}
-
-		
 		if(wc.getBreakBlockRules().Allowed(block.getLocation(), player).Denied()){
-            System.out.println("BreakBlock Rules blocked break.");
-			breakEvent.setCancelled(true);
+            breakEvent.setCancelled(true);
 			return;
 		}
 		

@@ -306,8 +306,11 @@ permissions:
     griefprevention.claims.ignorelimit:
         description: Allows creation of more claims than any configured per-player limit.
         default: false
-    griefprevention.claims.create:
+    griefprevention.claims.chestcreate:
         description: Grants permission to create claims.
+        default: true
+    griefprevention.claims.toolcreate:
+        description: Grants permission to use the Shovel or other claim tool to create claims.
         default: true
     griefprevention.admin.*:
         description: Grants all administrative functionality.

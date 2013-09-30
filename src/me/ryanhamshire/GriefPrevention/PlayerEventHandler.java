@@ -465,8 +465,7 @@ class PlayerEventHandler implements Listener {
 		}
 		if(!wc.Enabled()) return;
 		
-		if (!wc.getClaimsEnabled())
-			return;
+
 		ClaimAllowanceConstants resultdata = wc.getBeds().Allowed(block.getLocation(), bedEvent.getPlayer(), false);
 
 		if (resultdata == ClaimAllowanceConstants.Allow_Forced)
@@ -1257,8 +1256,7 @@ class PlayerEventHandler implements Listener {
 				event.setCancelled(true);
 				return;
 			}
-
-			// can't use the shovel from too far away
+            // can't use the shovel from too far away
 			if (clickedBlockType == Material.AIR) {
 				GriefPrevention.sendMessage(player, TextMode.Err, Messages.TooFarAway);
 				return;
@@ -1421,6 +1419,10 @@ class PlayerEventHandler implements Listener {
 				GriefPrevention.sendMessage(player, TextMode.Err, Messages.NoCreateClaimPermission);
 				return;
 			}
+            else if(!wc.getClaimsEnabled()){
+                GriefPrevention.sendMessage(player,TextMode.Err,Messages.ClaimsDisabledWorld);
+                return;
+            }
 			if (playerData.claimResizing == null) {
 				// see if the player has clicked inside one of their claims.
 				Claim checkclaim = GriefPrevention.instance.dataStore.getClaimAt(clickedBlock.getLocation(), true);
