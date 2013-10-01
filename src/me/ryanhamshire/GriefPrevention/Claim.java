@@ -334,9 +334,9 @@ public class Claim {
 		Material material = BlocktoCheck.getType();
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(player.getWorld());
 		// if under siege, some blocks will be breakable
-        System.out.println("allowBreak.");
+
 		if (this.siegeData != null) {
-            System.out.println("siegeData is not null.");
+
 			// and the breaking player is the attacker...
 
 			boolean breakable = false;
@@ -350,8 +350,8 @@ public class Claim {
 				}
 			}
 			breakable = breakable || BrokenBlockInfo.canBreak(BlocktoCheck.getLocation());
-            System.out.println(BlocktoCheck.getType().name() + " Breakable:" + breakable);
-            System.out.println("player:" + player.getName() + " Siege player:" + siegeData.attacker.getName())   ;
+            //System.out.println(BlocktoCheck.getType().name() + " Breakable:" + breakable);
+            //System.out.println("player:" + player.getName() + " Siege player:" + siegeData.attacker.getName())   ;
 			if (breakable && player.getName().equalsIgnoreCase(siegeData.attacker.getName())) {
 				// if breakable, player is the attacker, and
 				if (wc.getSiegeBlockRevert()) {
