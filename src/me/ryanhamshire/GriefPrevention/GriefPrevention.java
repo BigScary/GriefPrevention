@@ -151,7 +151,7 @@ public class GriefPrevention extends JavaPlugin
 	public boolean config_claims_warnOnBuildOutside;				//whether players should be warned when they're building in an unclaimed area
 	
 	public HashMap<String, Integer> config_seaLevelOverride;		//override for sea level, because bukkit doesn't report the right value for all situations
-	
+
 	//reference to the economy plugin, if economy integration is enabled
 	public static Economy economy = null;					
 	
@@ -166,13 +166,17 @@ public class GriefPrevention extends JavaPlugin
 	{
 		log.info("GriefPrevention: " + entry);
 	}
-	
+
+	@Override
+	public void onLoad() {
+		instance = this;
+	}
+
 	//initializes well...   everything
+	@Override
 	public void onEnable()
 	{ 		
 		AddLogEntry("Grief Prevention enabled.");
-		
-		instance = this;
 		
 		//load the config if it exists
 		FileConfiguration config = YamlConfiguration.loadConfiguration(new File(DataStore.configFilePath));
@@ -730,7 +734,7 @@ public class GriefPrevention extends JavaPlugin
 		//entity events
 		EntityEventHandler entityEventHandler = new EntityEventHandler(this.dataStore);
 		pluginManager.registerEvents(entityEventHandler, this);
-		
+
 		//if economy is enabled
 		if(this.config_economy_claimBlocksPurchaseCost > 0 || this.config_economy_claimBlocksSellValue > 0)
 		{
@@ -2428,7 +2432,7 @@ public class GriefPrevention extends JavaPlugin
 	}
 	
 	//sends a color-coded message to a player
-	static void sendMessage(Player player, ChatColor color, String message)
+	public static void sendMessage(Player player, ChatColor color, String message)
 	{
 		if(player == null)
 		{
