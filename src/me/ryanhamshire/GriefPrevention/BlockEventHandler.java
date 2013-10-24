@@ -158,6 +158,23 @@ public class BlockEventHandler implements Listener
 				//and confirm for the player
 				GriefPrevention.sendMessage(player, TextMode.Success, Messages.DonationSuccess);
 			}
+		} else if (block.getType() == Material.DRAGON_EGG &&
+				GriefPrevention.instance.config_claims_preventTheft) {
+			PlayerData playerData = this.dataStore.getPlayerData(player.getName());
+			Claim claim = this.dataStore.getClaimAt(block.getLocation(), false, playerData.lastClaim);
+			if(claim != null)
+			{
+				playerData.lastClaim = claim;
+				
+				String noAccessReason = claim.allowAccess(player);
+				if(noAccessReason != null)
+				{
+					// prevent the egg from teleporting away
+					event.setCancelled(true);
+					GriefPrevention.sendMessage(player, TextMode.Err, noAccessReason);
+					return;
+				}
+			}
 		}
 	}
 	

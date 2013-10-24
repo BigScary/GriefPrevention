@@ -36,9 +36,8 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Animals;
 import org.bukkit.entity.Boat;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Hanging;
-import org.bukkit.entity.PoweredMinecart;
-import org.bukkit.entity.StorageMinecart;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.event.EventHandler;
@@ -736,7 +735,9 @@ class PlayerEventHandler implements Listener
 		}
 		
 		//don't allow container access during pvp combat
-		if((entity instanceof StorageMinecart || entity instanceof PoweredMinecart))
+		if(entity.getType() == EntityType.MINECART_CHEST ||
+				entity.getType() == EntityType.MINECART_FURNACE ||
+				entity.getType() == EntityType.MINECART_HOPPER)
 		{
 			if(playerData.siegeData != null)
 			{
@@ -761,8 +762,10 @@ class PlayerEventHandler implements Listener
 			if(claim != null)
 			{
 				//for storage and powered minecarts, apply container rules (this is a potential theft)
-				if(entity instanceof StorageMinecart || entity instanceof PoweredMinecart)
-				{					
+				if(entity.getType() == EntityType.MINECART_CHEST ||
+					entity.getType() == EntityType.MINECART_FURNACE ||
+					entity.getType() == EntityType.MINECART_HOPPER)
+				{
 					String noContainersReason = claim.allowContainers(player);
 					if(noContainersReason != null)
 					{
@@ -992,24 +995,25 @@ class PlayerEventHandler implements Listener
 		
 		Material clickedBlockType = clickedBlock.getType();
 		
-		//apply rules for putting out fires (requires build permission)
+		//apply rules for putting out fires (requires build permission) and completing end portal frame and such
 		PlayerData playerData = this.dataStore.getPlayerData(player.getName());
-		if(event.getClickedBlock() != null && event.getClickedBlock().getRelative(event.getBlockFace()).getType() == Material.FIRE)
-		{
-			Claim claim = this.dataStore.getClaimAt(clickedBlock.getLocation(), false, playerData.lastClaim);
-			if(claim != null)
-			{
-				playerData.lastClaim = claim;
-				
-				String noBuildReason = claim.allowBuild(player);
-				if(noBuildReason != null)
-				{
-					event.setCancelled(true);
-					GriefPrevention.sendMessage(player, TextMode.Err, noBuildReason);
-					return;
+		if(event.getClickedBlock() != null)
+			if (event.getClickedBlock().getRelative(event.getBlockFace()).getType() == Material.FIRE ||
+					(event.getClickedBlock().getType() == Material.ENDER_PORTAL_FRAME &&
+							player.getItemInHand().getType() == Material.EYE_OF_ENDER) ||
+					(event.getClickedBlock().getType() == Material.FLOWER_POT)) {
+				Claim claim = this.dataStore.getClaimAt(clickedBlock.getLocation(), false, playerData.lastClaim);
+				if (claim != null) {
+					playerData.lastClaim = claim;
+
+					String noBuildReason = claim.allowBuild(player);
+					if (noBuildReason != null) {
+						event.setCancelled(true);
+						GriefPrevention.sendMessage(player, TextMode.Err, noBuildReason);
+						return;
+					}
 				}
 			}
-		}
 		
 		//apply rules for containers and crafting blocks
 		if(	GriefPrevention.instance.config_claims_preventTheft && (
@@ -1022,12 +1026,14 @@ class PlayerEventHandler implements Listener
 						clickedBlockType == Material.BREWING_STAND || 
 						clickedBlockType == Material.JUKEBOX || 
 						clickedBlockType == Material.ENCHANTMENT_TABLE ||
+						clickedBlockType == Material.DRAGON_EGG ||
 						GriefPrevention.instance.config_mods_containerTrustIds.Contains(new MaterialInfo(clickedBlock.getTypeId(), clickedBlock.getData(), null)))))
 		{			
 			//block container use while under siege, so players can't hide items from attackers
 			if(playerData.siegeData != null)
 			{
 				GriefPrevention.sendMessage(player, TextMode.Err, Messages.SiegeNoContainers);
+				player.closeInventory();
 				event.setCancelled(true);
 				return;
 			}
@@ -1036,6 +1042,7 @@ class PlayerEventHandler implements Listener
 			if(playerData.inPvpCombat())
 			{
 				GriefPrevention.sendMessage(player, TextMode.Err, Messages.PvPNoContainers);
+				player.closeInventory();
 				event.setCancelled(true);
 				return;
 			}
@@ -1051,6 +1058,7 @@ class PlayerEventHandler implements Listener
 				{
 					event.setCancelled(true);
 					GriefPrevention.sendMessage(player, TextMode.Err, noContainersReason);
+					player.closeInventory();
 					return;
 				}
 			}
@@ -1085,7 +1093,12 @@ class PlayerEventHandler implements Listener
 		}
 		
 		//otherwise apply rules for buttons and switches
-		else if(GriefPrevention.instance.config_claims_preventButtonsSwitches && (clickedBlockType == null || clickedBlockType == Material.STONE_BUTTON || clickedBlockType == Material.WOOD_BUTTON || clickedBlockType == Material.LEVER || GriefPrevention.instance.config_mods_accessTrustIds.Contains(new MaterialInfo(clickedBlock.getTypeId(), clickedBlock.getData(), null))))
+		else if(GriefPrevention.instance.config_claims_preventButtonsSwitches &&
+				(clickedBlockType == null ||
+				clickedBlockType == Material.STONE_BUTTON ||
+				clickedBlockType == Material.WOOD_BUTTON ||
+				clickedBlockType == Material.LEVER ||
+				GriefPrevention.instance.config_mods_accessTrustIds.Contains(new MaterialInfo(clickedBlock.getTypeId(), clickedBlock.getData(), null))))
 		{
 			Claim claim = this.dataStore.getClaimAt(clickedBlock.getLocation(), false, playerData.lastClaim);
 			if(claim != null)
@@ -1097,6 +1110,8 @@ class PlayerEventHandler implements Listener
 				{
 					event.setCancelled(true);
 					GriefPrevention.sendMessage(player, TextMode.Err, noAccessReason);
+					player.closeInventory();
+					player.sendBlockChange(clickedBlock.getLocation(), clickedBlockType, clickedBlock.getData());
 					return;
 				}
 			}			
@@ -1111,7 +1126,12 @@ class PlayerEventHandler implements Listener
 		}
 		
 		//apply rule for note blocks and repeaters
-		else if(clickedBlockType == Material.NOTE_BLOCK || clickedBlockType == Material.DIODE_BLOCK_ON || clickedBlockType == Material.DIODE_BLOCK_OFF)
+		else if(clickedBlockType == Material.NOTE_BLOCK ||
+				clickedBlockType == Material.DIODE_BLOCK_ON ||
+				clickedBlockType == Material.DIODE_BLOCK_OFF ||
+				clickedBlockType == Material.REDSTONE_COMPARATOR_ON ||
+				clickedBlockType == Material.REDSTONE_COMPARATOR_OFF
+				)
 		{
 			Claim claim = this.dataStore.getClaimAt(clickedBlock.getLocation(), false, playerData.lastClaim);
 			if(claim != null)
@@ -1134,10 +1154,11 @@ class PlayerEventHandler implements Listener
 			if(action != Action.RIGHT_CLICK_BLOCK && action != Action.RIGHT_CLICK_AIR) return;
 			
 			//what's the player holding?
-			Material materialInHand = player.getItemInHand().getType();		
+			Material materialInHand = player.getItemInHand().getType();
+			short itemDurability = player.getItemInHand().getDurability();
 			
-			//if it's bonemeal, check for build permission (ink sac == bone meal, must be a Bukkit bug?)
-			if(materialInHand == Material.INK_SACK)
+			//if it's bonemeal, check for build permission (ink sac with meta data 15 = bone meal)
+			if(materialInHand == Material.INK_SACK && itemDurability == 15)
 			{
 				String noBuildReason = GriefPrevention.instance.allowBuild(player, clickedBlock.getLocation());
 				if(noBuildReason != null)
