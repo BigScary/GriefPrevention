@@ -19,6 +19,10 @@ commands:
       description: cleans all of a given material from a owned claim. target material defaults to AIR.
       usage: /CleanClaim <source> <target>
       permission: griefprevention.commands.cleanclaim
+   cleanclaims:
+      description: performs a manual Claim Cleanup. This will delete and remove claims where the owner has not been online in a while and where the claim doesn't have much invested in it.
+      usage: /CleanClaims
+      permission: griefprevention.commands.cleanclaims
    clearmanagers:
       description: Clears all managers on a claim.
       usage: /ClearManagers
@@ -180,6 +184,10 @@ commands:
       description: reloads GP configuration.
       usage: /gpreload
       permission: griefprevention.commands.gpreload
+   gpdebug:
+      description: sets GriefPrevention debug options. 
+      usage: /gpdebug <option> <value>
+      permission: griefprevention.commands.gpdebug
 permissions:
     griefprevention.basicclaimcommands:
         description: Grants access to Basic GriefPrevention claim commands.
@@ -189,14 +197,21 @@ permissions:
             griefprevention.commands.accesstrust: true
             griefprevention.commands.containertrust: true
             griefprevention.commands.permissiontrust: true
+            griefprevention.commands.claimexplosions: true
     griefprevention.commands.setclaimblocks:
         description: Grants access to the setclaimblocks command.
         default: op
     griefprevention.commands.claiminfo:
         description: Grants access to the claiminfo command.
         default: op
+    griefprevention.commands.claimexplosions:
+        description: Grants access to the claimexplosions command.
+        default: true
     griefprevention.commands.cleanclaim:
         description: Grants access to the cleanclaim command.
+        default: op
+    griefprevention.commands.cleanclaims:
+        description: Grants access to the cleanclaims command.
         default: op
     griefprevention.commands.clearmanagers:
         description: Grants access to the clearmanagers command.
@@ -302,6 +317,9 @@ permissions:
         default: true
     griefprevention.commands.gpreload:
         description: grants access to the gpreload command.
+        default: op
+    griefprevention.commands.gpdebug:
+        description: grants access to the gpdebug command.
         default: op
     griefprevention.claims.ignorelimit:
         description: Allows creation of more claims than any configured per-player limit.

@@ -37,7 +37,9 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -202,10 +204,8 @@ public class BlockEventHandler implements Listener {
 			return;
 		}
 
-		// never burn claimed blocks, regardless of settings
-		if (this.dataStore.getClaimAt(burnEvent.getBlock().getLocation(), false) != null) {
-			burnEvent.setCancelled(true);
-		}
+
+
 	}
 
 	// when a block is damaged...
@@ -298,6 +298,12 @@ public class BlockEventHandler implements Listener {
 				GriefPrevention.sendMessage(player, TextMode.Success, Messages.DonationSuccess);
 			}
 		}
+        else if(block.getType()==Material.DRAGON_EGG){
+            if(wc.getDragonEggRules().Allowed(block.getLocation(),event.getPlayer()).Denied()){
+               event.setCancelled(true);
+               return;
+            }
+        }
 	}
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
@@ -353,7 +359,36 @@ public class BlockEventHandler implements Listener {
 			}
 		}
 	}
+    private void ActivateAdjacentTNT(Block SourceLocation){
+       int[] directions = new int[]{-1,1};
+       for(int x:directions){
+           for(int y:directions){
+               for(int z:directions){
 
+                   int useX = SourceLocation.getX()+x;
+                   int useY = SourceLocation.getY()+y;
+                   int useZ = SourceLocation.getZ()+z;
+                   Location loc = new Location(SourceLocation.getWorld(),useX,useY,useZ);
+                   if(loc.getBlock().getType()==Material.TNT){
+                       loc.getBlock().setType(Material.AIR);
+
+
+
+                       TNTPrimed tprimed = (TNTPrimed)(SourceLocation.getWorld().spawnEntity(
+                               new Location(SourceLocation.getWorld(),(float)(loc.getX()+0.5f),(float)(loc.getY()+0.5f),(float)(loc.getZ()+0.5f)),
+                               EntityType.PRIMED_TNT));
+                       tprimed.setFuseTicks(25);
+                       ActivateAdjacentTNT(loc.getBlock());
+                   }
+
+
+
+               }
+           }
+       }
+
+
+    }
 	// blocks are ignited ONLY by flint and steel (not by being near lava, open
 	// flames, etc), unless configured otherwise
 	@EventHandler(priority = EventPriority.LOWEST)
@@ -363,7 +398,22 @@ public class BlockEventHandler implements Listener {
 		boolean TargetAllowed = igniteEvent.getIgnitingBlock()==null?true:
 			wc.getFireSpreadTargetBehaviour().Allowed(igniteEvent.getIgnitingBlock().getLocation(), null).Allowed();
 		
-		
+		Claim testclaim = GriefPrevention.instance.dataStore.getClaimAt(igniteEvent.getIgnitingBlock().getLocation(),true);
+        if(testclaim!=null){
+            if(testclaim.siegeData!=null){
+                if(testclaim.siegeData.attacker.getName().equals(igniteEvent.getPlayer().getName())){
+                    //it's allowed, but we also have additional logic, basically
+                    //the attacker in a claim will set groups of TNT rather than just one.
+
+                     ActivateAdjacentTNT(igniteEvent.getBlock());
+
+
+
+
+                    return;
+                }
+            }
+        }
 		
 		
 		if (!TargetAllowed && igniteEvent.getCause() != IgniteCause.FLINT_AND_STEEL && igniteEvent.getCause() != IgniteCause.FIREBALL && igniteEvent.getCause() != IgniteCause.LIGHTNING) {
@@ -517,6 +567,13 @@ public class BlockEventHandler implements Listener {
 		Block block = placeEvent.getBlock();
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(block.getWorld());
 		if(!wc.Enabled()) return;
+        if(wc.getPlaceBlockRules().Allowed(block.getLocation(), player).Denied()){
+            placeEvent.setCancelled(true);
+            return;
+        }
+
+
+
 		boolean theftallowed = wc.getContainersRules().Allowed(block.getLocation(), player, false).Allowed();
 		/*if (wc.getApplyTrashBlockRules()) {
 			// if set, then we only allow Trash Blocks to be placed, and only in

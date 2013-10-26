@@ -24,6 +24,7 @@ public class WorldClaimCleanupTask implements Runnable {
 	private int nextClaimIndex = 0;
 	private int TaskCookie = 0;
 	private WorldConfig wc = null;
+    public int lastcleaned = 0;
 
 	public WorldClaimCleanupTask(String WorldCleanup) {
 		CleanupWorldName = WorldCleanup;
@@ -91,6 +92,7 @@ public class WorldClaimCleanupTask implements Runnable {
 				Debugger.Write("Deleting Chest Claim owned by " + claim.getOwnerName() + " last login:" + playerData.lastLogin.toString(), DebugLevel.Verbose);
 				claim.removeSurfaceFluids(null);
 				GriefPrevention.instance.dataStore.deleteClaim(claim);
+                lastcleaned++;
 				if (playerData.claims.size() == 0) {
 					GriefPrevention.instance.dataStore.deletePlayerData(playerData.playerName);
 				}

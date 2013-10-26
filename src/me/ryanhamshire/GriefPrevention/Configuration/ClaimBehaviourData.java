@@ -391,7 +391,7 @@ public class ClaimBehaviourData {
 	/**
 	 * returns whether this Behaviour is allowed at the given location. if the
 	 * passed player currently has ignoreclaims on, this will return true no
-	 * matter what.
+	 * matter what. Otherwise, the Value will be determined based on the set fields and values of this instance.
 	 * 
 	 * @param position
 	 *            Position to test.
@@ -404,9 +404,11 @@ public class ClaimBehaviourData {
 	 *            Whether this call will fire the PermissionCheckEvent. This can
 	 *            be passed as false by plugins handling this event to get the
 	 *            value that would be retrieved without it's interference.
-	 * @return whether this behaviour is Allowed or Denied in this claim.
+	 * @return whether this behaviour is Allowed or Denied at the given position and for the given player.
+     *
+     *
 	 */
-	@SuppressWarnings("unused")
+
 	public ClaimAllowanceConstants Allowed(Location position, Player RelevantPlayer, boolean ShowMessages, boolean fireEvent) {
 		ClaimAllowanceConstants returned = ClaimAllowanceConstants.Allow;
 		try {

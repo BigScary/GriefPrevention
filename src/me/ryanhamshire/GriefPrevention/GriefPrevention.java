@@ -28,13 +28,9 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import me.ryanhamshire.GriefPrevention.Configuration.*;
 import me.ryanhamshire.GriefPrevention.Debugger.DebugLevel;
 import me.ryanhamshire.GriefPrevention.CommandHandling.CommandHandler;
-import me.ryanhamshire.GriefPrevention.Configuration.ClaimMetaHandler;
-import me.ryanhamshire.GriefPrevention.Configuration.ConfigData;
-import me.ryanhamshire.GriefPrevention.Configuration.ModBlockHelper;
-import me.ryanhamshire.GriefPrevention.Configuration.ModdedBlocksSearchResults;
-import me.ryanhamshire.GriefPrevention.Configuration.WorldConfig;
 import me.ryanhamshire.GriefPrevention.events.GPLoadEvent;
 import me.ryanhamshire.GriefPrevention.events.GPUnloadEvent;
 import me.ryanhamshire.GriefPrevention.tasks.DeliverClaimBlocksTask;
@@ -274,6 +270,18 @@ public class GriefPrevention extends JavaPlugin {
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(player.getWorld());
 		// exception: administrators in ignore claims mode, and special player
 		// accounts created by server mods
+        ClaimBehaviourData cbd = null;
+        if(null!=(cbd =wc.getBreakOverrides().getBehaviourforBlock(location.getBlock()))){
+            ClaimBehaviourData.ClaimAllowanceConstants cac;
+            if((cac=cbd.Allowed(location,player,true)).Allowed()){
+                return null;
+            }
+            else if(cac== ClaimBehaviourData.ClaimAllowanceConstants.Deny_Forced){
+                return "";
+            }
+
+        }
+
 		if (playerData.ignoreClaims || wc.getModsIgnoreClaimsAccounts().contains(player.getName()))
 			return null;
 
@@ -296,6 +304,9 @@ public class GriefPrevention extends JavaPlugin {
 				return null;
 			}
 		} else {
+
+
+
 			// cache the claim for later reference
 			playerData.lastClaim = claim;
 
@@ -313,6 +324,13 @@ public class GriefPrevention extends JavaPlugin {
 		// accounts created by server mods
 		if (playerData.ignoreClaims || wc.getModsIgnoreClaimsAccounts().contains(player.getName()))
 			return null;
+        ClaimBehaviourData cbd;
+        if(null!=(cbd=wc.getBlockPlaceOverrides().getBehaviourforBlock(location.getBlock()))){
+            if(cbd.Allowed(location,player,true).Denied()){
+                return "";
+            }
+        }
+
 
 		// wilderness rules
 		if (claim == null) {
@@ -365,8 +383,11 @@ public class GriefPrevention extends JavaPlugin {
 			return;
 
 		// if anti spawn camping feature is not enabled, do nothing
-		if (!wc.getProtectFreshSpawns())
+		if (!wc.getProtectFreshSpawns())         {
+            PlayerData playerData = this.dataStore.getPlayerData(player.getName());
+            playerData.pvpImmune=false;
 			return;
+        }
 
 		// if the player has the damage any player permission enabled, do
 		// nothing

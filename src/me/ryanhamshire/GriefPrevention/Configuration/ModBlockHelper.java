@@ -148,19 +148,21 @@ public class ModBlockHelper {
 		ArrayList<String> results = new ArrayList<String>();
 		File f = new File(SourcePath);
 		if (f.exists()) {
-			for (File iterate : f.listFiles()) {
-				if (iterate.isDirectory()) {
-					for (String addresult : FindConfigFiles(iterate.getAbsolutePath())) {
-						results.add(addresult);
-					}
+            File[] grablist = f.listFiles();
+            if(grablist!=null){
+                for (File iterate : grablist) {
+                    if (iterate.isDirectory()) {
+                        for (String addresult : FindConfigFiles(iterate.getAbsolutePath())) {
+                            results.add(addresult);
+                        }
 
-				} else if (iterate.getName().toLowerCase().endsWith(".cfg") || iterate.getName().toLowerCase().endsWith(".conf")) {
-					GriefPrevention.AddLogEntry("Found cfg File:" + iterate.getAbsolutePath());
-					results.add(iterate.getAbsolutePath());
-				}
+                    } else if (iterate.getName().toLowerCase().endsWith(".cfg") || iterate.getName().toLowerCase().endsWith(".conf")) {
+                        GriefPrevention.AddLogEntry("Found cfg File:" + iterate.getAbsolutePath());
+                        results.add(iterate.getAbsolutePath());
+                    }
 
-			}
-
+                }
+            }
 			GriefPrevention.AddLogEntry("Config Search in " + SourcePath + " found " + results.size() + " Files.");
 			return results;
 		}

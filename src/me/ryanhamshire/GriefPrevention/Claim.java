@@ -586,8 +586,11 @@ public class Claim {
 			return "";
 
 		// anyone who can modify the claim can do this
-		if (this.allowEdit(player) == null)
-			return null;
+		/*if (this.allowEdit(player) == null)
+			return null;*/
+
+        if(player.getName().equalsIgnoreCase(claimOwnerName)) return null;
+
 
 		// anyone who's in the managers (/PermissionTrust) list can do this
 		for (int i = 0; i < this.managers.size(); i++) {

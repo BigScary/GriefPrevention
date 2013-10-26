@@ -38,15 +38,11 @@ import me.ryanhamshire.GriefPrevention.events.ClaimResizeEvent;
 import me.ryanhamshire.GriefPrevention.events.SiegeEndEvent;
 import me.ryanhamshire.GriefPrevention.events.SiegeStartEvent;
 import me.ryanhamshire.GriefPrevention.exceptions.WorldNotFoundException;
+import me.ryanhamshire.GriefPrevention.tasks.PlayerRescueTask;
 import me.ryanhamshire.GriefPrevention.tasks.SecureClaimTask;
 import me.ryanhamshire.GriefPrevention.tasks.SiegeCheckupTask;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
-import org.bukkit.WorldCreator;
+import org.bukkit.*;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -533,13 +529,47 @@ public abstract class DataStore {
 		
 		
 		this.siegeCooldownRemaining.put(siegeData.attacker.getName() + "_" + siegeData.defender.getName(), cooldownEnd);
+        List<Player> PlayersinClaim = new ArrayList<Player>();
+        for(Player p:Bukkit.getOnlinePlayers()){
 
+            Claim playerclaim = GriefPrevention.instance.dataStore.getClaimAt(p.getLocation(),false);
+            boolean dobreak=false;
+            for(Claim c:siegeData.claims){
+                if(c==playerclaim){
+                    PlayersinClaim.add(p);
+                    break;
+                }
+
+            }
+
+        }
 		// if there are blocks queued up to revert, do so.
 		int revertedCount = 0;
 		if (!siegeData.SiegedBlocks.isEmpty()) {
 
 			for (BrokenBlockInfo bbi : siegeData.SiegedBlocks.values()) {
-				bbi.reset();
+                //special logic: if a player's head is where we want to revert a block, delay that revert by about 20 seconds and issue an automatic trapped
+                //command for that player.
+                for(int i=PlayersinClaim.size();i<0;i--){
+                    Player p  = PlayersinClaim.get(i);
+                    if(p.getLocation().distance(bbi.getLocation())<1){
+                        //'rescue' the player immediately.
+                        //this would, with the /trapped command, take a few seconds. We do the same logic here
+                        //but make it occur immediately.
+                        //since it happens immediately show a message indicating what happened.
+                        PlayerRescueTask task = new PlayerRescueTask(p, p.getLocation());
+                        Bukkit.getScheduler().scheduleSyncDelayedTask(GriefPrevention.instance,task,2);
+                        GriefPrevention.sendMessage(p,TextMode.Info,"You have been teleported to prevent suffocation from reverting siege blocks.");
+
+                    }
+                }
+
+
+
+                bbi.reset();
+
+
+
 				revertedCount++;
 			}
 			siegeData.SiegedBlocks.clear();

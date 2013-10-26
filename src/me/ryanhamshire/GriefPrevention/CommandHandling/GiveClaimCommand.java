@@ -27,7 +27,7 @@ public class GiveClaimCommand extends GriefPreventionCommand {
 			return false;
 		Player source = (sender instanceof Player) ? (Player) sender : null;
 		Player target = Bukkit.getPlayer(args[0]);
-		if (sender == null)
+		if (source == null)
 			return false;
 		if(!EnsurePermission(source,command.getName())) return true;
 		DataStore dataStore = GriefPrevention.instance.dataStore;
@@ -55,9 +55,10 @@ public class GiveClaimCommand extends GriefPreventionCommand {
 				}
 			}
 			// transfer ownership.
-			claimtogive.setOwnerName(target.getName());
+
 
 			String originalOwner = claimtogive.getOwnerName();
+            //claimtogive.setOwnerName(target.getName());
 			try {
 				dataStore.changeClaimOwner(claimtogive, target.getName());
 				// message both players.

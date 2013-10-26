@@ -9,7 +9,9 @@ import org.bukkit.event.HandlerList;
 /**
  * Whenever a claim is created this event is called. This event is called before
  * the claim is added to the dataStore and initialized, as such it does not yet
- * have an ID. If you need to process events for new claims as they are made,
+ * have an ID. The ID Value of a Claim does not exist before it is created and
+ * any attempt to "fake" an ID by using the nextClaimID value will end in tears.
+ * If you need to process events for new claims as they are made,
  * consider using the ClaimAfterCreateEvent.
  */
 public class ClaimBeforeCreateEvent extends PlayerClaimEvent implements Cancellable {

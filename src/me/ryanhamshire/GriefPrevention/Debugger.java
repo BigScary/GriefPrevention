@@ -2,7 +2,15 @@ package me.ryanhamshire.GriefPrevention;
 
 public class Debugger {
 
-	public enum DebugLevel {
+    public static void setDebugLevel(DebugLevel debugLevel) {
+        GriefPrevention.instance.debug.setCurrentLevel(debugLevel);
+    }
+
+    public void setCurrentLevel(DebugLevel currentLevel) {
+        this.CurrentLevel = currentLevel;
+    }
+
+    public enum DebugLevel {
 		Errors, Informational, None, Verbose, Warning;
 		/**
 		 * returns whether the given DebugLevel applies to this one.

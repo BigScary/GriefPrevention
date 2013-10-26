@@ -439,14 +439,19 @@ public class WorldConfig {
 															// automatically
 															// remove partially
 															// cut trees
-
+    private PlaceBreakOverrides BlockBreakOverrides = PlaceBreakOverrides.Default;
+    public PlaceBreakOverrides getBreakOverrides(){ return BlockBreakOverrides;}
+    private PlaceBreakOverrides BlockPlaceOverrides = PlaceBreakOverrides.Default;
+    public PlaceBreakOverrides getBlockPlaceOverrides(){ return BlockPlaceOverrides;}
     private ClaimBehaviourMode SiegeDefender = ClaimBehaviourMode.RequireOwner; //applicable Trust level of defender.
 	private ClaimBehaviourData PlaceBlockRules;
 	private ClaimBehaviourData BreakBlockRules;
 	public ClaimBehaviourData getPlaceBlockRules(){ return PlaceBlockRules;}
 	public ClaimBehaviourData getBreakBlockRules(){ return BreakBlockRules;}
     public ClaimBehaviourMode getSiegeDefendable(){ return SiegeDefender;}
-	private ClaimBehaviourData ContainersRules;
+    private ClaimBehaviourData DragonEggRules = ClaimBehaviourData.getAll("Dragon Egg").setBehaviourMode(ClaimBehaviourMode.RequireBuild);
+	public ClaimBehaviourData getDragonEggRules(){ return DragonEggRules;}
+    private ClaimBehaviourData ContainersRules;
 
 	private ClaimBehaviourData CreatureDamage;
 
@@ -588,6 +593,8 @@ public class WorldConfig {
 
 	private ClaimBehaviourData TNTExplosionsBehaviour;
 
+    private ClaimBehaviourData TNTCoalesceBehaviour;
+    public ClaimBehaviourData getTNTCoalesceBehaviour(){ return TNTCoalesceBehaviour;}
 	private ClaimBehaviourData TrapDoors;
 
 	private ClaimBehaviourData TrashBlockPlacementBehaviour;
@@ -688,6 +695,10 @@ public class WorldConfig {
 		outConfig.set("GriefPrevention.Enabled", this.griefprevention_enabled);
 		// read in the data for TNT explosions and Golem/Wither placements.
 		this.config_afkDistanceCheck = config.getInt("GriefPrevention.AFKDistance", 3);
+
+        this.BlockBreakOverrides = new PlaceBreakOverrides(config,outConfig,"GriefPrevention.Rules.BreakOverrides",PlaceBreakOverrides.Default);
+        this.BlockPlaceOverrides = new PlaceBreakOverrides(config,outConfig,"GriefPrevention.Rules.PlaceOverrides",PlaceBreakOverrides.Default);
+
 		this.SilverfishBreakRules = new ClaimBehaviourData("Silverfish Break", config, outConfig, "GriefPrevention.Rules.SilverfishBreak", new ClaimBehaviourData("Silverfish Break", PlacementRules.Both, PlacementRules.Neither, ClaimBehaviourMode.Disabled));
         String SiegeDefenderStr = config.getString("GriefPrevention.SiegeDefendable",ClaimBehaviourMode.RequireOwner.name());
         ClaimBehaviourMode ccm = ClaimBehaviourMode.parseMode(SiegeDefenderStr);
@@ -696,7 +707,7 @@ public class WorldConfig {
 		//placement requires build permission by default, and isn't allowed during PVP or Siege.
 		
 		this.PlaceBlockRules = new ClaimBehaviourData("Block Placement",config,outConfig,"GriefPrevention.Rules.BlockPlacement",new ClaimBehaviourData("Block Placement",PlacementRules.Both,PlacementRules.Both,ClaimBehaviourMode.RequireBuild).setPVPOverride(SiegePVPOverrideConstants.Deny).setSiegeOverrides(SiegePVPOverrideConstants.Deny, SiegePVPOverrideConstants.Deny));
-		this.BreakBlockRules = new ClaimBehaviourData("Block Breaking",config,outConfig,"GriefPrevention.Rules.BlockBreaking",new ClaimBehaviourData("Block Placement",PlacementRules.Both,PlacementRules.Both,ClaimBehaviourMode.RequireBuild).setPVPOverride(SiegePVPOverrideConstants.Deny).setSiegeOverrides(SiegePVPOverrideConstants.Allow, SiegePVPOverrideConstants.Deny));
+		this.BreakBlockRules = new ClaimBehaviourData("Block Breaking",config,outConfig,"GriefPrevention.Rules.BlockBreaking",new ClaimBehaviourData("Block Breaking",PlacementRules.Both,PlacementRules.Both,ClaimBehaviourMode.RequireBuild).setPVPOverride(SiegePVPOverrideConstants.Deny).setSiegeOverrides(SiegePVPOverrideConstants.Allow, SiegePVPOverrideConstants.Deny));
 		
 		
 		this.FireDestroyBehaviour = new ClaimBehaviourData("Fire Destruction",config,outConfig,"GriefPrevention.Rules.FireDestroys",new ClaimBehaviourData("GriefPrevention.Rules.FireDestroys",PlacementRules.Neither,PlacementRules.Neither,ClaimBehaviourMode.Disabled));
@@ -710,6 +721,11 @@ public class WorldConfig {
 		this.TNTExplosionsBehaviour = new ClaimBehaviourData("TNT Explosions", config, outConfig, "GriefPrevention.Rules.TNTExplosions",
 
 		ClaimBehaviourData.getAll("TNT Explosions").setSeaLevelOffsets(SeaLevelOverrideTypes.Offset, -1));
+
+
+        this.TNTCoalesceBehaviour = new ClaimBehaviourData("TNT Coalescing",config,outConfig,"GriefPrevention.Rules.TNTCoalesce",
+                ClaimBehaviourData.getAll("TNT Coalescing").setSiegeOverrides(SiegePVPOverrideConstants.None,SiegePVPOverrideConstants.None,SiegePVPOverrideConstants.Allow));
+
 
 		this.OtherExplosionBehaviour = new ClaimBehaviourData("Other Explosions", config, outConfig, "GriefPrevention.Rules.OtherExplosions", ClaimBehaviourData.getAll("Other Explosions").setSeaLevelOffsets(SeaLevelOverrideTypes.Offset, -1));
 
@@ -1839,7 +1855,12 @@ public class WorldConfig {
 	public List<Material> getSiegeBlocks() {
 		return config_siege_blocks;
 	}
-
+    public boolean isSiegeMaterial(Material b){
+        for(Material p:getSiegeBlocks()){
+            if(p.name().equals(b.name())) return true;
+        }
+        return false;
+    }
 	public int getSiegeTamedAnimalDistance() {
 		return Siege_TamedAnimalDistance;
 	}
@@ -2066,4 +2087,6 @@ public class WorldConfig {
 		
 		
 	}
+
+
 }

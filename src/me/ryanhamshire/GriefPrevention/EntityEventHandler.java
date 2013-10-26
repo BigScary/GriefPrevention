@@ -18,10 +18,7 @@
 
 package me.ryanhamshire.GriefPrevention;
 
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import me.ryanhamshire.GriefPrevention.Debugger.DebugLevel;
 import me.ryanhamshire.GriefPrevention.Configuration.ClaimBehaviourData;
@@ -491,9 +488,36 @@ class EntityEventHandler implements Listener {
 		}
 
 	}
+    private float getCoalescedPower(Entity SourceEntity,float Range,boolean RemoveItems){
+        List<Entity> Dealt = new ArrayList<Entity>();
+        Dealt.add(SourceEntity);
 
+        float result = getCoalescedPower(SourceEntity,Range,Dealt);
+        if(RemoveItems){
+            for(Entity iterate:Dealt) iterate.remove();
+        }
+        return result;
+    }
+    private float getCoalescedPower(Entity SourceEntity,float Range,List<Entity> DealtWith){
+        float BuildPower = 0;
+
+        List<Entity> nearbyEntities = SourceEntity.getNearbyEntities(Range, Range, Range);
+        for(Entity iterate:nearbyEntities){
+            if(!DealtWith.contains(iterate) && iterate.getClass().equals(SourceEntity.getClass())){
+                if(SourceEntity.getLocation().distance(iterate.getLocation()) <= Range){
+                    DealtWith.add(SourceEntity);
+                    BuildPower+=getCoalescedPower(SourceEntity,Range/2,DealtWith);
+                }
+            }
+
+        }
+        return BuildPower;
+    }
+    private Set<Entity> HandledEntities = new HashSet<Entity>();
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
 	public void onEntityExplode(EntityExplodeEvent explodeEvent) {
+
+
 
 		// System.out.println("EntityExplode:" +
 		// explodeEvent.getEntity().getClass().getName());
@@ -540,13 +564,65 @@ class EntityEventHandler implements Listener {
 			usebehaviour = wc.getWitherExplosionBlockDamageBehaviour();
 		else if (isTNT){
 			usebehaviour = wc.getTNTExplosionBlockDamageBehaviour();
+            if(wc.getTNTCoalesceBehaviour().Allowed(explodeEvent.getLocation(), null).Allowed()
+                    && ! HandledEntities.contains(explodeEvent.getEntity())
+                    ){
+                  //try to coalesce nearby TNTPrimed Entities.
+                 //count nearby TNTPrimed and add 25% more power for each.
+                //we only do this if the entity being kerploded isn't a "handled" entity.
+
+                 float powerfactor = this.getCoalescedPower(explodeEvent.getEntity(),5,true);
+                 //generate a new TNTPrimed with a lower fuse time in this position, and set it to have a higher yield.
+                TNTPrimed newTNT = (TNTPrimed)(explodeEvent.getEntity().getWorld().spawnEntity(explodeEvent.getEntity().getLocation(),EntityType.PRIMED_TNT));
+                HandledEntities.add(newTNT);
+                newTNT.setFuseTicks(2);
+                float newYield= newTNT.getYield()*powerfactor;
+                newTNT.setYield(newYield);
+
+            } else if(HandledEntities.contains(explodeEvent.getEntity())){
+                HandledEntities.remove(explodeEvent.getEntity());
+            }
 		}
 		else
 			usebehaviour = wc.getOtherExplosionBlockDamageBehaviour();
-		Claim claimpos = null;
+		Claim claimpos = GriefPrevention.instance.dataStore.getClaimAt(explodeEvent.getEntity().getLocation(),true);
 		// //go through each block that was affected...
 		for (int i = 0; i < blocks.size(); i++) {
+
+
+
 			Block block = blocks.get(i);
+            Claim explodepos = GriefPrevention.instance.dataStore.getClaimAt(block.getLocation(),false);
+            if(explodepos.siegeData!=null){
+                //under siege...
+                if(wc.getSiegeBlockRevert()){
+                if(!wc.isSiegeMaterial(block.getType())){
+                    blocks.remove(i--);
+                }
+                else {
+
+                    String usekey = GriefPrevention.getfriendlyLocationString(block.getLocation());
+                    // if it already contains an entry, the block was broken
+                    // during this siege
+                    // and replaced with another block that is being broken
+                    // again.
+                    if (explodepos.siegeData.SiegedBlocks.containsKey(usekey)) {
+
+                    } else {
+                        // otherwise, we have to add it to the siege blocks
+                        // list.
+                        explodepos.siegeData.SiegedBlocks.put(usekey, new BrokenBlockInfo(block.getLocation()));
+                        // replace it manually
+                        block.setType(Material.AIR);
+                        // return empty string, because obviously returning
+
+
+                    }
+
+
+                }
+                }
+            }
 			// if(wc.getModsExplodableIds().contains(new
 			// MaterialInfo(block.getTypeId(), block.getData(), null)))
 			// continue;
@@ -570,7 +646,21 @@ class EntityEventHandler implements Listener {
 			}
 
 		}
+        //now, check if we are in a claim, if so and if that claim is under siege, add all blocks still in the blocks list to
+        //the revert list of that claim.
+        if(claimpos!=null){
+            if(claimpos.siegeData!=null){
+                //claim is under siege.
+                if(wc.getSiegeBlockRevert()){
+                    for(Block iterate:blocks){
+                        String usekey = GriefPrevention.getfriendlyLocationString(iterate.getLocation());
+                        claimpos.siegeData.SiegedBlocks.put(usekey, new BrokenBlockInfo(iterate.getLocation()));
+                    }
+                }
 
+
+            }
+        }
 	}
 
 	// don't allow entities to trample crops

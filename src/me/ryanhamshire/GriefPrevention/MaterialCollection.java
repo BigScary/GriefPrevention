@@ -27,7 +27,9 @@ import org.bukkit.Material;
 //ordered list of material info objects, for fast searching
 public class MaterialCollection {
 	HashMap<Integer, List<MaterialInfo>> materials = new HashMap<Integer, List<MaterialInfo>>();
-
+    public boolean hasMaterial(Material test){
+        return materials.containsKey(test.getId());
+    }
 	public MaterialCollection() {
 
 	}
