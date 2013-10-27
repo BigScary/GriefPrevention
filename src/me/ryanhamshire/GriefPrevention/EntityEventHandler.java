@@ -20,7 +20,6 @@ package me.ryanhamshire.GriefPrevention;
 
 import java.util.*;
 
-import me.ryanhamshire.GriefPrevention.Debugger.DebugLevel;
 import me.ryanhamshire.GriefPrevention.Configuration.ClaimBehaviourData;
 import me.ryanhamshire.GriefPrevention.Configuration.ClaimBehaviourData.ClaimAllowanceConstants;
 import me.ryanhamshire.GriefPrevention.Configuration.WorldConfig;
@@ -231,13 +230,21 @@ class EntityEventHandler implements Listener {
 				if (!defender.isOnline() || !attacker.isOnline())
 					return;
 			// otherwise if protecting spawning players
-			if (wc.getProtectFreshSpawns()) {
-				if (defenderData.pvpImmune) {
-					event.setCancelled(true);
-					CancelMMO((LivingEntity) event.getEntity());
-					GriefPrevention.sendMessage(attacker, TextMode.Err, Messages.ThatPlayerPvPImmune);
-					return;
-				}
+			if (wc.getSpawnProtectEnabled()) {
+
+                if(defenderData.pvpImmune && !attackerData.pvpImmune && wc.getSpawnProtectDisableonInstigate()){
+                //disable the defender's pvp immunity.
+                    defenderData.pvpImmune=false;
+                }
+
+				else{
+                    if (defenderData.pvpImmune) {
+                        event.setCancelled(true);
+                        CancelMMO((LivingEntity) event.getEntity());
+                        GriefPrevention.sendMessage(attacker, TextMode.Err, Messages.ThatPlayerPvPImmune);
+                        return;
+                    }
+
 
 				if (attackerData.pvpImmune) {
 					event.setCancelled(true);
@@ -245,6 +252,7 @@ class EntityEventHandler implements Listener {
 					GriefPrevention.sendMessage(attacker, TextMode.Err, Messages.CantFightWhileImmune);
 					return;
 				}
+            }
 			}
 
 			// FEATURE: prevent players from engaging in PvP combat inside land
@@ -593,7 +601,7 @@ class EntityEventHandler implements Listener {
 
 			Block block = blocks.get(i);
             Claim explodepos = GriefPrevention.instance.dataStore.getClaimAt(block.getLocation(),false);
-            if(explodepos.siegeData!=null){
+            if(explodepos!=null && explodepos.siegeData!=null){
                 //under siege...
                 if(wc.getSiegeBlockRevert()){
                 if(!wc.isSiegeMaterial(block.getType())){

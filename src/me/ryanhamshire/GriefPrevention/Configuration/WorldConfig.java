@@ -317,6 +317,8 @@ public class WorldConfig {
 
 	private boolean config_pvp_blockContainers;
 
+
+
 	private ArrayList<String> config_pvp_blockedCommands = new ArrayList<String>(); // list
 																					// of
 																					// commands
@@ -346,12 +348,21 @@ public class WorldConfig {
 															// player-owned land
 															// claims
 
-	// private ArrayList<World> config_pvp_enabledWorlds; //list of worlds where
+
 	// pvp anti-grief rules apply
-	private boolean config_pvp_protectFreshSpawns; // whether to make newly
+	private boolean SpawnProtectEnabled; // whether to make newly
 													// spawned players immune
 													// until they pick up an
 													// item
+    private int SpawnProtectTimeout;
+    private boolean SpawnProtectDisableonItemPickup;
+    private boolean SpawnProtectDisableonInstigate;
+    private int SpawnProtectPickupTimeout;
+    public int getSpawnProtectTimeout(){return SpawnProtectTimeout;}
+    public boolean getSpawnProtectDisableonItemPickup(){return SpawnProtectDisableonItemPickup;}
+    public boolean getSpawnProtectDisableonInstigate(){return SpawnProtectDisableonInstigate;}
+    public int getSpawnProtectPickupTimeout(){ return SpawnProtectPickupTimeout;}
+
 
 	private boolean config_pvp_punishLogout; // whether to kill players who log
 												// out during PvP combat
@@ -443,6 +454,7 @@ public class WorldConfig {
     public PlaceBreakOverrides getBreakOverrides(){ return BlockBreakOverrides;}
     private PlaceBreakOverrides BlockPlaceOverrides = PlaceBreakOverrides.Default;
     public PlaceBreakOverrides getBlockPlaceOverrides(){ return BlockPlaceOverrides;}
+
     private ClaimBehaviourMode SiegeDefender = ClaimBehaviourMode.RequireOwner; //applicable Trust level of defender.
 	private ClaimBehaviourData PlaceBlockRules;
 	private ClaimBehaviourData BreakBlockRules;
@@ -451,6 +463,12 @@ public class WorldConfig {
     public ClaimBehaviourMode getSiegeDefendable(){ return SiegeDefender;}
     private ClaimBehaviourData DragonEggRules = ClaimBehaviourData.getAll("Dragon Egg").setBehaviourMode(ClaimBehaviourMode.RequireBuild);
 	public ClaimBehaviourData getDragonEggRules(){ return DragonEggRules;}
+    private ClaimBehaviourData EnderEyePortalRules;
+    private ClaimBehaviourData FlowerPotRules;
+    private ClaimBehaviourData ItemFrameItemRules;
+    public ClaimBehaviourData getFlowerPotRules(){ return FlowerPotRules;}
+    public ClaimBehaviourData getEnderEyePortalRules(){return EnderEyePortalRules;}
+    public ClaimBehaviourData getItemFrameRules(){return ItemFrameItemRules;}
     private ClaimBehaviourData ContainersRules;
 
 	private ClaimBehaviourData CreatureDamage;
@@ -727,7 +745,20 @@ public class WorldConfig {
                 ClaimBehaviourData.getAll("TNT Coalescing").setSiegeOverrides(SiegePVPOverrideConstants.None,SiegePVPOverrideConstants.None,SiegePVPOverrideConstants.Allow));
 
 
-		this.OtherExplosionBehaviour = new ClaimBehaviourData("Other Explosions", config, outConfig, "GriefPrevention.Rules.OtherExplosions", ClaimBehaviourData.getAll("Other Explosions").setSeaLevelOffsets(SeaLevelOverrideTypes.Offset, -1));
+        //private ClaimBehaviourData EnderEyePortalRules;
+        //private ClaimBehaviourData FlowerPotRules;
+        //private ClaimBehaviourData ItemFrameItemRules;
+
+        this.EnderEyePortalRules = new ClaimBehaviourData("Ender Portal Fill",config,outConfig,"GriefPrevention.Rules.EnderPortalFill",
+             ClaimBehaviourData.getAll("Ender Portal Fill").setBehaviourMode(ClaimBehaviourMode.RequireBuild));
+
+		this.FlowerPotRules = new ClaimBehaviourData("Flower Pots",config,outConfig,"GriefPrevention.Rules.FlowerPots",
+                ClaimBehaviourData.getAll("Flower Pots").setBehaviourMode(ClaimBehaviourMode.RequireBuild));
+
+        this.ItemFrameItemRules = new ClaimBehaviourData("Item Frame Items",config,outConfig,"GriefPrevention.Rules.ItemFrameItems",
+                ClaimBehaviourData.getAll("Flower Pots").setBehaviourMode(ClaimBehaviourMode.RequireBuild));
+
+        this.OtherExplosionBehaviour = new ClaimBehaviourData("Other Explosions", config, outConfig, "GriefPrevention.Rules.OtherExplosions", ClaimBehaviourData.getAll("Other Explosions").setSeaLevelOffsets(SeaLevelOverrideTypes.Offset, -1));
 
 		this.CreeperExplosionBlockDamageBehaviour = new ClaimBehaviourData("Creeper Explosion Damage", config, outConfig, "GriefPrevention.Rules.BlockDamageCreeperExplosion", new ClaimBehaviourData("Creeper Explosion Damage", PlacementRules.AboveOnly, PlacementRules.Neither, ClaimBehaviourMode.Disabled).setSeaLevelOffsets(SeaLevelOverrideTypes.Offset, -1));
 
@@ -1041,7 +1072,11 @@ public class WorldConfig {
 		outConfig.set("GriefPrevention.Spam.KickCommand", this.config_spam_kickcommand);
 		outConfig.set("GriefPrevention.Spam.BanCommand", config_spam_bancommand);
 
-		this.config_pvp_protectFreshSpawns = config.getBoolean("GriefPrevention.PvP.ProtectFreshSpawns", true);
+		this.SpawnProtectEnabled = config.getBoolean("GriefPrevention.PvP.SpawnProtect.Enabled", true);
+        this.SpawnProtectTimeout = config.getInt("GriefPrevention.PvP.SpawnProtect.Timeout",20*120);
+        this.SpawnProtectDisableonInstigate = config.getBoolean("GriefPrevention.PvP.SpawnProtect.DisableonInstigate",true);
+        this.SpawnProtectDisableonItemPickup = config.getBoolean("GriefPrevention.PvP.SpawnProtect.DisableonItemPickup",true);
+        this.SpawnProtectPickupTimeout = config.getInt("GriefPrevention.PvP.SpawnProtect.PickupTimeout",10000);
 		this.config_pvp_punishLogout = config.getBoolean("GriefPrevention.PvP.PunishLogout", true);
 		this.config_pvp_combatTimeoutSeconds = config.getInt("GriefPrevention.PvP.CombatTimeoutSeconds", 15);
 		this.config_pvp_allowCombatItemDrop = config.getBoolean("GriefPrevention.PvP.AllowCombatItemDrop", false);
@@ -1301,7 +1336,7 @@ public class WorldConfig {
 		outConfig.set("GriefPrevention.Claims.WildernessWarningBlockCount", this.config_claims_wildernessBlocksDelay);
 
 		// outConfig.set("GriefPrevention.PvP.Worlds", pvpEnabledWorldNames);
-		outConfig.set("GriefPrevention.PvP.ProtectFreshSpawns", this.config_pvp_protectFreshSpawns);
+		outConfig.set("GriefPrevention.PvP.ProtectFreshSpawns", this.SpawnProtectEnabled);
 		outConfig.set("GriefPrevention.PvP.PunishLogout", this.config_pvp_punishLogout);
 		outConfig.set("GriefPrevention.PvP.CombatTimeoutSeconds", this.config_pvp_combatTimeoutSeconds);
 		outConfig.set("GriefPrevention.PvP.AllowCombatItemDrop", this.config_pvp_allowCombatItemDrop);
@@ -1777,8 +1812,8 @@ public class WorldConfig {
 		return PlayerTrampleRules;
 	}
 
-	public boolean getProtectFreshSpawns() {
-		return config_pvp_protectFreshSpawns;
+	public boolean getSpawnProtectEnabled() {
+		return SpawnProtectEnabled;
 	}
 
 	public boolean getPvPBlockContainers() {

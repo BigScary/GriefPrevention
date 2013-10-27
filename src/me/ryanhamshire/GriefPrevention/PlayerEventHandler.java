@@ -46,23 +46,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.World.Environment;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.entity.Animals;
-import org.bukkit.entity.Boat;
-import org.bukkit.entity.Chicken;
-import org.bukkit.entity.Cow;
-import org.bukkit.entity.Creature;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Hanging;
-import org.bukkit.entity.Horse;
-import org.bukkit.entity.MushroomCow;
-import org.bukkit.entity.Ocelot;
-import org.bukkit.entity.Pig;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Sheep;
-import org.bukkit.entity.Tameable;
-import org.bukkit.entity.Vehicle;
-import org.bukkit.entity.Villager;
-import org.bukkit.entity.Wolf;
+import org.bukkit.entity.*;
 import org.bukkit.entity.minecart.HopperMinecart;
 import org.bukkit.entity.minecart.PoweredMinecart;
 import org.bukkit.entity.minecart.StorageMinecart;
@@ -888,6 +872,24 @@ class PlayerEventHandler implements Listener {
 
 		//
 		PlayerData playerData = this.dataStore.getPlayerData(player.getName());
+
+
+		if(clickedBlock.getType().name().equals("FLOWER_POT")){
+            //flower pot, apply flower pot rules.
+            if(wc.getFlowerPotRules().Allowed(player.getLocation(),player,true).Denied()){
+                event.setCancelled(true);
+                return;
+            }
+        }
+        else if(clickedBlock.getType()==Material.ENDER_PORTAL_FRAME){
+            if(event.getItem().getType()==Material.EYE_OF_ENDER){
+                if(wc.getEnderEyePortalRules().Allowed(player.getLocation(),player,true).Denied()){
+                    event.setCancelled(true);
+                }
+            }
+
+
+        }
 		// Apply rules for the leash. Leashes can be attached to fences and
 		// netherbrick fences, but require
 		// permission at the block location for the player.
@@ -1951,12 +1953,20 @@ class PlayerEventHandler implements Listener {
 			// don't allow interaction with item frames in claimed areas without
 			// build permission
 			if (entity instanceof Hanging) {
+                if(entity.getEntityId()==18){
+                //Item Frame.
+                    if(wc.getItemFrameRules().Allowed(entity.getLocation(),player,true).Denied()){
+                        event.setCancelled(true);
+                    }
+
+                }
 				String noBuildReason = GriefPrevention.instance.allowBuild(player, entity.getLocation());
 				if (noBuildReason != null) {
 					GriefPrevention.sendMessage(player, TextMode.Err, noBuildReason);
 					event.setCancelled(true);
 					return;
 				}
+
 			}
 
 			if (entity instanceof Creature) {
@@ -2326,7 +2336,7 @@ class PlayerEventHandler implements Listener {
 
 		// if we're preventing spawn camping and the player was previously empty
 		// handed...
-		if (wc.getProtectFreshSpawns() && (player.getItemInHand().getType() == Material.AIR)) {
+		if (wc.getSpawnProtectEnabled() && (player.getItemInHand().getType() == Material.AIR)) {
 			// if that player is currently immune to pvp
 			PlayerData playerData = this.dataStore.getPlayerData(event.getPlayer().getName());
 			if (playerData.pvpImmune) {
@@ -2334,15 +2344,16 @@ class PlayerEventHandler implements Listener {
 				// spawned, don't pick up the item
 				long now = Calendar.getInstance().getTimeInMillis();
 				long elapsedSinceLastSpawn = now - playerData.lastSpawn;
-				if (elapsedSinceLastSpawn < 10000) {
+				if (elapsedSinceLastSpawn < wc.getSpawnProtectPickupTimeout()) {
 					event.setCancelled(true);
 					return;
 				}
-
-				// otherwise take away his immunity. he may be armed now. at
-				// least, he's worth killing for some loot
-				playerData.pvpImmune = false;
-				GriefPrevention.sendMessage(player, TextMode.Warn, Messages.PvPImmunityEnd);
+                if(wc.getSpawnProtectDisableonItemPickup()){
+				    // otherwise take away his immunity. he may be armed now. at
+				    // least, he's worth killing for some loot
+				    playerData.pvpImmune = false;
+				    GriefPrevention.sendMessage(player, TextMode.Warn, Messages.PvPImmunityEnd);
+                }
 			}
 		}
 	}

@@ -19,7 +19,7 @@ public class Debugger {
 		 * @return
 		 */
 		public boolean applies(DebugLevel checkapply) {
-			return ordinal() < checkapply.ordinal();
+			return ordinal() <= checkapply.ordinal();
 		}
 	}
 
@@ -51,7 +51,7 @@ public class Debugger {
 	}
 
 	public void Output(String Message, DebugLevel Level) {
-		if (CurrentLevel == DebugLevel.None)
+        if (CurrentLevel == DebugLevel.None)
 			return;
 		if (CurrentLevel.applies(Level)) {
 			GriefPrevention.AddLogEntry("[" + Level.name() + "]:" + Message);

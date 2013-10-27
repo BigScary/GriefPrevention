@@ -383,7 +383,7 @@ public class GriefPrevention extends JavaPlugin {
 			return;
 
 		// if anti spawn camping feature is not enabled, do nothing
-		if (!wc.getProtectFreshSpawns())         {
+		if (!wc.getSpawnProtectEnabled())         {
             PlayerData playerData = this.dataStore.getPlayerData(player.getName());
             playerData.pvpImmune=false;
 			return;
@@ -412,11 +412,23 @@ public class GriefPrevention extends JavaPlugin {
 		}
 
 		// otherwise, apply immunity
-		PlayerData playerData = this.dataStore.getPlayerData(player.getName());
+		final PlayerData playerData = this.dataStore.getPlayerData(player.getName());
 		playerData.pvpImmune = true;
 
 		// inform the player
 		GriefPrevention.sendMessage(player, TextMode.Success, Messages.PvPImmunityStart);
+        final Player p = player;
+        //set a timeout callback to reset PvP if a timeout is set.
+        if(wc.getSpawnProtectTimeout()>0){
+            Bukkit.getScheduler().runTaskLater(this,new Runnable(){
+                public void run(){
+                    playerData.pvpImmune=false;
+                    GriefPrevention.sendMessage(p, TextMode.Success, Messages.PvPImmunityEnd);
+
+                }
+            },wc.getSpawnProtectTimeout());
+        }
+
 	}
 
 	// checks whether players can create claims in a world
