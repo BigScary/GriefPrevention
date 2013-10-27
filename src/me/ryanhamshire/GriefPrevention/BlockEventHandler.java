@@ -397,7 +397,7 @@ public class BlockEventHandler implements Listener {
 		if(!wc.Enabled()) return;
 		boolean TargetAllowed = igniteEvent.getIgnitingBlock()==null?true:
 			wc.getFireSpreadTargetBehaviour().Allowed(igniteEvent.getIgnitingBlock().getLocation(), null).Allowed();
-		
+		if(igniteEvent.getIgnitingBlock()==null) return;
 		Claim testclaim = GriefPrevention.instance.dataStore.getClaimAt(igniteEvent.getIgnitingBlock().getLocation(),true);
         if(testclaim!=null){
             if(testclaim.siegeData!=null){
