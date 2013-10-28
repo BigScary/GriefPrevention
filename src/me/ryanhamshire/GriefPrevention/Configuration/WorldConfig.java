@@ -375,10 +375,11 @@ public class WorldConfig {
 
 	private int config_seaLevelOverride;
 
-	private ArrayList<Material> config_siege_blocks; // which blocks will be
+	private List<SiegeableData> config_siege_blocks; // which blocks will be
 														// breakable in siege
 														// mode
-
+    private List<SiegeableData> config_TNTSiege_blocks; //which blocks are breakable during a siege from explosions.
+    public List<SiegeableData> getTNTSiegeBlocks(){ return config_TNTSiege_blocks;}
 	private boolean config_siege_enabled;
 
 	private boolean config_sign_Eavesdrop; // whether to allow sign
@@ -1260,55 +1261,27 @@ public class WorldConfig {
 		// get siege world names from the config file
 
 		// default siege blocks
-		this.config_siege_blocks = new ArrayList<Material>();
-		this.config_siege_blocks.add(Material.DIRT);
-		this.config_siege_blocks.add(Material.GRASS);
-		this.config_siege_blocks.add(Material.LONG_GRASS);
-		this.config_siege_blocks.add(Material.COBBLESTONE);
-		this.config_siege_blocks.add(Material.GRAVEL);
-		this.config_siege_blocks.add(Material.SAND);
-		this.config_siege_blocks.add(Material.GLASS);
-		this.config_siege_blocks.add(Material.THIN_GLASS);
-		this.config_siege_blocks.add(Material.WOOD);
-		this.config_siege_blocks.add(Material.WOOL);
-		this.config_siege_blocks.add(Material.SNOW);
+		this.config_siege_blocks = new ArrayList<SiegeableData>();
+		this.config_siege_blocks.add(new SiegeableData(Material.DIRT.name()));
+		this.config_siege_blocks.add(new SiegeableData(Material.GRASS.name()));
+		this.config_siege_blocks.add(new SiegeableData(Material.LONG_GRASS.name()));
+		this.config_siege_blocks.add(new SiegeableData(Material.COBBLESTONE.name()));
+		this.config_siege_blocks.add(new SiegeableData(Material.GRAVEL.name()));
+		this.config_siege_blocks.add(new SiegeableData(Material.SAND.name()));
+		this.config_siege_blocks.add(new SiegeableData(Material.GLASS.name()));
+		this.config_siege_blocks.add(new SiegeableData(Material.THIN_GLASS.name()));
+		this.config_siege_blocks.add(new SiegeableData(Material.WOOD.name()));
+		this.config_siege_blocks.add(new SiegeableData(Material.WOOL.name()));
+		this.config_siege_blocks.add(new SiegeableData(Material.SNOW.name()));
 
-		// build a default config entry
-		ArrayList<String> defaultBreakableBlocksList = new ArrayList<String>();
-		for (int i = 0; i < this.config_siege_blocks.size(); i++) {
-			defaultBreakableBlocksList.add(this.config_siege_blocks.get(i).name());
-		}
+        this.config_siege_blocks = SiegeableData.readList(config,outConfig,"GriefPrevention.Siege.BreakableBlocks",config_siege_blocks);
+        config_TNTSiege_blocks = new ArrayList<SiegeableData>();
+        //go with cobble for now.
+        config_TNTSiege_blocks.add(new SiegeableData(Material.COBBLESTONE.name()));
 
-		// try to load the list from the config file
-		List<String> breakableBlocksList = config.getStringList("GriefPrevention.Siege.BreakableBlocks");
+        this.config_TNTSiege_blocks = SiegeableData.readList(config,outConfig,"GriefPrevention.Siege.ExplosionBreakableBlocks",config_TNTSiege_blocks);
 
-		// if it fails, use default list instead
-		if (breakableBlocksList == null || breakableBlocksList.size() == 0) {
-			breakableBlocksList = defaultBreakableBlocksList;
-		}
-
-		// parse the list of siege-breakable blocks
-		this.config_siege_blocks = new ArrayList<Material>();
-		for (int i = 0; i < breakableBlocksList.size(); i++) {
-			String blockName = breakableBlocksList.get(i);
-			Material material = Material.getMaterial(blockName);
-			if (material == null) {
-				// check and see if it is an ID value.
-				try {
-					int grabint = Integer.parseInt(blockName);
-					material = Material.getMaterial(grabint);
-
-				} catch (NumberFormatException exx) {
-					material = null;
-				}
-			}
-
-			if (material == null) {
-				GriefPrevention.AddLogEntry("Siege Configuration: Material not found: " + blockName + ".");
-			} else {
-				this.config_siege_blocks.add(material);
-			}
-		}
+		//List<String> breakableBlocksList = config.getStringList("GriefPrevention.Siege.BreakableBlocks");
 
 		this.config_pvp_noCombatInPlayerLandClaims = config.getBoolean("GriefPrevention.PvP.ProtectPlayersInLandClaims.PlayerOwnedClaims", !this.config_siege_enabled);
 		this.config_pvp_noCombatInAdminLandClaims = config.getBoolean("GriefPrevention.PvP.ProtectPlayersInLandClaims.AdministrativeClaims", !this.config_siege_enabled);
@@ -1362,7 +1335,7 @@ public class WorldConfig {
 
 		// outConfig.set("GriefPrevention.Siege.Worlds",
 		// siegeEnabledWorldNames);
-		outConfig.set("GriefPrevention.Siege.BreakableBlocks", breakableBlocksList);
+
 
 		outConfig.set("GriefPrevention.CreaturesTrampleCrops", this.config_creaturesTrampleCrops);
 
@@ -1887,14 +1860,11 @@ public class WorldConfig {
 		return SiegeBlockRevert;
 	}
 
-	public List<Material> getSiegeBlocks() {
+	public List<SiegeableData> getSiegeBlocks() {
 		return config_siege_blocks;
 	}
     public boolean isSiegeMaterial(Material b){
-        for(Material p:getSiegeBlocks()){
-            if(p.name().equals(b.name())) return true;
-        }
-        return false;
+        return SiegeableData.CheckList(config_siege_blocks,b);
     }
 	public int getSiegeTamedAnimalDistance() {
 		return Siege_TamedAnimalDistance;

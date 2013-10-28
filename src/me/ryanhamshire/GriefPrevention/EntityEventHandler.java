@@ -22,6 +22,7 @@ import java.util.*;
 
 import me.ryanhamshire.GriefPrevention.Configuration.ClaimBehaviourData;
 import me.ryanhamshire.GriefPrevention.Configuration.ClaimBehaviourData.ClaimAllowanceConstants;
+import me.ryanhamshire.GriefPrevention.Configuration.SiegeableData;
 import me.ryanhamshire.GriefPrevention.Configuration.WorldConfig;
 
 import org.bukkit.Bukkit;
@@ -603,9 +604,14 @@ class EntityEventHandler implements Listener {
             Claim explodepos = GriefPrevention.instance.dataStore.getClaimAt(block.getLocation(),false);
             if(explodepos!=null && explodepos.siegeData!=null){
                 //under siege...
-                if(wc.getSiegeBlockRevert()){
-                if(!wc.isSiegeMaterial(block.getType())){
-                    blocks.remove(i--);
+
+
+                if(!wc.getSiegeBlockRevert()){
+                    float gotpower;
+                    if(-1==(gotpower=SiegeableData.getListPower(wc.getTNTSiegeBlocks(),block.getType())) &&
+                    (gotpower < explodeEvent.getYield())){
+                       blocks.remove(i--);
+                    }
                 }
                 else {
 
@@ -622,7 +628,7 @@ class EntityEventHandler implements Listener {
                         explodepos.siegeData.SiegedBlocks.put(usekey, new BrokenBlockInfo(block.getLocation()));
                         // replace it manually
                         block.setType(Material.AIR);
-                        // return empty string, because obviously returning
+
 
 
                     }
@@ -630,7 +636,7 @@ class EntityEventHandler implements Listener {
 
                 }
                 }
-            }
+
 			// if(wc.getModsExplodableIds().contains(new
 			// MaterialInfo(block.getTypeId(), block.getData(), null)))
 			// continue;

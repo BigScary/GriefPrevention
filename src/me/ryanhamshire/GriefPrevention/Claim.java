@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import me.ryanhamshire.GriefPrevention.Configuration.SiegeableData;
 import me.ryanhamshire.GriefPrevention.Configuration.WorldConfig;
 import me.ryanhamshire.GriefPrevention.events.ClaimModifiedEvent;
 import me.ryanhamshire.GriefPrevention.tasks.RestoreNatureProcessingTask;
@@ -342,13 +343,8 @@ public class Claim {
 			boolean breakable = false;
 
 			// search for block type in list of breakable blocks
-			for (int i = 0; i < wc.getSiegeBlocks().size(); i++) {
-				Material breakableMaterial = wc.getSiegeBlocks().get(i);
-				if (breakableMaterial.getId() == material.getId()) {
-					breakable = true;
-					break;
-				}
-			}
+            breakable = SiegeableData.CheckList(wc.getSiegeBlocks(),material);
+
 			breakable = breakable || BrokenBlockInfo.canBreak(BlocktoCheck.getLocation());
             //System.out.println(BlocktoCheck.getType().name() + " Breakable:" + breakable);
             //System.out.println("player:" + player.getName() + " Siege player:" + siegeData.attacker.getName())   ;

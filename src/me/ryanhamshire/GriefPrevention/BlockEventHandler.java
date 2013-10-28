@@ -395,9 +395,10 @@ public class BlockEventHandler implements Listener {
 	public void onBlockIgnite(BlockIgniteEvent igniteEvent) {
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(igniteEvent.getBlock().getWorld());
 		if(!wc.Enabled()) return;
+        if(igniteEvent==null || igniteEvent.getIgnitingBlock()==null) return;
+        Debugger.Write("Block:" + igniteEvent.getBlock().getType().name() + ", Igniting Block:" + igniteEvent.getIgnitingBlock().getType().name() + " cause:" + igniteEvent.getCause().name(),DebugLevel.Verbose);
 		boolean TargetAllowed = igniteEvent.getIgnitingBlock()==null?true:
 			wc.getFireSpreadTargetBehaviour().Allowed(igniteEvent.getIgnitingBlock().getLocation(), null).Allowed();
-		if(igniteEvent.getIgnitingBlock()==null) return;
 		Claim testclaim = GriefPrevention.instance.dataStore.getClaimAt(igniteEvent.getIgnitingBlock().getLocation(),true);
         if(testclaim!=null){
             if(testclaim.siegeData!=null){
@@ -949,7 +950,7 @@ public class BlockEventHandler implements Listener {
 		for (String iterateLine : event.getLines()) {
 			if (iterateLine.length() != 0)
 				notEmpty = true;
-			lines.append(iterateLine).append(";");
+			lines.append(iterateLine).append(";" + ChatColor.RESET);
 		}
 
 		String signMessage = lines.toString();
@@ -967,6 +968,7 @@ public class BlockEventHandler implements Listener {
 					Player otherPlayer = players[i];
 					if (otherPlayer.hasPermission(PermNodes.EavesDropPermission)) {
 						otherPlayer.sendMessage(ChatColor.GRAY + player.getName() + "(sign): " + signMessage);
+                        otherPlayer.sendMessage(ChatColor.GRAY + "Location:" + GriefPrevention.getfriendlyLocationString(player.getLocation()));
 					}
 				}
 			}
