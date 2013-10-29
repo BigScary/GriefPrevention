@@ -1528,7 +1528,7 @@ class PlayerEventHandler implements Listener {
 							GriefPrevention.sendMessage(player, TextMode.Err, Messages.ResizeNeedMoreBlocks, String.valueOf(Math.abs(blocksRemainingAfter)));
 							}
 							else {
-								GriefPrevention.sendMessage(player, TextMode.Err, Messages.OtherPlayerResizeInsufficientWorldBlocks,pdata.playerName);
+								GriefPrevention.sendMessage(player, TextMode.Err, Messages.OtherPlayerResizeInsufficientWorldBlocks,pdata.playerName,String.valueOf(Math.abs(blocksRemainingAfter)));
 								
 							}
 							return;

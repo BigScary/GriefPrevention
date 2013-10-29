@@ -1154,7 +1154,7 @@ public abstract class DataStore {
 		this.addDefault(defaults, Messages.RescueAbortedMoved, "You moved!  Rescue cancelled.", null);
 		this.addDefault(defaults, Messages.SiegeDoorsLockedEjection, "Looting time is up!  Ejected from the claim.", null);
 		this.addDefault(defaults, Messages.NoModifyDuringSiege, "Claims can't be modified while under siege.", null);
-		this.addDefault(defaults, Messages.OnlyOwnersModifyClaims, "Only {0} can modify this claim.", "0: owner name");
+		this.addDefault(defaults, Messages.OnlyOwnersModifyClaims, "You do not have {0}'s Permission to modify this claim.", "0: owner name");
 		this.addDefault(defaults, Messages.NoBuildUnderSiege, "This claim is under siege by {0}.  No one can build here.", "0: attacker name");
 		this.addDefault(defaults, Messages.NoBuildPvP, "You can't build in claims during PvP combat.", null);
 		this.addDefault(defaults, Messages.NoBuildPermission, "You don't have {0}'s permission to build here.", "0: owner name");
@@ -1223,7 +1223,7 @@ public abstract class DataStore {
 		this.addDefault(defaults, Messages.ResizeNeedMoreBlocks, "The resized claim would be too large. You need {0} more claim blocks.", "0:number of claim blocks required");
 		this.addDefault(defaults, Messages.ResizeTooFewBlocks, "That claim would not take up enough space. Claims must use at least {0} Blocks.", "0:Minimum blocks in a claim");
 		this.addDefault(defaults, Messages.ConfirmationReset, "Confirmation for {0} Reset.", "0:Name of confirmation flag");
-		this.addDefault(defaults, Messages.OtherPlayerResizeInsufficientWorldBlocks, "{0} Doesn't have enough claim blocks for that.", "0:Player that needs more claim blocks");
+		this.addDefault(defaults, Messages.OtherPlayerResizeInsufficientWorldBlocks, "{0} Needs {1} more claim blocks for that.", "0:Player that needs more claim blocks;1:Claim blocks required");
 		this.addDefault(defaults, Messages.ClaimResizedOtherPlayer, "{0}'s Claim has been resized. They now have {1} Claim Blocks left.", "0:Owner of claim;1:Claim blocks remaining.");
 		// load the config file
 		FileConfiguration config = YamlConfiguration.loadConfiguration(new File(messagesFilePath));

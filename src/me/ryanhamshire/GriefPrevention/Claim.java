@@ -535,7 +535,8 @@ public class Claim {
 		// mods can make this happen somehow)
 		if (player == null)
 			return "";
-
+        PlayerData pd = GriefPrevention.instance.dataStore.getPlayerData(player.getName());
+        Debugger.Write("allowEdit Check for player " + player.getName() + " on claim owned by " + this.claimOwnerName, Debugger.DebugLevel.Verbose);
 		// special cases...
 
 		// admin claims need adminclaims permission only.
@@ -544,11 +545,14 @@ public class Claim {
 				return null;
 		}
 
-		// anyone with deleteclaims permission can modify non-admin claims at
-		// any time
+		// anyone with deleteclaims permission can modify non-admin claims if ignoreclaims is set.
+
 		else {
-			if (player.hasPermission(PermNodes.DeleteClaimsPermission))
+			if (player.hasPermission(PermNodes.DeleteClaimsPermission) && pd.ignoreClaims)
+            {
+                Debugger.Write("Player has Delete Claims Permission and ignoreClaims is set.", Debugger.DebugLevel.Verbose);
 				return null;
+            }
 		}
 
 		// no resizing, deleting, and so forth while under siege
