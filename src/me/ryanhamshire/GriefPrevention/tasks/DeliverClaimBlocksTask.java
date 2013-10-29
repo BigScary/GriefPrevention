@@ -42,12 +42,25 @@ public class DeliverClaimBlocksTask implements Runnable {
 		for (Player player : players) {
 
 			WorldConfig wc = GriefPrevention.instance.getWorldCfg(player.getWorld());
+            DataStore dataStore = GriefPrevention.instance.dataStore;
+            PlayerData playerData = dataStore.getPlayerData(player.getName());
 			if (wc.getClaimBlocksAccruedPerHour() == 0)
 				break; // if not set to accrue, don't accrue.
-			int accruedBlocks = Math.max(1, (int) (wc.getClaimBlocksAccruedPerHour() / 12));
+            float accrual = wc.getClaimBlocksAccruedPerHour();
+            //if it's less than 12, assume it is a percentage...
+            int accruedBlocks;
+            float percentpart = accrual-(float)Math.floor(accrual);
+            if(percentpart !=0){
+                //get the players current Claim Blocks, multiply it by accrual/12 and use that as the accrued value.
+                accruedBlocks = (int)((float)playerData.getRemainingClaimBlocks()*percentpart/12);
 
-			DataStore dataStore = GriefPrevention.instance.dataStore;
-			PlayerData playerData = dataStore.getPlayerData(player.getName());
+
+            }
+            else {
+			    accruedBlocks = Math.max(1, (int) (wc.getClaimBlocksAccruedPerHour() / 12));
+            }
+
+
 
 			Location lastLocation = playerData.lastAfkCheckLocation;
 			try // distance squared will throw an exception if the player has

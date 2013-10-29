@@ -973,7 +973,13 @@ public class WorldConfig {
 		// max investment score, defaults to 400 for creative worlds.
 		this.config_claimcleanup_maxinvestmentscore = config.getInt("GriefPrevention.ClaimCleanup.MaxInvestmentScore", isCreative ? 400 : 100);
 
-		config_claims_blocksAccruedPerHour = config.getInt("GriefPrevention.Claims.BlocksAccruedPerHour", 100);
+		String blocksaccruedstr = config.getString("GriefPrevention.Claims.BlocksAccruedPerHour", "100");
+        try {
+            config_claims_blocksAccruedPerHour = Float.parseFloat(blocksaccruedstr);
+        }
+        catch(NumberFormatException nfe){
+            config_claims_blocksAccruedPerHour=100;
+        }
 
 		this.config_claims_maxblocks = config.getInt("GriefPrevention.Claims.MaxClaimBlocks", 0);
 		outConfig.set("GriefPrevention.Claims.MaxClaimBlocks", this.config_claims_maxblocks);
