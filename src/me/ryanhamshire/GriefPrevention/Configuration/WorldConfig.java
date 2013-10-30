@@ -1151,6 +1151,7 @@ public class WorldConfig {
 		// trash blocks.
 		this.config_trash_blocks = new MaterialCollection();
 		List<String> trashblockStrings = config.getStringList("GriefPrevention.TrashBlocks");
+        outConfig.set("GriefPrevention.TrashBlocks",trashblockStrings);
 		if (GriefPrevention.instance.ModdedBlocks != null) {
 			for (MaterialInfo mi : GriefPrevention.instance.ModdedBlocks.FoundOres.getMaterials()) {
 				trashblockStrings.add(mi.toString());
