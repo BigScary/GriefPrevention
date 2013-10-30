@@ -84,6 +84,34 @@ public class PlayerData {
 	// the claim this player is currently subdividing
 	public Claim claimSubdividing = null;
 
+    public boolean SoftMute = false;
+    //track players on this Players "ignore list"
+    private List<String> IgnoreList = new ArrayList<String>();
+
+    public boolean isIgnored(Player p){
+        for(String iterate:IgnoreList){
+            if(iterate.equalsIgnoreCase(p.getName())) return true;
+        }
+        return false;
+    }
+    public void ignorePlayer(Player p){
+        if(!isIgnored(p)) IgnoreList.add(p.getName());
+    }
+    public void unignorePlayer(Player p){
+        if(isIgnored(p)) IgnoreList.remove(p.getName());
+    }
+    public List<String> getIgnoreList(){
+        return IgnoreList;
+    }
+    /**
+     * toggles the ignore value for a player by adding, or removing that player from this players ignore list.
+     * @param p
+     * @return
+     */
+    public boolean ToggleIgnored(Player p){
+        if(isIgnored(p)) unignorePlayer(p); else ignorePlayer(p);
+        return isIgnored(p);
+    }
 	// radius for restore nature fill mode
 	public int fillRadius = 0;
 

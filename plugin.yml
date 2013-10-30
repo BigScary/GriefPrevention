@@ -148,6 +148,10 @@ commands:
       usage: /IgnoreClaims
       permission: griefprevention.commands.ignoreclaims
       aliases: ic
+   ignore:
+      description: Ignores a Player, or displays your current ignore list.
+      usage: /Ignore [Player]
+      permission: griefprevention.commands.ignore
    deletealladminclaims:
       description: Deletes all administrative claims.
       usage: /DeleteAllAdminClaims
@@ -293,6 +297,9 @@ permissions:
         default: true
     griefprevention.commands.ignoreclaims:
         description: grants access to the ignoreclaims command.
+        default: op
+    griefprevention.commands.ignore:
+        description: grants access to the ignore command.
         default: op
     griefprevention.commands.deletealladminclaims:
         description: grants access to the deletealladminclaims command.

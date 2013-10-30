@@ -125,8 +125,13 @@ class PlayerEventHandler implements Listener {
 		// watching for message format how*claim*, and will send a link to the
 		// basics video
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(player.getWorld());
-		if (!wc.getClaimsEnabled())
+		if (!wc.Enabled())
 			return false;
+
+
+
+
+
 
 		if (this.howToClaimPattern == null) {
 			this.howToClaimPattern = Pattern.compile(this.dataStore.getMessage(Messages.HowToClaimRegex), Pattern.CASE_INSENSITIVE);
@@ -627,6 +632,25 @@ class PlayerEventHandler implements Listener {
 			event.setCancelled(true);
 			return;
 		}
+        PlayerData pdata = GriefPrevention.instance.dataStore.getPlayerData(player.getName());
+
+        //remove any recipients that have this sender on their list.
+        Set<Player> removeplayers = new HashSet<Player>();
+        for(Player iterate:event.getRecipients()){
+
+            PlayerData recipientData = GriefPrevention.instance.dataStore.getPlayerData(iterate.getName());
+            if(recipientData.isIgnored(event.getPlayer())){
+                removeplayers.add(iterate);
+            }
+            else if(pdata.SoftMute && !recipientData.SoftMute){
+                //don't show messages if the player sending the message has SoftMute set, but the
+                //recipient does not. If they both do, the recipient will receive the message.
+                removeplayers.add(iterate);
+            }
+        }
+        for(Player removeit:removeplayers)  event.getRecipients().remove(removeit);
+
+
 
 		String message = event.getMessage();
 
@@ -708,10 +732,12 @@ class PlayerEventHandler implements Listener {
 
 		playerData.lastDeathTimeStamp = now;
 	}
+    @EventHandler
 
-	// helper for above
+
 	private void onPlayerDisconnect(Player player, String notificationMessage) {
 		String playerName = player.getName();
+
 		PlayerData playerData = this.dataStore.getPlayerData(playerName);
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(player.getWorld());
 		if (!wc.Enabled())
@@ -1417,7 +1443,7 @@ class PlayerEventHandler implements Listener {
 			}
 
 			// if the player doesn't have claims permission, don't do anything
-			if (wc.getCreateClaimRequiresPermission() && !player.hasPermission(PermNodes.CreateClaimsPermission)) {
+			if (wc.getCreateClaimRequiresPermission() && !player.hasPermission(PermNodes.CreateClaimsShovelPermission)) {
 				GriefPrevention.sendMessage(player, TextMode.Err, Messages.NoCreateClaimPermission);
 				return;
 			}
@@ -2363,6 +2389,15 @@ class PlayerEventHandler implements Listener {
 	void onPlayerQuit(PlayerQuitEvent event) {
 
 		Player player = event.getPlayer();
+        if(player.isBanned()){
+            event.setQuitMessage(null);
+            //However, all players with griefprevention.admin.eavesdrop permission get a ban notification.
+            for(Player p:Bukkit.getOnlinePlayers()){
+                if(p.hasPermission(PermNodes.AdminEavesDropPermission)){
+                    GriefPrevention.sendMessage(p,TextMode.Info, player.getName() + " Was banned.");
+                }
+            }
+        }
 		WorldConfig wc =
 		 GriefPrevention.instance.getWorldCfg(player.getWorld());
 		if(!wc.Enabled()) return;
