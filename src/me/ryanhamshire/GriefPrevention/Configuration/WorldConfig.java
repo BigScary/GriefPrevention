@@ -282,7 +282,7 @@ public class WorldConfig {
 
 	private int config_message_cooldown_stuck = 0; // stuck cooldown. 0= no
 													// cooldown.
-
+    private int config_message_cooldown_ignore = 0;
 	private MaterialCollection config_mods_accessTrustIds; // list of block IDs
 															// which should
 															// require
@@ -990,9 +990,10 @@ public class WorldConfig {
 		outConfig.set("GriefPrevention.ClaimCleanup.Enabled", this.config_claimcleanup_enabled);
 		this.config_message_cooldown_claims = config.getInt("GriefPrevention.Expiration.MessageCooldown.Claim", 0);
 		this.config_message_cooldown_stuck = config.getInt("GriefPrevention.Expiration.MessageCooldown.Stuck", 0);
+        this.config_message_cooldown_ignore = config.getInt("GriefPrevention.Expiration.MessageCooldown.Ignore",0);
 		outConfig.set("GriefPrevention.Expiration.MessageCooldown.Claim", config_message_cooldown_claims);
 		outConfig.set("GriefPrevention.Expiration.MessageCooldown.Stuck", config_message_cooldown_stuck);
-
+        outConfig.set("GriefPrevention.Expiration.MessageCooldown.Ignore",config_message_cooldown_ignore);
 		this.config_claims_wildernessBlocksDelay = config.getInt("GriefPrevention.Claims.WildernessWarningBlockCount", 15); // number
 																															// of
 																															// blocks,0
@@ -1747,7 +1748,9 @@ public class WorldConfig {
 	public int getMessageCooldownStuck() {
 		return config_message_cooldown_stuck;
 	}
-
+    public int getMessageCooldownIgnore(){
+        return config_message_cooldown_ignore;
+    }
 	public int getMinClaimSize() {
 		return config_claims_minSize;
 	}

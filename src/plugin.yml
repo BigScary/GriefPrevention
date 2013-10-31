@@ -152,6 +152,10 @@ commands:
       description: Ignores a Player, or displays your current ignore list.
       usage: /Ignore [Player]
       permission: griefprevention.commands.ignore
+   softmute:
+      description: Mutes a player, making their messages not display for most server players.
+      usage: /SoftMute <Player>
+      permission: griefprevention.commands.softmute
    deletealladminclaims:
       description: Deletes all administrative claims.
       usage: /DeleteAllAdminClaims
@@ -300,6 +304,9 @@ permissions:
         default: op
     griefprevention.commands.ignore:
         description: grants access to the ignore command.
+        default: op
+    griefprevention.commands.softmute:
+        description: grants access to the softmute command.
         default: op
     griefprevention.commands.deletealladminclaims:
         description: grants access to the deletealladminclaims command.

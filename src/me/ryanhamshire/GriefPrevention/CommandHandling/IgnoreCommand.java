@@ -54,7 +54,7 @@ public class IgnoreCommand extends GriefPreventionCommand {
             boolean nowignored = pdata.ToggleIgnored(ignoredplayer);
             Messages usemessage = nowignored?Messages.StartIgnorePlayer:Messages.StopIgnorePlayer;
             GriefPrevention.sendMessage(p,TextMode.Info,usemessage,ignoredplayer.getName());
-
+            return true;
 
             }
         }

@@ -84,7 +84,26 @@ public class PlayerData {
 	// the claim this player is currently subdividing
 	public Claim claimSubdividing = null;
 
-    public boolean SoftMute = false;
+    public static List<String> SoftMutedPlayers = new ArrayList<String>();
+
+
+    public boolean getSoftMute(){
+       return SoftMutedPlayers.contains(playerName);
+    }
+    public boolean setSoftMute(boolean value){
+    if(getSoftMute()==value) return value; //no change.
+    else if(getSoftMute()){
+        SoftMutedPlayers.remove(playerName);
+
+    }
+    else{
+        SoftMutedPlayers.add(playerName);
+    }
+    return value;
+    }
+    public boolean ToggleSoftMute(){
+        return setSoftMute(!getSoftMute());
+    }
     //track players on this Players "ignore list"
     private List<String> IgnoreList = new ArrayList<String>();
 
@@ -127,7 +146,7 @@ public class PlayerData {
 
 	public boolean IgnoreStuckMessage = false; // save semantics as above, but
 												// for Stuck Messages.
-
+    public boolean IgnoreIgnoreMessage = false;
 	public InetAddress ipAddress;
 
 	// where this player was the last time we checked on him for earning claim

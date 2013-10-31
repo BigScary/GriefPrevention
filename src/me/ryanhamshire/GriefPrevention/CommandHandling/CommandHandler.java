@@ -85,6 +85,7 @@ public class CommandHandler implements CommandExecutor {
         GPCommands.add(new GPDebugCommand());
         GPCommands.add(new CleanClaimsCommand());
         GPCommands.add(new IgnoreCommand());
+        GPCommands.add(new SoftMuteCommand());
 		for (GriefPreventionCommand iterate : GPCommands) {
 			String[] gotlabels = iterate.getLabels();
 			if (gotlabels == null) {

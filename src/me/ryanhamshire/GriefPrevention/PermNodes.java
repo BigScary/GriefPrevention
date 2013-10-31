@@ -28,6 +28,8 @@ public class PermNodes {
 	 * "standard" eavesdropping, which is whispers/tells.
 	 */
 	public static final String EavesDropPermission = "griefprevention.eavesdrop.standard";
+    public static final String EavesDropMute = "griefprevention.eavesdrop.mute";
+
 	public static final String LoginSpamPermission = "griefprevention.spam.login";
 	public static final String NoPvPImmunityPermission = "griefprevention.pvp.noimmunity";
 	public static final String ReloadPermission = "griefprevention.admin.reload";

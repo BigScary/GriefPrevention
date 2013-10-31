@@ -18,12 +18,7 @@
 
 package me.ryanhamshire.GriefPrevention;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -168,9 +163,28 @@ class PlayerEventHandler implements Listener {
 			}
 		}
 
+		//advertise the ignore command if the player says shut up or ban.
+        if(!message.contains("/ignore") && message.contains("ignore") || message.contains("ban") || message.contains("shut up")){
+
+            final PlayerData pdata = GriefPrevention.instance.dataStore.getPlayerData(player.getName());
+            if(!pdata.IgnoreIgnoreMessage){
+                pdata.IgnoreIgnoreMessage=true;
+                Bukkit.getScheduler().runTaskLater(GriefPrevention.instance, new Runnable() {
+                    public void run() {
+                        pdata.IgnoreIgnoreMessage = false;
+                    }
+                }, wc.getMessageCooldownIgnore() * 20);
+
+                GriefPrevention.sendMessage(player, TextMode.Info, Messages.IgnoreInstructions, 10L);
+            }
+
+        }
+
 		// FEATURE: automatically educate players about the /trapped command
 		// check for "trapped" or "stuck" to educate players about the /trapped
 		// command
+
+
 		if (!message.contains("/trapped") && (message.contains("trapped") || message.contains("stuck") || message.contains(this.dataStore.getMessage(Messages.TrappedChatKeyword)))) {
 			final PlayerData pdata = GriefPrevention.instance.dataStore.getPlayerData(player.getName());
 			// if not set to ignore the stuck message, show it, set the ignore
@@ -182,7 +196,7 @@ class PlayerEventHandler implements Listener {
 
 				Bukkit.getScheduler().runTaskLater(GriefPrevention.instance, new Runnable() {
 					public void run() {
-						pdata.IgnoreStuckMessage = true;
+						pdata.IgnoreStuckMessage = false;
 					}
 				}, wc.getMessageCooldownStuck() * 20);
 
@@ -639,12 +653,27 @@ class PlayerEventHandler implements Listener {
         for(Player iterate:event.getRecipients()){
 
             PlayerData recipientData = GriefPrevention.instance.dataStore.getPlayerData(iterate.getName());
+
+
+
+
+
             if(recipientData.isIgnored(event.getPlayer())){
                 removeplayers.add(iterate);
             }
-            else if(pdata.SoftMute && !recipientData.SoftMute){
+            else if(pdata.getSoftMute() && !recipientData.getSoftMute()){
                 //don't show messages if the player sending the message has SoftMute set, but the
                 //recipient does not. If they both do, the recipient will receive the message.
+                //if the recipient has the Eavesdrop perm, they see the message but it get's displayed. with [MUTED] in front.
+                //in order to do this we still cancel it but send them a message manually.
+
+                if(iterate.hasPermission(PermNodes.EavesDropMute)){
+
+                    iterate.sendMessage(ChatColor.BLUE + "[MUTED]" + ChatColor.RESET + "<" + player.getDisplayName() + ">" + event.getMessage());
+
+
+                }
+
                 removeplayers.add(iterate);
             }
         }
@@ -657,7 +686,7 @@ class PlayerEventHandler implements Listener {
 		event.setCancelled(this.handlePlayerChat(player, message, event));
 	}
 
-	
+	private Map<String,String> BanLookups = new HashMap<String,String>();
 	
 	// when a player uses a slash command...
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
