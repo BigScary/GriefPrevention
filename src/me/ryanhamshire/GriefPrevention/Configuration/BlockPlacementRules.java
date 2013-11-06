@@ -13,6 +13,7 @@ import me.ryanhamshire.GriefPrevention.TextMode;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -41,7 +42,8 @@ public class BlockPlacementRules {
 		return Result;
 
 	}
-
+    private String Name;
+    public String getName(){ return Name;}
 	private ClaimBehaviourData ClaimBehaviour;
 
 	private MaterialCollection Materials = null;

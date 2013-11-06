@@ -271,7 +271,7 @@ public class GriefPrevention extends JavaPlugin {
 		// exception: administrators in ignore claims mode, and special player
 		// accounts created by server mods
         ClaimBehaviourData cbd = null;
-        if(null!=(cbd =wc.getBreakOverrides().getBehaviourforBlock(location.getBlock()))){
+        if(null!=(cbd =wc.getBlockBreakOverrides().getBehaviourforBlock(location.getBlock()))){
             ClaimBehaviourData.ClaimAllowanceConstants cac;
             if((cac=cbd.Allowed(location,player,true)).Allowed()){
                 return null;
@@ -946,7 +946,7 @@ public class GriefPrevention extends JavaPlugin {
 					}
 				}
 				if (FlatFileDataStore.hasData() && databaseStore != null) {
-					GriefPrevention.AddLogEntry("There appears to be some data on the hard drive.  Migrating those data to the database...");
+					GriefPrevention.AddLogEntry("There appears to be some data on the hard drive.  Migrating that data to the database...");
 					FlatFileDataStore flatFileStore = new FlatFileDataStore();
 					flatFileStore.migrateData(databaseStore);
 					GriefPrevention.AddLogEntry("Data migration process complete.  Reloading data from the database...");
@@ -1064,6 +1064,9 @@ public class GriefPrevention extends JavaPlugin {
 
 	public void parseMaterialListFromConfig(List<String> stringsToParse, MaterialCollection materialCollection) {
 		materialCollection.clear();
+        Debugger.Write("parseMaterialListFromConfig:" + String.valueOf(stringsToParse.size()) + " Items.",DebugLevel.Verbose);
+        if(stringsToParse==null || stringsToParse.size()==0) return;
+
 
 		// for each string in the list
 		for (int i = 0; i < stringsToParse.size(); i++) {
@@ -1089,6 +1092,7 @@ public class GriefPrevention extends JavaPlugin {
 				materialCollection.add(materialInfo);
 			}
 		}
+        Debugger.Write("parsed material collection contains " + materialCollection + " Elements.",DebugLevel.Verbose);
 	}
 
 	private RecursiveCopyResult recursiveCopy(File pSource, File pDest, boolean ShowMessages) throws IOException {

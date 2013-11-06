@@ -93,7 +93,7 @@ public abstract class DataStore {
 	 * 
 	 * @param newClaim
 	 */
-	synchronized void addClaim(Claim newClaim) {
+	public synchronized void addClaim(Claim newClaim) {
 		// ClaimCreatedEvent createevent = new ClaimCreatedEvent();
 		// ClaimCreatedEvent ev
 

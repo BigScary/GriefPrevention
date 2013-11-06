@@ -21,6 +21,7 @@ package me.ryanhamshire.GriefPrevention;
 import java.util.ArrayList;
 import java.util.List;
 
+import me.ryanhamshire.GriefPrevention.Configuration.BlockPlacementRules;
 import me.ryanhamshire.GriefPrevention.Debugger.DebugLevel;
 import me.ryanhamshire.GriefPrevention.Configuration.ClaimBehaviourData;
 import me.ryanhamshire.GriefPrevention.Configuration.WorldConfig;
@@ -132,6 +133,24 @@ public class BlockEventHandler implements Listener {
 		Player player = breakEvent.getPlayer();
 		Block block = breakEvent.getBlock();
 
+        //block overrides.
+        ClaimBehaviourData cbd = wc.getBlockBreakOverrides().getBehaviourforBlock(block);
+        if(cbd!=null){
+                ClaimBehaviourData.ClaimAllowanceConstants result = cbd.Allowed(block.getLocation(),player);
+            if(result.Allowed()){
+                Debugger.Write("Block Override Forcing allow for break of block:" + block.getType().name(),DebugLevel.Verbose);
+                return;
+            }
+                else if(result.Denied()){
+                Debugger.Write("Block Override Forcing deny for breaking of block:" + block.getType().name(),DebugLevel.Verbose);
+                breakEvent.setCancelled(true);
+                return;
+            }
+        }
+        if(wc.getBreakBlockRules().Allowed(block.getLocation(),player).Denied()){
+            breakEvent.setCancelled(true);
+            return;
+        }
 		// if no survival building outside claims is enabled...
 		// if the block is a trash block....
 		if (wc.getTrashBlocks().contains(breakEvent.getBlock().getType())) {
@@ -398,7 +417,7 @@ public class BlockEventHandler implements Listener {
         if(igniteEvent==null || igniteEvent.getIgnitingBlock()==null) return;
         Debugger.Write("Block:" + igniteEvent.getBlock().getType().name() + ", Igniting Block:" + igniteEvent.getIgnitingBlock().getType().name() + " cause:" + igniteEvent.getCause().name(),DebugLevel.Verbose);
 		boolean TargetAllowed = igniteEvent.getIgnitingBlock()==null?true:
-			wc.getFireSpreadTargetBehaviour().Allowed(igniteEvent.getIgnitingBlock().getLocation(), null).Allowed();
+		wc.getFireSpreadTargetBehaviour().Allowed(igniteEvent.getIgnitingBlock().getLocation(), null).Allowed();
 		Claim testclaim = GriefPrevention.instance.dataStore.getClaimAt(igniteEvent.getIgnitingBlock().getLocation(),true);
         if(testclaim!=null){
             if(testclaim.siegeData!=null){
@@ -568,6 +587,21 @@ public class BlockEventHandler implements Listener {
 		Block block = placeEvent.getBlock();
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(block.getWorld());
 		if(!wc.Enabled()) return;
+
+        ClaimBehaviourData cbd = wc.getBlockPlaceOverrides().getBehaviourforBlock(block);
+        if(cbd!=null){
+            ClaimBehaviourData.ClaimAllowanceConstants result = cbd.Allowed(block.getLocation(),player);
+            if(result.Allowed()){
+                Debugger.Write("Block Override Forcing allow for placement of block:" + block.getType().name(),DebugLevel.Verbose);
+                return;
+            }
+            else if(result.Denied()){
+                Debugger.Write("Block Override Forcing deny for placement of block:" + block.getType().name(),DebugLevel.Verbose);
+                placeEvent.setCancelled(true);
+                return;
+            }
+        }
+
         if(wc.getPlaceBlockRules().Allowed(block.getLocation(), player).Denied()){
             placeEvent.setCancelled(true);
             return;

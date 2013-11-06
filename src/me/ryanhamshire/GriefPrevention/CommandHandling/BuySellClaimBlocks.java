@@ -35,10 +35,7 @@ public class BuySellClaimBlocks extends GriefPreventionCommand {
 				GriefPrevention.sendMessage(player, TextMode.Err, Messages.BuySellNotConfigured);
 				return true;
 			}
-			if (!player.hasPermission(PermNodes.BuyClaimBlocks)) {
-				GriefPrevention.sendMessage(player, TextMode.Err, Messages.NoPermissionForCommand);
-				return true;
-			}
+
 
 			// if purchase disabled, send error message
 			if (GriefPrevention.instance.config_economy_claimBlocksPurchaseCost == 0) {
@@ -113,10 +110,7 @@ public class BuySellClaimBlocks extends GriefPreventionCommand {
 				return true;
 			}
 
-			if (!player.hasPermission(PermNodes.SellClaimBlocks)) {
-				GriefPrevention.sendMessage(player, TextMode.Err, Messages.NoPermissionForCommand);
-				return true;
-			}
+
 
 			// if disabled, error message
 			if (GriefPrevention.instance.config_economy_claimBlocksSellValue == 0) {

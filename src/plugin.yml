@@ -335,6 +335,15 @@ permissions:
     griefprevention.commands.gpdebug:
         description: grants access to the gpdebug command.
         default: op
+    griefprevention.claims.transfer:
+        description: grants access to allow transfer of claims.
+        default: op
+    griefprevention.placement.water:
+        description: Allow access to place water in applicable locations.
+        default: op
+    griefprevention.placement.lava:
+        description: Allow access to place Lava in applicable locations.
+        default: op
     griefprevention.claims.ignorelimit:
         description: Allows creation of more claims than any configured per-player limit.
         default: false

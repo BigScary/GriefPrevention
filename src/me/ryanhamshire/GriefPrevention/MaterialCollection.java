@@ -23,12 +23,27 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 
 //ordered list of material info objects, for fast searching
 public class MaterialCollection {
 	HashMap<Integer, List<MaterialInfo>> materials = new HashMap<Integer, List<MaterialInfo>>();
     public boolean hasMaterial(Material test){
         return materials.containsKey(test.getId());
+    }
+    public boolean testLocation(Block testblock){
+        List<MaterialInfo> AcquiredList = null;
+        if(materials.containsKey(testblock.getType().getId())){
+
+            AcquiredList = materials.get(testblock.getType().getId());
+            for(MaterialInfo mi:AcquiredList){
+                if(mi.Match(testblock)) return true;
+            }
+
+        }
+        return false;
+
+
     }
 	public MaterialCollection() {
 

@@ -32,7 +32,7 @@ public class PlacementRules {
 	}
 	
 	public enum BasicPermissionConstants {
-		Allow, Deny;
+		Allow,Deny,Force_Allow, Force_Deny;
 
 		public static BasicPermissionConstants fromBoolean(boolean value) {
 			return value ? Allow : Deny;
@@ -52,7 +52,7 @@ public class PlacementRules {
 		}
 
 		public boolean Allowed() {
-			return this == Allow;
+			return this == Allow || this==Force_Allow;
 		}
 
 		public boolean Denied() {
@@ -108,6 +108,7 @@ public class PlacementRules {
 		AboveSeaLevel = BasicPermissionConstants.fromBoolean(Above);
 		BelowSeaLevel = BasicPermissionConstants.fromBoolean(Below);
 	}
+
 
 	/**
 	 * constructs a new PlacementRules based on the settings in the given

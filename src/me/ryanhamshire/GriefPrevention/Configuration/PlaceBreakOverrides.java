@@ -1,6 +1,7 @@
 package me.ryanhamshire.GriefPrevention.Configuration;
 
 
+import me.ryanhamshire.GriefPrevention.Debugger;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import me.ryanhamshire.GriefPrevention.MaterialCollection;
 import me.ryanhamshire.GriefPrevention.MaterialInfo;
@@ -30,56 +31,43 @@ public class PlaceBreakOverrides {
     {
 
         private MaterialCollection Materials = new MaterialCollection();
-        private String DataMask = "*";
         private ClaimBehaviourData Rule;
         private String Name;
         public String getName(){ return Name;}
-        public String getDataMask() { return DataMask;}
         public ClaimBehaviourData getRule(){ return Rule;}
         public MaterialCollection getMaterials(){ return Materials;}
-        public OverrideData(String pName,MaterialCollection pMaterials,String pDataMask,ClaimBehaviourData pRule){
+        public OverrideData(String pName,MaterialCollection pMaterials,ClaimBehaviourData pRule){
             Name = pName;
             Materials=pMaterials;
-            DataMask = pDataMask;
+
             Rule = pRule;
+
         }
-        public OverrideData(String pName,FileConfiguration Source,FileConfiguration Target,String useNode){
+        public OverrideData(String pName,FileConfiguration Source,FileConfiguration Target,String useNode,OverrideData defaults){
+            Debugger.Write("OverrideData Constructor, Name=" + pName + " Node=" + useNode,Debugger.DebugLevel.Verbose);
+            Materials = new MaterialCollection();
             List<String> readStrings = Source.getStringList(useNode + ".Materials");
-            GriefPrevention.instance.parseMaterialListFromConfig(readStrings,Materials);
+            if(defaults!=null) Debugger.Write("OverrideData constructor: default has " + String.valueOf(defaults.getMaterials().size()),Debugger.DebugLevel.Verbose);
+            Debugger.Write("Override Data read in " + String.valueOf(readStrings.size()) + " Materials." , Debugger.DebugLevel.Verbose);
+            GriefPrevention.instance.parseMaterialListFromConfig(readStrings, Materials);
+            if(readStrings.size()==0) Materials = defaults==null?new MaterialCollection():defaults.getMaterials();
+            Debugger.Write("Materials Count:" + String.valueOf(Materials.size()),Debugger.DebugLevel.Verbose);
             Name = pName;
-            DataMask = Source.getString(useNode + ".DataMask");
+
             readStrings = Materials.GetList();
-            Target.set(useNode + ".Materials",readStrings);
-            Target.set(useNode + ".DataMask",DataMask);
+
+            Debugger.Write("Persisting Override Data values to configuration.",Debugger.DebugLevel.Verbose);
+            Target.set(useNode + ".Materials", readStrings);
+
             Target.set(useNode + ".Name",Name);
-            Rule = new ClaimBehaviourData("OverrideRule",Source,Target,useNode,ClaimBehaviourData.getAll("OverrideRule"));
+            Rule = new ClaimBehaviourData("OverrideRule",Source,Target,useNode,defaults==null?null:defaults.getRule());
 
         }
         public boolean testBlock(Block blockTest){
 
             if(!Materials.hasMaterial(blockTest.getType())) return false; //not the right kind of material.
 
-            //otherwise we need to test the Type.
-            else if(DataMask.equals("*") || DataMask.length()==0) return true;
-
-
-            else if(DataMask.startsWith("!")){
-
-                String testval = DataMask.substring(1);
-                try {
-                    return Byte.parseByte(testval)!=blockTest.getData();
-                }                                                       catch(NumberFormatException nfe){}
-
-
-            }else {
-                try {
-                    return Byte.parseByte(DataMask)==blockTest.getData();
-                }                                                         catch(NumberFormatException nfe){}
-
-            }
-
-
-            return false;
+            return true;
 
         }
     }
@@ -100,7 +88,7 @@ public class PlaceBreakOverrides {
 
         MaterialCollection mc = new MaterialCollection();
         mc.add(Material.getMaterial(ID));
-        OverrideData addoverride = new OverrideData(pName,mc,"*",data);
+        OverrideData addoverride = new OverrideData(pName,mc,data);
         addDirect(ID,addoverride);
         return this;
 
@@ -112,7 +100,7 @@ public class PlaceBreakOverrides {
 
 
     private void addDirect(int ID,OverrideData additem){
-
+        Debugger.Write("Adding direct:" + String.valueOf(ID) + " od:" + additem.getName(),Debugger.DebugLevel.Verbose);
         if(!BreakOverrides.containsKey(ID))
             BreakOverrides.put(ID,new ArrayList<OverrideData>());
 
@@ -123,7 +111,11 @@ public class PlaceBreakOverrides {
     public ClaimBehaviourData getBehaviourforBlock(Block blockfor){
 
         Integer blockID = blockfor.getTypeId();
-        if(!BreakOverrides.containsKey(blockID)) return null; //not in the HashMap, so nothing to return. we will return null.
+        Debugger.Write("getBehaviourforBlock called on id:" + String.valueOf(blockID) + " material Name:" + blockfor.getType().name(), Debugger.DebugLevel.Verbose);
+        if(!BreakOverrides.containsKey(blockID)) {
+            Debugger.Write("BreakOverrides does not contain ID key...", Debugger.DebugLevel.Verbose) ;
+            return null; //not in the HashMap, so nothing to return. we will return null.
+        }
 
         List<OverrideData> datalist = BreakOverrides.get(blockID);
         for(OverrideData od:datalist){
@@ -140,13 +132,48 @@ public class PlaceBreakOverrides {
 
     }
     private void Copy(PlaceBreakOverrides Source){
+        Debugger.Write("Copying existing PlaceBreakOverrides",Debugger.DebugLevel.Verbose);
         this.BreakOverrides = Source.BreakOverrides;
 
+    }
+    public OverrideData getOverrideByName(String pName){
+        Debugger.Write("Looking for Override by name of " + pName,Debugger.DebugLevel.Verbose);
+        Debugger.Write("getOverrideByName: BreakOverrides has " + String.valueOf(this.BreakOverrides.size()) + " values.",Debugger.DebugLevel.Verbose);
+        for(List<OverrideData> iterateList:this.BreakOverrides.values()){
+            Debugger.Write("List in BreakOverrides has " + String.valueOf(iterateList.size()) + " values.",Debugger.DebugLevel.Verbose);
+             for(OverrideData od:iterateList){
+                 Debugger.Write("overrideData named:" + od.getName(),Debugger.DebugLevel.Verbose);
+                if(od.getName().trim().equalsIgnoreCase(pName)) {
+                    Debugger.Write("Found "  + od.getName(),Debugger.DebugLevel.Verbose);
+                    return od;
+
+                }
+            }
+
+        }
+        return null;
+
+
+
+    }
+
+
+
+
+    public Set<String> getOverrideNames(){
+        Set<String> Buildresult = new HashSet<String>();
+        for(List<OverrideData> iterate:this.BreakOverrides.values()){
+            for(OverrideData element:iterate){
+                if(!Buildresult.contains(element.getName()))
+                Buildresult.add(element.getName());
+            }
+        }
+        return Buildresult;
     }
     public PlaceBreakOverrides(FileConfiguration Source,FileConfiguration Target,String NodeSource,PlaceBreakOverrides Defaults){
 
         //Default would be something like "GriefPrevention.Claims.Rules.Overrides
-
+        Debugger.Write("PlaceBreakOverrides Constructor", Debugger.DebugLevel.Verbose);
         ConfigurationSection getSection;
         getSection = Source.getConfigurationSection(NodeSource);
         Set<String> OverrideNames = new HashSet<String>();
@@ -154,14 +181,29 @@ public class PlaceBreakOverrides {
             OverrideNames = getSection.getKeys(false);
         if(OverrideNames.size()==0){
             //init to defaults...
+            Debugger.Write("No entries in " + NodeSource, Debugger.DebugLevel.Verbose);
             Copy(Defaults);
-            return;
+
+            Debugger.Write("using defaults...",Debugger.DebugLevel.Verbose);
+            OverrideNames = getOverrideNames();
+
         }
         //create a new OverrideData from "GriefPrevention.Claims.Rules.<OverrideName>" for each entry.
+
         for(String makeoverride:OverrideNames){
-            OverrideData od = new OverrideData(makeoverride,Source,Target,NodeSource = "." + makeoverride);
+            OverrideData usedefault = null;
+
+            OverrideData od;
+            if(Defaults!=null) usedefault = Defaults.getOverrideByName(makeoverride);
+            if(!Source.isConfigurationSection(NodeSource + "." + makeoverride)){
+                Debugger.Write("using Default for " + makeoverride + " as no Config node exists.", Debugger.DebugLevel.Verbose);
+
+            }
+            od = new OverrideData(makeoverride,Source,Target,NodeSource + "." + makeoverride,usedefault);
+
             for(MaterialInfo iterate:od.getMaterials().getMaterials()){
                 Integer grabmat = iterate.getTypeID();
+                Debugger.Write("Adding Material:" + iterate.getTypeID(),Debugger.DebugLevel.Verbose);
                 //does this material exist as a key?
                 if(!BreakOverrides.containsKey(grabmat)){
                     BreakOverrides.put(grabmat,new ArrayList<OverrideData>());

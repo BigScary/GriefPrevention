@@ -10,8 +10,6 @@ public class PermNodes {
 	public static final String AdminEavesDropPermission = "griefprevention.admin.eavesdrop";
 	public static final String AdminToolPermission = "griefprevention.admin.tool";
 	public static final String AdminLockPermission = "griefprevention.admin.lock";
-	public static final String BuyClaimBlocks = "griefprevention.claimblocks.buy";
-	public static final String SellClaimBlocks = "griefprevention.claimblocks.sell";
 
 	public static final String IgnoreClaimsLimitPermission = "griefprevention.claims.ignorelimit";
 	public static final String GiveClaimsPermission = "griefprevention.claims.give";

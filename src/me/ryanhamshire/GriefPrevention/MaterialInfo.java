@@ -18,9 +18,11 @@
 
 package me.ryanhamshire.GriefPrevention;
 
+import java.security.BasicPermission;
 import java.util.regex.Pattern;
 
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 
 //represents a material or collection of materials
 public class MaterialInfo {
@@ -34,13 +36,16 @@ public class MaterialInfo {
 			try {
 				return new MaterialInfo(Integer.parseInt(parts[0]), null);
 			} catch (NumberFormatException ex) {
-				return null;
+				return new MaterialInfo(Material.getMaterial(parts[0]));
 			}
 		}
-
-		try {
-			int typeID = Integer.parseInt(parts[0]);
-
+        int typeID=0;
+        try {
+			typeID = Integer.parseInt(parts[0]);
+        }
+        catch(NumberFormatException nfe){
+            typeID = Material.getMaterial(parts[0]).getId();
+        }
 			byte data;
 			boolean allDataValues;
 			if (parts[1].equals("*")) {
@@ -50,11 +55,10 @@ public class MaterialInfo {
 				allDataValues = false;
 				data = Byte.parseByte(parts[1]);
 			}
-			String Name = parts.length < 2 ? parts[2] : "X" + String.valueOf(typeID) + "$" + String.valueOf(data);
+            String Name = Material.getMaterial(typeID).name();
+			//String Name = parts.length < 2 ? parts[2] : "X" + String.valueOf(typeID) + "$" + String.valueOf(data);
 			return new MaterialInfo(typeID, data, allDataValues, Name);
-		} catch (NumberFormatException exception) {
-			return null;
-		}
+
 	}
 
 	public boolean allDataValues;
@@ -63,7 +67,10 @@ public class MaterialInfo {
 	private Pattern re;
 
 	public int typeID;
-
+    public boolean Match(Block testblock){
+         return typeID==testblock.getType().getId() &&
+                 (this.allDataValues || (this.data==testblock.getData()));
+    }
 	private MaterialInfo(int typeID, byte data, boolean allDataValues, String description) {
 		this.typeID = typeID;
 		this.data = data;
@@ -90,7 +97,6 @@ public class MaterialInfo {
 		}
 		this.description = description;
 	}
-
 	public MaterialInfo(Material Source) {
 		this.typeID = Source.getId();
 		this.data = 0;
@@ -148,10 +154,13 @@ public class MaterialInfo {
 
 	@Override
 	public String toString() {
-		String returnValue = String.valueOf(this.typeID) + ":" + (this.allDataValues ? "*" : String.valueOf(this.data));
-		if (this.description != null)
-			returnValue += ":" + this.description;
+                   //46:*:X46$0
 
-		return returnValue;
+        StringBuffer sb = new StringBuffer();
+        sb.append(Material.getMaterial(this.typeID).name());
+        sb.append(":");
+        sb.append(this.allDataValues?"*":String.valueOf(this.data));
+		if(this.description!=null) sb.append(":" + description);
+		return sb.toString();
 	}
 }

@@ -452,7 +452,7 @@ public class WorldConfig {
 															// remove partially
 															// cut trees
     private PlaceBreakOverrides BlockBreakOverrides = PlaceBreakOverrides.Default;
-    public PlaceBreakOverrides getBreakOverrides(){ return BlockBreakOverrides;}
+    public PlaceBreakOverrides getBlockBreakOverrides(){ return BlockBreakOverrides;}
     private PlaceBreakOverrides BlockPlaceOverrides = PlaceBreakOverrides.Default;
     public PlaceBreakOverrides getBlockPlaceOverrides(){ return BlockPlaceOverrides;}
 
@@ -731,8 +731,8 @@ public class WorldConfig {
 		
 		this.FireDestroyBehaviour = new ClaimBehaviourData("Fire Destruction",config,outConfig,"GriefPrevention.Rules.FireDestroys",new ClaimBehaviourData("GriefPrevention.Rules.FireDestroys",PlacementRules.Neither,PlacementRules.Neither,ClaimBehaviourMode.Disabled));
 		
-		this.FireSpreadOriginBehaviour = new ClaimBehaviourData("Fire Spread Origin",config,outConfig,"GriefPrevention.Rules.FireSpreadOrigin",new ClaimBehaviourData("GriefPrevention.Rules.FireSpreadOrigin",PlacementRules.Neither,PlacementRules.Neither,ClaimBehaviourMode.Disabled));
-		this.FireSpreadTargetBehaviour = new ClaimBehaviourData("Fire Spread Target",config,outConfig,"GriefPrevention.Rules.FireSpreadTarget",new ClaimBehaviourData("GriefPrevention.Rules.FireSpreadOrigin",PlacementRules.Neither,PlacementRules.Neither,ClaimBehaviourMode.Disabled));
+		this.FireSpreadOriginBehaviour = new ClaimBehaviourData("Fire Spread Origin",config,outConfig,"GriefPrevention.Rules.FireSpreadOrigin",new ClaimBehaviourData("Fire Spread Origin",PlacementRules.Neither,PlacementRules.Neither,ClaimBehaviourMode.Disabled));
+		this.FireSpreadTargetBehaviour = new ClaimBehaviourData("Fire Spread Target",config,outConfig,"GriefPrevention.Rules.FireSpreadTarget",new ClaimBehaviourData("Fire Spread Target",PlacementRules.Neither,PlacementRules.Neither,ClaimBehaviourMode.Disabled));
 		
 		this.CreeperExplosionsBehaviour = new ClaimBehaviourData("Creeper Explosions", config, outConfig, "GriefPrevention.Rules.CreeperExplosions", new ClaimBehaviourData("Creeper Explosions", PlacementRules.AboveOnly , PlacementRules.Both, ClaimBehaviourMode.Disabled).setSeaLevelOffsets(SeaLevelOverrideTypes.Offset,-1));
 		this.WitherExplosionBehaviour = new ClaimBehaviourData("Wither Explosions", config, outConfig, "GriefPrevention.Rules.WitherExplosions", new ClaimBehaviourData("Wither Explosions", PlacementRules.Neither, PlacementRules.Neither, ClaimBehaviourMode.Disabled).setSeaLevelOffsets(SeaLevelOverrideTypes.Offset,-1));
@@ -769,7 +769,7 @@ public class WorldConfig {
 
 		this.TNTExplosionBlockDamageBehaviour = new ClaimBehaviourData("TNT Explosion Damage", config, outConfig, "GriefPrevention.Rules.BlockDamageTNTExplosions", ClaimBehaviourData.getOutsideClaims("TNT Explosion Damage").setSeaLevelOffsets(SeaLevelOverrideTypes.Offset, -1));
 
-		this.OtherExplosionBlockDamageBehaviour = new ClaimBehaviourData("Other Explosion Damage", config, outConfig, "GriefPrevention.Rules.BlockDamageOtherExplosions", ClaimBehaviourData.getOutsideClaims("Other Explosion Damage").getAboveSeaLevel("Other Explosion Damange").setSeaLevelOffsets(SeaLevelOverrideTypes.Offset, -1));
+		this.OtherExplosionBlockDamageBehaviour = new ClaimBehaviourData("Other Explosion Damage", config, outConfig, "GriefPrevention.Rules.BlockDamageOtherExplosions", ClaimBehaviourData.getOutsideClaims("Other Explosion Damage").getAboveSeaLevel("Other Explosion Damage").setSeaLevelOffsets(SeaLevelOverrideTypes.Offset, -1));
 
 		ClaimBehaviourData WaterRequire = new ClaimBehaviourData("Water Placement", PlacementRules.BelowOnly, PlacementRules.Both, ClaimBehaviourMode.RequireBuild);
 		ClaimBehaviourData LavaRequire = new ClaimBehaviourData("Lava Placement", PlacementRules.BelowOnly, PlacementRules.Both, ClaimBehaviourMode.RequireBuild).setWildernessRequiredPermission(PermNodes.LavaPermission);
@@ -1285,7 +1285,8 @@ public class WorldConfig {
         this.config_siege_blocks = SiegeableData.readList(config,outConfig,"GriefPrevention.Siege.BreakableBlocks",config_siege_blocks);
         config_TNTSiege_blocks = new ArrayList<SiegeableData>();
         //go with cobble for now.
-        config_TNTSiege_blocks.add(new SiegeableData(Material.COBBLESTONE.name()));
+        config_TNTSiege_blocks.add(new SiegeableData(Material.BRICK.name()));
+        config_TNTSiege_blocks.add(new SiegeableData(Material.CLAY_BRICK.name()));
 
         this.config_TNTSiege_blocks = SiegeableData.readList(config,outConfig,"GriefPrevention.Siege.ExplosionBreakableBlocks",config_TNTSiege_blocks);
 

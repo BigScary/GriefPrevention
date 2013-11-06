@@ -1,6 +1,7 @@
 package me.ryanhamshire.GriefPrevention.Configuration;
 
 
+import me.ryanhamshire.GriefPrevention.Debugger;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -32,6 +33,10 @@ public class SiegeableData {
 
 
     }
+    @Override
+    public String toString(){
+        return MaterialName + "," + String.valueOf(MatchID) + "," + String.valueOf(RequiredBlastPower);
+    }
     public boolean doesMatch(Block testblock){
         return doesMatch(testblock.getType());
     }
@@ -43,9 +48,23 @@ public class SiegeableData {
     }
 
     public static List<SiegeableData> readList(FileConfiguration Source,FileConfiguration Target,String Node,List<SiegeableData> Default){
+        Debugger.Write("Reading SiegableData List From Node:" + Node, Debugger.DebugLevel.Verbose);
+        List<?> testcontents = Source.getList(Node);
 
         List<String> retrievelist = Source.getStringList(Node);
-        List<SiegeableData> result = retrievelist==null?Default:new ArrayList<SiegeableData>();
+        //getStringList() will return an empty String ArrayList, but will not return null
+        //if there are in fact no elements.
+
+        if(testcontents==null){
+            //fill the string list with the contents of the passed default values.
+          retrievelist = new ArrayList<String>();
+            for(SiegeableData sd:Default){
+                retrievelist.add(sd.toString()); //add the string representation.
+            }
+        }
+        //we set the defaults to the string list, and then parse it after, rather than just setting the default and
+        //breaking out because we want ot save those defaults to the configuration node in question.
+        List<SiegeableData> result = new ArrayList<SiegeableData>();
         for(String iterate: retrievelist){
             result.add(new SiegeableData(iterate));
 

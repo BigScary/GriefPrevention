@@ -23,7 +23,7 @@ import org.bukkit.entity.Tameable;
 public class ClaimBehaviourData {
 
 	public enum ClaimAllowanceConstants {
-		Allow, Allow_Forced, Deny, Deny_Forced;
+		None, Allow, Allow_Forced, Deny, Deny_Forced;
 		public boolean Allowed() {
 			return this == Allow || this == Allow_Forced;
 		}
@@ -216,7 +216,7 @@ public class ClaimBehaviourData {
 	//on a claim.
 	
 	private SiegePVPOverrideConstants PvPOverride = SiegePVPOverrideConstants.None;
-	
+	public SiegePVPOverrideConstants getPvPOverride(){ return PvPOverride;}
 	public boolean getTameableAllowOwner(){ return TameableAllowOwner;}
 	public ClaimBehaviourData setTameableAllowOwner(boolean value){ TameableAllowOwner = value; return this;}
 	public ClaimBehaviourData setSiegeOverrides(SiegePVPOverrideConstants Attacker,SiegePVPOverrideConstants Defender){
@@ -255,7 +255,8 @@ public class ClaimBehaviourData {
 	}
 
 	public ClaimBehaviourData(String pName, FileConfiguration Source, FileConfiguration outConfig, String NodePath, ClaimBehaviourData Defaults) {
-
+        Debugger.Write("Reading ClaimBehaviourData from Node:" + NodePath,Debugger.DebugLevel.Verbose);
+        if(Defaults==null) Defaults = ClaimBehaviourData.getNone(pName);
 		BehaviourName = pName;
 		// we want to read NodePath.BelowSeaLevelWilderness and whatnot.
 		// bases Defaults off another ClaimBehaviourData instance.
@@ -275,10 +276,10 @@ public class ClaimBehaviourData {
 		//NodePath + ".Claims.SiegeDefender"
 		//NodePath + ".PVP"
 		//retrieve each. Set the value. Then if it's not the default, save them back.
-		String SAttacker = Source.getString(NodePath + ".Claims.SiegeAttacker","None");
-		String SDefender = Source.getString(NodePath + ".Claims.SiegeDefender","None");
-		String SBystander = Source.getString(NodePath + ".Claims.SiegeBystander","None");
-		String PVPProvision = Source.getString(NodePath + ".PVP","None");
+		String SAttacker = Source.getString(NodePath + ".Claims.SiegeAttacker",Defaults.getSiegeAttackerOverride().name());
+		String SDefender = Source.getString(NodePath + ".Claims.SiegeDefender",Defaults.getSiegeDefenderOverride().name());
+		String SBystander = Source.getString(NodePath + ".Claims.SiegeBystander",Defaults.getSiegeBystanderOverride().name());
+		String PVPProvision = Source.getString(NodePath + ".PVP",Defaults.getPvPOverride().name());
 		
 		
 		//parse each.
@@ -304,7 +305,7 @@ public class ClaimBehaviourData {
 			outConfig.set(NodePath + ".Claims.SiegeBystander", SiegeBystanderOverride.name());
 		}
 		if(PvPOverride != SiegePVPOverrideConstants.None){
-			outConfig.set(NodePath + ".PVP", PvPOverride);
+			outConfig.set(NodePath + ".PVP", PvPOverride.name());
 		}
 		
 			
@@ -335,15 +336,18 @@ public class ClaimBehaviourData {
 	 * @return Whether this action is allowed, returning a number of ClaimAllowance values.
 	 */
 	public ClaimAllowanceConstants Allowed(Entity Target,Player RelevantPlayer,boolean ShowMessages){
-		
+
+        Debugger.Write("ClaimBehaviourData::Allowed-" + this.getBehaviourName(), DebugLevel.Verbose);
 		if(!this.TameableAllowOwner || RelevantPlayer==null || !(Target instanceof Tameable)){
 			return Allowed(Target.getLocation(),RelevantPlayer,ShowMessages);
 			
 		}
 		else if(!(((Tameable)Target).getOwner()==null)){
 			Tameable testTamed = (Tameable)Target;
-			if(testTamed.getOwner().getName().equalsIgnoreCase(RelevantPlayer.getName()))
+			if(testTamed.getOwner().getName().equalsIgnoreCase(RelevantPlayer.getName())){
+                Debugger.Write("ClaimBehaviourData::Allowed- Forcing allowance for Tameable owned by " + RelevantPlayer.getName(),DebugLevel.Verbose);
 				return ClaimAllowanceConstants.Allow_Forced;
+            }
 			else
 				return Allowed(Target.getLocation(),RelevantPlayer,ShowMessages);
 			
@@ -560,6 +564,12 @@ public class ClaimBehaviourData {
 			 
 			 
 			Debugger.Write("ClaimBehaviourData returning:\"" + returned.name() + "\"" + " For " + BehaviourName, DebugLevel.Verbose);
+            try {
+                throw new Exception("stack trace");
+            }
+            catch(Exception exx){
+            Debugger.Write(org.apache.commons.lang.exception.ExceptionUtils.getFullStackTrace(exx),DebugLevel.Verbose);
+            }
 		}
 	}
 

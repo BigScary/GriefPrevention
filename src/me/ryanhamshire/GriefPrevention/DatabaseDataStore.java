@@ -187,8 +187,8 @@ public class DatabaseDataStore extends DataStore {
 		// "jdbc:mysql://<hostname>/database"
 		String FormatString = "jdbc:mysql://%s/%s";
 
-		databaseUrl = Source.getString("URL", "");
-		if (databaseUrl == null || databaseUrl.length() == 0) {
+
+
 			String grabhost = Source.getString("Host", "localhost");
 			String grabdbname = Source.getString("Database", "GriefPrevention");
 
@@ -196,12 +196,12 @@ public class DatabaseDataStore extends DataStore {
 			Target.set("Host", grabhost);
 			Target.set("Database", grabdbname);
 
-		}
+
 
 		userName = Source.getString("Username", "");
 		this.password = Source.getString("Password", "");
 
-		Target.set("URL", databaseUrl);
+		//Target.set("URL", databaseUrl);
 		Target.set("Username", userName);
 		Target.set("Password", password);
 
