@@ -761,7 +761,7 @@ class PlayerEventHandler implements Listener {
 
 		playerData.lastDeathTimeStamp = now;
 	}
-    @EventHandler
+
 
 
 	private void onPlayerDisconnect(Player player, String notificationMessage) {

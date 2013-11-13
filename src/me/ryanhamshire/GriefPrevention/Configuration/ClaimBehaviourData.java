@@ -313,7 +313,7 @@ public class ClaimBehaviourData {
 
 		
 		outConfig.set(NodePath + ".Claims.ClaimControl", ClaimBehaviour.name());
-		
+		Debugger.Write(this.toString(),DebugLevel.Verbose);
 
 	}
 

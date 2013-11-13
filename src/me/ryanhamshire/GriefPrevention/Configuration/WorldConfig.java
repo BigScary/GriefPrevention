@@ -795,7 +795,7 @@ public class WorldConfig {
 		this.VehicleDamage = new ClaimBehaviourData("Vehicle Damage", config, outConfig, "GriefPrevention.Rules.VehicleDamage", ClaimBehaviourData.getAll("Vehicle Damage").setBehaviourMode(ClaimBehaviourMode.RequireContainer));
 
 		this.EnvironmentalVehicleDamage = new ClaimBehaviourData("Environmental Vehicle Damage", config, outConfig, "GriefPrevention.Rules.EnvironmentalVehicleDamage", ClaimBehaviourData.getOutsideClaims("Environmental Vehicle Damage"));
-		System.out.println(pName + ",Environmental Vehicle Damage:" + this.getEnvironmentalVehicleDamage().toString());
+
 		
 		this.ZombieDoorBreaking = new ClaimBehaviourData("Zombie Door Breaking", config, outConfig, "GriefPrevention.Rules.ZombieDoorBreaking", ClaimBehaviourData.getNone("Zombie Door Breaking"));
 

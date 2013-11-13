@@ -544,6 +544,8 @@ class EntityEventHandler implements Listener {
 		// special configuration options.
 		// make sure that we are allowed to explode, first.
 		Entity explodingEntity = explodeEvent.getEntity();
+
+
 		boolean isCreeper = explodingEntity != null && explodingEntity instanceof Creeper;
 		boolean isTNT = explodingEntity != null && (explodingEntity instanceof TNTPrimed || explodingEntity instanceof ExplosiveMinecart);
 
@@ -594,7 +596,7 @@ class EntityEventHandler implements Listener {
 		}
 		else
 			usebehaviour = wc.getOtherExplosionBlockDamageBehaviour();
-		Claim claimpos = GriefPrevention.instance.dataStore.getClaimAt(explodeEvent.getEntity().getLocation(),true);
+		Claim claimpos = GriefPrevention.instance.dataStore.getClaimAt(explodeEvent.getLocation(),true);
 		// //go through each block that was affected...
 		for (int i = 0; i < blocks.size(); i++) {
 

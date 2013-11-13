@@ -126,6 +126,9 @@ public class BlockEventHandler implements Listener {
 	// when a player breaks a block...
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
 	public void onBlockBreak(BlockBreakEvent breakEvent) {
+        boolean DoCancelEvent = false;
+        ClaimBehaviourData cbd = null;
+        try {
 		Debugger.Write("onBlockBreak", DebugLevel.Verbose);
 		Debugger.Write("Block broken:" + breakEvent.getBlock().getType().name(), DebugLevel.Verbose);
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(breakEvent.getBlock().getWorld());
@@ -134,24 +137,24 @@ public class BlockEventHandler implements Listener {
 		Block block = breakEvent.getBlock();
 
         //block overrides.
-        ClaimBehaviourData cbd = wc.getBlockBreakOverrides().getBehaviourforBlock(block);
+        cbd = wc.getBlockBreakOverrides().getBehaviourforBlock(block);
         if(cbd!=null){
                 ClaimBehaviourData.ClaimAllowanceConstants result = cbd.Allowed(block.getLocation(),player);
             if(result.Allowed()){
                 Debugger.Write("Block Override Forcing allow for break of block:" + block.getType().name(),DebugLevel.Verbose);
-                return;
+                DoCancelEvent=false;
             }
                 else if(result.Denied()){
                 Debugger.Write("Block Override Forcing deny for breaking of block:" + block.getType().name(),DebugLevel.Verbose);
-                breakEvent.setCancelled(true);
-                return;
+                DoCancelEvent=true;
+
             }
         }
-        if(wc.getBreakBlockRules().Allowed(block.getLocation(),player).Denied()){
+        if(wc.getBreakBlockRules().Allowed(block.getLocation(),player,!DoCancelEvent).Denied() && cbd==null){
             breakEvent.setCancelled(true);
             return;
         }
-		// if no survival building outside claims is enabled...
+
 		// if the block is a trash block....
 		if (wc.getTrashBlocks().contains(breakEvent.getBlock().getType())) {
 			// and if this location is applicable for trash block placement...
@@ -161,7 +164,7 @@ public class BlockEventHandler implements Listener {
 			return;
 
 		}
-		if(wc.getBreakBlockRules().Allowed(block.getLocation(), player).Denied()){
+		if(wc.getBreakBlockRules().Allowed(block.getLocation(), player,!DoCancelEvent).Denied()){
             breakEvent.setCancelled(true);
 			return;
 		}
@@ -183,7 +186,7 @@ public class BlockEventHandler implements Listener {
 
 		}
 		String noBuildReason = GriefPrevention.instance.allowBreak(player, block.getLocation());
-		if (noBuildReason != null) {
+		if (noBuildReason != null && !DoCancelEvent) {
 			// System.out.println("BuildReason!=null.");
 			GriefPrevention.sendMessage(player, TextMode.Err, noBuildReason);
 			breakEvent.setCancelled(true);
@@ -195,6 +198,10 @@ public class BlockEventHandler implements Listener {
 			// run the specialized code for treetop removal (see below)
 			GriefPrevention.instance.handleLogBroken(block);
 		}
+        }
+        finally {
+            if(cbd!=null) breakEvent.setCancelled(DoCancelEvent);
+        }
 	}
 
 	// blocks are not destroyed by fire, unless configured to do so
@@ -583,26 +590,29 @@ public class BlockEventHandler implements Listener {
 	// when a player places a block...
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
 	public void onBlockPlace(BlockPlaceEvent placeEvent) {
+        boolean DoCancelEvent = false;
+        ClaimBehaviourData cbd=null;
+        try {
 		Player player = placeEvent.getPlayer();
 		Block block = placeEvent.getBlock();
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(block.getWorld());
 		if(!wc.Enabled()) return;
 
-        ClaimBehaviourData cbd = wc.getBlockPlaceOverrides().getBehaviourforBlock(block);
+        cbd = wc.getBlockPlaceOverrides().getBehaviourforBlock(block);
         if(cbd!=null){
             ClaimBehaviourData.ClaimAllowanceConstants result = cbd.Allowed(block.getLocation(),player);
             if(result.Allowed()){
                 Debugger.Write("Block Override Forcing allow for placement of block:" + block.getType().name(),DebugLevel.Verbose);
-                return;
+                DoCancelEvent=false;
             }
             else if(result.Denied()){
                 Debugger.Write("Block Override Forcing deny for placement of block:" + block.getType().name(),DebugLevel.Verbose);
-                placeEvent.setCancelled(true);
-                return;
+                DoCancelEvent=true;
+
             }
         }
 
-        if(wc.getPlaceBlockRules().Allowed(block.getLocation(), player).Denied()){
+        if(wc.getPlaceBlockRules().Allowed(block.getLocation(), player,!DoCancelEvent).Denied() && (cbd==null)){
             placeEvent.setCancelled(true);
             return;
         }
@@ -625,7 +635,7 @@ public class BlockEventHandler implements Listener {
 		// if placed block is fire, make sure FireSetting is allowed in that
 		// location.
 		if (block.getType() == Material.FIRE) {
-			if (wc.getFireSetting().Allowed(block.getLocation(), player).Denied()) {
+			if (wc.getFireSetting().Allowed(block.getLocation(), player,!DoCancelEvent).Denied()) {
 				placeEvent.setCancelled(true);
 				return;
 			}
@@ -658,7 +668,7 @@ public class BlockEventHandler implements Listener {
 			return;
 		}
 */
-		if(wc.getPlaceBlockRules().Allowed(block.getLocation(),player).Denied()){
+		if(wc.getPlaceBlockRules().Allowed(block.getLocation(),player,!DoCancelEvent).Denied()){
 			placeEvent.setCancelled(true);
 			return;
 		}
@@ -669,7 +679,7 @@ public class BlockEventHandler implements Listener {
 		Claim claim = this.dataStore.getClaimAt(block.getLocation(), true);
 		if (claim != null) {
 			// warn about TNT not destroying claimed blocks
-			if (block.getType() == Material.TNT && !claim.areExplosivesAllowed) {
+			if (block.getType() == Material.TNT && !claim.areExplosivesAllowed && !DoCancelEvent) {
 				GriefPrevention.sendMessage(player, TextMode.Warn, Messages.NoTNTDamageClaims);
 				GriefPrevention.sendMessage(player, TextMode.Instr, Messages.ClaimExplosivesAdvertisement);
 			}
@@ -691,7 +701,7 @@ public class BlockEventHandler implements Listener {
 
 		// otherwise if there's no claim, the player is placing a chest, and new
 		// player automatic claims are enabled
-		else if (block.getType() == Material.CHEST && wc.getAutomaticClaimsForNewPlayerRadius() > -1 && GriefPrevention.instance.claimsEnabledForWorld(block.getWorld())) {
+		else if (block.getType() == Material.CHEST && wc.getAutomaticClaimsForNewPlayerRadius() > -1 && GriefPrevention.instance.claimsEnabledForWorld(block.getWorld()) && !DoCancelEvent) {
 			// if the chest is too deep underground, don't create the claim and
 			// explain why
 			if (theftallowed && block.getY() < wc.getClaimsMaxDepth()) {
@@ -790,6 +800,12 @@ public class BlockEventHandler implements Listener {
 		if (!TNTAllowed && block.getType() == Material.TNT && block.getWorld().getEnvironment() != Environment.NETHER && block.getY() > GriefPrevention.instance.getSeaLevel(block.getWorld()) - 5) {
 			GriefPrevention.sendMessage(player, TextMode.Warn, Messages.NoTNTDamageAboveSeaLevel);
 		}
+        }
+        finally {
+                //if the rules were block overridden, we ignore any other rules and just set that value.
+                if(cbd!=null) placeEvent.setCancelled(DoCancelEvent);
+
+        }
 	}
 
 	// fire doesn't spread unless configured to, but other blocks still do

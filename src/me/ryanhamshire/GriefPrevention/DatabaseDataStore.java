@@ -294,7 +294,7 @@ public class DatabaseDataStore extends DataStore {
 		}
 
 		// load claims data into memory
-		results = statement.executeQuery("SELECT * FROM griefprevention_claimdata;");
+		//results = statement.executeQuery("SELECT * FROM griefprevention_claimdata;");
 
 		super.initialize(Source, Target);
 	}
