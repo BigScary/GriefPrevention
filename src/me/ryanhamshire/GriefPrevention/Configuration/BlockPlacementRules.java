@@ -52,16 +52,12 @@ public class BlockPlacementRules {
 
 	public BlockPlacementRules(String RuleName, FileConfiguration Source, FileConfiguration Target, String NodePath) {
 
-		/*
-		 * GriefPrevention: BlockPlacementRules: Redstone: IDs:
-		 * [55,76,93,150,331,356,404] MinClaimDistance : 16 Rules: Wilderness:
-		 * AboveSeaLevel: Deny BelowSeaLevel: Deny Claims: AboveSeaLevel: Deny
-		 * BelowSeaLevel: Deny ClaimControl: Disabled
-		 */
+
 
 		List<String> getlist = Source.getStringList(NodePath + ".IDs");
 		List<String> buildlist = new ArrayList<String>();
 		Materials = new MaterialCollection();
+        Name=RuleName;
 		for (String iterate : getlist) {
 			MaterialInfo acquired = MaterialInfo.fromString(iterate);
 			if (acquired != null) {

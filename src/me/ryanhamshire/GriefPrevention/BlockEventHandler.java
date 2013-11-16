@@ -715,15 +715,18 @@ public class BlockEventHandler implements Listener {
 			// claim centered at the chest
 			if (playerData.claims.size() == 0) {
 				// make sure they have permission to create claims.
+                Debugger.Write("Player has no claims, and is placing a chest.",DebugLevel.Verbose);
 
 				if (!player.hasPermission(PermNodes.CreateClaimsPermission)) {
 					// no message is sent, because players may not be aware.
+                    Debugger.Write("Player " + player.getName() + " does not have permission to create claims. Not automatically creating a claim.",DebugLevel.Verbose);
 					return;
 
 				}
 
 				// radius == 0 means protect ONLY the chest
 				if (wc.getAutomaticClaimsForNewPlayerRadius() == 0) {
+                    Debugger.Write("Creating 1x1 claim to protect Chest placed by " + player.getName(),DebugLevel.Verbose);
 					this.dataStore.createClaim(block.getWorld(), block.getX(), block.getX(), block.getY(), block.getY(), block.getZ(), block.getZ(), player.getName(), null, null, false, player);
 					GriefPrevention.sendMessage(player, TextMode.Success, Messages.ChestClaimConfirmation);
 				}
@@ -735,6 +738,7 @@ public class BlockEventHandler implements Listener {
 					// note that since the player had permission to place the
 					// chest, at the very least, the automatic claim will
 					// include the chest
+
 					while (radius >= 0 && (this.dataStore.createClaim(block.getWorld(), block.getX() - radius, block.getX() + radius, block.getY() - wc.getClaimsExtendIntoGroundDistance(), block.getY(), block.getZ() - radius, block.getZ() + radius, player.getName(), null, null, false, player).succeeded != CreateClaimResult.Result.Success)) {
 						radius--;
 					}
@@ -760,7 +764,7 @@ public class BlockEventHandler implements Listener {
 
 			// check to see if this chest is in a claim, and warn when it isn't
 
-			if (theftallowed && this.dataStore.getClaimAt(block.getLocation(), false) == null) {
+			if (theftallowed && this.dataStore.getClaimAt(block.getLocation(), false) == null && !DoCancelEvent) {
 				GriefPrevention.sendMessage(player, TextMode.Warn, Messages.UnprotectedChestWarning);
 			}
 		}
@@ -798,7 +802,7 @@ public class BlockEventHandler implements Listener {
 		boolean TNTAllowed = wc.getTNTExplosionBlockDamageBehaviour().Allowed(block.getLocation(), null, false).Allowed();
 
 		if (!TNTAllowed && block.getType() == Material.TNT && block.getWorld().getEnvironment() != Environment.NETHER && block.getY() > GriefPrevention.instance.getSeaLevel(block.getWorld()) - 5) {
-			GriefPrevention.sendMessage(player, TextMode.Warn, Messages.NoTNTDamageAboveSeaLevel);
+			GriefPrevention.sendMessage(player, TextMode.Warn, Messages.NoTNTDamageThere);
 		}
         }
         finally {

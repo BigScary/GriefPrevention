@@ -722,6 +722,7 @@ public class Claim {
 			}
 		}
 		this.playerNameToClaimPermissionMap.clear();
+
 		return true;
 	}
 

@@ -18,21 +18,37 @@ import org.bukkit.entity.Player;
 //this enum is used for some of the configuration options.
 import org.bukkit.entity.Tameable;
 
+import java.util.EnumSet;
+import java.util.List;
+
 //holds data pertaining to an option and where it works. 
 //used primarily for information on explosions.
 public class ClaimBehaviourData {
 
 	public enum ClaimAllowanceConstants {
-		None, Allow, Allow_Forced, Deny, Deny_Forced;
+		None, Allow, Allow_Forced, Deny, Deny_Forced  ;
 		public boolean Allowed() {
+
 			return this == Allow || this == Allow_Forced;
 		}
 
 		public boolean Denied() {
+
 			return this == Deny || this == Deny_Forced;
 		}
 
 	}
+
+    /**
+     * special rules enum indicates special requirements for a given ClaimBehaviourData.
+     * For example, a special rule can be set to require that players have no claims for this Behaviour to ever pass.
+     */
+    public enum SpecialRules{
+        ClaimRule_RequireNoClaims, //the player being tested MUST have no claims for this behaviour to pass.
+        ClaimRule_RequireClaims,  //The player being tested MUST have claims for this behaviour to pass.
+        ClaimRule_Claim, //allows on a claim. Will still test set permission value.
+        ClaimRule_Wilderness  //allows in wilderness.
+    }
 	//enum for "overriding" the default permissions during PvP or during a siege.
 	
 		public enum SiegePVPOverrideConstants{
@@ -71,6 +87,7 @@ public class ClaimBehaviourData {
             if(this==RequireManager) return toClaim.isManager(p);
             if(this==RequireOwner) return toClaim.getOwnerName().equals(p.getName());
 
+
             return false;
 
         }
@@ -98,6 +115,10 @@ public class ClaimBehaviourData {
 					pd = GriefPrevention.instance.dataStore.getPlayerData(testPlayer.getName());
 				if ((pd != null) && pd.ignoreClaims || this == RequireNone)
 					return true;
+
+
+
+
 				String result = null;
 				Claim atposition = GriefPrevention.instance.dataStore.getClaimAt(testLocation, false);
 				if (atposition == null)
@@ -195,6 +216,8 @@ public class ClaimBehaviourData {
 
 	private String BehaviourName;
 
+    private String DenialMessage;
+
 	private ClaimBehaviourMode ClaimBehaviour;
 
 	private PlacementRules Claims;
@@ -203,6 +226,7 @@ public class ClaimBehaviourData {
 
 	private boolean TameableAllowOwner = false;
 
+    private EnumSet<SpecialRules> SpecialRuleFlags = EnumSet.noneOf(SpecialRules.class);
 	private SiegePVPOverrideConstants SiegeAttackerOverride = SiegePVPOverrideConstants.None;
 	private SiegePVPOverrideConstants SiegeDefenderOverride = SiegePVPOverrideConstants.None;
 	private SiegePVPOverrideConstants SiegeBystanderOverride = SiegePVPOverrideConstants.None;
@@ -244,6 +268,7 @@ public class ClaimBehaviourData {
 	public ClaimBehaviourData(ClaimBehaviourData Source) {
 
 		this.BehaviourName = Source.BehaviourName;
+        this.SpecialRuleFlags = Source.SpecialRuleFlags;
 		this.Claims = (PlacementRules) Source.Claims.clone();
 		this.Wilderness = (PlacementRules) Source.Wilderness.clone();
 		this.ClaimBehaviour = Source.ClaimBehaviour;
@@ -260,7 +285,32 @@ public class ClaimBehaviourData {
 		BehaviourName = pName;
 		// we want to read NodePath.BelowSeaLevelWilderness and whatnot.
 		// bases Defaults off another ClaimBehaviourData instance.
-		Wilderness = new PlacementRules(Source, outConfig, NodePath + ".Wilderness", Defaults.getWildernessRules());
+
+        //special rules.
+        //read in the list of special rules.
+        List<String> specialrules = Source.getStringList(NodePath + ".SpecialRules");
+
+        if(specialrules!=null && specialrules.size() > 0){
+
+            for(String iterate:specialrules){
+            try {
+            SpecialRules sr = Enum.valueOf(SpecialRules.class,iterate);
+            this.SpecialRuleFlags.add(sr);
+            }
+            catch(Exception srexception){
+                Debugger.Write("Failed to read SpecialRules item:" + iterate,DebugLevel.Verbose);
+            }
+            }
+
+            outConfig.set(NodePath + ".SpecialRules",specialrules);
+        }
+
+        String _DenialMessage = Source.getString(NodePath + ".DenialMessage");
+        if(_DenialMessage!=null && _DenialMessage.length()>0){
+            this.DenialMessage = _DenialMessage;
+        }
+
+        Wilderness = new PlacementRules(Source, outConfig, NodePath + ".Wilderness", Defaults.getWildernessRules());
 		Claims = new PlacementRules(Source, outConfig, NodePath + ".Claims", Defaults.getClaimsRules());
 		String strmode = Source.getString(NodePath + ".Claims.ClaimControl", Defaults.getBehaviourMode().name());
 		
@@ -338,6 +388,9 @@ public class ClaimBehaviourData {
 	public ClaimAllowanceConstants Allowed(Entity Target,Player RelevantPlayer,boolean ShowMessages){
 
         Debugger.Write("ClaimBehaviourData::Allowed-" + this.getBehaviourName(), DebugLevel.Verbose);
+
+
+
 		if(!this.TameableAllowOwner || RelevantPlayer==null || !(Target instanceof Tameable)){
 			return Allowed(Target.getLocation(),RelevantPlayer,ShowMessages);
 			
@@ -417,10 +470,54 @@ public class ClaimBehaviourData {
 		ClaimAllowanceConstants returned = ClaimAllowanceConstants.Allow;
 		try {
 			Debugger.Write("Behaviour: " +this.getBehaviourName(), DebugLevel.Verbose);
-			// System.out.println("ClaimBehaviour:" + this.getBehaviourName());
-			// System.out.println("Testing Allowed," + BehaviourName +
-			// " Messages:" + ShowMessages);
-			// String result=null;
+
+            //if there are special rules...
+            if(this.SpecialRuleFlags.size()>0){
+                Debugger.Write("SpecialRuleFlags found on element named " + this.BehaviourName,DebugLevel.Verbose);
+                if(RelevantPlayer!=null){
+
+                    Player p = RelevantPlayer;
+                    Debugger.Write("SpecialRuleFlags testing with Player " + p.getName(),DebugLevel.Verbose);
+                    PlayerData pd = GriefPrevention.instance.dataStore.getPlayerData(p.getName());
+                    //check them all. Right now it doesn't really make sense to have more than one,
+                    //and some are sorta mutually exclusive, but more might be added. Exclusivity will
+                    //(hopefully) get documented, if it is ever added.
+                    ClaimAllowanceConstants cac = ClaimAllowanceConstants.None;
+                    Claim GrabClaim = GriefPrevention.instance.dataStore.getClaimAt(position,true);
+                    boolean InClaim=false;
+                    if(GrabClaim!=null && GrabClaim.allowBuild(p)==null) InClaim=true;
+                    for(SpecialRules sr:this.SpecialRuleFlags){
+
+                        if(sr==SpecialRules.ClaimRule_RequireClaims){
+                            //if they have no claims, return deny.
+                            Debugger.Write("RequireClaims: Player has " + String.valueOf(pd.claims.size()) + " claims.",DebugLevel.Verbose);
+                            if(pd.claims.size()==0) cac = ClaimAllowanceConstants.Deny;
+                        }
+                        if(sr==SpecialRules.ClaimRule_RequireNoClaims){
+                            //if they have claims, deny.
+                            Debugger.Write("RequireNoClaims: Player has " + String.valueOf(pd.claims.size()) + " claims.",DebugLevel.Verbose);
+                            if(pd.claims.size()>0) cac = ClaimAllowanceConstants.Deny;
+                        }
+                        if(sr==SpecialRules.ClaimRule_Claim){
+                            Debugger.Write("ClaimRule_Claim: Player In claim:" + String.valueOf(InClaim),DebugLevel.Verbose);
+                            if(InClaim) return ClaimAllowanceConstants.Allow;
+                        }
+                        if(sr==SpecialRules.ClaimRule_Wilderness){
+                            Debugger.Write("ClaimRule_Wilderness: Player In claim:" + String.valueOf(InClaim),DebugLevel.Verbose);
+                            if(!InClaim) return ClaimAllowanceConstants.Allow;
+                        }
+
+
+
+
+                    }
+                    return cac;
+
+
+                }
+            }
+
+
 			PlayerData pd = null;
 			boolean ignoringclaims = false;
 			if (RelevantPlayer != null) {
@@ -498,7 +595,8 @@ public class ClaimBehaviourData {
 							if(null==AccessResult){
 								return ClaimAllowanceConstants.Allow;
 							}  else {
-								if(ShowMessages) GriefPrevention.sendMessage(RelevantPlayer, TextMode.Err, AccessResult);
+								if(ShowMessages && hasDenialMessage()) GriefPrevention.sendMessage(RelevantPlayer, TextMode.Err, DenialMessage);
+                                else if (ShowMessages)  GriefPrevention.sendMessage(RelevantPlayer, TextMode.Err, AccessResult);
 								return ClaimAllowanceConstants.Deny;
 							}
 						}
@@ -508,7 +606,8 @@ public class ClaimBehaviourData {
 							if(null == BuildResult){
 								return ClaimAllowanceConstants.Allow;
 							} else {
-								if(ShowMessages) GriefPrevention.sendMessage(RelevantPlayer, TextMode.Err, BuildResult);
+                                if(ShowMessages && hasDenialMessage()) GriefPrevention.sendMessage(RelevantPlayer, TextMode.Err, DenialMessage);
+                                else if (ShowMessages)  GriefPrevention.sendMessage(RelevantPlayer, TextMode.Err, BuildResult);
 								return ClaimAllowanceConstants.Deny;
 							}
 						}
@@ -565,14 +664,16 @@ public class ClaimBehaviourData {
 			 
 			Debugger.Write("ClaimBehaviourData returning:\"" + returned.name() + "\"" + " For " + BehaviourName, DebugLevel.Verbose);
             try {
-                throw new Exception("stack trace");
+               // throw new Exception("stack trace");
             }
             catch(Exception exx){
             Debugger.Write(org.apache.commons.lang.exception.ExceptionUtils.getFullStackTrace(exx),DebugLevel.Verbose);
             }
 		}
 	}
-
+    private boolean hasDenialMessage(){
+        return this.DenialMessage!=null && DenialMessage.length()>0;
+    }
 	@Override
 	public Object clone() {
 		return new ClaimBehaviourData(this);
