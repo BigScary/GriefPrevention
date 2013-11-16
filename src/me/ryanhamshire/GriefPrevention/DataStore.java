@@ -1231,6 +1231,7 @@ public abstract class DataStore {
         this.addDefault(defaults,Messages.IgnoreInstructions,"To ignore a player, you can use the /ignore command.",null);
         this.addDefault(defaults,Messages.PlayerSoftMuted,"Player {0} Soft-Muted.","0:Player muted");
         this.addDefault(defaults,Messages.PlayerUnSoftMuted,"Player {0} is no longer Soft-Muted.","0:Player unmuted");
+        this.addDefault(defaults,Messages.NoTNTExplosionsThere,"TNT will not explode or damage anything here.",null);
 		// load the config file
 		FileConfiguration config = YamlConfiguration.loadConfiguration(new File(messagesFilePath));
 

@@ -668,7 +668,7 @@ public class BlockEventHandler implements Listener {
 			return;
 		}
 */
-		if(wc.getPlaceBlockRules().Allowed(block.getLocation(),player,!DoCancelEvent).Denied()){
+		if(wc.getPlaceBlockRules().Allowed(block.getLocation(),player,!DoCancelEvent).Denied() && cbd==null){
 			placeEvent.setCancelled(true);
 			return;
 		}
@@ -782,7 +782,9 @@ public class BlockEventHandler implements Listener {
 
 		// FEATURE: warn players when they're placing non-trash blocks outside
 		// of their claimed areas
-		else if (wc.claims_warnOnBuildOutside() && !wc.getTrashBlocks().contains(block.getType()) && wc.getClaimsEnabled() && playerData.claims.size() > 0) {
+        //we emit the warming if warning on building outside is enabled, the block is not a trashblock, claims are enabled, AND
+        //cbd is null, meaning there is no override.
+		else if (wc.claims_warnOnBuildOutside() && !wc.getTrashBlocks().contains(block.getType()) && wc.getClaimsEnabled() && playerData.claims.size() > 0 && cbd==null) {
 			if (--playerData.unclaimedBlockPlacementsUntilWarning <= 0 && wc.getClaimsWildernessBlocksDelay() != 0) {
 				GriefPrevention.sendMessage(player, TextMode.Warn, Messages.BuildingOutsideClaims);
 				playerData.unclaimedBlockPlacementsUntilWarning = wc.getClaimsWildernessBlocksDelay();
@@ -800,10 +802,17 @@ public class BlockEventHandler implements Listener {
 		// warn players if Explosions are not allowed at the position they place
 		// it.
 		boolean TNTAllowed = wc.getTNTExplosionBlockDamageBehaviour().Allowed(block.getLocation(), null, false).Allowed();
+        boolean TNTExplodes= wc.getTNTExplosionBehaviour().Allowed(block.getLocation(),null,false).Allowed();
 
-		if (!TNTAllowed && block.getType() == Material.TNT && block.getWorld().getEnvironment() != Environment.NETHER && block.getY() > GriefPrevention.instance.getSeaLevel(block.getWorld()) - 5) {
+            if (!TNTExplodes && block.getType() == Material.TNT && block.getWorld().getEnvironment() != Environment.NETHER) {
+                GriefPrevention.sendMessage(player, TextMode.Warn, Messages.NoTNTDamageThere);
+            }
+            if (!TNTAllowed && block.getType() == Material.TNT && block.getWorld().getEnvironment() != Environment.NETHER ) {
 			GriefPrevention.sendMessage(player, TextMode.Warn, Messages.NoTNTDamageThere);
 		}
+
+
+
         }
         finally {
                 //if the rules were block overridden, we ignore any other rules and just set that value.
