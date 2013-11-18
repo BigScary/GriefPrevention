@@ -364,7 +364,7 @@ public class FlatFileDataStore extends DataStore {
 	}
 
 	synchronized void migrateData(DataStore targetStore) {
-		ForceLoadAllClaims();
+		ForceLoadAllClaims(this);
 
 		// migrate claims
 		for (Claim c : this.claims) {

@@ -173,6 +173,7 @@ public class PlacementRules {
 		else{
 			
 			try {
+
 				SeaLevelOffset = Integer.parseInt(sealevelvalue);
 				SeaLevelType = SeaLevelOverrideTypes.Absolute;
 			}

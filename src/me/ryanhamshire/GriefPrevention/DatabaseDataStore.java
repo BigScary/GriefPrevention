@@ -100,7 +100,7 @@ public class DatabaseDataStore extends DataStore {
 	@Override
 	public List<PlayerData> getAllPlayerData() {
 		// TODO Auto-generated method stub
-		super.ForceLoadAllClaims();
+		super.ForceLoadAllClaims(this);
 		List<PlayerData> generateList = new ArrayList<PlayerData>();
 		try {
 

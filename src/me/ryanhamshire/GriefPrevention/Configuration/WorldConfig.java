@@ -34,6 +34,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
  */
 public class WorldConfig {
 
+
 	// Explosion and similar effect information.
 	// we've moved this to another class for brevity as well as to make it
 	// easier to deal with and more flexible.
