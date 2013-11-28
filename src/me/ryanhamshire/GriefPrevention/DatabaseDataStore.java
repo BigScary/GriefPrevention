@@ -373,6 +373,7 @@ public class DatabaseDataStore extends DataStore {
 	@Override
 	void WorldLoaded(World loading) {
 		try {
+            Debugger.Write("Database:Loading claims in world:" + loading.getName(),DebugLevel.Verbose);
 			Statement statement = databaseConnection.createStatement();
 			ResultSet results = statement.executeQuery("SELECT * FROM griefprevention_claimdata where lessercorner LIKE \"" + loading.getName() + ";%\";");
 			ArrayList<Claim> claimsToRemove = new ArrayList<Claim>();

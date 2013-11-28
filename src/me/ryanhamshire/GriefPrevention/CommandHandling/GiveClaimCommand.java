@@ -44,6 +44,7 @@ public class GiveClaimCommand extends GriefPreventionCommand {
 			Claim claimtogive = dataStore.getClaimAt(source.getLocation(), true);
 			if(claimtogive==null){
 				GriefPrevention.sendMessage(source, TextMode.Err, "You must be in a claim to give away claims.");
+                return true;
 			}
 			// if the owner is not the source, they have to have adminclaims
 			// permission too.

@@ -2,10 +2,7 @@ package me.ryanhamshire.GriefPrevention.CommandHandling;
 
 import java.util.ArrayList;
 
-import me.ryanhamshire.GriefPrevention.Claim;
-import me.ryanhamshire.GriefPrevention.GriefPrevention;
-import me.ryanhamshire.GriefPrevention.Messages;
-import me.ryanhamshire.GriefPrevention.TextMode;
+import me.ryanhamshire.GriefPrevention.*;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -24,6 +21,7 @@ public class TrustListCommand extends GriefPreventionCommand {
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		// TODO Auto-generated method stub
 		Player player = (sender instanceof Player) ? (Player) sender : null;
+        PlayerData pdata = GriefPrevention.instance.dataStore.getPlayerData(player.getName());
 		if (player == null)
 			return false;
 		if(!EnsurePermission(player, label)) return true;
@@ -38,8 +36,9 @@ public class TrustListCommand extends GriefPreventionCommand {
 		}
 
 		// if no permission to manage permissions, error message
+        // Change: also allow those with admin permission.
 		String errorMessage = claim.allowGrantPermission(player);
-		if (errorMessage != null) {
+		if (errorMessage != null && !pdata.ignoreClaims) {
 			GriefPrevention.sendMessage(player, TextMode.Err, errorMessage);
 			return true;
 		}

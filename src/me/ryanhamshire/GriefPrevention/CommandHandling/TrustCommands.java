@@ -92,7 +92,7 @@ public class TrustCommands extends GriefPreventionCommand {
 			}
 		} else {
 			// check permission here
-			if (claim.allowGrantPermission(player) != null) {
+			if (claim.allowGrantPermission(player) != null && !playerData.ignoreClaims) {
 				GriefPrevention.sendMessage(player, TextMode.Err, Messages.NoPermissionTrust, claim.getOwnerName());
 				return;
 			}

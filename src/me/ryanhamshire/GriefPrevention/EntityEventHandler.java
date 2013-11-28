@@ -497,31 +497,7 @@ class EntityEventHandler implements Listener {
 		}
 
 	}
-    private float getCoalescedPower(Entity SourceEntity,float Range,boolean RemoveItems){
-        List<Entity> Dealt = new ArrayList<Entity>();
-        Dealt.add(SourceEntity);
 
-        float result = getCoalescedPower(SourceEntity,Range,Dealt);
-        if(RemoveItems){
-            for(Entity iterate:Dealt) iterate.remove();
-        }
-        return result;
-    }
-    private float getCoalescedPower(Entity SourceEntity,float Range,List<Entity> DealtWith){
-        float BuildPower = 0;
-
-        List<Entity> nearbyEntities = SourceEntity.getNearbyEntities(Range, Range, Range);
-        for(Entity iterate:nearbyEntities){
-            if(!DealtWith.contains(iterate) && iterate.getClass().equals(SourceEntity.getClass())){
-                if(SourceEntity.getLocation().distance(iterate.getLocation()) <= Range){
-                    DealtWith.add(SourceEntity);
-                    BuildPower+=getCoalescedPower(SourceEntity,Range/2,DealtWith);
-                }
-            }
-
-        }
-        return BuildPower;
-    }
     private Set<Entity> HandledEntities = new HashSet<Entity>();
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
 	public void onEntityExplode(EntityExplodeEvent explodeEvent) {
@@ -575,7 +551,7 @@ class EntityEventHandler implements Listener {
 			usebehaviour = wc.getWitherExplosionBlockDamageBehaviour();
 		else if (isTNT){
 			usebehaviour = wc.getTNTExplosionBlockDamageBehaviour();
-            if(wc.getTNTCoalesceBehaviour().Allowed(explodeEvent.getLocation(), null).Allowed()
+            /*if(wc.getTNTCoalesceBehaviour().Allowed(explodeEvent.getLocation(), null).Allowed()
                     && ! HandledEntities.contains(explodeEvent.getEntity())
                     ){
                   //try to coalesce nearby TNTPrimed Entities.
@@ -592,7 +568,7 @@ class EntityEventHandler implements Listener {
 
             } else if(HandledEntities.contains(explodeEvent.getEntity())){
                 HandledEntities.remove(explodeEvent.getEntity());
-            }
+            } */
 		}
 		else
 			usebehaviour = wc.getOtherExplosionBlockDamageBehaviour();

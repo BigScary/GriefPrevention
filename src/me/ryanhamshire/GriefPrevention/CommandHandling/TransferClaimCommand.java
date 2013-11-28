@@ -42,15 +42,14 @@ public class TransferClaimCommand extends GriefPreventionCommand {
 		if (inclaim == null) {
 			// not inside a claim, so not valid.
 			GriefPrevention.sendMessage(player, TextMode.Err, "There is no claim here.");
-
-		} else {
-			toAdmin = !inclaim.isAdminClaim();
+            return true;
 		}
 		// /TransferClaim
 		// when given no arguments, /TransferClaim will make an owned claim into
 		// an admin claim.
 		// requires transferclaim and adminclaims permissions.
 		if (args.length == 0) {
+            toAdmin = !inclaim.isAdminClaim();
 			// with no arguments, the player must be inside a claim AND that
 			// claim must
 			// not be an admin claim.

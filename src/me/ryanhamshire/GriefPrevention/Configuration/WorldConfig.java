@@ -614,7 +614,11 @@ public class WorldConfig {
 	private ClaimBehaviourData TNTExplosionsBehaviour;
 
     private ClaimBehaviourData TNTCoalesceBehaviour;
-    public ClaimBehaviourData getTNTCoalesceBehaviour(){ return TNTCoalesceBehaviour;}
+    public ClaimBehaviourData getTNTCoalesceBehaviour()
+    {
+
+        return TNTCoalesceBehaviour;
+    }
 	private ClaimBehaviourData TrapDoors;
 
 	private ClaimBehaviourData TrashBlockPlacementBehaviour;
