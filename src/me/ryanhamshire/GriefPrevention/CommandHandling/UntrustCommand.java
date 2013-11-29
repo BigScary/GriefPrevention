@@ -29,6 +29,8 @@ public class UntrustCommand extends GriefPreventionCommand {
 		Player player = (sender instanceof Player) ? (Player) sender : null;
 		if (player == null)
 			return false;
+        PlayerData pd = GriefPrevention.instance.dataStore.getPlayerData(player.getName());
+
 		if(!EnsurePermission(player, label)) return true;
 		// determine which claim the player is standing in
 		Claim claim = inst.dataStore.getClaimAt(player.getLocation(), true /*
@@ -46,7 +48,7 @@ public class UntrustCommand extends GriefPreventionCommand {
 		OfflinePlayer otherPlayer = null;
 		// System.out.println("clearing perms for name:" + args[0]);
 		if (args[0].equals("all")) {
-			if (claim == null || claim.allowEdit(player) == null) {
+			if (claim == null || claim.allowEdit(player) == null || pd.ignoreClaims) {
 				clearPermissions = true;
 			} else {
 				GriefPrevention.sendMessage(player, TextMode.Err, Messages.ClearPermsOwnerOnly);

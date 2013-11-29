@@ -588,7 +588,13 @@ public class Claim {
 		// anyone who can modify the claim can do this
 		/*if (this.allowEdit(player) == null)
 			return null;*/
-
+        if(this.isAdminClaim())
+        if(player.hasPermission(PermNodes.AdminClaimsPermission)){
+            return null;
+        }
+        else{
+             return GriefPrevention.instance.dataStore.getMessage(Messages.NoAdminClaimsPermission);
+        }
         if(player.getName().equalsIgnoreCase(claimOwnerName)) return null;
 
 
