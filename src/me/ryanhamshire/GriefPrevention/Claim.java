@@ -588,6 +588,7 @@ public class Claim {
 		// anyone who can modify the claim can do this
 		/*if (this.allowEdit(player) == null)
 			return null;*/
+        PlayerData pdata = GriefPrevention.instance.dataStore.getPlayerData(player.getName());
         if(this.isAdminClaim())
         if(player.hasPermission(PermNodes.AdminClaimsPermission)){
             return null;
@@ -595,7 +596,7 @@ public class Claim {
         else{
              return GriefPrevention.instance.dataStore.getMessage(Messages.NoAdminClaimsPermission);
         }
-        if(player.getName().equalsIgnoreCase(claimOwnerName)) return null;
+        if(pdata.ignoreClaims || player.getName().equalsIgnoreCase(claimOwnerName)) return null;
 
 
 		// anyone who's in the managers (/PermissionTrust) list can do this

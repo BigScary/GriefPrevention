@@ -1,11 +1,6 @@
 package me.ryanhamshire.GriefPrevention.CommandHandling;
 
-import me.ryanhamshire.GriefPrevention.Claim;
-import me.ryanhamshire.GriefPrevention.DataStore;
-import me.ryanhamshire.GriefPrevention.GriefPrevention;
-import me.ryanhamshire.GriefPrevention.Messages;
-import me.ryanhamshire.GriefPrevention.PlayerData;
-import me.ryanhamshire.GriefPrevention.TextMode;
+import me.ryanhamshire.GriefPrevention.*;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -30,7 +25,7 @@ public class ClearManagersCommand extends GriefPreventionCommand {
 		Claim claimatpos = dataStore.getClaimAt(player.getLocation(), true);
 		PlayerData pdata = dataStore.getPlayerData(player.getName());
 		if (claimatpos != null) {
-			if (claimatpos.isAdminClaim()) {
+			if (claimatpos.isAdminClaim() && !player.hasPermission(PermNodes.AdminClaimsPermission)) {
 				GriefPrevention.sendMessage(player, TextMode.Err, Messages.ClearManagersNotAdmin);
 				return true;
 			}
