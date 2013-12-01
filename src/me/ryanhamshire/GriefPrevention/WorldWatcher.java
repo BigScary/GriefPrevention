@@ -49,7 +49,7 @@ public class WorldWatcher implements Listener {
 	public void WorldLoad(WorldLoadEvent event) {
 		if (event.getWorld() == null)
 			return;
-
+        Debugger.Write("WorldLoaded:" + event.getWorld().getName(),DebugLevel.Verbose);
 		if (WorldLoadDelegates.containsKey(event.getWorld().getName())) {
 			int randelegates = 0;
 			Runnable r = null;
@@ -70,11 +70,12 @@ public class WorldWatcher implements Listener {
 		WorldClaimCleanupTask createdTask = new WorldClaimCleanupTask(event.getWorld().getName());
 		WorldClaimTasks.put(event.getWorld().getName(), createdTask);
 		if (wc.getClaimCleanupEnabled()) {
+            //ten minute cleanup interval.
 			int taskCookie = Bukkit.getScheduler().scheduleSyncRepeatingTask(GriefPrevention.instance, createdTask, 60*5*20, 60*5*10);
 			createdTask.setTaskCookie(taskCookie);
 		}
 
-		// 10 minutes, ** make configurable...*
+
 
 	}
 
@@ -82,7 +83,7 @@ public class WorldWatcher implements Listener {
 	public void WorldUnload(WorldUnloadEvent event) {
 		if (LoadedWorlds.contains(event.getWorld())) {
 			// stop world claim cleanup.
-
+            Debugger.Write("WorldUnload:" + event.getWorld().getName(),DebugLevel.Verbose);
 			WorldClaimCleanupTask wtask = WorldClaimTasks.remove(event.getWorld().getName());
 			// stop the task.
 			Bukkit.getScheduler().cancelTask(wtask.getTaskCookie());

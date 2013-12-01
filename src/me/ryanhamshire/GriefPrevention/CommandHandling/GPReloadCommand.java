@@ -1,5 +1,6 @@
 package me.ryanhamshire.GriefPrevention.CommandHandling;
 
+import me.ryanhamshire.GriefPrevention.Debugger;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import me.ryanhamshire.GriefPrevention.PermNodes;
 
@@ -21,11 +22,9 @@ public class GPReloadCommand extends GriefPreventionCommand {
 		Player player = (sender instanceof Player) ? (Player) sender : null;
 		if(player!=null && !EnsurePermission(player,command.getName())) return true;
 		if (player == null || player.hasPermission(PermNodes.ReloadPermission)) {
-			GriefPrevention useinstance = GriefPrevention.instance; // we need a
-																	// reference
-																	// to
-																	// re-enable
-																	// it,
+
+			GriefPrevention useinstance = GriefPrevention.instance;
+			// we need a reference to re-enable it, so keep one around.
 			useinstance.onDisable();
 			useinstance.onEnable();
 			// GriefPrevention.instance.reloadConfiguration();

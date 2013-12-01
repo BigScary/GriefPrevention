@@ -937,7 +937,7 @@ class PlayerEventHandler implements Listener {
             }
         }
         else if(clickedBlock.getType()==Material.ENDER_PORTAL_FRAME){
-            if(event.getItem().getType()==Material.EYE_OF_ENDER){
+            if(inhand==Material.EYE_OF_ENDER){
                 if(wc.getEnderEyePortalRules().Allowed(player.getLocation(),player,true).Denied()){
                     event.setCancelled(true);
                 }
@@ -2029,7 +2029,7 @@ class PlayerEventHandler implements Listener {
 				// This is for with creatures, the BlockEvent interaction
 				// handles interaction with Fence and Netherbrick fence
 				// blocks.
-				if (handItem.getType() == Material.LEASH) {
+				if (handItem!=null && handItem.getType() == Material.LEASH) {
 					if (entity instanceof Tameable) {
 						if (((Tameable) entity).getOwner() == player) {
 							return;
@@ -2039,7 +2039,7 @@ class PlayerEventHandler implements Listener {
 						event.setCancelled(true);
 						return;
 					}
-				} else if (handItem.getType().getId() == 421) {
+				} else if (handItem!=null && handItem.getType().getId() == 421) {
 					if (entity instanceof Tameable) {
 						if (((Tameable) entity).getOwner() == player) {
 							return;
@@ -2053,17 +2053,17 @@ class PlayerEventHandler implements Listener {
 				}
 			}
 			if (isHorse(entity)) {
-
+                Debugger.Write("Horse Detected.",DebugLevel.Verbose);
 				Horse h = (Horse) entity;
 
-				if (h.isTamed() && handItem.getType() == Material.GOLDEN_APPLE) {
+				if (h.isTamed() && handItem!=null && handItem.getType() == Material.GOLDEN_APPLE) {
 					// if horse is tamed, apply breeding rules.
 					if (wc.getBreedingRules().Allowed(h, player).Denied()) {
 						event.setCancelled(true);
 						return;
 					}
 
-				} else if (handItem.getType() == Material.WHEAT || handItem.getType() == Material.HAY_BLOCK || handItem.getType() == Material.APPLE || handItem.getType() == Material.GOLDEN_APPLE) {
+				} else if (handItem!=null && (handItem.getType() == Material.WHEAT || handItem.getType() == Material.HAY_BLOCK || handItem.getType() == Material.APPLE || handItem.getType() == Material.GOLDEN_APPLE)) {
 					// apply feeding rules.
 					if (wc.getFeedingRules().Allowed(h, player).Denied()) {
 						event.setCancelled(true);
@@ -2072,30 +2072,47 @@ class PlayerEventHandler implements Listener {
 
 				} else {
 
-					if (h.isTamed()) {
+                        if (h.isTamed()) {
+                        Debugger.Write("Tamed Horse.",DebugLevel.Verbose);
 						// if the player is the owner of the horse,
 						// they can do what they want no matter where they are.
-						{
-							if (h.getOwner() == null || h.getOwner().getName().equals(player.getName()))
+						    if(h.getOwner()==null){
+                                Debugger.Write("Tamed Horse with no owner. Strangeness.",DebugLevel.Verbose);
+                            }
+                            else {
+                                Debugger.Write("Horse Owner:" + h.getOwner().getName(),DebugLevel.Verbose);
+                            }
+							if (h.getOwner() == null || h.getOwner().getName().equals(player.getName())){
 								return;
-						}
-						// otherwise, Apply Containers rules if they aren't
-						// sneaking, otherwise,
-						// apply the Inventory rules.
-						// what this means is that if you ride a horse onto
-						// somebody elses claim, they will have access to the
-						// horse.
-						// if the EquineInventoryRules/ContainerRules are set to
-						// allow.
+                            }
+                            else if (h.getOwner()!=null && !h.getOwner().getName().equals(player.getName())){
+                                GriefPrevention.sendMessage(player,TextMode.Err,Messages.NoDamageClaimedEntity,h.getOwner().getName());
+                                event.setCancelled(true);
+                                return;
+                            }
+
 						if (player.isSneaking()) {
-							if (wc.getEquineInventoryRules().Allowed(h, player).Denied())
+							if (wc.getEquineInventoryRules().Allowed(h, player,true).Denied()){
+                                Player owner = (Player)(h.getOwner());
+                                String usename = owner==null?"Unknown":owner.getName();
+                                GriefPrevention.sendMessage(player,TextMode.Err,Messages.NoDamageClaimedEntity,usename);
 								event.setCancelled(true);
-							return;
+							    return;
+                            }
 
 						}
 					}
+                    else if (handItem==null || handItem.getType()==Material.AIR) {
+                        //not tamed. Require permission in an owned claim.
+                        if(wc.getTamingRules().Allowed(h,player).Denied()){
+                            event.setCancelled(true);
+                            return;
+                        }
+                    }
+
 
 				}
+                return;
 			}
 
 			// check for breeding animals. We don't check horse breeding here

@@ -29,27 +29,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Arrow;
-import org.bukkit.entity.Creature;
-import org.bukkit.entity.Creeper;
-import org.bukkit.entity.Egg;
-import org.bukkit.entity.Enderman;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Fireball;
-import org.bukkit.entity.Hanging;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Monster;
-import org.bukkit.entity.Ocelot;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Snowball;
-import org.bukkit.entity.TNTPrimed;
-import org.bukkit.entity.Tameable;
-import org.bukkit.entity.ThrownPotion;
-import org.bukkit.entity.Villager;
-import org.bukkit.entity.Wither;
-import org.bukkit.entity.WitherSkull;
-import org.bukkit.entity.Wolf;
+import org.bukkit.entity.*;
 import org.bukkit.entity.minecart.ExplosiveMinecart;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -150,11 +130,11 @@ class EntityEventHandler implements Listener {
 		if (!wc.Enabled())
 			return;
 		// environmental damage
-		
+        Claim claimatpos = dataStore.getClaimAt(event.getEntity().getLocation(), false);
 		if (event.getEntity() instanceof Hanging) { // hanging objects are not
 													// destroyed by explosions
 													// inside claims.
-			Claim claimatpos = dataStore.getClaimAt(event.getEntity().getLocation(), false);
+
 			if (claimatpos != null) {
 				if (!claimatpos.areExplosivesAllowed) {
 					event.setCancelled(true);
@@ -169,6 +149,10 @@ class EntityEventHandler implements Listener {
 		// monsters are never protected
 		if (event.getEntity() instanceof Monster)
 			return;
+
+
+
+
 
 		EntityDamageByEntityEvent subEvent = (EntityDamageByEntityEvent) event;
 
@@ -209,6 +193,61 @@ class EntityEventHandler implements Listener {
 				attacker = (Player) wskull.getShooter();
 			}
 		}
+        //horses are protected:
+        //In wilderness: Protected from everybody except the owner.
+        //In Claim: Protected from everybody except the owner, Unless being ridden, in which case players with trust on that claim
+        //can attack the horse.
+        //this can be modelled by a rule but people don't like my rules framework *sadface*
+        if(attacker!=null && event.getEntity() instanceof Horse && ((Horse)event.getEntity()).isTamed()){
+            Horse h = (Horse)event.getEntity();
+            //if the attacker owns the horse, he can abuse it as he sees fit.
+            if(h.getOwner().getName().equals(attacker.getName()))
+            {
+                return;
+            }
+            if(claimatpos==null){
+
+                if(!attacker.getName().equals(h.getOwner().getName())){
+                    //deny
+                    String owner = h.getOwner()==null?"unknown":h.getOwner().getName();
+                    GriefPrevention.sendMessage(attacker,TextMode.Err,Messages.NoDamageClaimedEntity,owner);
+                    event.setCancelled(true);
+                    return;
+                }
+            }
+            else {
+                //inside a claim. More tricky. It's allowed if the attacker has trust on the claim and the player riding the horse doesn't.
+                //if there is no rider, it is disallowed.
+                //Does the horse have a rider?
+                if(h.getPassenger()!=null && h.getPassenger() instanceof Player){
+                    Player rider = (Player)(h.getPassenger());
+                    //ok, does the attacker have Access Trust on the Claim? And does the attacker NOT
+                    //have that access?
+
+                    if(claimatpos.allowAccess(attacker)==null && claimatpos.allowAccess(rider)!=null){
+                        //indeed. Horse has a passenger, AND the attacker is in a claim they have trust in- allow it.
+                        event.setCancelled(false);
+                        return;
+                    }
+                    else {
+                        event.setCancelled(true);
+                        GriefPrevention.sendMessage(attacker,TextMode.Err,Messages.NoDamageClaimedEntity,rider.getName());
+                        return;
+                    }
+                }
+                else if(h.getPassenger()==null){
+                //not allowed. This may cause issues, as players can leave their horses in other peoples claims and cause problems.
+                //will be changed based on feedback. Looking at this it's funny because I could just use a rule for all of this. That's too complicated though :P
+                    String owner = h.getOwner()==null?"Unknown":h.getOwner().getName();
+                    GriefPrevention.sendMessage(attacker,TextMode.Err,Messages.NoDamageClaimedEntity,owner);
+                    event.setCancelled(true);
+                    return;
+                }
+            }
+        }
+
+
+
 
 		// if the attacker is a player and defender is a player (pvp combat)
 		if (attacker != null && event.getEntity() instanceof Player && event.getEntity().getWorld().getPVP()) {
@@ -225,7 +264,7 @@ class EntityEventHandler implements Listener {
 
 			Player defender = (Player) (event.getEntity());
 
-			PlayerData defenderData = this.dataStore.getPlayerData(((Player) event.getEntity()).getName());
+			PlayerData defenderData = this.dataStore.getPlayerData(defender.getName());
 			PlayerData attackerData = this.dataStore.getPlayerData(attacker.getName());
 			if (defender instanceof Player && attacker instanceof Player)
 				if (!defender.isOnline() || !attacker.isOnline())
@@ -233,13 +272,19 @@ class EntityEventHandler implements Listener {
 			// otherwise if protecting spawning players
 			if (wc.getSpawnProtectEnabled()) {
 
-                if(defenderData.pvpImmune && !attackerData.pvpImmune && wc.getSpawnProtectDisableonInstigate()){
-                //disable the defender's pvp immunity.
-                    defenderData.pvpImmune=false;
+                Debugger.Write("Spawn Protection Enabled...", Debugger.DebugLevel.Verbose);
+                Debugger.Write("Defender PvPImmune=" + defenderData.pvpImmune, Debugger.DebugLevel.Verbose);
+                Debugger.Write("Attacker PvPImmune=" + attackerData.pvpImmune,Debugger.DebugLevel.Verbose);
+                if(!defenderData.pvpImmune && attackerData.pvpImmune && wc.getSpawnProtectDisableonInstigate()){
+                //disable the attacker's pvp immunity.
+                    Debugger.Write("Disabling PVP immunity for attacking player," + attacker.getName(), Debugger.DebugLevel.Verbose);
+
+                    attackerData.pvpImmune=false;
                 }
 
 				else{
                     if (defenderData.pvpImmune) {
+                        Debugger.Write("Defender is immune. Cancelling.",Debugger.DebugLevel.Verbose);
                         event.setCancelled(true);
                         CancelMMO((LivingEntity) event.getEntity());
                         GriefPrevention.sendMessage(attacker, TextMode.Err, Messages.ThatPlayerPvPImmune);
@@ -249,6 +294,7 @@ class EntityEventHandler implements Listener {
 
 				if (attackerData.pvpImmune) {
 					event.setCancelled(true);
+                    Debugger.Write("Attacker is immune. Cancelling.",Debugger.DebugLevel.Verbose);
 					CancelMMO((LivingEntity) event.getEntity());
 					GriefPrevention.sendMessage(attacker, TextMode.Err, Messages.CantFightWhileImmune);
 					return;
@@ -287,6 +333,7 @@ class EntityEventHandler implements Listener {
 			defenderData.lastPvpPlayer = attacker.getName();
 			attackerData.lastPvpTimestamp = now;
 			attackerData.lastPvpPlayer = defender.getName();
+
 		}
 
 		// FEATURE: protect claimed animals, boats, minecarts
@@ -295,10 +342,7 @@ class EntityEventHandler implements Listener {
 		// might find ways to steal anyway
 
 		// if theft protection is enabled
-		if (event instanceof EntityDamageByEntityEvent) {
-			// if the entity is an non-monster creature (remember monsters
-			// disqualified above), or a vehicle
-			//
+		//
 			if (subEvent.getEntity() instanceof Creature) {
 
 				Claim cachedClaim = null;
@@ -312,6 +356,7 @@ class EntityEventHandler implements Listener {
 
 				// if it's claimed
 				if (claim != null) {
+
 					// if damaged by anything other than a player (exception
 					// villagers injured by zombies in admin claims), cancel the
 					// event
@@ -320,6 +365,7 @@ class EntityEventHandler implements Listener {
 					// players.
 					// Additional exception added: cactus, lava, and drowning of
 					// entities happens.
+
 					if (attacker == null) {
 						// exception case
 						if (event.getEntity() instanceof Villager && damageSource instanceof Monster && claim.isAdminClaim()) {
@@ -382,7 +428,7 @@ class EntityEventHandler implements Listener {
 					}
 				}
 			}
-		}
+
 	}
 
 	// @EventHandler

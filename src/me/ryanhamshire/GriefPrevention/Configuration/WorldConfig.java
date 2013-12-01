@@ -1087,6 +1087,7 @@ public class WorldConfig {
 
 		this.SpawnProtectEnabled = config.getBoolean("GriefPrevention.PvP.SpawnProtect.Enabled", true);
         this.SpawnProtectTimeout = config.getInt("GriefPrevention.PvP.SpawnProtect.Timeout",20*120);
+
         this.SpawnProtectDisableonInstigate = config.getBoolean("GriefPrevention.PvP.SpawnProtect.DisableonInstigate",true);
         this.SpawnProtectDisableonItemPickup = config.getBoolean("GriefPrevention.PvP.SpawnProtect.DisableonItemPickup",true);
         this.SpawnProtectPickupTimeout = config.getInt("GriefPrevention.PvP.SpawnProtect.PickupTimeout",10000);
@@ -1094,7 +1095,13 @@ public class WorldConfig {
 		this.config_pvp_combatTimeoutSeconds = config.getInt("GriefPrevention.PvP.CombatTimeoutSeconds", 15);
 		this.config_pvp_allowCombatItemDrop = config.getBoolean("GriefPrevention.PvP.AllowCombatItemDrop", false);
 		this.config_pvp_blockContainers = config.getBoolean("GriefPrevention.PvP.BlockContainers", true);
-		String bannedPvPCommandsList = config.getString("GriefPrevention.PvP.BlockedSlashCommands", "/home;/vanish;/spawn;/tpa");
+        config.set("GriefPrevention.PvP.SpawnProtect.Timeout",SpawnProtectTimeout);
+        config.set("GriefPrevention.PvP.SpawnProtect.DisableonInstigate",SpawnProtectDisableonInstigate);
+        config.set("GriefPrevention.PvP.SpawnProtect.DisableonItemPickup",SpawnProtectDisableonItemPickup);
+        config.set("GriefPrevention.PvP.SpawnProtect.PickupTimeout",SpawnProtectPickupTimeout);
+
+
+        String bannedPvPCommandsList = config.getString("GriefPrevention.PvP.BlockedSlashCommands", "/home;/vanish;/spawn;/tpa");
 
 		this.config_trees_removeFloatingTreetops = config.getBoolean("GriefPrevention.Trees.RemoveFloatingTreetops", true);
 		this.config_trees_regrowGriefedTrees = config.getBoolean("GriefPrevention.Trees.RegrowGriefedTrees", true);
