@@ -46,7 +46,9 @@ public class MaterialInfo {
 			typeID = Integer.parseInt(parts[0]);
         }
         catch(NumberFormatException nfe){
-            typeID = Material.getMaterial(parts[0]).getId();
+            Material Acquired = Material.getMaterial(parts[0]);
+            if(Acquired==null) return null;
+            typeID = Acquired.getId();
         }
 			byte data;
 			boolean allDataValues;
