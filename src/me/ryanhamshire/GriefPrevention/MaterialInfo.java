@@ -36,7 +36,9 @@ public class MaterialInfo {
 			try {
 				return new MaterialInfo(Integer.parseInt(parts[0]), null);
 			} catch (NumberFormatException ex) {
-				return new MaterialInfo(Material.getMaterial(parts[0]));
+                Material Acquired = Material.getMaterial(parts[0]);
+                if(Acquired!=null)
+				    return new MaterialInfo(Acquired);
 			}
 		}
         int typeID=0;
@@ -98,6 +100,7 @@ public class MaterialInfo {
 		this.description = description;
 	}
 	public MaterialInfo(Material Source) {
+
 		this.typeID = Source.getId();
 		this.data = 0;
 		this.allDataValues = true;

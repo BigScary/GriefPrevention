@@ -87,7 +87,7 @@ public class WorldWatcher implements Listener {
             Debugger.Write("WorldUnload:" + event.getWorld().getName(),DebugLevel.Verbose);
 			WorldClaimCleanupTask wtask = WorldClaimTasks.remove(event.getWorld().getName());
 			// stop the task.
-			Bukkit.getScheduler().cancelTask(wtask.getTaskCookie());
+            if(wtask!=null) Bukkit.getScheduler().cancelTask(wtask.getTaskCookie());
 			// that oughta do it.
 
 			GriefPrevention.instance.dataStore.WorldUnloaded(event.getWorld());
