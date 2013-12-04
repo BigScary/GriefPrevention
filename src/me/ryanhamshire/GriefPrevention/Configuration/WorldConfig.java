@@ -1306,7 +1306,7 @@ public class WorldConfig {
 
 		this.config_pvp_noCombatInPlayerLandClaims = config.getBoolean("GriefPrevention.PvP.ProtectPlayersInLandClaims.PlayerOwnedClaims", !this.config_siege_enabled);
 		this.config_pvp_noCombatInAdminLandClaims = config.getBoolean("GriefPrevention.PvP.ProtectPlayersInLandClaims.AdministrativeClaims", !this.config_siege_enabled);
-
+        this.SpawnProtectEnabled= config.getBoolean("GriefPrevention.PvP.ProtectFreshSpawns",true);
 		// outConfig.set("GriefPrevention.Claims.Worlds",
 		// claimsEnabledWorldNames);
 		// outConfig.set("GriefPrevention.Claims.CreativeRulesWorlds",

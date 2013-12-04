@@ -743,9 +743,12 @@ public abstract class DataStore {
 	 *         location.
 	 */
 	synchronized public Claim getClaimAt(Location location, boolean ignoreHeight) {
-		// Debugger.Write("Looking for Claim at:" +
-		// GriefPrevention.getfriendlyLocationString(location) +
-		// " Ignoreheight:" + ignoreHeight,DebugLevel.Verbose);
+		 Debugger.Write("Looking for Claim at:" +
+		 GriefPrevention.getfriendlyLocationString(location) +
+		 " Ignoreheight:" + ignoreHeight,DebugLevel.Verbose);
+
+        Debugger.Write("ChunkMap Size:" + claims.chunkmap.size() + " claimworldmap:" + claims.claimworldmap.size() + " ClaimMap:" + claims.claimmap.size(),DebugLevel.Verbose);
+
         if(location==null) return null;
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(location.getWorld());
 		if(!wc.getClaimsEnabled()) return null;
@@ -821,13 +824,13 @@ public abstract class DataStore {
 
 	synchronized public Set<Claim> getClaimsIn(Location Lesser, Location Greater, boolean Inclusive) {
 
-		WorldConfig wc = GriefPrevention.instance.getWorldCfg(Greater.getWorld());
-		if(!wc.getClaimsEnabled()) return new HashSet<Claim>();
+
 		if (Lesser == null)
 			throw new IllegalArgumentException("Lesser");
 		if (Greater == null)
 			throw new IllegalArgumentException("Greater");
-		
+        WorldConfig wc = GriefPrevention.instance.getWorldCfg(Greater.getWorld());
+        if(!wc.getClaimsEnabled()) return new HashSet<Claim>();
 		int LessX = Math.min(Lesser.getBlockX(), Greater.getBlockX());
 		int LessY = Math.min(Lesser.getBlockY(), Greater.getBlockY());
 		int LessZ = Math.min(Lesser.getBlockZ(), Greater.getBlockZ());

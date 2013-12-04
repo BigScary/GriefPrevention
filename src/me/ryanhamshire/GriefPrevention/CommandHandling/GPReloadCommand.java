@@ -4,9 +4,12 @@ import me.ryanhamshire.GriefPrevention.Debugger;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import me.ryanhamshire.GriefPrevention.PermNodes;
 
+import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.event.world.WorldLoadEvent;
 
 public class GPReloadCommand extends GriefPreventionCommand {
 
@@ -25,8 +28,13 @@ public class GPReloadCommand extends GriefPreventionCommand {
 
 			GriefPrevention useinstance = GriefPrevention.instance;
 			// we need a reference to re-enable it, so keep one around.
+            Debugger.Write("GPReload: Disabling GriefPrevention", Debugger.DebugLevel.Verbose);
 			useinstance.onDisable();
+            Debugger.Write("GPReload: Re-Enabling GriefPrevention",Debugger.DebugLevel.Verbose);
+
 			useinstance.onEnable();
+
+
 			// GriefPrevention.instance.reloadConfiguration();
 			// FileConfiguration config =
 			// YamlConfiguration.loadConfiguration(new

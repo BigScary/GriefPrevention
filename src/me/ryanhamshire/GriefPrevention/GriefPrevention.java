@@ -795,19 +795,25 @@ public class GriefPrevention extends JavaPlugin {
                 PlayerData playerData = this.dataStore.getPlayerData(playerName);
                 this.dataStore.savePlayerData(playerName, playerData);
             }
-            for (World iterate : Bukkit.getWorlds()) {
-                ww.WorldUnload(new WorldUnloadEvent(iterate));
+            if(ww!=null){
+              for (World iterate : Bukkit.getWorlds()) {
+                  ww.WorldUnload(new WorldUnloadEvent(iterate));
+              }
             }
             this.dataStore.close();
+            dataStore=null;
         }
         else
             GriefPrevention.AddLogEntry("ERROR: DataStore is not configured correctly, no data is being saved. Please fix your config!");
-        ww = null;
+
+
+
+
+        ww.clear();
         dataStore = null;
 
         this.cmdHandler = null;
-
-		AddLogEntry("GriefPrevention disabled.");
+        AddLogEntry("GriefPrevention disabled.");
 	}
 
 	// initializes well... everything
@@ -915,17 +921,14 @@ public class GriefPrevention extends JavaPlugin {
 		outConfig.set("GriefPrevention.EnableMoveWatcher", config_movementWatcher);
 		Configuration = new ConfigData(config, outConfig);
 
-		if (config_mod_config_search) { // if specified, to search, save the
-										// results to the template file.
-			// WorldConfig's will save the ModdedBlock Contents when they are
-			// created,
+		if (config_mod_config_search) {
+		    // if specified, to search, save the results to the template file.
+		    // WorldConfig's will save the ModdedBlock Contents when they are created,
 			// therefore we will set the template in this manner. Otherwise,
-			// this setting (ModdedBlock search results)
-			// will only be valid for this one server session.
-			WorldConfig templatefile = WorldConfig.fromFile(Configuration.getTemplateFile());
-			// we don't actually need to do anything with the variable, all the
+			// this setting (ModdedBlock search results) will only be valid for this one server session.
+			// we don't actually need to do anything with the templateFile variable, all the
 			// work was done in fromFile() and the WorldConfig constructors.
-
+            WorldConfig templatefile = WorldConfig.fromFile(Configuration.getTemplateFile());
 		}
 
 		// when datastore initializes, it loads player and claim data, and posts
@@ -970,13 +973,10 @@ public class GriefPrevention extends JavaPlugin {
 			}
 		}
 
-		// start the recurring cleanup event for entities in creative worlds, if
-		// enabled.
+		// start the recurring cleanup event for entities in creative worlds, if enabled.
 
-		// start recurring cleanup scan for unused claims belonging to inactive
-		// players
-		// if the option is enabled.
-		// look through all world configurations.
+		// start recurring cleanup scan for unused claims belonging to inactive players
+		// if the option is enabled. look through all world configurations.
 		boolean claimcleanupOn = false;
 		boolean entitycleanupEnabled = false;
 		try {
@@ -1000,16 +1000,18 @@ public class GriefPrevention extends JavaPlugin {
 			PluginManager pluginManager = this.getServer().getPluginManager();
 
 			// player events
-			PlayerEventHandler playerEventHandler = new PlayerEventHandler(this.dataStore, this);
+			PlayerEventHandler playerEventHandler = new PlayerEventHandler();
 			pluginManager.registerEvents(playerEventHandler, this);
 
 			// block events
-			BlockEventHandler blockEventHandler = new BlockEventHandler(this.dataStore);
+			BlockEventHandler blockEventHandler = new BlockEventHandler();
 			pluginManager.registerEvents(blockEventHandler, this);
 
 			// entity events
-			EntityEventHandler entityEventHandler = new EntityEventHandler(this.dataStore);
+			EntityEventHandler entityEventHandler = new EntityEventHandler();
 			pluginManager.registerEvents(entityEventHandler, this);
+
+            Bukkit.getPluginManager().registerEvents(ww, this);
 		}
 
 		// if economy is enabled
@@ -1049,10 +1051,10 @@ public class GriefPrevention extends JavaPlugin {
 		} catch (IOException exx) {
 			GriefPrevention.log.log(Level.SEVERE, "Failed to save primary configuration file:" + DataStore.configFilePath);
 		}
-		ww = new WorldWatcher();
-		Bukkit.getPluginManager().registerEvents(ww, this);
+
 		// go through all available worlds, and fire a "world load" event for
 		// them.
+        Debugger.Write("Looking Through " + Bukkit.getWorlds().size() + " Worlds, reloading Claim Data.",DebugLevel.Verbose);
 		for (World iterate : Bukkit.getWorlds()) {
 			WorldLoadEvent wle = new WorldLoadEvent(iterate);
 			ww.WorldLoad(wle);

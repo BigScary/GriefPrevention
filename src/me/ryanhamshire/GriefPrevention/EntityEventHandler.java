@@ -63,10 +63,11 @@ class EntityEventHandler implements Listener {
 	private Claim ChangeBlockClaimCache = null;
 
 	// convenience reference for the singleton datastore
-	private DataStore dataStore;
 
-	public EntityEventHandler(DataStore dataStore) {
-		this.dataStore = dataStore;
+    private DataStore getDataStore(){ return GriefPrevention.instance.dataStore;}
+
+	public EntityEventHandler() {
+
 	}
 
 	private void CancelMMO(LivingEntity e) {
@@ -126,20 +127,23 @@ class EntityEventHandler implements Listener {
 	// when an entity is damaged
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
 	public void onEntityDamage(EntityDamageEvent event) {
+        Debugger.Write("onEntityDamage, instance:" + event.getEntity().getClass().getName(), Debugger.DebugLevel.Verbose);
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(event.getEntity().getWorld());
 		if (!wc.Enabled())
 			return;
 		// environmental damage
-        Claim claimatpos = dataStore.getClaimAt(event.getEntity().getLocation(), false);
+        Claim claimatpos = getDataStore().getClaimAt(event.getEntity().getLocation(), false);
 		if (event.getEntity() instanceof Hanging) { // hanging objects are not
 													// destroyed by explosions
 													// inside claims.
+
 
 			if (claimatpos != null) {
 				if (!claimatpos.areExplosivesAllowed) {
 					event.setCancelled(true);
 				}
 			}
+
 
 		}
 
@@ -193,6 +197,12 @@ class EntityEventHandler implements Listener {
 				attacker = (Player) wskull.getShooter();
 			}
 		}
+        if(event.getEntity() instanceof Hanging){
+            if(wc.getItemFrameRules().Allowed(event.getEntity().getLocation(),attacker).Denied()){
+                event.setCancelled(true);
+                return;
+            }
+        }
         //horses are protected:
         //In wilderness: Protected from everybody except the owner.
         //In Claim: Protected from everybody except the owner, Unless being ridden, in which case players with trust on that claim
@@ -264,8 +274,8 @@ class EntityEventHandler implements Listener {
 
 			Player defender = (Player) (event.getEntity());
 
-			PlayerData defenderData = this.dataStore.getPlayerData(defender.getName());
-			PlayerData attackerData = this.dataStore.getPlayerData(attacker.getName());
+			PlayerData defenderData = this.getDataStore().getPlayerData(defender.getName());
+			PlayerData attackerData = this.getDataStore().getPlayerData(attacker.getName());
 			if (defender instanceof Player && attacker instanceof Player)
 				if (!defender.isOnline() || !attacker.isOnline())
 					return;
@@ -305,7 +315,7 @@ class EntityEventHandler implements Listener {
 			// FEATURE: prevent players from engaging in PvP combat inside land
 			// claims (when it's disabled)
 			if (wc.getPvPNoCombatinPlayerClaims() || wc.getNoPvPCombatinAdminClaims()) {
-				Claim attackerClaim = this.dataStore.getClaimAt(attacker.getLocation(), false);
+				Claim attackerClaim = this.getDataStore().getClaimAt(attacker.getLocation(), false);
 				if (attackerClaim != null && (attackerClaim.isAdminClaim() && wc.getNoPvPCombatinAdminClaims() || !attackerClaim.isAdminClaim() && wc.getPvPNoCombatinPlayerClaims())) {
 					attackerData.lastClaim = attackerClaim;
 					event.setCancelled(true);
@@ -313,7 +323,7 @@ class EntityEventHandler implements Listener {
 					return;
 				}
 
-				Claim defenderClaim = this.dataStore.getClaimAt(defender.getLocation(), false);
+				Claim defenderClaim = this.getDataStore().getClaimAt(defender.getLocation(), false);
 				if (defenderClaim != null && (defenderClaim.isAdminClaim() && wc.getNoPvPCombatinAdminClaims() || !defenderClaim.isAdminClaim() && wc.getPvPNoCombatinPlayerClaims())) {
 					defenderData.lastClaim = defenderClaim;
 					event.setCancelled(true);
@@ -348,11 +358,11 @@ class EntityEventHandler implements Listener {
 				Claim cachedClaim = null;
 				PlayerData playerData = null;
 				if (attacker != null) {
-					playerData = this.dataStore.getPlayerData(attacker.getName());
+					playerData = this.getDataStore().getPlayerData(attacker.getName());
 					cachedClaim = playerData.lastClaim;
 				}
 
-				Claim claim = this.dataStore.getClaimAt(event.getEntity().getLocation(), false);
+				Claim claim = this.getDataStore().getClaimAt(event.getEntity().getLocation(), false);
 
 				// if it's claimed
 				if (claim != null) {
@@ -485,7 +495,7 @@ class EntityEventHandler implements Listener {
 		if (entity instanceof Player) {
 
 			Player player = (Player) entity;
-			PlayerData playerData = this.dataStore.getPlayerData(player.getName());
+			PlayerData playerData = this.getDataStore().getPlayerData(player.getName());
 
 			// if involved in a siege
 			if (playerData.siegeData != null) {
@@ -495,7 +505,7 @@ class EntityEventHandler implements Listener {
 					event.getDrops().clear();
 
 				// end it, with the dieing player being the loser
-				this.dataStore.endSiege(playerData.siegeData, null, player.getName(), true /*
+				this.getDataStore().endSiege(playerData.siegeData, null, player.getName(), true /*
 																							 * ended
 																							 * due
 																							 * to
@@ -707,6 +717,7 @@ class EntityEventHandler implements Listener {
 	 */
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
 	public void onEntityInteract(EntityInteractEvent event) {
+        Debugger.Write("onEntityInteract, instance:" + event.getEntity().getClass().getName(), Debugger.DebugLevel.Verbose);
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(event.getEntity().getWorld());
 		if (!wc.Enabled())
 			return;
@@ -742,7 +753,16 @@ class EntityEventHandler implements Listener {
 
 			grabplayer = event.getEntity() instanceof Player ? (Player) event.getEntity() : null;
 			if (grabplayer != null) {
-
+                if(event.getEntity() instanceof Hanging){
+                    //can't interact with paintings yet...
+                    if(event.getEntity() instanceof ItemFrame){
+                          if(wc.getItemFrameRules().Allowed(event.getEntity().getLocation(),grabplayer).Denied()){
+                             event.setCancelled(true);
+                              return;
+                          }
+                    }
+                 //itemframe or painting.
+                }
 				if (event.getEntity().getPassenger() != null) {
 					if (event.getEntity().getPassenger() instanceof Player) {
 						grabplayer = (Player) event.getEntity().getPassenger();
@@ -856,7 +876,7 @@ class EntityEventHandler implements Listener {
 			return;
 
 		// otherwise, just apply the limit on total entities per claim
-		Claim claim = this.dataStore.getClaimAt(event.getLocation(), false);
+		Claim claim = this.getDataStore().getClaimAt(event.getLocation(), false);
 		if (claim != null && claim.allowMoreEntities() != null) {
 			event.setCancelled(true);
 			return;
@@ -884,6 +904,7 @@ class EntityEventHandler implements Listener {
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
 	public void onHangingBreak(HangingBreakEvent event) {
 		// FEATURE: claimed paintings are protected from breakage
+        Debugger.Write("onHangingBreak", Debugger.DebugLevel.Verbose);
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(event.getEntity().getWorld());
 		if (!wc.Enabled())
 			return;
@@ -982,7 +1003,7 @@ class EntityEventHandler implements Listener {
 	 * if(wc.mods_explodableIds().Contains(new MaterialInfo(block.getTypeId(),
 	 * block.getData(), null))) continue;
 	 * 
-	 * claim = this.dataStore.getClaimAt(block.getLocation(), false, claim);
+	 * claim = this.getDataStore().getClaimAt(block.getLocation(), false, claim);
 	 * //if the block is claimed, remove it from the list of destroyed blocks
 	 * if(claim != null && !claim.areExplosivesAllowed) { blocks.remove(i--); }
 	 * 
@@ -1058,8 +1079,8 @@ class EntityEventHandler implements Listener {
 
 		// otherwise, apply entity-count limitations for creative worlds
 		else if (GriefPrevention.instance.creativeRulesApply(event.getEntity().getLocation())) {
-			PlayerData playerData = this.dataStore.getPlayerData(event.getPlayer().getName());
-			Claim claim = this.dataStore.getClaimAt(event.getBlock().getLocation(), false);
+			PlayerData playerData = this.getDataStore().getPlayerData(event.getPlayer().getName());
+			Claim claim = this.getDataStore().getClaimAt(event.getBlock().getLocation(), false);
 			if (claim == null)
 				return;
 

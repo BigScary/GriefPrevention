@@ -47,7 +47,8 @@ public class WorldWatcher implements Listener {
 
 	@EventHandler
 	public void WorldLoad(WorldLoadEvent event) {
-		if (event.getWorld() == null)
+
+        if (event.getWorld() == null)
 			return;
         Debugger.Write("WorldLoaded:" + event.getWorld().getName(),DebugLevel.Verbose);
 		if (WorldLoadDelegates.containsKey(event.getWorld().getName())) {
@@ -57,8 +58,8 @@ public class WorldWatcher implements Listener {
 				r.run();
 				randelegates++;
 			}
-			if (randelegates > 0 && GriefPrevention.instance.DebuggingLevel == DebugLevel.Verbose) {
-				System.out.println("Ran " + randelegates + " WorldLoad Delegates.");
+			if (randelegates > 0) {
+				Debugger.Write("Ran " + randelegates + " WorldLoad Delegates.",DebugLevel.Verbose);
 			}
 		}
 
@@ -95,4 +96,13 @@ public class WorldWatcher implements Listener {
 		}
 	}
 
+    public void clear() {
+        LoadedWorlds.clear();
+        //cancel all claim cleanup Tasks.
+        for(WorldClaimCleanupTask cleaner :this.WorldClaimTasks.values()){
+            Bukkit.getScheduler().cancelTask(cleaner.getTaskCookie());
+        }
+        WorldClaimTasks.clear();
+
+    }
 }
