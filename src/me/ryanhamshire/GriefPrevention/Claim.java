@@ -412,6 +412,7 @@ public class Claim {
 	 * @param player
 	 * @return
 	 */
+
 	public String allowBuild(Player player) {
 		// if we don't know who's asking, always say no (i've been told some
 		// mods can make this happen somehow)

@@ -59,7 +59,9 @@ public class MaterialInfo {
 				allDataValues = false;
 				data = Byte.parseByte(parts[1]);
 			}
-            String Name = Material.getMaterial(typeID).name();
+            Material acquired = Material.getMaterial(typeID);
+            if(acquired==null) return null;
+            String Name = acquired.name();
 			//String Name = parts.length < 2 ? parts[2] : "X" + String.valueOf(typeID) + "$" + String.valueOf(data);
 			return new MaterialInfo(typeID, data, allDataValues, Name);
 

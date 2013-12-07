@@ -263,8 +263,10 @@ public class GriefPrevention extends JavaPlugin {
 
 	public RegExTestHelper OreBlockRegexHelper;
 	public WorldWatcher ww = new WorldWatcher();
-
-	public String allowBreak(Player player, Location location) {
+    public String allowBreak(Player player,Location location){
+        return allowBreak(player,location,true);
+    }
+	public String allowBreak(Player player, Location location,boolean ShowMessages) {
 		PlayerData playerData = this.dataStore.getPlayerData(player.getName());
 		Claim claim = this.dataStore.getClaimAt(location, false);
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(player.getWorld());
@@ -273,7 +275,7 @@ public class GriefPrevention extends JavaPlugin {
         ClaimBehaviourData cbd = null;
         if(null!=(cbd =wc.getBlockBreakOverrides().getBehaviourforBlock(location.getBlock()))){
             ClaimBehaviourData.ClaimAllowanceConstants cac;
-            if((cac=cbd.Allowed(location,player,true)).Allowed()){
+            if((cac=cbd.Allowed(location,player,ShowMessages)).Allowed()){
                 return null;
             }
             else if(cac== ClaimBehaviourData.ClaimAllowanceConstants.Deny_Forced){

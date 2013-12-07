@@ -143,7 +143,7 @@ public class BlockEventHandler implements Listener {
         //block overrides.
         cbd = wc.getBlockBreakOverrides().getBehaviourforBlock(block);
         if(cbd!=null){
-                ClaimBehaviourData.ClaimAllowanceConstants result = cbd.Allowed(block.getLocation(),player);
+                ClaimBehaviourData.ClaimAllowanceConstants result = cbd.Allowed(block.getLocation(),player,true);
             if(result.Allowed()){
                 Debugger.Write("Block Override Forcing allow for break of block:" + block.getType().name(),DebugLevel.Verbose);
                 DoCancelEvent=false;
@@ -154,7 +154,7 @@ public class BlockEventHandler implements Listener {
 
             }
         }
-        if(wc.getBreakBlockRules().Allowed(block.getLocation(),player,!DoCancelEvent).Denied() && cbd==null){
+        if(wc.getBreakBlockRules().Allowed(block.getLocation(),player,cbd==null).Denied() && cbd==null){
             breakEvent.setCancelled(true);
             return;
         }
@@ -168,7 +168,7 @@ public class BlockEventHandler implements Listener {
 			return;
 
 		}
-		if(wc.getBreakBlockRules().Allowed(block.getLocation(), player,!DoCancelEvent).Denied()){
+		if(wc.getBreakBlockRules().Allowed(block.getLocation(), player,cbd==null).Denied()){
             breakEvent.setCancelled(true);
 			return;
 		}
@@ -189,7 +189,7 @@ public class BlockEventHandler implements Listener {
 			}
 
 		}
-		String noBuildReason = GriefPrevention.instance.allowBreak(player, block.getLocation());
+		String noBuildReason = GriefPrevention.instance.allowBreak(player, block.getLocation(),cbd==null);
 		if (noBuildReason != null && !DoCancelEvent) {
 			// System.out.println("BuildReason!=null.");
 			GriefPrevention.sendMessage(player, TextMode.Err, noBuildReason);
@@ -204,6 +204,7 @@ public class BlockEventHandler implements Listener {
 		}
         }
         finally {
+
             if(cbd!=null) breakEvent.setCancelled(DoCancelEvent);
         }
 	}
@@ -616,7 +617,7 @@ public class BlockEventHandler implements Listener {
             }
         }
 
-        if(wc.getPlaceBlockRules().Allowed(block.getLocation(), player,!DoCancelEvent).Denied() && (cbd==null)){
+        if(wc.getPlaceBlockRules().Allowed(block.getLocation(), player,cbd==null).Denied() && (cbd==null)){
             placeEvent.setCancelled(true);
             return;
         }
@@ -639,7 +640,7 @@ public class BlockEventHandler implements Listener {
 		// if placed block is fire, make sure FireSetting is allowed in that
 		// location.
 		if (block.getType() == Material.FIRE) {
-			if (wc.getFireSetting().Allowed(block.getLocation(), player,!DoCancelEvent).Denied()) {
+			if (wc.getFireSetting().Allowed(block.getLocation(), player,cbd==null).Denied()) {
 				placeEvent.setCancelled(true);
 				return;
 			}
@@ -672,7 +673,7 @@ public class BlockEventHandler implements Listener {
 			return;
 		}
 */
-		if(wc.getPlaceBlockRules().Allowed(block.getLocation(),player,!DoCancelEvent).Denied() && cbd==null){
+		if(wc.getPlaceBlockRules().Allowed(block.getLocation(),player,cbd==null).Denied() && cbd==null){
 			placeEvent.setCancelled(true);
 			return;
 		}
@@ -684,8 +685,13 @@ public class BlockEventHandler implements Listener {
 		if (claim != null) {
 			// warn about TNT not destroying claimed blocks
 			if (block.getType() == Material.TNT && !claim.areExplosivesAllowed && !DoCancelEvent) {
-				GriefPrevention.sendMessage(player, TextMode.Warn, Messages.NoTNTDamageClaims);
-				GriefPrevention.sendMessage(player, TextMode.Instr, Messages.ClaimExplosivesAdvertisement);
+                //if TNT will not damage this area, say as much.
+                if(wc.getTNTExplosionBehaviour().Allowed(block.getLocation(),player,false).Denied()){
+				   GriefPrevention.sendMessage(player, TextMode.Warn, Messages.NoTNTDamageClaims);
+                   GriefPrevention.sendMessage(player, TextMode.Instr, Messages.ClaimExplosivesAdvertisement);
+                }
+
+
 			}
 
 			// if the player has permission for the claim and he's placing UNDER
@@ -768,7 +774,7 @@ public class BlockEventHandler implements Listener {
 
 			// check to see if this chest is in a claim, and warn when it isn't
 
-			if (theftallowed && this.getDataStore().getClaimAt(block.getLocation(), false) == null && !DoCancelEvent) {
+			if (theftallowed && this.getDataStore().getClaimAt(block.getLocation(), false) == null && cbd==null) {
 				GriefPrevention.sendMessage(player, TextMode.Warn, Messages.UnprotectedChestWarning);
 			}
 		}

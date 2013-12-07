@@ -699,8 +699,7 @@ public class WorldConfig {
 		Debugger.Write("Reading Configuration for World:" + pName, DebugLevel.Verbose);
 
 		this.config_seaLevelOverride = config.getInt("GriefPrevention.SeaLevelOverride", -1);
-
-		if (this.config_seaLevelOverride == -1) {
+        if (this.config_seaLevelOverride == -1) {
 
 			// try to get new setting.
 			int newsealevel = config.getInt("GriefPrevention.SeaLevelOverride.Setting", -1);

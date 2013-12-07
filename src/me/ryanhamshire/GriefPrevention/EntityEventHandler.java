@@ -128,6 +128,7 @@ class EntityEventHandler implements Listener {
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
 	public void onEntityDamage(EntityDamageEvent event) {
         Debugger.Write("onEntityDamage, instance:" + event.getEntity().getClass().getName(), Debugger.DebugLevel.Verbose);
+
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(event.getEntity().getWorld());
 		if (!wc.Enabled())
 			return;
@@ -263,14 +264,16 @@ class EntityEventHandler implements Listener {
 		if (attacker != null && event.getEntity() instanceof Player && event.getEntity().getWorld().getPVP()) {
 			// FEATURE: prevent pvp in the first minute after spawn, and prevent
 			// pvp when one or both players have no inventory
-
+            Debugger.Write("PVP Damage detected between " + ((Player)event.getEntity()).getName() + " And " + attacker.getName(),Debugger.DebugLevel.Verbose);
 			// doesn't apply when the attacker has the no pvp immunity
 			// permission
 			// this rule is here to allow server owners to have a world with no
 			// spawn camp protection by assigning permissions based on the
 			// player's world
-			if (attacker.hasPermission(PermNodes.NoPvPImmunityPermission))
+			if (attacker.hasPermission(PermNodes.NoPvPImmunityPermission)){
+                Debugger.Write("PVP Damage: Attacker (" + attacker.getName() + ") has " + PermNodes.NoPvPImmunityPermission + " Permission.",Debugger.DebugLevel.Verbose);
 				return;
+            }
 
 			Player defender = (Player) (event.getEntity());
 
