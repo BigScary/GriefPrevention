@@ -270,7 +270,8 @@ public class Claim {
 				return false;
 			}
 		}
-		System.out.println("Adding " + player + " as manager to claim ID #" + this.getID());
+		Debugger.Write("Adding " + player + " as manager to claim ID #" + this.getID(),DebugLevel.Verbose);
+
 		managers.add(player);
 		if (inDataStore)
 			GriefPrevention.instance.dataStore.saveClaim(this);

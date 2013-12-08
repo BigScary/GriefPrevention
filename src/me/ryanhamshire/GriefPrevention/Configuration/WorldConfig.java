@@ -1018,6 +1018,7 @@ public class WorldConfig {
 		outConfig.set("GriefPrevention.Claims.PerPlayerLimit", config_claims_perplayer_claim_limit);
 
 		this.config_pvp_Siege_Loot_Chests = config.getInt("GriefPrevention.Claims.SiegeLootChests", 0);
+
 		outConfig.set("GriefPrevention.Claims.SiegeLootChests", config_pvp_Siege_Loot_Chests);
 
 		this.config_claims_automaticClaimsForNewPlayersRadius = config.getInt("GriefPrevention.Claims.AutomaticNewPlayerClaimsRadius", 4);
@@ -1094,14 +1095,25 @@ public class WorldConfig {
 		this.config_pvp_combatTimeoutSeconds = config.getInt("GriefPrevention.PvP.CombatTimeoutSeconds", 15);
 		this.config_pvp_allowCombatItemDrop = config.getBoolean("GriefPrevention.PvP.AllowCombatItemDrop", false);
 		this.config_pvp_blockContainers = config.getBoolean("GriefPrevention.PvP.BlockContainers", true);
-        config.set("GriefPrevention.PvP.SpawnProtect.Timeout",SpawnProtectTimeout);
-        config.set("GriefPrevention.PvP.SpawnProtect.DisableonInstigate",SpawnProtectDisableonInstigate);
-        config.set("GriefPrevention.PvP.SpawnProtect.DisableonItemPickup",SpawnProtectDisableonItemPickup);
-        config.set("GriefPrevention.PvP.SpawnProtect.PickupTimeout",SpawnProtectPickupTimeout);
+
+
+
+
+        outConfig.set("GriefPrevention.PvP.SpawnProtect.Enabled",String.valueOf(SpawnProtectEnabled));
+        outConfig.set("GriefPrevention.PvP.SpawnProtect.Timeout",SpawnProtectTimeout);
+        outConfig.set("GriefPrevention.PvP.SpawnProtect.DisableonInstigate",SpawnProtectDisableonInstigate);
+        outConfig.set("GriefPrevention.PvP.SpawnProtect.DisableonItemPickup",SpawnProtectDisableonItemPickup);
+        outConfig.set("GriefPrevention.PvP.SpawnProtect.PickupTimeout",SpawnProtectPickupTimeout);
 
 
         String bannedPvPCommandsList = config.getString("GriefPrevention.PvP.BlockedSlashCommands", "/home;/vanish;/spawn;/tpa");
-
+        outConfig.set("GriefPrevention.PvP.ProtectFreshSpawns", this.SpawnProtectEnabled);
+        outConfig.set("GriefPrevention.PvP.PunishLogout", this.config_pvp_punishLogout);
+        outConfig.set("GriefPrevention.PvP.CombatTimeoutSeconds", this.config_pvp_combatTimeoutSeconds);
+        outConfig.set("GriefPrevention.PvP.AllowCombatItemDrop", this.config_pvp_allowCombatItemDrop);
+        outConfig.set("GriefPrevention.PvP.BlockedSlashCommands", bannedPvPCommandsList);
+        outConfig.set("GriefPrevention.PvP.ProtectPlayersInLandClaims.PlayerOwnedClaims", this.config_pvp_noCombatInPlayerLandClaims);
+        outConfig.set("GriefPrevention.PvP.ProtectPlayersInLandClaims.AdministrativeClaims", this.config_pvp_noCombatInAdminLandClaims);
 		this.config_trees_removeFloatingTreetops = config.getBoolean("GriefPrevention.Trees.RemoveFloatingTreetops", true);
 		this.config_trees_regrowGriefedTrees = config.getBoolean("GriefPrevention.Trees.RegrowGriefedTrees", true);
 		outConfig.set("GriefPrevention.PvP.BlockContainers", config_pvp_blockContainers);
@@ -1328,14 +1340,8 @@ public class WorldConfig {
 		// outConfig.set("GriefPrevention.Claims.TrashBlocks",trashblocks);
 		outConfig.set("GriefPrevention.Claims.WildernessWarningBlockCount", this.config_claims_wildernessBlocksDelay);
 
-		// outConfig.set("GriefPrevention.PvP.Worlds", pvpEnabledWorldNames);
-		outConfig.set("GriefPrevention.PvP.ProtectFreshSpawns", this.SpawnProtectEnabled);
-		outConfig.set("GriefPrevention.PvP.PunishLogout", this.config_pvp_punishLogout);
-		outConfig.set("GriefPrevention.PvP.CombatTimeoutSeconds", this.config_pvp_combatTimeoutSeconds);
-		outConfig.set("GriefPrevention.PvP.AllowCombatItemDrop", this.config_pvp_allowCombatItemDrop);
-		outConfig.set("GriefPrevention.PvP.BlockedSlashCommands", bannedPvPCommandsList);
-		outConfig.set("GriefPrevention.PvP.ProtectPlayersInLandClaims.PlayerOwnedClaims", this.config_pvp_noCombatInPlayerLandClaims);
-		outConfig.set("GriefPrevention.PvP.ProtectPlayersInLandClaims.AdministrativeClaims", this.config_pvp_noCombatInAdminLandClaims);
+
+
 
 		outConfig.set("GriefPrevention.Trees.RemoveFloatingTreetops", this.config_trees_removeFloatingTreetops);
 		outConfig.set("GriefPrevention.Trees.RegrowGriefedTrees", this.config_trees_regrowGriefedTrees);
