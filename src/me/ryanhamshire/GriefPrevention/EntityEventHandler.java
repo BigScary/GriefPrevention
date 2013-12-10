@@ -203,6 +203,10 @@ class EntityEventHandler implements Listener {
                 event.setCancelled(true);
                 return;
             }
+            else {
+                event.setCancelled(false);
+                return;
+            }
         }
         //horses are protected:
         //In wilderness: Protected from everybody except the owner.
