@@ -270,7 +270,7 @@ public class Claim {
 				return false;
 			}
 		}
-		Debugger.Write("Adding " + player + " as manager to claim ID #" + this.getID(),DebugLevel.Verbose);
+		Debugger.Write("Adding " + player + " as manager to claim ID #" + this.getID(),Debugger.DebugLevel.Verbose);
 
 		managers.add(player);
 		if (inDataStore)
