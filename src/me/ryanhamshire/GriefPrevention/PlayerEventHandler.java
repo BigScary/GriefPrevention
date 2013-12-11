@@ -692,6 +692,7 @@ class PlayerEventHandler implements Listener {
 	// when a player uses a slash command...
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
 	synchronized void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event) {
+
 		String[] args = event.getMessage().split(" ");
 		if (event.getPlayer() == null)
 			return;
@@ -703,6 +704,7 @@ class PlayerEventHandler implements Listener {
 		// if eavesdrop enabled, eavesdrop
 		List<String> WhisperCommands = wc.eavesdrop_whisperCommands();
 		String command = args[0].toLowerCase();
+        Debugger.Write("Command:" + command,DebugLevel.Verbose);
 		if (wc.getEavesDrop() && WhisperCommands.contains(command) && args.length > 1) {
 			StringBuilder logMessageBuilder = new StringBuilder();
 			logMessageBuilder.append("[[").append(event.getPlayer().getName()).append("]] ");

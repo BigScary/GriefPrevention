@@ -1107,6 +1107,12 @@ public class WorldConfig {
 
 
         String bannedPvPCommandsList = config.getString("GriefPrevention.PvP.BlockedSlashCommands", "/home;/vanish;/spawn;/tpa");
+        String[] splitresult = bannedPvPCommandsList.split(";");
+        config_pvp_blockedCommands = new ArrayList<String>();
+        for(int i=0;i<splitresult.length;i++){
+            config_pvp_blockedCommands.add(splitresult[i]);
+        }
+
         outConfig.set("GriefPrevention.PvP.ProtectFreshSpawns", this.SpawnProtectEnabled);
         outConfig.set("GriefPrevention.PvP.PunishLogout", this.config_pvp_punishLogout);
         outConfig.set("GriefPrevention.PvP.CombatTimeoutSeconds", this.config_pvp_combatTimeoutSeconds);
