@@ -93,7 +93,7 @@ public class ConfigData {
 		}
 		String SingleConfig = CoreConfig.getString("GriefPrevention.WorldConfig.SingleWorld", NoneSpecifier);
 		SingleWorldConfigLocation = SingleConfig;
-		if (!SingleConfig.equals(NoneSpecifier) && new File(NoneSpecifier).exists()) {
+		if (!SingleConfig.equals(NoneSpecifier) && new File(SingleConfig).exists()) {
 			GriefPrevention.AddLogEntry("SingleWorld Configuration Mode Enabled. File \"" + SingleConfig + "\" will be used for all worlds.");
 			YamlConfiguration SingleReadConfig = YamlConfiguration.loadConfiguration(new File(SingleConfig));
 			YamlConfiguration SingleTargetConfig = new YamlConfiguration();
