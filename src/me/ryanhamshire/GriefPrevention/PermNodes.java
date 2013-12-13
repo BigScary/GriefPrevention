@@ -22,6 +22,7 @@ public class PermNodes {
 	public static final String TransferClaimsPermission = "griefprevention.claims.transfer";
 	public static final String LavaPermission = "griefprevention.placement.lava";
 	public static final String WaterPermission = "griefprevention.placement.water";
+    public static final String AllHorsesPermission = "griefprevention.admin.horses";
 	/**
 	 * "standard" eavesdropping, which is whispers/tells.
 	 */

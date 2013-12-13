@@ -2058,7 +2058,7 @@ class PlayerEventHandler implements Listener {
 			if (isHorse(entity)) {
                 Debugger.Write("Horse Detected.",DebugLevel.Verbose);
 				Horse h = (Horse) entity;
-
+                Debugger.Write("Horse Owner:" + h.getOwner().getName() + " Player:" + player.getName(),DebugLevel.Verbose);
 				if (h.isTamed() && handItem!=null && handItem.getType() == Material.GOLDEN_APPLE) {
 					// if horse is tamed, apply breeding rules.
 					if (wc.getBreedingRules().Allowed(h, player).Denied()) {
@@ -2085,10 +2085,54 @@ class PlayerEventHandler implements Listener {
                             else {
                                 Debugger.Write("Horse Owner:" + h.getOwner().getName(),DebugLevel.Verbose);
                             }
-							if (h.getOwner() == null || h.getOwner().getName().equals(player.getName())){
+
+                            boolean SpecialHorseTrust = true;
+
+                            if(wc.getHorseTrust()){
+
+                            boolean HasTrust = false;
+                            Claim targetclaim = GriefPrevention.instance.dataStore.getClaimAt(h.getLocation(),true);
+                            if(targetclaim!=null){
+
+                                //if inside of a claim, check if the player in question has build trust on that claim.
+                                //technically this could be a rule too, I suppose.
+                                HasTrust = targetclaim.allowBuild(player)==null && (h.getOwner().getName().equals(targetclaim.getOwnerName()));
+                                Debugger.Write("Within a claim. HasTrust:" + String.valueOf(HasTrust),DebugLevel.Verbose);
+
+                            }
+                            if(h.getOwner()!=null && !h.getOwner().getName().equals(player.getName()))
+                            {
+                                if(player.hasPermission(PermNodes.AllHorsesPermission)){
+
+                                    GriefPrevention.sendMessage(player,TextMode.Info,Messages.MountOtherPlayersHorse,h.getOwner().getName());
+                                     return;
+                                }
+                                if(HasTrust){
+                                    Debugger.Write("HasTrust:" + String.valueOf(HasTrust),DebugLevel.Verbose);
+                                    Player ownerplayer = (Player)h.getOwner();
+                                    if(ownerplayer.isOnline()){
+                                        Debugger.Write("Horse Owner is online.",DebugLevel.Verbose);
+                                        //notify both, and transfer ownership.
+                                        GriefPrevention.sendMessage(ownerplayer,TextMode.Info,Messages.PlayerTakesHorse,player.getName());
+                                        GriefPrevention.sendMessage(player,TextMode.Info,Messages.PlayerReceivesHorse);
+                                        h.setOwner(player);
+                                        return;
+                                    }
+                                    else {
+                                          Debugger.Write("Horse Owner is not online.",DebugLevel.Verbose);
+                                          GriefPrevention.sendMessage(player,TextMode.Err,Messages.HorseOwnerNotOnline);
+                                          return;
+                                    }
+                                }
+
+
+                            }
+                            }
+							if (h.getOwner() == null || h.getOwner().getName().equals(player.getName()) ){
+                                Debugger.Write("Horse is ownerless or already belongs to player.",DebugLevel.Verbose);
 								return;
                             }
-                            else if (h.getOwner()!=null && !h.getOwner().getName().equals(player.getName())){
+                            else if (h.getOwner()!=null && !h.getOwner().getName().equals(player.getName()) || player.hasPermission(PermNodes.AllHorsesPermission)){
                                 GriefPrevention.sendMessage(player,TextMode.Err,Messages.NoDamageClaimedEntity,h.getOwner().getName());
                                 event.setCancelled(true);
                                 return;

@@ -1235,6 +1235,12 @@ public abstract class DataStore {
         this.addDefault(defaults,Messages.PlayerSoftMuted,"Player {0} Soft-Muted.","0:Player muted");
         this.addDefault(defaults,Messages.PlayerUnSoftMuted,"Player {0} is no longer Soft-Muted.","0:Player unmuted");
         this.addDefault(defaults,Messages.NoTNTExplosionsThere,"TNT will not explode or damage anything here.",null);
+        this.addDefault(defaults,Messages.HorseOwnerNotOnline,"You may not take {0}'s horses when they are not online.","0:Player who owns horse");
+        this.addDefault(defaults,Messages.PlayerTakesHorse,"{0} Has taken ownership of one of your horses.","0:Horse taker");
+        this.addDefault(defaults,Messages.PlayerReceivesHorse,"This horse now belongs to you.",null);
+        this.addDefault(defaults,Messages.MountOtherPlayersHorse,"You have mounted {0}'s horse.","0:owner of horse");
+
+
 		// load the config file
 		FileConfiguration config = YamlConfiguration.loadConfiguration(new File(messagesFilePath));
 
