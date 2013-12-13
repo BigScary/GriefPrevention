@@ -213,7 +213,7 @@ class EntityEventHandler implements Listener {
         //In Claim: Protected from everybody except the owner, Unless being ridden, in which case players with trust on that claim
         //can attack the horse.
         //this can be modelled by a rule but people don't like my rules framework *sadface*
-        if(attacker!=null && event.getEntity() instanceof Horse && ((Horse)event.getEntity()).isTamed()){
+        if(attacker!=null && GriefPrevention.instance.isHorse(event.getEntity()) && ((Horse)event.getEntity()).isTamed()){
             Horse h = (Horse)event.getEntity();
             //if the attacker owns the horse, he can abuse it as he sees fit.
             if(h.getOwner().getName().equals(attacker.getName()))
