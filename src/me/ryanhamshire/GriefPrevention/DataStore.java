@@ -20,13 +20,7 @@ package me.ryanhamshire.GriefPrevention;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import me.ryanhamshire.GriefPrevention.Debugger.DebugLevel;
@@ -623,15 +617,21 @@ public abstract class DataStore {
 				if (!wc.getSiegeAutoTransfer())
 					return;
 				// get loser's inventory, then clear it
-				ItemStack[] loserItems = loser.getInventory().getContents();
+				ItemStack[] loserItemStack = loser.getInventory().getContents();
+                List<ItemStack> loserItems = Arrays.asList(loserItemStack);
+                loserItems.add(loser.getInventory().getHelmet());
+                loserItems.add(loser.getInventory().getChestplate());
+                loserItems.add(loser.getInventory().getLeggings());
+                loserItems.add(loser.getInventory().getBoots());
 				loser.getInventory().clear();
 
 				// try to add it to the winner's inventory
-				for (int j = 0; j < loserItems.length; j++) {
-					if (loserItems[j] == null || loserItems[j].getType() == Material.AIR || loserItems[j].getAmount() == 0)
+                for(ItemStack iterateitem:loserItems){
+
+					if (iterateitem == null || iterateitem.getType() == Material.AIR || iterateitem.getAmount() == 0)
 						continue;
 
-					HashMap<Integer, ItemStack> wontFitItems = winner.getInventory().addItem(loserItems[j]);
+					HashMap<Integer, ItemStack> wontFitItems = winner.getInventory().addItem(iterateitem);
 
 					// drop any remainder on the ground at his feet
 					Object[] keys = wontFitItems.keySet().toArray();
@@ -640,8 +640,9 @@ public abstract class DataStore {
 						winnerLocation.getWorld().dropItemNaturally(winnerLocation, wontFitItems.get(key));
 					}
 				}
+                }
 			}
-		}
+
 	}
 
 	/**
@@ -1239,6 +1240,7 @@ public abstract class DataStore {
         this.addDefault(defaults,Messages.PlayerTakesHorse,"{0} Has taken ownership of one of your horses.","0:Horse taker");
         this.addDefault(defaults,Messages.PlayerReceivesHorse,"This horse now belongs to you.",null);
         this.addDefault(defaults,Messages.MountOtherPlayersHorse,"You have mounted {0}'s horse.","0:owner of horse");
+        this.addDefault(defaults,Messages.NoPermission,"You cannot do that here.");
 
 
 		// load the config file

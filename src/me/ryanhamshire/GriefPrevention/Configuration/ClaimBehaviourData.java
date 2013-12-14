@@ -663,6 +663,7 @@ public class ClaimBehaviourData {
 			 
 			 
 			Debugger.Write("ClaimBehaviourData returning:\"" + returned.name() + "\"" + " For " + BehaviourName, DebugLevel.Verbose);
+            if(ShowMessages) if(hasDenialMessage()) GriefPrevention.sendMessage(RelevantPlayer,TextMode.Err,DenialMessage);
             try {
                // throw new Exception("stack trace");
             }

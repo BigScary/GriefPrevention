@@ -2047,6 +2047,7 @@ class PlayerEventHandler implements Listener {
 						if (((Tameable) entity).getOwner() == player) {
 							return;
 						}
+
 					}
 					if (wc.getNameTagUsageRules().Allowed(entity, player).Denied())
 							{

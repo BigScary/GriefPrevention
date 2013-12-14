@@ -726,8 +726,10 @@ public class BlockEventHandler implements Listener {
 			if (playerData.claims.size() == 0) {
 				// make sure they have permission to create claims.
                 Debugger.Write("Player has no claims, and is placing a chest.",DebugLevel.Verbose);
-
-				if (!player.hasPermission(PermNodes.CreateClaimsPermission)) {
+                if(wc.getCreateClaimRequiresPermission() && !player.hasPermission(PermNodes.CreateClaimsPermission)){
+                   return;
+                }
+				else if (!player.hasPermission(PermNodes.CreateClaimsPermission)) {
 					// no message is sent, because players may not be aware.
                     Debugger.Write("Player " + player.getName() + " does not have permission to create claims. Not automatically creating a claim.",DebugLevel.Verbose);
 					return;
