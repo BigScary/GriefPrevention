@@ -746,7 +746,7 @@ public class GriefPrevention extends JavaPlugin {
 		try{
 			return entitytest instanceof Horse;
 		}catch(NoClassDefFoundError err){
-			return false
+			return false;
 		}
 
 	}

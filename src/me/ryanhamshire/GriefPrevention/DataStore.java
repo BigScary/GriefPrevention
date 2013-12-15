@@ -1240,7 +1240,7 @@ public abstract class DataStore {
         this.addDefault(defaults,Messages.PlayerTakesHorse,"{0} Has taken ownership of one of your horses.","0:Horse taker");
         this.addDefault(defaults,Messages.PlayerReceivesHorse,"This horse now belongs to you.",null);
         this.addDefault(defaults,Messages.MountOtherPlayersHorse,"You have mounted {0}'s horse.","0:owner of horse");
-        this.addDefault(defaults,Messages.NoPermission,"You cannot do that here.");
+        this.addDefault(defaults,Messages.NoPermission,"You cannot do that here.",null);
 
 
 		// load the config file
