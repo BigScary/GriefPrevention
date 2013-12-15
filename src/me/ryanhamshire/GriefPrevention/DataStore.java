@@ -618,7 +618,7 @@ public abstract class DataStore {
 					return;
 				// get loser's inventory, then clear it
 				ItemStack[] loserItemStack = loser.getInventory().getContents();
-                List<ItemStack> loserItems = Arrays.asList(loserItemStack);
+                ArrayList<ItemStack> loserItems = new ArrayList<ItemStack>(Arrays.asList(loserItemStack));
                 loserItems.add(loser.getInventory().getHelmet());
                 loserItems.add(loser.getInventory().getChestplate());
                 loserItems.add(loser.getInventory().getLeggings());
