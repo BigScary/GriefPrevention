@@ -731,6 +731,7 @@ public class WorldConfig {
         this.HorseTrust = config.getBoolean("GriefPrevention.ExtendedHorseTrust",false);
         String SiegeDefenderStr = config.getString("GriefPrevention.SiegeDefendable", ClaimBehaviourMode.RequireOwner.name());
         ClaimBehaviourMode ccm = ClaimBehaviourMode.parseMode(SiegeDefenderStr);
+        outConfig.set("GriefPrevention.SiegeDefendable",SiegeDefenderStr);
         if (ccm == null) SiegeDefender = ClaimBehaviourMode.RequireOwner;
         else SiegeDefender = ccm;
 
