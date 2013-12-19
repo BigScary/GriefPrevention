@@ -381,7 +381,9 @@ public class FlatFileDataStore extends DataStore {
 
 		// migrate players
 		for (PlayerData pdata : getAllPlayerData()) {
+
 			targetStore.playerNameToPlayerDataMap.put(pdata.playerName, pdata);
+            targetStore.savePlayerData(pdata.playerName,pdata);
 
 		}
 

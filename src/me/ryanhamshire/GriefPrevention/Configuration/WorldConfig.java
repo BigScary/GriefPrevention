@@ -115,14 +115,10 @@ public class WorldConfig {
     // are not cleaned up.
 
     private int config_claimcleanup_maxinvestmentscore; // maximum
-    // investmentscore.
-    // claims with a higher
-    // score will not be
-    // cleaned up. if set to
-    // 0, claim cleanup will
-    // not have it's score
-    // calculated.
+    // investmentscore. claims with a higher score will not be cleaned up. if set to 0, claim cleanup will not have it's score calculated.
 
+    private int config_claimcleanup_interval = 5*60;
+    public int getClaimCleanupInterval(){ return config_claimcleanup_interval;}
     private boolean config_claims_Abandon_NatureRestoration; // whether survival
     // claims will
     // be
@@ -727,7 +723,6 @@ public class WorldConfig {
         outConfig.set("GriefPrevention.Enabled", this.griefprevention_enabled);
         // read in the data for TNT explosions and Golem/Wither placements.
         this.config_afkDistanceCheck = config.getInt("GriefPrevention.AFKDistance", 3);
-
         this.HorseTrust = config.getBoolean("GriefPrevention.ExtendedHorseTrust",false);
         String SiegeDefenderStr = config.getString("GriefPrevention.SiegeDefendable", ClaimBehaviourMode.RequireOwner.name());
         ClaimBehaviourMode ccm = ClaimBehaviourMode.parseMode(SiegeDefenderStr);
@@ -745,7 +740,7 @@ public class WorldConfig {
         this.SiegeAutoTransfer = config.getBoolean("GriefPrevention.Siege.ItemTransfer", true);
         outConfig.set("GriefPrevention.Siege.ItemTransfer", this.SiegeAutoTransfer);
 
-        this.SiegeBlockRevert = config.getBoolean("GriefPrevention.Siege.BlockRevert", false);
+        this.SiegeBlockRevert = config.getBoolean("GriefPrevention.Siege.BlockRevert", true);
         outConfig.set("GriefPrevention.Siege.BlockRevert", SiegeBlockRevert);
         // read trash blocks.
         // Cobblestone,Torch,Dirt,Sapling,Gravel,Sand,TNT,Workbench
@@ -784,13 +779,15 @@ public class WorldConfig {
         outConfig.set("GriefPrevention.Claims.SiegeTamedAnimalDistance", Siege_TamedAnimalDistance);
         this.claims_enabled = config.getBoolean("GriefPrevention.Claims.Enabled", true);
         outConfig.set("GriefPrevention.Claims.Enabled", claims_enabled);
-        this.config_entitycleanup_enabled = config.getBoolean("GriefPrevention.CleanupTasks.Claims", true);
+        this.config_entitycleanup_enabled = config.getBoolean("GriefPrevention.CleanupTasks.Entity", true);
         outConfig.set("GriefPrevention.CleanupTasks.Entity", this.config_entitycleanup_enabled);
         // this.config_treecleanup_enabled =
         // config.getBoolean("GriefPrevention.CleanupTasks.Trees",true);
         // this.config_naturerestorecleanup_enabled =
         // config.getBoolean("GriefPrevention.CleanupTasks.NatureRestore",true);
         this.config_claimcleanup_enabled = config.getBoolean("GriefPrevention.ClaimCleanup.Enabled", true);
+        this.config_claimcleanup_interval = config.getInt("GriefPrevention.ClaimCleanup.Interval",5*60);
+        outConfig.set("GriefPrevention.ClaimCleanup.Interval",config_claimcleanup_interval);
         this.config_claimcleanup_maximumsize = config.getInt("GriefPrevention.ClaimCleanup.MaximumSize", 25);
         // max investment score, defaults to 400 for creative worlds.
         this.config_claimcleanup_maxinvestmentscore = config.getInt("GriefPrevention.ClaimCleanup.MaxInvestmentScore", isCreative ? 400 : 100);
@@ -1798,7 +1795,10 @@ public class WorldConfig {
     public boolean getRemoveFloatingTreetops() {
         return config_trees_removeFloatingTreetops;
     }
-
+    public int getTreeCleanupDelay(){
+        return config_trees_cleanupDelay;
+    }
+    private int config_trees_cleanupDelay = (20*60)*10; //ten minutes.
     // private HashMap<String, Integer> config_seaLevelOverride; //override for
     // sea level, because bukkit doesn't report the right value for all
     // situations

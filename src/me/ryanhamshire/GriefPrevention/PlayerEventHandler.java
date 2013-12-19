@@ -1141,8 +1141,7 @@ class PlayerEventHandler implements Listener {
 			// what's the player holding?
 			Material materialInHand = player.getItemInHand().getType();
 
-			// if it's bonemeal, check for build permission (ink sac == bone
-			// meal, must be a Bukkit bug?)
+
 			if (materialInHand == Material.INK_SACK) {
 				if (wc.getBonemealGrassRules().Allowed(event.getClickedBlock().getLocation(), event.getPlayer()).Denied()) {
 					event.setCancelled(true);
@@ -2032,7 +2031,9 @@ class PlayerEventHandler implements Listener {
 				// This is for with creatures, the BlockEvent interaction
 				// handles interaction with Fence and Netherbrick fence
 				// blocks.
-				if (handItem!=null && handItem.getType() == Material.LEASH) {
+
+				if (GriefPrevention.isMCVersionorLater(GriefPrevention.MinecraftVersions.MC16) &&
+                        handItem!=null && handItem.getType() == Material.LEASH) {
 					if (entity instanceof Tameable) {
 						if (((Tameable) entity).getOwner() == player) {
 							return;
@@ -2042,7 +2043,10 @@ class PlayerEventHandler implements Listener {
 						event.setCancelled(true);
 						return;
 					}
-				} else if (handItem!=null && handItem.getType().getId() == 421) {
+				}
+                //Name Tags.
+                else if (GriefPrevention.isMCVersionorLater(GriefPrevention.MinecraftVersions.MC16) &&
+                        handItem!=null && handItem.getType()==Material.NAME_TAG) {
 					if (entity instanceof Tameable) {
 						if (((Tameable) entity).getOwner() == player) {
 							return;
@@ -2059,7 +2063,7 @@ class PlayerEventHandler implements Listener {
 			if (isHorse(entity)) {
                 Debugger.Write("Horse Detected.",DebugLevel.Verbose);
 				Horse h = (Horse) entity;
-                Debugger.Write("Horse Owner:" + h.getOwner().getName() + " Player:" + player.getName(),DebugLevel.Verbose);
+
 				if (h.isTamed() && handItem!=null && handItem.getType() == Material.GOLDEN_APPLE) {
 					// if horse is tamed, apply breeding rules.
 					if (wc.getBreedingRules().Allowed(h, player).Denied()) {

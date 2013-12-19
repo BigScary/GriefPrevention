@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -76,6 +77,17 @@ import org.bukkit.plugin.java.JavaPlugin;
 //import com.gmail.nossr50.mcMMO;
 
 public class GriefPrevention extends JavaPlugin {
+    public enum MinecraftVersions
+    {
+        MC125,
+        MC13,
+        MC14,
+        MC15,
+        MC16,
+        MC17
+
+
+    }
 	private class RecursiveCopyResult {
 		public int DirCount;
 		public int FileCount;
@@ -607,7 +619,7 @@ public class GriefPrevention extends JavaPlugin {
 	void handleLogBroken(Block block) {
 		// find the lowest log in the tree trunk including this log
 		Block rootBlock = this.getRootBlock(block);
-
+        WorldConfig wc = GriefPrevention.instance.getWorldCfg(block.getWorld());
 		// null indicates this block isn't part of a tree trunk
 		if (rootBlock == null)
 			return;
@@ -720,8 +732,8 @@ public class GriefPrevention extends JavaPlugin {
 			// of this tree hanging in the air
 			TreeCleanupTask cleanupTask = new TreeCleanupTask(block, rootBlock, treeBlocks, rootBlock.getData());
 
-			// 20L ~ 1 second, so 2 mins = 120 seconds ~ 2400L
-			GriefPrevention.instance.getServer().getScheduler().scheduleSyncDelayedTask(GriefPrevention.instance, cleanupTask, 2400L);
+
+			GriefPrevention.instance.getServer().getScheduler().scheduleSyncDelayedTask(GriefPrevention.instance, cleanupTask, wc.getTreeCleanupDelay());
 		}
 	}
 
@@ -826,7 +838,7 @@ public class GriefPrevention extends JavaPlugin {
 	public void onEnable() {
 		instance = this;
 		AddLogEntry("Grief Prevention enabled.");
-
+        AddLogEntry("Grief Prevention Running for " + getMinecraftVersionString());
 		cmdHandler = new CommandHandler();
 		// if the old data folder exists and the new one doesn't...
 		File oldData = new File(DataStore.oldDataLayerFolderPath);
@@ -1242,5 +1254,78 @@ public class GriefPrevention extends JavaPlugin {
 	public boolean siegeEnabledForWorld(World world) {
 		return this.getWorldCfg(world).getSiegeEnabled();
 	}
+    public static String getMinecraftVersionString(){
+        switch (getMCVersion()) {
+            case MC125:
+                return "Minecraft 1.2.x";
+            case MC13:
+                return "Minecraft 1.3.x";
+            case MC14:
+                return "Minecraft 1.4.x";
 
+            case MC15:
+                return "Minecraft 1.5.x";
+
+            case MC16:
+                return "Minecraft 1.6.x";
+
+            case MC17:
+                return "Minecraft 1.7.x";
+
+            default:
+                return "Unknown Version";
+        }
+
+    }
+    public static MinecraftVersions getMCVersion(){
+        //go down the list.
+        MinecraftVersions[] testversions = MinecraftVersions.values();
+        //start from the last element and move towards the first...
+        //the first one to not fail is the running version.
+        for(int i=testversions.length-1;i>0;i--){
+            if(isMCVersionorLater(testversions[i])) return testversions[i];
+        }
+
+        return null; //let's hope THIS doesn't happen...
+    }
+    //static version helpers.
+    public static boolean isMCVersionorLater(MinecraftVersions VersionEnum){
+        //each version adds material fields, so we can inspect the Material
+        //enum using reflection.
+        String findMaterial=null;
+        switch (VersionEnum) {
+
+            case MC125:
+                //redstone lamp was added in 1.2.5.
+                findMaterial="REDSTONE_LAMP_ON";
+                break;
+            case MC13: //command blocks are new in 1.3.
+                findMaterial = "COMMAND";
+                break;
+            case MC14:
+                findMaterial = "ENCHANTED_BOOK"; //enchanted books added in 1.4
+                break;
+            case MC15:
+                findMaterial="REDSTONE_BLOCK";  //redstone blocks added in 1.5
+                break;
+            case MC16:
+                findMaterial="STAINED_CLAY";  //stained clay added in 1.6.
+                break;
+            case MC17:
+                findMaterial="STAINED_GLASS"; //stained glass is new in 1.7.
+                break;
+        }
+        //if we catch a FieldNotFoundException, than we are NOT that version or later.
+        try {
+
+             Field acquired = Material.class.getField(findMaterial);
+            return true; //no exception, so the field exists. we are that version or later.
+        }
+        catch(NoSuchFieldException fnf){
+            //field not found- we are not that version or later.
+            return false;
+        }
+
+
+    }
 }
