@@ -29,6 +29,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.*;
 import org.bukkit.entity.minecart.ExplosiveMinecart;
 import org.bukkit.event.EventHandler;
@@ -566,7 +567,7 @@ class EntityEventHandler implements Listener {
 	public void onEntityExplode(EntityExplodeEvent explodeEvent) {
 
 
-
+        Debugger.Write("Entity Exploding:" + explodeEvent.getEntity().getClass().getName(), Debugger.DebugLevel.Verbose);
 		// System.out.println("EntityExplode:" +
 		// explodeEvent.getEntity().getClass().getName());
 		List<Block> blocks = explodeEvent.blockList();
@@ -604,6 +605,7 @@ class EntityEventHandler implements Listener {
 		if (preExplodeCheck.Allowed(explodeEvent.getLocation(), null).Denied()) {
 			//Debugger.Write("Explosion cancelled.", DebugLevel.Verbose);
 			explodeEvent.setCancelled(true);
+            explodeEvent.blockList().clear();
 			return;
 		}
 
@@ -681,8 +683,12 @@ class EntityEventHandler implements Listener {
 			// if(wc.getModsExplodableIds().contains(new
 			// MaterialInfo(block.getTypeId(), block.getData(), null)))
 			// continue;
-			if (block.getX() == explodeEvent.getLocation().getBlockX() && block.getY() == explodeEvent.getLocation().getBlockY() && block.getZ() == explodeEvent.getLocation().getBlockZ())
+			if (explodeEvent.getEntity()==null &&  block.getX() == explodeEvent.getLocation().getBlockX() && block.getY() == explodeEvent.getLocation().getBlockY() && block.getZ() == explodeEvent.getLocation().getBlockZ())
+            {
+
 				continue;
+
+            }
 			// creative rules stop all explosions, regardless of the other
 			// settings.
 			if (wc.getDenyAllExplosions() || (usebehaviour != null && usebehaviour.Allowed(block.getLocation(), null).Denied())) {
@@ -1067,17 +1073,35 @@ class EntityEventHandler implements Listener {
 			}
 		}
 	}
-
+    private Location getAffectedLocation(HangingPlaceEvent ev){
+        if(ev.getBlock()==null) return null;
+        Location uselocation = ev.getBlock().getLocation();
+        BlockFace bf = ev.getBlockFace();
+        int xoffset=bf.getModX(),yoffset=bf.getModY(),zoffset=bf.getModZ();
+        //south: Z+ North Z-
+        //east: X+ West X-
+        //Up: Y+ Down Y-
+        return new Location(ev.getBlock().getWorld(),uselocation.getX()+xoffset,uselocation.getY()+yoffset,uselocation.getZ()+zoffset);
+    }
 	// when a painting is placed...
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
 	public void onPaintingPlace(HangingPlaceEvent event) {
 		// FEATURE: similar to above, placing a painting requires build
 		// permission in the claim
-		WorldConfig wc = GriefPrevention.instance.getWorldCfg(event.getEntity().getWorld());
+        WorldConfig wc=  GriefPrevention.instance.getWorldCfg(event.getEntity().getWorld());
+        Location placedpos = getAffectedLocation(event);
+
+
+        Debugger.Write("onpaintingPlace:" + event.getEntity().getClass().getName(),Debugger.DebugLevel.Verbose);
+
+
+
+
 		if (!wc.Enabled())
 			return;
+
 		// if the player doesn't have permission, don't allow the placement
-		String noBuildReason = GriefPrevention.instance.allowBuild(event.getPlayer(), event.getEntity().getLocation());
+		String noBuildReason = GriefPrevention.instance.allowBuild(event.getPlayer(), placedpos);
 		if (noBuildReason != null) {
 			event.setCancelled(true);
 			GriefPrevention.sendMessage(event.getPlayer(), TextMode.Err, noBuildReason);
@@ -1085,9 +1109,9 @@ class EntityEventHandler implements Listener {
 		}
 
 		// otherwise, apply entity-count limitations for creative worlds
-		else if (GriefPrevention.instance.creativeRulesApply(event.getEntity().getLocation())) {
+		else if (GriefPrevention.instance.creativeRulesApply(placedpos)) {
 			PlayerData playerData = this.getDataStore().getPlayerData(event.getPlayer().getName());
-			Claim claim = this.getDataStore().getClaimAt(event.getBlock().getLocation(), false);
+			Claim claim = this.getDataStore().getClaimAt(placedpos, false);
 			if (claim == null)
 				return;
 

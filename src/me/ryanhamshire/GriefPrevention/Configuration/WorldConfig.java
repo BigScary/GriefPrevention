@@ -539,7 +539,8 @@ public class WorldConfig {
     // IronGolems can be
     // spawned.
 
-
+    private ClaimBehaviourData SpawnEggBehaviour;
+    public ClaimBehaviourData getSpawnEggBehaviour() { return SpawnEggBehaviour;}
     private List<ItemUsageRules> ItemRules;
 
 
@@ -935,6 +936,11 @@ public class WorldConfig {
         outConfig.set("GriefPrevention.PvP.ProtectPlayersInLandClaims.AdministrativeClaims", this.config_pvp_noCombatInAdminLandClaims);
         this.config_trees_removeFloatingTreetops = config.getBoolean("GriefPrevention.Trees.RemoveFloatingTreetops", true);
         this.config_trees_regrowGriefedTrees = config.getBoolean("GriefPrevention.Trees.RegrowGriefedTrees", true);
+        this.config_trees_cleanupDelay = config.getInt("GriefPrevention.Trees.CleanupTimeout",60*10)*20;
+        outConfig.set("GriefPrevention.Trees.CleanupTimeout",config_trees_cleanupDelay/20);
+
+
+
         outConfig.set("GriefPrevention.PvP.BlockContainers", config_pvp_blockContainers);
 
         // this.config_blockWildernessWaterBuckets =
@@ -1136,7 +1142,10 @@ public class WorldConfig {
 
         //List<String> breakableBlocksList = config.getStringList("GriefPrevention.Siege.BreakableBlocks");
 
-        this.config_pvp_noCombatInPlayerLandClaims = config.getBoolean("GriefPrevention.PvP.ProtectPlayersInLandClaims.PlayerOwnedClaims", !this.config_siege_enabled);
+        this.config_pvp_noCombatInPlayerLandClaims = config.getBoolean("GriefPrevention.PvP.ProtectPlayersInLandClaims.PlayerOwnedClaims");
+
+        Debugger.Write("\"GriefPrevention.PvP.ProtectPlayersInLandClaims.PlayerOwnedClaims\" is " + String.valueOf(config_pvp_noCombatInPlayerLandClaims),DebugLevel.Verbose);
+
         this.config_pvp_noCombatInAdminLandClaims = config.getBoolean("GriefPrevention.PvP.ProtectPlayersInLandClaims.AdministrativeClaims", !this.config_siege_enabled);
         this.SpawnProtectEnabled = config.getBoolean("GriefPrevention.PvP.ProtectFreshSpawns", true);
         // outConfig.set("GriefPrevention.Claims.Worlds",
@@ -1215,7 +1224,10 @@ public class WorldConfig {
         this.FlowerPotRules = new ClaimBehaviourData("Flower Pots", config, outConfig, "GriefPrevention.Rules.FlowerPots",
                 ClaimBehaviourData.getAll("Flower Pots").setBehaviourMode(ClaimBehaviourMode.RequireBuild));
         this.ItemFrameItemRules = new ClaimBehaviourData("Item Frame Items", config, outConfig, "GriefPrevention.Rules.ItemFrameItems",
-                ClaimBehaviourData.getAll("Flower Pots").setBehaviourMode(ClaimBehaviourMode.RequireBuild));
+                ClaimBehaviourData.getAll("Item Frame").setBehaviourMode(ClaimBehaviourMode.RequireBuild));
+        this.SpawnEggBehaviour = new ClaimBehaviourData("Spawn Eggs",config,outConfig,"GriefPrevention.Rules.SpawnEggs",
+                ClaimBehaviourData.getAll("Monster Eggs").setBehaviourMode(ClaimBehaviourMode.RequireBuild));
+
         this.OtherExplosionBehaviour = new ClaimBehaviourData("Other Explosions", config, outConfig, "GriefPrevention.Rules.OtherExplosions", ClaimBehaviourData.getAll("Other Explosions").setSeaLevelOffsets(SeaLevelOverrideTypes.Offset, -1));
         this.CreeperExplosionBlockDamageBehaviour = new ClaimBehaviourData("Creeper Explosion Damage", config, outConfig, "GriefPrevention.Rules.BlockDamageCreeperExplosion", new ClaimBehaviourData("Creeper Explosion Damage", PlacementRules.AboveOnly, PlacementRules.Neither, ClaimBehaviourMode.Disabled).setSeaLevelOffsets(SeaLevelOverrideTypes.Offset, -1));
         this.WitherExplosionBlockDamageBehaviour = new ClaimBehaviourData("Wither Explosion Damage", config, outConfig, "GriefPrevention.Rules.BlockDamageWitherExplosions", new ClaimBehaviourData("Wither Explosion Damage", PlacementRules.AboveOnly, PlacementRules.Neither, ClaimBehaviourMode.Disabled).setSeaLevelOffsets(SeaLevelOverrideTypes.Offset, -1));
@@ -1327,7 +1339,7 @@ public class WorldConfig {
         // claim blocks is null,
         // create and schedule it to run.
         if (config_claims_blocksAccruedPerHour > 0 && GriefPrevention.instance.ClaimTask == null) {
-
+            Debugger.Write("Starting Claim Block Delivery Task.",DebugLevel.Verbose);
             GriefPrevention.instance.ClaimTask = new DeliverClaimBlocksTask();
             GriefPrevention.instance.getServer().getScheduler().scheduleSyncRepeatingTask(GriefPrevention.instance, GriefPrevention.instance.ClaimTask, 60L * 20 * 2, 60L * 20 * 5);
         }

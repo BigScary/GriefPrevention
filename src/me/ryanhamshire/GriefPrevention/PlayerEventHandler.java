@@ -830,7 +830,16 @@ class PlayerEventHandler implements Listener {
 			event.setCancelled(true);
 		}
 	}
-
+    private Location getAffectedLocation(PlayerInteractEvent ev){
+        if(ev.getClickedBlock()==null) return null;
+        Location uselocation = ev.getClickedBlock().getLocation();
+        BlockFace bf = ev.getBlockFace();
+        int xoffset=bf.getModX(),yoffset=bf.getModY(),zoffset=bf.getModZ();
+        //south: Z+ North Z-
+        //east: X+ West X-
+        //Up: Y+ Down Y-
+        return new Location(ev.getClickedBlock().getWorld(),uselocation.getX()+xoffset,uselocation.getY()+yoffset,uselocation.getZ()+zoffset);
+    }
 	// when a player interacts with the world
 	@EventHandler(priority = EventPriority.LOWEST)
 	void onPlayerInteract(PlayerInteractEvent event) {
@@ -849,7 +858,7 @@ class PlayerEventHandler implements Listener {
 		// determine target block. FEATURE: shovel and stick can be used from a
 		// distance away
 		Block clickedBlock = event.getClickedBlock();
-
+        Location relevantPosition = getAffectedLocation(event);
 		if (wc.getItemRules() != null) {
 			getTransparentMaterials();
 			try {
@@ -860,7 +869,7 @@ class PlayerEventHandler implements Listener {
 
 			for (ItemUsageRules iur : wc.getItemRules()) {
 				if (iur.Applicable(event.getItem())) {
-					if (iur.TestPlayer(player, clickedBlock).Denied()) {
+					if (iur.TestPlayer(player, relevantPosition.getBlock()).Denied()) {
 						event.setCancelled(true);
 						return;
 
@@ -878,10 +887,12 @@ class PlayerEventHandler implements Listener {
 			sb.append("Clicked:");
 			if (clickedBlock != null) {
 				sb.append(clickedBlock.getType().name());
-				sb.append("State:" + clickedBlock.getState() == null);
+                sb.append(",Relevant Location:" + GriefPrevention.getfriendlyLocationString(relevantPosition));
+				sb.append(",State:" + clickedBlock.getState() == null);
 				if (clickedBlock.getState() != null)
 					sb.append(" " + clickedBlock.getState().getClass().getName());
 			}
+
 			sb.append(",");
 			if (event != null) {
 				if (event.getItem() != null) {
@@ -928,11 +939,13 @@ class PlayerEventHandler implements Listener {
 
 		Material clickedBlockType = clickedBlock.getType();
 
+
+
 		//
 		PlayerData playerData = GriefPrevention.instance.dataStore.getPlayerData(player.getName());
 
 
-		if(clickedBlock.getType().name().equals("FLOWER_POT")){
+		if(GriefPrevention.isMCVersionorLater(GriefPrevention.MinecraftVersions.MC16) &&   clickedBlock.getType()==Material.FLOWER_POT){
             //flower pot, apply flower pot rules.
             if(wc.getFlowerPotRules().Allowed(player.getLocation(),player,true).Denied()){
                 event.setCancelled(true);
@@ -943,11 +956,20 @@ class PlayerEventHandler implements Listener {
             if(inhand==Material.EYE_OF_ENDER){
                 if(wc.getEnderEyePortalRules().Allowed(player.getLocation(),player,true).Denied()){
                     event.setCancelled(true);
+                    return;
                 }
             }
 
+        }
+
+        if(inhand==Material.MONSTER_EGG){
+            if(wc.getSpawnEggBehaviour().Allowed(relevantPosition,player,true).Denied()){
+                event.setCancelled(true);
+                return;
+            }
 
         }
+
 		// Apply rules for the leash. Leashes can be attached to fences and
 		// netherbrick fences, but require
 		// permission at the block location for the player.
@@ -991,14 +1013,18 @@ class PlayerEventHandler implements Listener {
 			ContainerMaterials = new HashSet<Material>();
 			ContainerMaterials.add(Material.WORKBENCH);
 			ContainerMaterials.add(Material.ENDER_CHEST);
-			ContainerMaterials.add(Material.ANVIL);
+			if(GriefPrevention.isMCVersionorLater(GriefPrevention.MinecraftVersions.MC14))
+                ContainerMaterials.add(Material.ANVIL);
 			ContainerMaterials.add(Material.BREWING_STAND);
 			ContainerMaterials.add(Material.ENCHANTMENT_TABLE);
 			ContainerMaterials.add(Material.CAKE_BLOCK);
 			ContainerMaterials.add(Material.JUKEBOX);
 			ContainerMaterials.add(Material.DISPENSER);
-			ContainerMaterials.add(Material.DROPPER);
-			ContainerMaterials.add(Material.HOPPER);
+            if(GriefPrevention.isMCVersionorLater(GriefPrevention.MinecraftVersions.MC15))
+            {
+			  ContainerMaterials.add(Material.DROPPER);
+              ContainerMaterials.add(Material.HOPPER);
+            }
 
 		}
 		// apply rules for containers and crafting blocks
@@ -1143,14 +1169,14 @@ class PlayerEventHandler implements Listener {
 
 
 			if (materialInHand == Material.INK_SACK) {
-				if (wc.getBonemealGrassRules().Allowed(event.getClickedBlock().getLocation(), event.getPlayer()).Denied()) {
+				if (wc.getBonemealGrassRules().Allowed(relevantPosition, event.getPlayer()).Denied()) {
 					event.setCancelled(true);
 				}
 				return;
 			}
 
 			else if (materialInHand == Material.BOAT) {
-				Claim claim = GriefPrevention.instance.dataStore.getClaimAt(clickedBlock.getLocation(), false);
+				Claim claim = GriefPrevention.instance.dataStore.getClaimAt(relevantPosition, false);
 				if (claim != null) {
 					String noAccessReason = claim.allowAccess(player);
 					if (noAccessReason != null) {
@@ -1162,11 +1188,12 @@ class PlayerEventHandler implements Listener {
 				return;
 			}
 
+
 			// if it's a spawn egg, minecart, or boat, and this is a creative
 			// world, apply special rules
-			else if ((materialInHand == Material.MONSTER_EGG || materialInHand == Material.MINECART || materialInHand == Material.POWERED_MINECART || materialInHand == Material.STORAGE_MINECART || materialInHand == Material.HOPPER_MINECART || materialInHand == Material.EXPLOSIVE_MINECART || materialInHand == Material.BOAT) && GriefPrevention.instance.creativeRulesApply(clickedBlock.getLocation())) {
+			else if (materialInHand == Material.MINECART || materialInHand == Material.POWERED_MINECART || materialInHand == Material.STORAGE_MINECART || materialInHand == Material.HOPPER_MINECART || materialInHand == Material.EXPLOSIVE_MINECART || materialInHand == Material.BOAT && GriefPrevention.instance.creativeRulesApply(clickedBlock.getLocation())) {
 				// player needs build permission at this location
-				String noBuildReason = GriefPrevention.instance.allowBuild(player, clickedBlock.getLocation());
+				String noBuildReason = GriefPrevention.instance.allowBuild(player, relevantPosition);
 				if (noBuildReason != null) {
 					GriefPrevention.sendMessage(player, TextMode.Err, noBuildReason);
 
@@ -1175,7 +1202,7 @@ class PlayerEventHandler implements Listener {
 				}
 
 				// enforce limit on total number of entities in this claim
-				Claim claim = GriefPrevention.instance.dataStore.getClaimAt(clickedBlock.getLocation(), false);
+				Claim claim = GriefPrevention.instance.dataStore.getClaimAt(relevantPosition, false);
 				if (claim == null)
 					return;
 
@@ -2010,7 +2037,7 @@ class PlayerEventHandler implements Listener {
 			// don't allow interaction with item frames in claimed areas without
 			// build permission
 			if (entity instanceof Hanging) {
-                if(entity.getEntityId()==18){
+                if(GriefPrevention.isMCVersionorLater(GriefPrevention.MinecraftVersions.MC16) && entity instanceof ItemFrame){
                 //Item Frame.
                     if(wc.getItemFrameRules().Allowed(entity.getLocation(),player,true).Denied()){
                         event.setCancelled(true);
