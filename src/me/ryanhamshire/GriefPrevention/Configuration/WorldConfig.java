@@ -912,7 +912,7 @@ public class WorldConfig {
         this.config_pvp_blockContainers = config.getBoolean("GriefPrevention.PvP.BlockContainers", true);
 
 
-        outConfig.set("GriefPrevention.PvP.SpawnProtect.Enabled", String.valueOf(SpawnProtectEnabled));
+        outConfig.set("GriefPrevention.PvP.SpawnProtect.Enabled", SpawnProtectEnabled);
         outConfig.set("GriefPrevention.PvP.SpawnProtect.Timeout", SpawnProtectTimeout);
         outConfig.set("GriefPrevention.PvP.SpawnProtect.DisableonInstigate", SpawnProtectDisableonInstigate);
         outConfig.set("GriefPrevention.PvP.SpawnProtect.DisableonItemPickup", SpawnProtectDisableonItemPickup);
@@ -932,8 +932,7 @@ public class WorldConfig {
         outConfig.set("GriefPrevention.PvP.CombatTimeoutSeconds", this.config_pvp_combatTimeoutSeconds);
         outConfig.set("GriefPrevention.PvP.AllowCombatItemDrop", this.config_pvp_allowCombatItemDrop);
         outConfig.set("GriefPrevention.PvP.BlockedSlashCommands", bannedPvPCommandsList);
-        outConfig.set("GriefPrevention.PvP.ProtectPlayersInLandClaims.PlayerOwnedClaims", this.config_pvp_noCombatInPlayerLandClaims);
-        outConfig.set("GriefPrevention.PvP.ProtectPlayersInLandClaims.AdministrativeClaims", this.config_pvp_noCombatInAdminLandClaims);
+
         this.config_trees_removeFloatingTreetops = config.getBoolean("GriefPrevention.Trees.RemoveFloatingTreetops", true);
         this.config_trees_regrowGriefedTrees = config.getBoolean("GriefPrevention.Trees.RegrowGriefedTrees", true);
         this.config_trees_cleanupDelay = config.getInt("GriefPrevention.Trees.CleanupTimeout",60*10)*20;
@@ -1147,6 +1146,10 @@ public class WorldConfig {
         Debugger.Write("\"GriefPrevention.PvP.ProtectPlayersInLandClaims.PlayerOwnedClaims\" is " + String.valueOf(config_pvp_noCombatInPlayerLandClaims),DebugLevel.Verbose);
 
         this.config_pvp_noCombatInAdminLandClaims = config.getBoolean("GriefPrevention.PvP.ProtectPlayersInLandClaims.AdministrativeClaims", !this.config_siege_enabled);
+
+        outConfig.set("GriefPrevention.PvP.ProtectPlayersInLandClaims.PlayerOwnedClaims", this.config_pvp_noCombatInPlayerLandClaims);
+        outConfig.set("GriefPrevention.PvP.ProtectPlayersInLandClaims.AdministrativeClaims", this.config_pvp_noCombatInAdminLandClaims);
+
         this.SpawnProtectEnabled = config.getBoolean("GriefPrevention.PvP.ProtectFreshSpawns", true);
         // outConfig.set("GriefPrevention.Claims.Worlds",
         // claimsEnabledWorldNames);

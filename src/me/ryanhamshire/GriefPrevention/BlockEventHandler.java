@@ -666,12 +666,7 @@ public class BlockEventHandler implements Listener {
 		
 		
 		// make sure the player is allowed to build at the location
-		/*String noBuildReason = GriefPrevention.instance.allowBuild(player, block.getLocation());
-		if (noBuildReason != null) {
-			GriefPrevention.sendMessage(player, TextMode.Err, noBuildReason);
-			placeEvent.setCancelled(true);
-			return;
-		}
+		/*
 */
 		if(wc.getPlaceBlockRules().Allowed(block.getLocation(),player,cbd==null).Denied() && cbd==null){
 			placeEvent.setCancelled(true);
