@@ -100,9 +100,11 @@ public class SiegeCommand extends GriefPreventionCommand {
 		}
 
 		Claim defenderClaim = inst.dataStore.getClaimAt(defender.getLocation(), false);
+
         WorldConfig wc = GriefPrevention.instance.getWorldCfg(defender.getLocation().getWorld());
 		// make sure they have the appropriate permissions.
-        if(!wc.getSiegeDefendable().hasAccess(defender,defenderClaim)){
+
+        if(defenderClaim==null || !wc.getSiegeDefendable().hasAccess(defender,defenderClaim)){
             GriefPrevention.sendMessage(player, TextMode.Err, Messages.NotSiegableThere, defender.getName());
             return true;
         }

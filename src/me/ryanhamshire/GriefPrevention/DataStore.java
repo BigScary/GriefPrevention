@@ -79,8 +79,12 @@ public abstract class DataStore {
 	// in-memory cache for player data
 	protected ConcurrentHashMap<String, PlayerData> playerNameToPlayerDataMap = new ConcurrentHashMap<String, PlayerData>();
 
+    protected Set<String> ClearInventoryOnJoinPlayers = new HashSet<String>();
+
 	// timestamp for each siege cooldown to end
 	private HashMap<String, Long> siegeCooldownRemaining = new HashMap<String, Long>();
+
+
 
 	/**
 	 * Adds a claim to the datastore, making it an effective claim.
@@ -212,6 +216,10 @@ public abstract class DataStore {
 
 		}
 
+        for(String pname:this.playerNameToPlayerDataMap.keySet()){
+            this.savePlayerData(pname,playerNameToPlayerDataMap.get(pname));
+
+        }
 	}
 
 	@Deprecated
@@ -546,7 +554,7 @@ public abstract class DataStore {
                 //command for that player.
                 for(int i=PlayersinClaim.size();i<0;i--){
                     Player p  = PlayersinClaim.get(i);
-                    if(p.getLocation().distance(bbi.getLocation())<1){
+                    if(p.getEyeLocation().distance(bbi.getLocation())<1){
                         //'rescue' the player immediately.
                         //this would, with the /trapped command, take a few seconds. We do the same logic here
                         //but make it occur immediately.
@@ -569,7 +577,12 @@ public abstract class DataStore {
 			siegeData.SiegedBlocks.clear();
 			GriefPrevention.AddLogEntry("reverted " + revertedCount + " Sieged Blocks.");
 
+
+
+
 		}
+
+
 		// start cooldowns for every attacker/involved claim pair
 		for (int i = 0; i < siegeData.claims.size(); i++) {
 			Claim claim = siegeData.claims.get(i);
@@ -744,13 +757,15 @@ public abstract class DataStore {
 	 *         location.
 	 */
 	synchronized public Claim getClaimAt(Location location, boolean ignoreHeight) {
-		 Debugger.Write("Looking for Claim at:" +
-		 GriefPrevention.getfriendlyLocationString(location) +
-		 " Ignoreheight:" + ignoreHeight,DebugLevel.Verbose);
 
-        Debugger.Write("ChunkMap Size:" + claims.chunkmap.size() + " claimworldmap:" + claims.claimworldmap.size() + " ClaimMap:" + claims.claimmap.size(),DebugLevel.Verbose);
+
 
         if(location==null) return null;
+        Debugger.Write("Looking for Claim at:" +
+                GriefPrevention.getfriendlyLocationString(location) +
+                " Ignoreheight:" + ignoreHeight,DebugLevel.Verbose);
+
+        Debugger.Write("ChunkMap Size:" + claims.chunkmap.size() + " claimworldmap:" + claims.claimworldmap.size() + " ClaimMap:" + claims.claimmap.size(),DebugLevel.Verbose);
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(location.getWorld());
 		if(!wc.getClaimsEnabled()) return null;
 		// create a temporary "fake" claim in memory for comparison purposes

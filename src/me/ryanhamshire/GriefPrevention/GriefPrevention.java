@@ -137,7 +137,8 @@ public class GriefPrevention extends JavaPlugin {
 	 *         depicting the approximate given location.
 	 */
 	public static String getfriendlyLocationString(Location location) {
-		return location.getWorld().getName() + "(" + location.getBlockX() + "," + location.getBlockY() + "," + location.getBlockZ() + ")";
+		if(location==null) return "null";
+        return location.getWorld().getName() + "(" + location.getBlockX() + "," + location.getBlockY() + "," + location.getBlockZ() + ")";
 	}
 
 	// ensures a piece of the managed world is loaded into server memory

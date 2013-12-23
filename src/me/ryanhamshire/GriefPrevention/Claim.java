@@ -1243,6 +1243,7 @@ public class Claim {
 	 * @return
 	 */
 	public boolean isNear(Location location, int howNear) {
+
 		Claim claim = new Claim(new Location(this.lesserBoundaryCorner.getWorld(), this.lesserBoundaryCorner.getBlockX() - howNear, this.lesserBoundaryCorner.getBlockY(), this.lesserBoundaryCorner.getBlockZ() - howNear), new Location(this.greaterBoundaryCorner.getWorld(), this.greaterBoundaryCorner.getBlockX() + howNear, this.greaterBoundaryCorner.getBlockY(), this.greaterBoundaryCorner.getBlockZ() + howNear), "", new String[] {}, new String[] {}, new String[] {}, new String[] {}, null, false);
 
 		return claim.contains(location, false, true);

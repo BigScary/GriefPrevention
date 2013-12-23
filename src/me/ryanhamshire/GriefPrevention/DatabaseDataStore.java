@@ -150,6 +150,7 @@ public class DatabaseDataStore extends DataStore {
 				playerData.lastLogin = results.getTimestamp("lastlogin");
 				playerData.accruedClaimBlocks = results.getInt("accruedblocks");
 				playerData.bonusClaimBlocks = results.getInt("bonusblocks");
+                playerData.ClearInventoryOnJoin = results.getBoolean("clearonjoin");
 			}
 		} catch (SQLException e) {
 			GriefPrevention.AddLogEntry("Unable to retrieve data for player " + playerName + ".  Details:");
@@ -245,7 +246,11 @@ public class DatabaseDataStore extends DataStore {
 
 				statement.execute("CREATE TABLE IF NOT EXISTS griefprevention_playerdata (name VARCHAR(50), lastlogin DATETIME, accruedblocks INT(15), bonusblocks INT(15));");
 
-				ResultSet tempresult = statement.executeQuery("SHOW COLUMNS FROM griefprevention_claimdata LIKE 'neverdelete';");
+                ResultSet tempresult = statement.executeQuery("SHOW COLUMNS FROM griefprevention_playerdata LIKE 'clearonjoin';");
+                if(!tempresult.next()){
+                    statement.execute("ALTER TABLE griefprevention_playerdata ADD clearonjoin BOOLEAN NOT NULL DEFAULT 0;");
+                }
+				tempresult = statement.executeQuery("SHOW COLUMNS FROM griefprevention_claimdata LIKE 'neverdelete';");
 				if (!tempresult.next()) {
 					statement.execute("ALTER TABLE griefprevention_claimdata ADD neverdelete BOOLEAN NOT NULL DEFAULT 0;");
 				}
@@ -340,7 +345,7 @@ public class DatabaseDataStore extends DataStore {
 
 			Statement statement = databaseConnection.createStatement();
 			statement.execute("DELETE FROM griefprevention_playerdata WHERE name='" + playerName + "';");
-			statement.execute("INSERT INTO griefprevention_playerdata VALUES ('" + playerName + "', '" + dateString + "', " + playerData.accruedClaimBlocks + ", " + playerData.bonusClaimBlocks + ");");
+			statement.execute("INSERT INTO griefprevention_playerdata VALUES ('" + playerName + "', '" + dateString + "', " + playerData.accruedClaimBlocks + ", " + playerData.bonusClaimBlocks + ", " + playerData.ClearInventoryOnJoin  + ");");
 		} catch (SQLException e) {
 			GriefPrevention.AddLogEntry("Unable to save data for player " + playerName + ".  Details:");
 			e.printStackTrace();

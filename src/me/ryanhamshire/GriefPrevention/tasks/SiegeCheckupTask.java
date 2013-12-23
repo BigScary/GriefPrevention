@@ -39,7 +39,7 @@ public class SiegeCheckupTask implements Runnable {
 	private boolean playerRemains(Player player) {
 		for (int i = 0; i < this.siegeData.claims.size(); i++) {
 			Claim claim = this.siegeData.claims.get(i);
-			if (claim.isNear(player.getLocation(), 25)) {
+			if (claim.isNear(player.getLocation(), 50)) {
 				return true;
 			}
 		}
@@ -77,6 +77,7 @@ public class SiegeCheckupTask implements Runnable {
 
 		// otherwise attacker wins if the defender runs away
 		else if (attackerRemains && !defenderRemains) {
+
 			dataStore.endSiege(this.siegeData, attacker.getName(), defender.getName(), false);
 		}
 

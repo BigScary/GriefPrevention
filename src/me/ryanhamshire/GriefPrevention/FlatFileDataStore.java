@@ -211,7 +211,8 @@ public class FlatFileDataStore extends DataStore {
 				// which is currently ignored
 				// String claimsString = inStream.readLine();
 				inStream.readLine();
-
+                String playerinventoryclear = inStream.readLine();
+                playerData.ClearInventoryOnJoin = Boolean.parseBoolean(playerinventoryclear);
 				inStream.close();
 			}
 
@@ -365,7 +366,7 @@ public class FlatFileDataStore extends DataStore {
 
 	synchronized void migrateData(DataStore targetStore) {
 		ForceLoadAllClaims(this);
-
+        targetStore.ClearInventoryOnJoinPlayers= ClearInventoryOnJoinPlayers;
 		// migrate claims
 		for (Claim c : this.claims) {
 			GriefPrevention.AddLogEntry("Migrating Claim #" + c.getID());
@@ -663,6 +664,9 @@ public class FlatFileDataStore extends DataStore {
 					outStream.write(";;" + this.locationToString(playerData.claims.get(i).getLesserBoundaryCorner()));
 				}
 			}
+            //write out wether the player's inventory needs to be cleared on join.
+            outStream.newLine();
+            outStream.write(String.valueOf(playerData.ClearInventoryOnJoin));
 			outStream.newLine();
 		}
 

@@ -78,14 +78,14 @@ public class ClaimBehaviourData {
 	public enum ClaimBehaviourMode {
 		Disabled, RequireAccess, RequireBuild, RequireContainer, RequireManager, RequireNone, RequireOwner;
         public boolean hasAccess(Player p,Claim toClaim){
-
+            if(toClaim==null) return false;
             if(this==Disabled) return false; //Disabled so no Access anywhere no matter what.
             if(this==RequireNone) return true;
             if(this==RequireAccess) return toClaim.allowAccess(p)==null;
             if(this==RequireBuild) return toClaim.allowBuild(p) == null;
             if(this==RequireContainer) return toClaim.allowContainers(p)==null;
             if(this==RequireManager) return toClaim.isManager(p);
-            if(this==RequireOwner) return toClaim.getOwnerName().equals(p.getName());
+            if(this==RequireOwner) return toClaim.getOwnerName()!=null && toClaim.getOwnerName().equals(p.getName());
 
 
             return false;
@@ -230,11 +230,12 @@ public class ClaimBehaviourData {
 	private SiegePVPOverrideConstants SiegeAttackerOverride = SiegePVPOverrideConstants.None;
 	private SiegePVPOverrideConstants SiegeDefenderOverride = SiegePVPOverrideConstants.None;
 	private SiegePVPOverrideConstants SiegeBystanderOverride = SiegePVPOverrideConstants.None;
-	
+	private SiegePVPOverrideConstants SiegeNonPlayerOverride = SiegePVPOverrideConstants.None;
 	
 	public SiegePVPOverrideConstants getSiegeAttackerOverride(){ return SiegeAttackerOverride;}
 	public SiegePVPOverrideConstants getSiegeDefenderOverride(){ return SiegeDefenderOverride;}
 	public SiegePVPOverrideConstants getSiegeBystanderOverride(){ return SiegeBystanderOverride;}
+    public SiegePVPOverrideConstants getSiegeNonPlayerOverride(){return SiegeNonPlayerOverride;}
 	//PvP Overrides can only apply to Claims currently.
 	//Attacker and Defender refers to the Attacker and Defender- the Attacker is the person with higher Permissions
 	//on a claim.
@@ -246,13 +247,33 @@ public class ClaimBehaviourData {
 	public ClaimBehaviourData setSiegeOverrides(SiegePVPOverrideConstants Attacker,SiegePVPOverrideConstants Defender){
 		return setSiegeOverrides(Attacker,Defender,SiegeBystanderOverride);
 	}
-	public ClaimBehaviourData setSiegeOverrides(SiegePVPOverrideConstants Attacker,SiegePVPOverrideConstants Defender,SiegePVPOverrideConstants ByStander){
+    public ClaimBehaviourData setSiegeOverrides(SiegePVPOverrideConstants Attacker,SiegePVPOverrideConstants Defender,SiegePVPOverrideConstants ByStander){
+        return setSiegeOverrides(Attacker,Defender,ByStander,SiegeNonPlayerOverride);
+    }
+	public ClaimBehaviourData setSiegeOverrides(SiegePVPOverrideConstants Attacker,SiegePVPOverrideConstants Defender,SiegePVPOverrideConstants ByStander,SiegePVPOverrideConstants NonPlayer){
 		
 		SiegeAttackerOverride = Attacker;
 		SiegeDefenderOverride = Defender;
 		SiegeBystanderOverride = ByStander;
+        SiegeNonPlayerOverride = NonPlayer;
 		return this;
 	}
+    public ClaimBehaviourData setSiegeAttackerOverride(SiegePVPOverrideConstants Attacker){
+        SiegeAttackerOverride = Attacker;
+        return this;
+    }
+    public ClaimBehaviourData setSiegeDefenderOverride(SiegePVPOverrideConstants Defender){
+        SiegeDefenderOverride = Defender;
+        return this;
+    }
+    public ClaimBehaviourData setSiegeBystanderOverride(SiegePVPOverrideConstants Bystander){
+        SiegeBystanderOverride = Bystander;
+        return this;
+    }
+    public ClaimBehaviourData setSiegeNonPlayerOverride(SiegePVPOverrideConstants nonPlayer){
+        SiegeNonPlayerOverride = nonPlayer;
+        return this;
+    }
 	public ClaimBehaviourData setPVPOverride(SiegePVPOverrideConstants newPVP){
 		this.PvPOverride = newPVP;
 		return this;
@@ -275,6 +296,8 @@ public class ClaimBehaviourData {
 		this.PvPOverride = Source.PvPOverride;
 		this.SiegeAttackerOverride = Source.SiegeAttackerOverride;
 		this.SiegeDefenderOverride = Source.SiegeDefenderOverride;
+        this.SiegeBystanderOverride = Source.SiegeBystanderOverride;
+        this.SiegeNonPlayerOverride = Source.SiegeNonPlayerOverride;
 		this.TameableAllowOwner = Source.getTameableAllowOwner();
 	
 	}
@@ -329,6 +352,8 @@ public class ClaimBehaviourData {
 		String SAttacker = Source.getString(NodePath + ".Claims.SiegeAttacker",Defaults.getSiegeAttackerOverride().name());
 		String SDefender = Source.getString(NodePath + ".Claims.SiegeDefender",Defaults.getSiegeDefenderOverride().name());
 		String SBystander = Source.getString(NodePath + ".Claims.SiegeBystander",Defaults.getSiegeBystanderOverride().name());
+        Debugger.Write("NoPlayer==null:" + (Defaults.getSiegeNonPlayerOverride()==null),DebugLevel.Verbose);
+        String SNoPlayer = Source.getString(NodePath + ".Claims.SiegeNonPlayer",Defaults.getSiegeNonPlayerOverride().name());
 		String PVPProvision = Source.getString(NodePath + ".PVP",Defaults.getPvPOverride().name());
 		
 		
@@ -340,10 +365,12 @@ public class ClaimBehaviourData {
 		
 		try {this.SiegeBystanderOverride = SiegePVPOverrideConstants.valueOf(SBystander);}
 		catch(Exception sBy){ this.SiegeBystanderOverride = SiegePVPOverrideConstants.None;}
-		
+		try {this.SiegeNonPlayerOverride = SiegePVPOverrideConstants.valueOf(SNoPlayer);}
+        catch(Exception snon){this.SiegeNonPlayerOverride = SiegePVPOverrideConstants.None;}
+
 		try {this.PvPOverride = SiegePVPOverrideConstants.valueOf(PVPProvision);}
 		catch(Exception sPVP){this.PvPOverride = SiegePVPOverrideConstants.None;}
-		
+
 		//save each back. If they are none, however, don't save.
 		if(SiegeAttackerOverride != SiegePVPOverrideConstants.None){
 			outConfig.set(NodePath + ".Claims.SiegeAttacker", SiegeAttackerOverride.name());
@@ -354,6 +381,10 @@ public class ClaimBehaviourData {
 		if(SiegeBystanderOverride != SiegePVPOverrideConstants.None){
 			outConfig.set(NodePath + ".Claims.SiegeBystander", SiegeBystanderOverride.name());
 		}
+        if(SiegeNonPlayerOverride != SiegePVPOverrideConstants.None){
+            outConfig.set(NodePath + ".Claims.SiegeNonPlayer",SiegeNonPlayerOverride.name());
+        }
+
 		if(PvPOverride != SiegePVPOverrideConstants.None){
 			outConfig.set(NodePath + ".PVP", PvPOverride.name());
 		}
@@ -581,7 +612,10 @@ public class ClaimBehaviourData {
                             useval = this.SiegeBystanderOverride;
                         }
                     }
-
+                    else
+                    {
+                        useval = this.SiegeNonPlayerOverride;
+                    }
 					//if not set to none...
 					if(useval!=SiegePVPOverrideConstants.None){
 						

@@ -63,6 +63,7 @@ public class PlayerData {
 
 	// how many claim blocks the player has earned via play time
 	public int accruedClaimBlocks = GriefPrevention.instance.config_claims_initialBlocks;
+    public boolean ClearInventoryOnJoin= false;
 
 	// visualization
 	public List<Visualization> ActiveVisualizations = new ArrayList<Visualization>();

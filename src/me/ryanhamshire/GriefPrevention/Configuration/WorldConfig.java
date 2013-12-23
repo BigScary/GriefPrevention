@@ -1067,12 +1067,7 @@ public class WorldConfig {
 		 * // Removed this segment. It supports Access, Container, and Trust
 		 * config settings for being able to hit other players with certain
 		 * items to add them to a claim. It was removed because it "doesn't fit"
-		 * and "should be in another plugin". That makes a change since usually
-		 * that line is just a cop out to avoid adding a new feature. Because
-		 * being able to change trust in a claim without commands is totally not
-		 * Grief Related. But then again, it's the same thing as being able to
-		 * visualize claims and make them with a gold shovel. That's not grief
-		 * prevention related either, and neither are sieges.
+		 * and "should be in another plugin". I kept it here because...meh, may as well.
 		 *
 		 *
 		 * String AccessTrustTool =
@@ -1115,9 +1110,9 @@ public class WorldConfig {
 		 */
         // default for siege worlds list
         // ArrayList<String> defaultSiegeWorldNames = new ArrayList<String>();
-        this.config_siege_enabled = config.getBoolean("GriefPrevention.Siege.Enabled", isPvP);
-        // get siege world names from the config file
 
+        this.config_siege_enabled = config.getBoolean("GriefPrevention.Siege.Enabled", isPvP);
+         outConfig.set("GriefPrevention.Siege.Enabled",config_siege_enabled);
         // default siege blocks
         this.config_siege_blocks = new ArrayList<SiegeableData>();
         this.config_siege_blocks.add(new SiegeableData(Material.DIRT.name()));
@@ -1132,11 +1127,31 @@ public class WorldConfig {
         this.config_siege_blocks.add(new SiegeableData(Material.WOOL.name()));
         this.config_siege_blocks.add(new SiegeableData(Material.SNOW.name()));
 
+        if(GriefPrevention.isMCVersionorLater(GriefPrevention.MinecraftVersions.MC17)){
+            this.config_siege_blocks.add(new SiegeableData(Material.STAINED_GLASS.name()));
+            this.config_siege_blocks.add(new SiegeableData(Material.STAINED_GLASS_PANE.name()));
+        }
+
+
         this.config_siege_blocks = SiegeableData.readList(config, outConfig, "GriefPrevention.Siege.BreakableBlocks", config_siege_blocks);
         config_TNTSiege_blocks = new ArrayList<SiegeableData>();
         //go with cobble for now.
+
+
+        for(SiegeableData sd:config_siege_blocks){
+            config_TNTSiege_blocks.add(sd);
+        }
+
         config_TNTSiege_blocks.add(new SiegeableData(Material.BRICK.name()));
         config_TNTSiege_blocks.add(new SiegeableData(Material.CLAY_BRICK.name()));
+        config_TNTSiege_blocks.add(new SiegeableData(Material.NETHER_BRICK.name()));
+        config_TNTSiege_blocks.add(new SiegeableData(Material.SANDSTONE.name()));
+        config_TNTSiege_blocks.add(new SiegeableData(Material.STONE.name()));
+        if(GriefPrevention.isMCVersionorLater(GriefPrevention.MinecraftVersions.MC16)){
+            config_TNTSiege_blocks.add(new SiegeableData(Material.STAINED_CLAY.name()));
+            config_TNTSiege_blocks.add(new SiegeableData(Material.HARD_CLAY.name()));
+        }
+
 
         this.config_TNTSiege_blocks = SiegeableData.readList(config, outConfig, "GriefPrevention.Siege.ExplosionBreakableBlocks", config_TNTSiege_blocks);
 
@@ -1232,12 +1247,14 @@ public class WorldConfig {
         this.SpawnEggBehaviour = new ClaimBehaviourData("Spawn Eggs",config,outConfig,"GriefPrevention.Rules.SpawnEggs",
                 ClaimBehaviourData.getAll("Monster Eggs").setBehaviourMode(ClaimBehaviourMode.RequireBuild));
 
-        this.OtherExplosionBehaviour = new ClaimBehaviourData("Other Explosions", config, outConfig, "GriefPrevention.Rules.OtherExplosions", ClaimBehaviourData.getAll("Other Explosions").setSeaLevelOffsets(SeaLevelOverrideTypes.Offset, -1));
-        this.CreeperExplosionBlockDamageBehaviour = new ClaimBehaviourData("Creeper Explosion Damage", config, outConfig, "GriefPrevention.Rules.BlockDamageCreeperExplosion", new ClaimBehaviourData("Creeper Explosion Damage", PlacementRules.AboveOnly, PlacementRules.Neither, ClaimBehaviourMode.Disabled).setSeaLevelOffsets(SeaLevelOverrideTypes.Offset, -1));
+
+
         this.WitherExplosionBlockDamageBehaviour = new ClaimBehaviourData("Wither Explosion Damage", config, outConfig, "GriefPrevention.Rules.BlockDamageWitherExplosions", new ClaimBehaviourData("Wither Explosion Damage", PlacementRules.AboveOnly, PlacementRules.Neither, ClaimBehaviourMode.Disabled).setSeaLevelOffsets(SeaLevelOverrideTypes.Offset, -1));
+        this.OtherExplosionBehaviour = new ClaimBehaviourData("Other Explosions", config, outConfig, "GriefPrevention.Rules.OtherExplosions", ClaimBehaviourData.getAll("Other Explosions").setSeaLevelOffsets(SeaLevelOverrideTypes.Offset, -1));
         this.WitherEatBehaviour = new ClaimBehaviourData("Wither Eating", config, outConfig, "GriefPrevention.Rules.WitherEating", new ClaimBehaviourData("Wither Eating", PlacementRules.AboveOnly, PlacementRules.Neither, ClaimBehaviourMode.Disabled));
-        this.TNTExplosionBlockDamageBehaviour = new ClaimBehaviourData("TNT Explosion Damage", config, outConfig, "GriefPrevention.Rules.BlockDamageTNTExplosions", ClaimBehaviourData.getOutsideClaims("TNT Explosion Damage").setSeaLevelOffsets(SeaLevelOverrideTypes.Offset, -1));
-        this.OtherExplosionBlockDamageBehaviour = new ClaimBehaviourData("Other Explosion Damage", config, outConfig, "GriefPrevention.Rules.BlockDamageOtherExplosions", ClaimBehaviourData.getOutsideClaims("Other Explosion Damage").getAboveSeaLevel("Other Explosion Damage").setSeaLevelOffsets(SeaLevelOverrideTypes.Offset, -1));
+        this.CreeperExplosionBlockDamageBehaviour = new ClaimBehaviourData("Creeper Explosion Damage", config, outConfig, "GriefPrevention.Rules.BlockDamageCreeperExplosion", new ClaimBehaviourData("Creeper Explosion Damage", PlacementRules.AboveOnly, PlacementRules.Neither, ClaimBehaviourMode.Disabled).setSeaLevelOffsets(SeaLevelOverrideTypes.Offset, -1).setSiegeNonPlayerOverride(SiegePVPOverrideConstants.Allow));
+        this.TNTExplosionBlockDamageBehaviour = new ClaimBehaviourData("TNT Explosion Damage", config, outConfig, "GriefPrevention.Rules.BlockDamageTNTExplosions", ClaimBehaviourData.getAll("TNT Explosion Damage").setSeaLevelOffsets(SeaLevelOverrideTypes.Offset, -1).setSiegeNonPlayerOverride(SiegePVPOverrideConstants.Allow));
+        this.OtherExplosionBlockDamageBehaviour = new ClaimBehaviourData("Other Explosion Damage", config, outConfig, "GriefPrevention.Rules.BlockDamageOtherExplosions", ClaimBehaviourData.getOutsideClaims("Other Explosion Damage").getAboveSeaLevel("Other Explosion Damage").setSeaLevelOffsets(SeaLevelOverrideTypes.Offset, -1).setSiegeNonPlayerOverride(SiegePVPOverrideConstants.Allow));
         ClaimBehaviourData WaterRequire = new ClaimBehaviourData("Water Placement", PlacementRules.BelowOnly, PlacementRules.Both, ClaimBehaviourMode.RequireBuild);
         ClaimBehaviourData LavaRequire = new ClaimBehaviourData("Lava Placement", PlacementRules.BelowOnly, PlacementRules.Both, ClaimBehaviourMode.RequireBuild).setWildernessRequiredPermission(PermNodes.LavaPermission);
         this.WaterBucketEmptyBehaviour = new ClaimBehaviourData("Water Placement", config, outConfig, "GriefPrevention.Rules.WaterBuckets.Place", WaterRequire).setWildernessRequiredPermission(PermNodes.WaterPermission);

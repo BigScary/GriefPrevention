@@ -639,7 +639,8 @@ class EntityEventHandler implements Listener {
 			usebehaviour = wc.getOtherExplosionBlockDamageBehaviour();
 		Claim claimpos = GriefPrevention.instance.dataStore.getClaimAt(explodeEvent.getLocation(),true);
 		// //go through each block that was affected...
-		for (int i = 0; i < blocks.size(); i++) {
+		for (int i = 0; i < blocks.size(); i++)
+        {
 
 
 
@@ -647,37 +648,46 @@ class EntityEventHandler implements Listener {
             Claim explodepos = GriefPrevention.instance.dataStore.getClaimAt(block.getLocation(),false);
             if(explodepos!=null && explodepos.siegeData!=null){
                 //under siege...
+                Debugger.Write("Explosion Block in claim under siege.", Debugger.DebugLevel.Verbose);
 
 
-                if(!wc.getSiegeBlockRevert()){
-                    float gotpower;
-                    if(-1==(gotpower=SiegeableData.getListPower(wc.getTNTSiegeBlocks(),block.getType())) &&
-                    (gotpower < explodeEvent.getYield())){
+                    float gotpower=0;
+                //-1 is returned if it is not in that list.
+                    if((i>0) && (-1==(gotpower=SiegeableData.getListPower(wc.getTNTSiegeBlocks(),block.getType())) ||
+                    (gotpower > explodeEvent.getYield()))){
+                        Debugger.Write("cancelling:" + block.getType().name() + "Power=" + gotpower + " Yield:" + explodeEvent.getYield() + " i=" + i, Debugger.DebugLevel.Verbose);
+                        //getListPower will return the power of the specified Material, or -1 if the material is
+                        //not in the list. if it's not in the list, remove it; if the retrieved power is greater than the explosion events
+                        //explosion yield, remove it.
+
+                        //remove it.
                        blocks.remove(i--);
+
+                        String usekey = GriefPrevention.getfriendlyLocationString(block.getLocation());
+                        // if it already contains an entry, the block was broken
+                        // during this siege
+                        // and replaced with another block that is being broken
+                        // again.
+                        if (explodepos.siegeData.SiegedBlocks.containsKey(usekey)) {
+
+                        } else {
+                            // otherwise, we have to add it to the siege blocks
+                            // list.
+                            explodepos.siegeData.SiegedBlocks.put(usekey, new BrokenBlockInfo(block.getLocation()));
+                            // replace it manually
+                            block.setType(Material.AIR);
+
+
+
+                        }
+                        continue;
+
+
                     }
-                }
-                else {
-
-                    String usekey = GriefPrevention.getfriendlyLocationString(block.getLocation());
-                    // if it already contains an entry, the block was broken
-                    // during this siege
-                    // and replaced with another block that is being broken
-                    // again.
-                    if (explodepos.siegeData.SiegedBlocks.containsKey(usekey)) {
-
-                    } else {
-                        // otherwise, we have to add it to the siege blocks
-                        // list.
-                        explodepos.siegeData.SiegedBlocks.put(usekey, new BrokenBlockInfo(block.getLocation()));
-                        // replace it manually
-                        block.setType(Material.AIR);
 
 
 
-                    }
 
-
-                }
                 }
 
 			// if(wc.getModsExplodableIds().contains(new
@@ -694,11 +704,12 @@ class EntityEventHandler implements Listener {
 			if (wc.getDenyAllExplosions() || (usebehaviour != null && usebehaviour.Allowed(block.getLocation(), null).Denied())) {
 				// if not allowed. remove it...
 				blocks.remove(i--);
+                continue;
 			} else {
 				// it is allowed, however, if it is on a claim only allow if
 				// explosions are enabled for that claim.
 				claimpos = GriefPrevention.instance.dataStore.getClaimAt(block.getLocation(), false);
-				if (claimpos != null && !claimpos.areExplosivesAllowed) {
+				if ( i>0 && claimpos != null && !claimpos.areExplosivesAllowed) {
 					blocks.remove(i--);
 				} else if (block.getType() == Material.LOG) {
 					GriefPrevention.instance.handleLogBroken(block);
@@ -706,7 +717,7 @@ class EntityEventHandler implements Listener {
 
 			}
 
-		}
+
         //now, check if we are in a claim, if so and if that claim is under siege, add all blocks still in the blocks list to
         //the revert list of that claim.
         if(claimpos!=null){
@@ -723,7 +734,7 @@ class EntityEventHandler implements Listener {
             }
         }
 	}
-
+    }
 	// don't allow entities to trample crops
 	/**
 	 * @param event

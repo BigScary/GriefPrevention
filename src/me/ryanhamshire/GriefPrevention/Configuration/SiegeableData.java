@@ -79,9 +79,11 @@ public class SiegeableData {
     public static float getListPower(List<SiegeableData> list,Material testmat){
         for(SiegeableData loopdata:list){
             if(loopdata.doesMatch(testmat))
-                loopdata.getRequiredBlastPower();
+            {
+                Debugger.Write("Material Match Found:" + testmat.name(), Debugger.DebugLevel.Verbose);
+                return loopdata.getRequiredBlastPower();
 
-
+            }
 
 
         }

@@ -19,6 +19,7 @@
 package me.ryanhamshire.GriefPrevention.tasks;
 
 import me.ryanhamshire.GriefPrevention.DataStore;
+import me.ryanhamshire.GriefPrevention.Debugger;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import me.ryanhamshire.GriefPrevention.PlayerData;
 import me.ryanhamshire.GriefPrevention.Configuration.WorldConfig;
@@ -37,7 +38,7 @@ public class DeliverClaimBlocksTask implements Runnable {
 		// this task won't even be scheduled)
 		// BC: refactored, now it calculates the blocks that have been accrued
 		// on a per-Player basis.
-
+        Debugger.Write("DeliverClaimBlocks Task Running.", Debugger.DebugLevel.Verbose);
 		// for each online player
 		for (Player player : players) {
 

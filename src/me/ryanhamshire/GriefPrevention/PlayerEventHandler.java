@@ -71,6 +71,7 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 
 class PlayerEventHandler implements Listener {
 	private static HashSet<Material> ContainerMaterials = null;
@@ -767,10 +768,10 @@ class PlayerEventHandler implements Listener {
 
 
 
-	private void onPlayerDisconnect(Player player, String notificationMessage) {
+	private void onPlayerDisconnect(final Player player, String notificationMessage) {
 		String playerName = player.getName();
 
-		PlayerData playerData = GriefPrevention.instance.dataStore.getPlayerData(playerName);
+		final PlayerData playerData = GriefPrevention.instance.dataStore.getPlayerData(playerName);
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(player.getWorld());
 		if (!wc.Enabled())
 			return;
@@ -781,8 +782,40 @@ class PlayerEventHandler implements Listener {
 		}
 
 		// FEATURE: players in pvp combat when they log out will die
+        //tweak: delay for 10 seconds before we perform this check...
 		if (wc.getPvPPunishLogout() && playerData.inPvpCombat()) {
-			player.setHealth(0);
+            final PlayerInventory dcedInventory = player.getInventory();
+            Bukkit.getScheduler().runTaskLater(GriefPrevention.instance, new Runnable() {
+                  public void run(){
+                      //if the last player this Player attacked is still online...
+                      if(Bukkit.getPlayerExact(playerData.lastPvpPlayer).isOnline()){
+                          playerData.ClearInventoryOnJoin=true;
+                          Player lastplayer = Bukkit.getPlayerExact(playerData.lastPvpPlayer);
+                          //kill the disconnected player. They will have disconnected by this point, naturally.
+                          player.setHealth(0);
+
+                          //I'm fairly certain this won't drop their items, since they DC'd.
+                          //as such, let's hope we can access the inventory of offline players.
+                          OfflinePlayer dcedplayer = Bukkit.getOfflinePlayer(playerData.lastPvpPlayer);
+                          lastplayer.sendMessage(TextMode.Info.toString() + dcedplayer + "PvP Logged. I'm sure they won't miss their stuff...");
+                          //drop all that players inventory naturally, where the other player was.
+                          for(ItemStack is:dcedInventory.getContents()){
+                              if(is!=null) lastplayer.getWorld().dropItemNaturally(lastplayer.getLocation(),is);
+                          }
+                          for(ItemStack is:dcedInventory.getArmorContents()){
+                              if(is!=null) lastplayer.getWorld().dropItemNaturally(lastplayer.getLocation(),is);
+                          }
+                          player.getInventory().clear();
+
+
+
+                      }
+                  }
+
+
+            },20*10);
+
+
 		}
 
 		// FEATURE: during a siege, any player who logs out dies and forfeits
@@ -790,9 +823,46 @@ class PlayerEventHandler implements Listener {
 
 		// if player was involved in a siege, he forfeits
 		if (playerData.siegeData != null) {
-			if (player.getHealth() > 0)
-				player.setHealth(0); // might already be zero from above, this
-										// avoids a double death message
+			if (player.getHealth() > 0){
+                // check current health to avoid doubled-up death message.
+                final PlayerInventory dcedInventory = player.getInventory();
+                final Player otherplayer=
+                        (playerData.siegeData.attacker==player)?playerData.siegeData.defender:playerData.siegeData.attacker;
+
+                Bukkit.getScheduler().runTaskLater(GriefPrevention.instance, new Runnable() {
+                    public void run(){
+                        Debugger.Write("Siege Disconnect Timer, player:" + player.getName(),DebugLevel.Informational);
+                        //get other player in the siege
+
+                        Debugger.Write("Other Player: " + otherplayer.getName(),DebugLevel.Informational);
+                        if(otherplayer.isOnline()){
+
+                            //kill the disconnected player. They will have disconnected by this point, naturally.
+                            player.setHealth(0);
+                            //I'm fairly certain this won't drop their items, since they DC'd.
+                            //as such, let's hope we can access the inventory of offline players.
+                            OfflinePlayer dcedplayer = Bukkit.getOfflinePlayer(playerData.lastPvpPlayer);
+
+                            //drop all that players inventory naturally, where the other player was.
+                            for(ItemStack is:dcedInventory.getContents()){
+                                if(is!=null)
+                                    otherplayer.getWorld().dropItemNaturally(otherplayer.getLocation(),is);
+                            }
+                            for(ItemStack is:dcedInventory.getArmorContents()){
+                                if(is!=null)
+                                    otherplayer.getWorld().dropItemNaturally(otherplayer.getLocation(),is);
+                            }
+                            player.getInventory().clear();
+
+
+
+                        }
+                    }
+
+
+                },20*10);
+
+            }
 		}
 
 		// drop data about this player
@@ -2465,6 +2535,22 @@ class PlayerEventHandler implements Listener {
 		// remember the player's ip address
 		PlayerData playerData = GriefPrevention.instance.dataStore.getPlayerData(player.getName());
 		playerData.ipAddress = event.getAddress();
+
+        if(playerData.ClearInventoryOnJoin){
+            //clear their inventory.
+            //set the flag to false, we don't want to clear it again!
+            playerData.ClearInventoryOnJoin=false;
+
+            player.getInventory().clear();
+            player.getInventory().setArmorContents( new ItemStack[]{null,null,null,null});
+            //now we kill them off.
+            //we clear it first so they do not drop their inventory, since it was already
+            //given away by the PvP and/or siege handling logic.
+            player.setHealth(0);
+            Debugger.Write("Cleared Inventory of " + player.getName() + " as they joined.",DebugLevel.Verbose);
+
+        }
+
 	}
 
 	// when a player picks up an item...
