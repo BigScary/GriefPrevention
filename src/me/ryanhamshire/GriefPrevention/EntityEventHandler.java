@@ -217,7 +217,7 @@ class EntityEventHandler implements Listener {
         if(attacker!=null && GriefPrevention.instance.isHorse(event.getEntity()) && ((Horse)event.getEntity()).isTamed()){
             Horse h = (Horse)event.getEntity();
             //if the attacker owns the horse, he can abuse it as he sees fit.
-            if(h.getOwner().getName().equals(attacker.getName()))
+            if(h.getOwner()!=null && h.getOwner().getName().equals(attacker.getName()))
             {
                 return;
             }
@@ -567,7 +567,7 @@ class EntityEventHandler implements Listener {
 	public void onEntityExplode(EntityExplodeEvent explodeEvent) {
 
 
-        Debugger.Write("Entity Exploding:" + explodeEvent.getEntity().getClass().getName(), Debugger.DebugLevel.Verbose);
+
 		// System.out.println("EntityExplode:" +
 		// explodeEvent.getEntity().getClass().getName());
 		List<Block> blocks = explodeEvent.blockList();

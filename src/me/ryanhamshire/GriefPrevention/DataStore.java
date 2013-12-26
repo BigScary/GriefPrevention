@@ -481,6 +481,11 @@ public abstract class DataStore {
 
 	public abstract boolean deletePlayerData(String playerName);
 
+
+    synchronized public void endSiege(SiegeData siegeData, String winnerName, String loserName, boolean death) {
+        endSiege(siegeData,winnerName,loserName,death,true);
+
+    }
 	/**
 	 * Ends a siege. Either winnerName or loserName can be null, but not both
 	 * 
@@ -493,7 +498,7 @@ public abstract class DataStore {
 	 * @param death
 	 *            Was the siege ended by a player's death?
 	 */
-	synchronized public void endSiege(SiegeData siegeData, String winnerName, String loserName, boolean death) {
+	synchronized public void endSiege(SiegeData siegeData, String winnerName, String loserName, boolean death,boolean Announcement) {
 		boolean grantAccess = false;
 		SiegeEndEvent event = new SiegeEndEvent(siegeData);
 		Bukkit.getPluginManager().callEvent(event);
@@ -600,14 +605,14 @@ public abstract class DataStore {
 		GriefPrevention.instance.getServer().getScheduler().cancelTask(siegeData.checkupTaskID);
 
 		// notify everyone who won and lost
-		if (winnerName != null && loserName != null) {
+		if (winnerName != null && loserName != null && Announcement) {
 			GriefPrevention.instance.getServer().broadcastMessage(winnerName + " defeated " + loserName + " in siege warfare!");
 		}
 
 		// if the claim should be opened to looting
 		if (grantAccess) {
 			Player winner = GriefPrevention.instance.getServer().getPlayer(winnerName);
-			if (winner != null) {
+			if (winner != null && Announcement) {
 				// notify the winner
 				GriefPrevention.sendMessage(winner, TextMode.Success, Messages.SiegeWinDoorsOpen);
 

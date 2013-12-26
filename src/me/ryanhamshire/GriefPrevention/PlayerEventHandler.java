@@ -829,6 +829,14 @@ class PlayerEventHandler implements Listener {
                 final Player otherplayer=
                         (playerData.siegeData.attacker==player)?playerData.siegeData.defender:playerData.siegeData.attacker;
 
+                for(Claim clearclaim:playerData.siegeData.claims){
+                    clearclaim.siegeData=null;
+                }
+
+                GriefPrevention.instance.dataStore.endSiege(playerData.siegeData,otherplayer.getName(),player.getName(),false,false);
+
+
+
                 Bukkit.getScheduler().runTaskLater(GriefPrevention.instance, new Runnable() {
                     public void run(){
                         Debugger.Write("Siege Disconnect Timer, player:" + player.getName(),DebugLevel.Informational);
@@ -853,7 +861,7 @@ class PlayerEventHandler implements Listener {
                                     otherplayer.getWorld().dropItemNaturally(otherplayer.getLocation(),is);
                             }
                             player.getInventory().clear();
-
+                            GriefPrevention.instance.getServer().broadcastMessage(otherplayer.getName() + " has defeated " + player.getName() + " in siege warfare!");
 
 
                         }
