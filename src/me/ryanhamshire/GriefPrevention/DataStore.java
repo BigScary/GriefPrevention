@@ -483,7 +483,7 @@ public abstract class DataStore {
 
 
     synchronized public void endSiege(SiegeData siegeData, String winnerName, String loserName, boolean death) {
-        endSiege(siegeData,winnerName,loserName,death,true);
+        endSiege(siegeData,winnerName,loserName,death);
 
     }
 	/**

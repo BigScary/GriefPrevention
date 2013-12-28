@@ -860,7 +860,9 @@ class PlayerEventHandler implements Listener {
                                 if(is!=null)
                                     otherplayer.getWorld().dropItemNaturally(otherplayer.getLocation(),is);
                             }
+                            playerData.ClearInventoryOnJoin=true;
                             player.getInventory().clear();
+
                             GriefPrevention.instance.getServer().broadcastMessage(otherplayer.getName() + " has defeated " + player.getName() + " in siege warfare!");
 
 

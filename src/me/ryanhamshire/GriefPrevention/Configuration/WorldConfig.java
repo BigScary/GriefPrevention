@@ -725,7 +725,7 @@ public class WorldConfig {
         // read in the data for TNT explosions and Golem/Wither placements.
         this.config_afkDistanceCheck = config.getInt("GriefPrevention.AFKDistance", 3);
         this.HorseTrust = config.getBoolean("GriefPrevention.ExtendedHorseTrust",false);
-        config.set("GriefPrevention.ExtendedHorseTrust",HorseTrust);
+        outConfig.set("GriefPrevention.ExtendedHorseTrust",HorseTrust);
         String SiegeDefenderStr = config.getString("GriefPrevention.SiegeDefendable", ClaimBehaviourMode.RequireOwner.name());
         ClaimBehaviourMode ccm = ClaimBehaviourMode.parseMode(SiegeDefenderStr);
         outConfig.set("GriefPrevention.SiegeDefendable",SiegeDefenderStr);

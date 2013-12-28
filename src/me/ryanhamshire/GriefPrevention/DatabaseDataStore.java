@@ -186,15 +186,17 @@ public class DatabaseDataStore extends DataStore {
 	void initialize(ConfigurationSection Source, ConfigurationSection Target) throws Exception {
 
 		// "jdbc:mysql://<hostname>/database"
-		String FormatString = "jdbc:mysql://%s/%s";
+		String FormatString = "jdbc:mysql://%s:%s/%s";
 
 
 
 			String grabhost = Source.getString("Host", "localhost");
+            String grabport = Source.getString("Port","3306");
 			String grabdbname = Source.getString("Database", "GriefPrevention");
 
-			databaseUrl = String.format(FormatString, grabhost, grabdbname);
+			databaseUrl = String.format(FormatString, grabhost,grabport, grabdbname);
 			Target.set("Host", grabhost);
+            Target.set("Port",grabport);
 			Target.set("Database", grabdbname);
 
 
