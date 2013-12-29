@@ -22,6 +22,17 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class CommandHandler implements CommandExecutor {
 
+
+    public boolean isCommandEnabled(Class commandclass){
+        for(GriefPreventionCommand gpc:GPCommands)
+        {
+            if(gpc.getClass().equals(commandclass)){
+                return true;
+            }
+        }
+        return false;
+    }
+
 	/**
 	 * transfers a number of claim blocks from a source player to a target
 	 * player.

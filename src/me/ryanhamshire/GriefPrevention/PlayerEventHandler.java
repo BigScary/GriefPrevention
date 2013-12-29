@@ -22,6 +22,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import me.ryanhamshire.GriefPrevention.CommandHandling.IgnoreCommand;
 import me.ryanhamshire.GriefPrevention.Debugger.DebugLevel;
 import me.ryanhamshire.GriefPrevention.Configuration.ClaimBehaviourData;
 import me.ryanhamshire.GriefPrevention.Configuration.ClaimBehaviourData.ClaimAllowanceConstants;
@@ -115,8 +116,8 @@ class PlayerEventHandler implements Listener {
 			transparentMaterials.add(Byte.valueOf((byte) Material.LEVER.getId()));
 		}
 	}
-    String sIgnoreRegExp = "/signore/s|/sban/s|/sshut up/s|/sbe quiet/s|/splease ban/s|/splease kick/s";
-
+    String sIgnoreRegExp = "\\signore\\s|\\sban\\s|\\sshut up\\s|\\sbe quiet\\s|\\splease ban\\s|\\splease kick\\s";
+    Pattern IgnoreRegExp = Pattern.compile(sIgnoreRegExp);
 
 	// returns true if the message should be sent, false if it should be muted
 	private boolean handlePlayerChat(Player player, String message, PlayerEvent event) {
@@ -168,9 +169,9 @@ class PlayerEventHandler implements Listener {
 		}
 
 		//advertise the ignore command if the player says shut up or ban.
+        boolean Matchtest = IgnoreRegExp.matcher(message).find();
 
-
-        if(!message.contains("/ignore") && Pattern.matches(sIgnoreRegExp,message));
+        if(!message.contains("/ignore") && Matchtest && GriefPrevention.instance.cmdHandler.isCommandEnabled(IgnoreCommand.class))
             if(wc.getMessageCooldownIgnore()>-1){
                 final PlayerData pdata = GriefPrevention.instance.dataStore.getPlayerData(player.getName());
                 if(!pdata.IgnoreIgnoreMessage){
@@ -849,7 +850,7 @@ class PlayerEventHandler implements Listener {
 
                         Debugger.Write("Other Player: " + otherplayer.getName(),DebugLevel.Informational);
                         if(otherplayer.isOnline()){
-
+                            playerData.ClearInventoryOnJoin=true;
                             //kill the disconnected player. They will have disconnected by this point, naturally.
                             player.setHealth(0);
                             //I'm fairly certain this won't drop their items, since they DC'd.
@@ -865,7 +866,7 @@ class PlayerEventHandler implements Listener {
                                 if(is!=null)
                                     otherplayer.getWorld().dropItemNaturally(otherplayer.getLocation(),is);
                             }
-                            playerData.ClearInventoryOnJoin=true;
+
                             player.getInventory().clear();
 
                             GriefPrevention.instance.getServer().broadcastMessage(otherplayer.getName() + " has defeated " + player.getName() + " in siege warfare!");
