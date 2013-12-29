@@ -42,8 +42,7 @@ public class GpHelpCommand extends GriefPreventionCommand {
 		// TODO Auto-generated method stub
 		// TODO Auto-generated method stub
 		if (sender != null) {
-			if(sender instanceof Player)
-				if(!EnsurePermission((Player)sender,command.getName())) return true;
+
 			String topic = "index";
 			if (args.length > 0)
 				topic = args[0];

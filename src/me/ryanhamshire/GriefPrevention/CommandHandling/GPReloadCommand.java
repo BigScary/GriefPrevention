@@ -23,7 +23,7 @@ public class GPReloadCommand extends GriefPreventionCommand {
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		// TODO Auto-generated method stub
 		Player player = (sender instanceof Player) ? (Player) sender : null;
-		if(player!=null && !EnsurePermission(player,command.getName())) return true;
+
 		if (player == null || player.hasPermission(PermNodes.ReloadPermission)) {
 
 			GriefPrevention useinstance = GriefPrevention.instance;

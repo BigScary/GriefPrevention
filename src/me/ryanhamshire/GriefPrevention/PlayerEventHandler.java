@@ -115,6 +115,8 @@ class PlayerEventHandler implements Listener {
 			transparentMaterials.add(Byte.valueOf((byte) Material.LEVER.getId()));
 		}
 	}
+    String sIgnoreRegExp = "/signore/s|/sban/s|/sshut up/s|/sbe quiet/s|/splease ban/s|/splease kick/s";
+
 
 	// returns true if the message should be sent, false if it should be muted
 	private boolean handlePlayerChat(Player player, String message, PlayerEvent event) {
@@ -166,21 +168,24 @@ class PlayerEventHandler implements Listener {
 		}
 
 		//advertise the ignore command if the player says shut up or ban.
-        if(!message.contains("/ignore") && message.contains("ignore") || message.contains("ban") || message.contains("shut up")){
 
-            final PlayerData pdata = GriefPrevention.instance.dataStore.getPlayerData(player.getName());
-            if(!pdata.IgnoreIgnoreMessage){
-                pdata.IgnoreIgnoreMessage=true;
-                Bukkit.getScheduler().runTaskLater(GriefPrevention.instance, new Runnable() {
-                    public void run() {
-                        pdata.IgnoreIgnoreMessage = false;
-                    }
-                }, wc.getMessageCooldownIgnore() * 20);
 
-                GriefPrevention.sendMessage(player, TextMode.Info, Messages.IgnoreInstructions, 10L);
+        if(!message.contains("/ignore") && Pattern.matches(sIgnoreRegExp,message));
+            if(wc.getMessageCooldownIgnore()>-1){
+                final PlayerData pdata = GriefPrevention.instance.dataStore.getPlayerData(player.getName());
+                if(!pdata.IgnoreIgnoreMessage){
+                    pdata.IgnoreIgnoreMessage=true;
+                    Bukkit.getScheduler().runTaskLater(GriefPrevention.instance, new Runnable() {
+                        public void run() {
+                            pdata.IgnoreIgnoreMessage = false;
+                        }
+                    }, wc.getMessageCooldownIgnore() * 20);
+
+                    GriefPrevention.sendMessage(player, TextMode.Info, Messages.IgnoreInstructions, 10L);
+                }
             }
 
-        }
+
 
 		// FEATURE: automatically educate players about the /trapped command
 		// check for "trapped" or "stuck" to educate players about the /trapped
@@ -1851,7 +1856,7 @@ class PlayerEventHandler implements Listener {
 							}
 						}
 
-						// otherwise, he's trying to finish creating a
+						// otherwise, trying to finish creating a
 						// subdivision by setting the other boundary corner
 						else {
 							// if last shovel location was in a different world,
@@ -1865,14 +1870,16 @@ class PlayerEventHandler implements Listener {
 
 							// try to create a new claim (will return null if
 							// this subdivision overlaps another)
-							CreateClaimResult result = GriefPrevention.instance.dataStore.createClaim(player.getWorld(), playerData.lastShovelLocation.getBlockX(), clickedBlock.getX(), playerData.lastShovelLocation.getBlockY() - wc.getClaimsExtendIntoGroundDistance(), clickedBlock.getY() - wc.getClaimsExtendIntoGroundDistance(), playerData.lastShovelLocation.getBlockZ(), clickedBlock.getZ(), "--subdivision--", // owner
-																																																																																																			// name
-																																																																																																			// is
-																																																																																																			// not
-																																																																																																			// used
-																																																																																																			// for
-																																																																																																			// subdivisions
-									playerData.claimSubdividing, null, false, player, true);
+							CreateClaimResult result =
+                                    GriefPrevention.instance.dataStore.createClaim(
+                                            player.getWorld(),
+                                            playerData.lastShovelLocation.getBlockX(),
+                                            clickedBlock.getX(),
+                                            playerData.lastShovelLocation.getBlockY() - wc.getClaimsExtendIntoGroundDistance(),
+                                            clickedBlock.getY() - wc.getClaimsExtendIntoGroundDistance(),
+                                            playerData.lastShovelLocation.getBlockZ(),
+                                            clickedBlock.getZ(), player.getName(),
+                                            playerData.claimSubdividing, null, false, player, true);
 
 							// if it didn't succeed, tell the player why
 							if (result.succeeded == CreateClaimResult.Result.ClaimOverlap) {

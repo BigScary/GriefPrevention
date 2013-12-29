@@ -18,9 +18,7 @@ public class TransferClaimBlocksCommand extends GriefPreventionCommand {
 		if (args.length < 3) {
 			return false;
 		}
-		if(sender instanceof Player){
-			if(!EnsurePermission((Player)sender, label)) return true;
-		}
+
 		String sourcename = args[0];
 		String targetname = args[1];
 		int desiredxfer = 0;

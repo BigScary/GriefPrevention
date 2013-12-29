@@ -32,7 +32,7 @@ public class TrappedCommand extends GriefPreventionCommand {
 		Player player = (sender instanceof Player) ? (Player) sender : null;
 		if (player == null)
 			return false;
-		if(!EnsurePermission(player, label)) return true;
+
 		WorldConfig wc = inst.getWorldCfg(player.getWorld());
 		PlayerData playerData = inst.dataStore.getPlayerData(player.getName());
 		Claim claim = inst.dataStore.getClaimAt(player.getLocation(), false);

@@ -133,6 +133,12 @@ class EntityEventHandler implements Listener {
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(event.getEntity().getWorld());
 		if (!wc.Enabled())
 			return;
+
+        //PvP damage. since we have logic inside for PvP stuff, we want to disable ALL of that logic if PvP is not enabled.
+        if(wc.getPvPEnabled()){
+
+        }
+
 		// environmental damage
         Claim claimatpos = getDataStore().getClaimAt(event.getEntity().getLocation(), false);
 		if (event.getEntity() instanceof Hanging) { // hanging objects are not

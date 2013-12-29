@@ -24,7 +24,7 @@ public class IgnoreClaimsCommand extends GriefPreventionCommand {
 			return false;
 		
 		Player player = (Player) sender;
-		if(!EnsurePermission(player,command.getName())) return true;
+
 		PlayerData playerData = GriefPrevention.instance.dataStore.getPlayerData(player.getName());
 
 		playerData.ignoreClaims = !playerData.ignoreClaims;

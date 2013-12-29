@@ -52,7 +52,7 @@ public class CleanClaimCommand extends GriefPreventionCommand {
 		// TODO Auto-generated method stub
 		// source is first arg; target is second arg.
 		if(player==null) return false;
-		if(!EnsurePermission(player,command.getName())) return true;
+
 		player.sendMessage("cleanclaim command..." + args.length);
 		if (args.length == 0) {
 			return true;

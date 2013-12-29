@@ -31,7 +31,7 @@ public class DeleteClaimCommand extends GriefPreventionCommand {
 		if (player == null)
 			return false;
 
-		if(!EnsurePermission(player,command.getName())) return true;
+
 		WorldConfig wc = inst.getWorldCfg(player.getWorld());
 
 		if (command.getName().equalsIgnoreCase("deleteclaim")) {

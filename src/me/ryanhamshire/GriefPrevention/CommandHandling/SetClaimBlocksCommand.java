@@ -26,9 +26,7 @@ public class SetClaimBlocksCommand extends GriefPreventionCommand {
 			return false;
 		// find the specified player
 		Player player = (sender instanceof Player) ? (Player) sender : null;
-		if(player!=null){
-			if(!EnsurePermission(player, label)) return true;
-		}
+
 		OfflinePlayer targetPlayer = inst.resolvePlayer(args[0]);
 		if (targetPlayer == null) {
 			GriefPrevention.sendMessage(player, TextMode.Err, "Player \"" + args[0] + "\" not found.");

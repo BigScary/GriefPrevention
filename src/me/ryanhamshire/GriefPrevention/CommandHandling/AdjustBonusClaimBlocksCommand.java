@@ -26,9 +26,7 @@ public class AdjustBonusClaimBlocksCommand extends GriefPreventionCommand {
 		if (args.length != 2)
 			return false;
 		Player player = (sender instanceof Player) ? (Player) sender : null;
-		if(player!=null){
-			if(!EnsurePermission(player,command.getName())) return true;
-		}
+
 		GriefPrevention inst = GriefPrevention.instance;
 		// parse the adjustment amount
 		int adjustment;

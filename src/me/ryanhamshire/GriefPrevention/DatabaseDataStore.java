@@ -382,6 +382,7 @@ public class DatabaseDataStore extends DataStore {
 		try {
             Debugger.Write("Database:Loading claims in world:" + loading.getName(),DebugLevel.Verbose);
 			Statement statement = databaseConnection.createStatement();
+            statement.closeOnCompletion();
 			ResultSet results = statement.executeQuery("SELECT * FROM griefprevention_claimdata where lessercorner LIKE \"" + loading.getName() + ";%\";");
 			ArrayList<Claim> claimsToRemove = new ArrayList<Claim>();
 
@@ -437,6 +438,7 @@ public class DatabaseDataStore extends DataStore {
 
 					// look for any subdivisions for this claim
 					Statement statement2 = this.databaseConnection.createStatement();
+                    statement2.closeOnCompletion();
 					ResultSet childResults = statement2.executeQuery("SELECT * FROM griefprevention_claimdata WHERE parentid=" + topLevelClaim.id + ";");
 
 					while (childResults.next()) {

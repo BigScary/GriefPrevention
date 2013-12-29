@@ -29,7 +29,7 @@ public class GiveClaimCommand extends GriefPreventionCommand {
 		Player target = Bukkit.getPlayer(args[0]);
 		if (source == null)
 			return false;
-		if(!EnsurePermission(source,command.getName())) return true;
+
 		DataStore dataStore = GriefPrevention.instance.dataStore;
 		if (target == null) {
 			GriefPrevention.sendMessage(source, TextMode.Err, Messages.PlayerNotFound, args[0]);

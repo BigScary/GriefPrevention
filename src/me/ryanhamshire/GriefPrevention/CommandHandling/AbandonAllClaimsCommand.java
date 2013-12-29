@@ -29,7 +29,7 @@ public class AbandonAllClaimsCommand extends GriefPreventionCommand {
 		if (player == null)
 			return false;
 		
-		if(!EnsurePermission(player,command.getName())) return true;
+
 		WorldConfig wc = inst.getWorldCfg(player.getLocation().getWorld());
 		
 		

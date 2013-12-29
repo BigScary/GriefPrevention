@@ -24,9 +24,7 @@ public class LockClaimCommands extends GriefPreventionCommand {
 		// TODO Auto-generated method stub
 		DataStore dataStore = GriefPrevention.instance.dataStore;
 		Player player = (sender instanceof Player) ? (Player) sender : null;
-		if(player!=null){
-			if(!EnsurePermission(player,command.getName())) return true;
-		}
+
 		if (command.getName().equalsIgnoreCase("lockclaim") && player != null) {
 			// requires exactly one parameter, the other player's name
 			if (args.length != 0)

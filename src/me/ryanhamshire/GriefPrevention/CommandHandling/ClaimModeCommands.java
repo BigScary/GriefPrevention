@@ -27,7 +27,7 @@ public class ClaimModeCommands extends GriefPreventionCommand {
 		if (player == null)
 			return false;
 		
-		if(!EnsurePermission(player,command.getName())) return true;
+
 		GriefPrevention inst = GriefPrevention.instance;
 
 		if (command.getName().equalsIgnoreCase("adminclaims") && player != null) {

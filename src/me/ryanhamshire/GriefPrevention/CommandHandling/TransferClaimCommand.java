@@ -35,7 +35,7 @@ public class TransferClaimCommand extends GriefPreventionCommand {
 		if (!(sender instanceof Player))
 			return false;
 		Player player = (Player) sender;
-		if(!EnsurePermission(player, label)) return true;
+
 		PlayerData pd = inst.dataStore.getPlayerData(player.getName());
 		Claim inclaim = inst.dataStore.getClaimAt(player.getLocation(), true);
 		boolean toAdmin = false;

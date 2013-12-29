@@ -62,8 +62,8 @@ public class ConfigData {
 	private HashMap<String, WorldConfig> WorldCfg = new HashMap<String, WorldConfig>();
 
 	private String WorldConfigLocation = null;
-
-	
+    private List<String> DisabledGPCommands = new ArrayList<String>();
+	public List<String> getDisabledGPCommands() { return DisabledGPCommands;}
 	private int SiegeCooldownSeconds = 1000 * 60 * 60; //default: one hour.
 	
 	public int getSiegeCooldownSeconds(){ return SiegeCooldownSeconds;}
@@ -91,6 +91,10 @@ public class ConfigData {
 			TemplateFile = DefaultTemplateFile;
 
 		}
+        this.DisabledGPCommands = CoreConfig.getStringList("GriefPrevention.DisabledCommands");
+        outConfig.set("GriefPrevention.DisabledCommands",DisabledGPCommands);
+
+
 		String SingleConfig = CoreConfig.getString("GriefPrevention.WorldConfig.SingleWorld", NoneSpecifier);
 		SingleWorldConfigLocation = SingleConfig;
 		if (!SingleConfig.equals(NoneSpecifier) && new File(SingleConfig).exists()) {

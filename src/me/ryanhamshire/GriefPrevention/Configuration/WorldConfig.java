@@ -1053,12 +1053,12 @@ public class WorldConfig {
             GriefPrevention.AddLogEntry("ERROR: Material " + modificationToolMaterialName + " not found.  Defaulting to the golden shovel. ");
             this.config_claims_modificationTool = Material.GOLD_SPADE;
         }
-        config_administration_tool = Material.CHAINMAIL_HELMET;
+        config_administration_tool = Material.FIRE;
         String admintoolName = config.getString("GriefPrevention.AdministrationTool", config_administration_tool.name());
         config_administration_tool = Material.getMaterial(admintoolName);
         if (config_administration_tool == null) {
             GriefPrevention.AddLogEntry("ERROR: Material " + modificationToolMaterialName + " not found.  Defaulting to the chainmail helm.");
-            this.config_claims_modificationTool = Material.CHAINMAIL_HELMET;
+            this.config_claims_modificationTool = Material.FIRE;
         }
 
 

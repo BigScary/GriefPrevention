@@ -136,7 +136,7 @@ public class AbandonClaimCommand extends GriefPreventionCommand {
 		if (!(sender instanceof Player))
 			return false;
 		Player p = (Player) sender;
-		if(!EnsurePermission(p,command.getName())) return true;
+
 		boolean dotoplevel = label.equalsIgnoreCase("abandontoplevelclaim");
 		return this.abandonClaimHandler(p, false);
 	}

@@ -26,7 +26,7 @@ public class BuySellClaimBlocks extends GriefPreventionCommand {
 		if (player == null)
 			return false;
 		
-		if(!EnsurePermission(player,command.getName())) return true;
+
 		
 		GriefPrevention inst = GriefPrevention.instance;
 		if (command.getName().equalsIgnoreCase("buyclaimblocks") && player != null) {

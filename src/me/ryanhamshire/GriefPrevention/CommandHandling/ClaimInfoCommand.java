@@ -24,9 +24,7 @@ public class ClaimInfoCommand extends GriefPreventionCommand {
 		GriefPrevention inst = GriefPrevention.instance;
 		Player player = (Player) sender;
 		Claim claimatpos = null;
-		if(player!=null){
-			if(!EnsurePermission(player,command.getName())) return true;
-		}
+
 		if (args.length == 0)
 			claimatpos = inst.dataStore.getClaimAt(player.getLocation(), true);
 		else {

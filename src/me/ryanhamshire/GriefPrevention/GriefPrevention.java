@@ -840,7 +840,7 @@ public class GriefPrevention extends JavaPlugin {
 		instance = this;
 		AddLogEntry("Grief Prevention enabled.");
         AddLogEntry("Grief Prevention Running for " + getMinecraftVersionString());
-		cmdHandler = new CommandHandler();
+
 		// if the old data folder exists and the new one doesn't...
 		File oldData = new File(DataStore.oldDataLayerFolderPath);
 		File newData = new File(DataStore.dataLayerFolderPath);
@@ -990,7 +990,8 @@ public class GriefPrevention extends JavaPlugin {
 				GriefPrevention.AddLogEntry(e.getMessage());
 			}
 		}
-
+        //start the command handler.
+        cmdHandler = new CommandHandler();
 		// start the recurring cleanup event for entities in creative worlds, if enabled.
 
 		// start recurring cleanup scan for unused claims belonging to inactive players

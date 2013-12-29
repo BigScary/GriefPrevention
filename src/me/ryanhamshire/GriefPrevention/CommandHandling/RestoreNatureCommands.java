@@ -26,7 +26,7 @@ public class RestoreNatureCommands extends GriefPreventionCommand {
 		if (player == null)
 			return false;
 		
-		if(!EnsurePermission(player,command.getName())) return true;
+
 		
 		if (command.getName().equalsIgnoreCase("restorenature") && player != null) {
 			// change shovel mode

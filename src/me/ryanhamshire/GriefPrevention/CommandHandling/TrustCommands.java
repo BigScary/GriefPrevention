@@ -205,9 +205,7 @@ public class TrustCommands extends GriefPreventionCommand {
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		// TODO Auto-generated method stub
 		Player player = (sender instanceof Player) ? (Player) sender : null;
-		if(player!=null){
-			if(!EnsurePermission(player, label)) return true;
-		}
+
 		if (command.getName().equalsIgnoreCase("trust") && player != null) {
 			// requires exactly one parameter, the other player's name
 			if (args.length != 1)
