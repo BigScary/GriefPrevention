@@ -152,11 +152,12 @@ public class FlatFileDataStore extends DataStore {
 	}
 
 	private String getPlayerDataFile(String sPlayerName) {
-		return playerDataFolderPath + File.separator + sPlayerName;
+		return playerDataFolderPath + File.separator + sPlayerName.toLowerCase();
 	}
 
 	@Override
 	synchronized PlayerData getPlayerDataFromStorage(String playerName) {
+        playerName = playerName.toLowerCase();
 		File playerFile = new File(getPlayerDataFile(playerName));
 
 		PlayerData playerData = new PlayerData();

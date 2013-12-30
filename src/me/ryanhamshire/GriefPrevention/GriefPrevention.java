@@ -1183,6 +1183,7 @@ public class GriefPrevention extends JavaPlugin {
 
 	// helper method to resolve a player by name
 	public OfflinePlayer resolvePlayer(String name) {
+        name = name.toLowerCase();
 		// try online players first
 		Player player = this.getServer().getPlayer(name);
 		if (player != null)
