@@ -399,7 +399,7 @@ public abstract class DataStore {
 		if (claim.parent != null) {
 			Claim parentClaim = claim.parent;
 			parentClaim.children.remove(claim);
-			this.saveClaim(parentClaim);
+			//this.saveClaim(parentClaim);
 			return true;
 		}
 

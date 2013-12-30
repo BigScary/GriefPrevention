@@ -125,9 +125,10 @@ public class CommandHandler implements CommandExecutor {
                 PluginCommand existingOwner = Bukkit.getPluginCommand(addcmd);
                     if(existingOwner!=null){
                         JavaPlugin p = (JavaPlugin)existingOwner.getPlugin();
-
-                        GriefPrevention.AddLogEntry("Could not add Command /" + addcmd + " Command already handled by \"" + p.getName() + "\"");
-                        continue;
+                        if(p!=GriefPrevention.instance){
+                          GriefPrevention.AddLogEntry("Could not add Command /" + addcmd + " Command already handled by \"" + p.getName() + "\"");
+                          continue;
+                        }
                     }
 
 

@@ -135,9 +135,28 @@ class EntityEventHandler implements Listener {
 			return;
 
         //PvP damage. since we have logic inside for PvP stuff, we want to disable ALL of that logic if PvP is not enabled.
-        if(wc.getPvPEnabled()){
 
-        }
+
+            if(event instanceof EntityDamageByEntityEvent){
+
+            EntityDamageByEntityEvent subEvent = (EntityDamageByEntityEvent) event;
+            if(!wc.getPvPEnabled()){
+                if(subEvent.getDamager() instanceof Player && event.getEntity() instanceof Player){
+                    return;
+                }
+            }
+                    //tweak: use class data to determine if entities were Pixelmon, and if so, allow them
+                //to damage one another.
+                if(subEvent.getDamager().getClass().getName().endsWith("EntityPixelmon") &&
+                        subEvent.getEntity().getClass().getName().endsWith("EntityPixelmon"))
+                {
+
+                    return;
+                }
+
+
+            }
+
 
 		// environmental damage
         Claim claimatpos = getDataStore().getClaimAt(event.getEntity().getLocation(), false);

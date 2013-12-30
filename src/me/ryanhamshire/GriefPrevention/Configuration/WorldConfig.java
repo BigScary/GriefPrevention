@@ -18,10 +18,7 @@ import me.ryanhamshire.GriefPrevention.Configuration.ClaimBehaviourData.SiegePVP
 import me.ryanhamshire.GriefPrevention.Configuration.PlacementRules.SeaLevelOverrideTypes;
 import me.ryanhamshire.GriefPrevention.tasks.DeliverClaimBlocksTask;
 
-import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
-import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -1836,8 +1833,13 @@ public class WorldConfig {
     // sea level, because bukkit doesn't report the right value for all
     // situations
     public Integer getSeaLevelOverride() {
-        if (config_seaLevelOverride == -1)
-            return (config_seaLevelOverride = Bukkit.getWorld(this.getWorldName()).getSeaLevel());
+        if (config_seaLevelOverride == -1)                                     {
+            World w = Bukkit.createWorld(new WorldCreator(this.getWorldName()));
+            if(w==null) {
+                GriefPrevention.AddLogEntry("World:" + this.getWorldName() + " failed to load.");
+            }
+            return (config_seaLevelOverride = w.getSeaLevel());
+        }
         else
             return config_seaLevelOverride;
     }
