@@ -926,6 +926,7 @@ class PlayerEventHandler implements Listener {
         //Up: Y+ Down Y-
         return new Location(ev.getClickedBlock().getWorld(),uselocation.getX()+xoffset,uselocation.getY()+yoffset,uselocation.getZ()+zoffset);
     }
+    private Material[] IgnoreInteractionMaterials = new Material[]{Material.SIGN_POST,Material.SIGN,Material.WALL_SIGN};
 	// when a player interacts with the world
 	@EventHandler(priority = EventPriority.LOWEST)
 	void onPlayerInteract(PlayerInteractEvent event) {
@@ -935,6 +936,7 @@ class PlayerEventHandler implements Listener {
 		if (event.getPlayer() == null)
 			return; // MCPC seems to sometimes fire events with a null player...
 		Player player = event.getPlayer();
+
 		String ItemName = event.getItem() == null ? "null" : "ID:" + String.valueOf(event.getItem().getTypeId());
 		Debugger.Write("onPlayerInteract: Item:" + ItemName, DebugLevel.Verbose);
 
@@ -1022,12 +1024,21 @@ class PlayerEventHandler implements Listener {
 
 			return;
 		}
+        //hack: we want to ignore interactions with certain items.
+
+
 
 		Material clickedBlockType = clickedBlock.getType();
 
+    Debugger.Write("Checking block:" + clickedBlockType.name(),DebugLevel.Verbose);
+    for(Material checkmat:IgnoreInteractionMaterials){
+        if(checkmat.name().equals(clickedBlockType.name())){
+            Debugger.Write("Ignoring interaction with Material:" + event.getClickedBlock().getType().name() + " as it is on the Ignore List.",DebugLevel.Verbose);
+            return;
+        }
+    }
 
-
-		//
+        //
 		PlayerData playerData = GriefPrevention.instance.dataStore.getPlayerData(player.getName());
 
 
