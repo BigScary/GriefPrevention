@@ -130,8 +130,6 @@ public class CommandHandler implements CommandExecutor {
                           continue;
                         }
                     }
-
-
                 PluginCommand pc = GriefPrevention.instance.getCommand(addcmd);
 				try {
 					Debugger.Write("Attaching Command \"" + addcmd + "\" to command class " + iterate.getClass().getName(), DebugLevel.Informational);

@@ -34,10 +34,8 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World.Environment;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
-import org.bukkit.block.BlockState;
-import org.bukkit.block.Chest;
+import org.bukkit.block.*;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
@@ -202,6 +200,36 @@ public class BlockEventHandler implements Listener {
 			// run the specialized code for treetop removal (see below)
 			GriefPrevention.instance.handleLogBroken(block);
 		}
+            else if(block.getType()==Material.ICE && wc.getWaterBucketEmptyBehaviour().Allowed(block.getLocation(),player).Allowed()){
+            //ice logic. We want to allow breaking ice (if it has so far passed)
+            //in the nether or a nether biome (since it won't turn to water)
+            //if the item being used has a silk touch enchant
+            ItemStack inhand = player.getItemInHand();
+            boolean FoundSilk=false;
+            if(block.getBiome()!= Biome.HELL){
+                if(inhand!=null){
+                    for(Enchantment enchant:inhand.getEnchantments().keySet()){
+                        if(enchant==Enchantment.SILK_TOUCH){
+                            FoundSilk=true;
+                            break;
+                        }
+
+                    }
+                    if(!FoundSilk){
+                        breakEvent.setCancelled(true);
+                        return;
+                    }
+                }
+
+
+            }
+            //search for Silk Touch Enchant. If they have silk touch we will allow it. Otherwise deny it.
+
+
+
+
+        }
+
         }
         finally {
 
