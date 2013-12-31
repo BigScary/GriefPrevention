@@ -200,7 +200,7 @@ public class BlockEventHandler implements Listener {
 			// run the specialized code for treetop removal (see below)
 			GriefPrevention.instance.handleLogBroken(block);
 		}
-            else if(block.getType()==Material.ICE && wc.getWaterBucketEmptyBehaviour().Allowed(block.getLocation(),player).Allowed()){
+            else if(block.getType()==Material.ICE && wc.getWaterBucketEmptyBehaviour().Allowed(block.getLocation(),player).Denied()){
             //ice logic. We want to allow breaking ice (if it has so far passed)
             //in the nether or a nether biome (since it won't turn to water)
             //if the item being used has a silk touch enchant
