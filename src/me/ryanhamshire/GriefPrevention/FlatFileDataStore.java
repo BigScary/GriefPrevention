@@ -150,15 +150,34 @@ public class FlatFileDataStore extends DataStore {
 			return "";
 		}
 	}
-
-	private String getPlayerDataFile(String sPlayerName) {
-		return playerDataFolderPath + File.separator + sPlayerName.toLowerCase();
+    private String getPlayerDataFile(String sPlayerName){
+        return getPlayerDataFile(sPlayerName,true);
+    }
+	private String getPlayerDataFile(String sPlayerName,boolean ForceLowerCase) {
+        String usename = sPlayerName;
+        if(ForceLowerCase) usename = usename.toLowerCase();
+		return playerDataFolderPath + File.separator + usename;
 	}
 
 	@Override
 	synchronized PlayerData getPlayerDataFromStorage(String playerName) {
+        //if the file exists when we check for the specific casing, use that file.
+        //On Windows machines the FS will not be case sensitive, however, for *nix based machines
+        //the file systems and the file I/O API are case sensitive. We save data lowercase now
+        //however previous installations may have upper-cased filenames. Thus we will
+        //look for the filename for the file that it would be named if we create the path
+        //with a case-insensitive player name.
+        File CaseInsensitive = new File(getPlayerDataFile(playerName,false));
+        //convert to lowercase.
         playerName = playerName.toLowerCase();
-		File playerFile = new File(getPlayerDataFile(playerName));
+        File playerFile;
+        //if the case insensitive file exists, use it as the playerFile.
+
+        if(CaseInsensitive.exists()) playerFile = CaseInsensitive;
+        else
+        //otherwise, grab the case insensitive file.
+		playerFile = new File(getPlayerDataFile(playerName));
+
 
 		PlayerData playerData = new PlayerData();
 		playerData.playerName = playerName;
