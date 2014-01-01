@@ -35,8 +35,17 @@ public class WorldClaimCleanupTask implements Runnable {
 	public int getTaskCookie() {
 		return TaskCookie;
 	}
+    public void run(){
 
-	public void run() {
+
+        Debugger.Write("Claim Cleanup Running for World:" + CleanupWorldName, DebugLevel.Verbose);
+        int numiterations = wc.getClaimCleanupQuantity();
+        for(int i=1;i<numiterations;i++){
+            runSingle();
+        }
+
+    }
+	public void runSingle() {
 
 		// retrieve the claims mapped to our world.
 		List<Claim> WorldClaims = GriefPrevention.instance.dataStore.getClaimArray().getWorldClaims(CleanupWorldName);
@@ -45,7 +54,7 @@ public class WorldClaimCleanupTask implements Runnable {
 		if (WorldClaims == null || WorldClaims.size() == 0)
 			return;
 
-		Debugger.Write("Claim Cleanup Running for World:" + CleanupWorldName, DebugLevel.Verbose);
+
 		if (!flInitialized) {
 			Random randomNumberGenerator = new Random();
 			this.nextClaimIndex = randomNumberGenerator.nextInt(GriefPrevention.instance.dataStore.getClaimsSize());

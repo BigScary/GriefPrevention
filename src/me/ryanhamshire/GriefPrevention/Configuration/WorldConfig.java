@@ -116,6 +116,10 @@ public class WorldConfig {
 
     private int config_claimcleanup_interval = 5*60;
     public int getClaimCleanupInterval(){ return config_claimcleanup_interval;}
+
+    private int config_claimcleanup_quantity = 5;
+    public int getClaimCleanupQuantity(){ return config_claimcleanup_quantity;}
+
     private boolean config_claims_Abandon_NatureRestoration; // whether survival
     // claims will
     // be
@@ -786,7 +790,9 @@ public class WorldConfig {
         // config.getBoolean("GriefPrevention.CleanupTasks.NatureRestore",true);
         this.config_claimcleanup_enabled = config.getBoolean("GriefPrevention.ClaimCleanup.Enabled", true);
         this.config_claimcleanup_interval = config.getInt("GriefPrevention.ClaimCleanup.Interval",5*60);
+        this.config_claimcleanup_quantity = config.getInt("GriefPrevention.ClaimCleanup.Quantity",5);
         outConfig.set("GriefPrevention.ClaimCleanup.Interval",config_claimcleanup_interval);
+        outConfig.set("GriefPrevention.ClaimCleanup.Quantity",config_claimcleanup_quantity);
         this.config_claimcleanup_maximumsize = config.getInt("GriefPrevention.ClaimCleanup.MaximumSize", 25);
         // max investment score, defaults to 400 for creative worlds.
         this.config_claimcleanup_maxinvestmentscore = config.getInt("GriefPrevention.ClaimCleanup.MaxInvestmentScore", isCreative ? 400 : 100);
