@@ -37,18 +37,35 @@ public class PermissionCheckEvent extends Event {
 		return handlers;
 	}
 
+    /**
+     * retrieves the permission/ClaimBehaviourData instance being checked.
+     * @return Permission being checked.
+     */
 	public ClaimBehaviourData getPermissionCheck() {
 		return PermissionCheck;
 	}
 
+    /**
+     * retrieves the Player applicable to this Permission check.
+     * @return
+     */
 	public Player getPlayer() {
 		return CheckPlayer;
 	}
 
+    /**
+     * retrieves any value set
+     * in a previous call to setResult().
+     * @return
+     */
 	public ClaimAllowanceConstants getResult() {
 		return Result;
 	}
 
+    /**
+     * sets the ClaimAllowanceConstants enumeration value that should result from the Allowed() call that caused this event to occur.
+     * @param value new value for Rule check Result.
+     */
 	public void setResult(ClaimAllowanceConstants value) {
 		Result = value;
 	}

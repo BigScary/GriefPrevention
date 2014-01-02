@@ -5,6 +5,10 @@ import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
+/**
+ * Fired immediately after GriefPrevention has loaded. This will be fired both when the plugin first loads
+ * as well as if the /reload command is issued, and if the /gpreload command is issued as well.
+ */
 public class GPLoadEvent extends Event {
 	// Custom Event Requirements
 	private static final HandlerList handlers = new HandlerList();

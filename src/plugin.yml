@@ -387,3 +387,6 @@ permissions:
     griefprevention.admin.lock:
         description: Grants permission to use the lock/unlock commands on any claim.
         default: op
+    griefprevention.spam.notignorable:
+        description: Makes a Player impossible to ignore using the /ignore command.
+        default: op

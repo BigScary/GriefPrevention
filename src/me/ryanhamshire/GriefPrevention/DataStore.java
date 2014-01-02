@@ -387,7 +387,7 @@ public abstract class DataStore {
 	// deletes a claim or subdivision
 	synchronized private boolean deleteClaim(Claim claim, boolean sendevent, Player p) {
 		Debugger.Write("Deleting Claim:" + claim.getID(), DebugLevel.Verbose);
-		;
+
 		// fire the delete Claim event.
 		if (sendevent) {
 			ClaimDeletedEvent ev = new ClaimDeletedEvent(claim, p);

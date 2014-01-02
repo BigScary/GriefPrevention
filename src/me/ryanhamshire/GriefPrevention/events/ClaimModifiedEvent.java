@@ -8,6 +8,11 @@ import org.bukkit.event.HandlerList;
 /**
  * Whenever a claim's data is modified, (besides being resized), this event will
  * be called.
+ * currently fired by:
+ * Claim.addManager,Claim.clearPermissions(),claim.dropPermission(),claim.removeManager() and
+ * Claim.setPermission().
+ *
+ * Not fired when a Claim's Plugin Metadata (Claim.getPluginMetadata()) changes.
  * 
  * @author Tux2
  * 

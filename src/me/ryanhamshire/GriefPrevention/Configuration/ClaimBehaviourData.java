@@ -559,6 +559,7 @@ public class ClaimBehaviourData {
 			}
 			if (fireEvent) {
 				PermissionCheckEvent permcheck = new PermissionCheckEvent(this, RelevantPlayer);
+
 				Bukkit.getPluginManager().callEvent(permcheck);
 				if (permcheck.getResult() != null) {
 					return returned = permcheck.getResult();

@@ -1,9 +1,6 @@
 package me.ryanhamshire.GriefPrevention.CommandHandling;
 
-import me.ryanhamshire.GriefPrevention.GriefPrevention;
-import me.ryanhamshire.GriefPrevention.Messages;
-import me.ryanhamshire.GriefPrevention.PlayerData;
-import me.ryanhamshire.GriefPrevention.TextMode;
+import me.ryanhamshire.GriefPrevention.*;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -47,8 +44,14 @@ public class IgnoreCommand extends GriefPreventionCommand {
             }   else {
                 //retrieve the player they want to ignore.
             Player ignoredplayer = Bukkit.getPlayer(args[0]);
+
             if(ignoredplayer==null){
                 GriefPrevention.sendMessage(p,TextMode.Err,Messages.PlayerNotFound);
+                return true;
+            }
+                //if the specified player has the not Ignorable permission, display a message.
+            if(ignoredplayer.hasPermission(PermNodes.NotIgnorablePermission)){
+                GriefPrevention.sendMessage(p,TextMode.Err,ignoredplayer.getName() + " cannot be ignored.");
                 return true;
             }
             boolean nowignored = pdata.ToggleIgnored(ignoredplayer);

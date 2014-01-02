@@ -18,11 +18,7 @@
 
 package me.ryanhamshire.GriefPrevention.tasks;
 
-import me.ryanhamshire.GriefPrevention.GriefPrevention;
-import me.ryanhamshire.GriefPrevention.Messages;
-import me.ryanhamshire.GriefPrevention.PlayerData;
-import me.ryanhamshire.GriefPrevention.ShovelMode;
-import me.ryanhamshire.GriefPrevention.TextMode;
+import me.ryanhamshire.GriefPrevention.*;
 import me.ryanhamshire.GriefPrevention.Configuration.WorldConfig;
 
 import org.bukkit.entity.Player;
@@ -46,7 +42,10 @@ public class EquipShovelProcessingTask implements Runnable {
 		// if he's not holding the golden shovel anymore, do nothing
 		if (player.getItemInHand().getType() != wc.getClaimsModificationTool())
 			return;
-
+        //do not show the message if they do not have permission to create claims using the Claims Tool.
+        if(!player.hasPermission(PermNodes.CreateClaimsShovelPermission)){
+            return;
+        }
 		PlayerData playerData = GriefPrevention.instance.dataStore.getPlayerData(player.getName());
 
 		int remainingBlocks = playerData.getRemainingClaimBlocks();

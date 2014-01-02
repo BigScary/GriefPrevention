@@ -5,6 +5,8 @@ import me.ryanhamshire.GriefPrevention.Claim;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
 
+/** fired when handling the /TransferClaim Command.
+*/
 public class ClaimTransferEvent extends ClaimEvent implements Cancellable {
 
 	// Custom Event Requirements

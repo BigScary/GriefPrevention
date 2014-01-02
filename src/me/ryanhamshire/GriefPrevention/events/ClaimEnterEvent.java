@@ -6,10 +6,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 
 /**
- * hey look the event that was never going to get added was added. What do ya
- * know. Fired when the movementwatcher is enabled when players enter and claims
- * 
- * 
+ * Fired when the movementwatcher is enabled when players enter claims
+ * Any plugins handling this event will need to enable the MovementWatcher, using
+ * the static GriefPrevention.InitializeMovementWatcher method.
+ *
  */
 public class ClaimEnterEvent extends PlayerClaimEvent {
 
@@ -17,7 +17,7 @@ public class ClaimEnterEvent extends PlayerClaimEvent {
 	private static final HandlerList handlers = new HandlerList();
 
 	public static HandlerList getHandlerList() {
-		return handlers;
+        return handlers;
 	}
 
 	public ClaimEnterEvent(Claim c, Player p) {

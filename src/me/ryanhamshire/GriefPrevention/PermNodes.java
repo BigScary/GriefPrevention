@@ -10,8 +10,7 @@ public class PermNodes {
 	public static final String AdminEavesDropPermission = "griefprevention.admin.eavesdrop";
 	public static final String AdminToolPermission = "griefprevention.admin.tool";
 	public static final String AdminLockPermission = "griefprevention.admin.lock";
-
-	public static final String IgnoreClaimsLimitPermission = "griefprevention.claims.ignorelimit";
+    public static final String IgnoreClaimsLimitPermission = "griefprevention.claims.ignorelimit";
 	public static final String GiveClaimsPermission = "griefprevention.claims.give";
 	public static final String CreateClaimsPermission = "griefprevention.claims.chestcreate";
     public static final String CreateClaimsShovelPermission = "griefprevention.claims.toolcreate";
@@ -33,8 +32,8 @@ public class PermNodes {
 	public static final String NoPvPImmunityPermission = "griefprevention.pvp.noimmunity";
 	public static final String ReloadPermission = "griefprevention.admin.reload";
 	public static final String SpamPermission = "griefprevention.spam.chat";
-	
 
+    public static final String NotIgnorablePermission= "griefprevention.spam.notignorable";
 	public static final String commandpermission = "griefprevention.commands.%s";
 	
 	public static String getCommandPermission(String CommandName){

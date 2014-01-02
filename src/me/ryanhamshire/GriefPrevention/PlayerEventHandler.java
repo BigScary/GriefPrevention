@@ -137,7 +137,7 @@ class PlayerEventHandler implements Listener {
 			this.howToClaimPattern = Pattern.compile(GriefPrevention.instance.dataStore.getMessage(Messages.HowToClaimRegex), Pattern.CASE_INSENSITIVE);
 		}
 		Messages showclaimmessage = null;
-		if (this.howToClaimPattern.matcher(message).matches()) {
+		if (this.howToClaimPattern.matcher(message).matches() && player.hasPermission(PermNodes.CreateClaimsShovelPermission)) {
 			if (GriefPrevention.instance.creativeRulesApply(player.getLocation())) {
 				showclaimmessage = Messages.CreativeBasicsDemoAdvertisement;
 
@@ -171,7 +171,7 @@ class PlayerEventHandler implements Listener {
 		//advertise the ignore command if the player says shut up or ban.
         boolean Matchtest = IgnoreRegExp.matcher(message).find();
 
-        if(!message.contains("/ignore") && Matchtest && GriefPrevention.instance.cmdHandler.isCommandEnabled(IgnoreCommand.class))
+        if(!message.contains("/ignore") && Matchtest && GriefPrevention.instance.cmdHandler.isCommandEnabled(IgnoreCommand.class) && player.hasPermission(PermNodes.getCommandPermission("ignore")))
             if(wc.getMessageCooldownIgnore()>-1){
                 final PlayerData pdata = GriefPrevention.instance.dataStore.getPlayerData(player.getName());
                 if(!pdata.IgnoreIgnoreMessage){
@@ -194,22 +194,24 @@ class PlayerEventHandler implements Listener {
 
 
 		if (!message.contains("/trapped") && (message.contains("trapped") || message.contains("stuck") || message.contains(GriefPrevention.instance.dataStore.getMessage(Messages.TrappedChatKeyword)))) {
-			final PlayerData pdata = GriefPrevention.instance.dataStore.getPlayerData(player.getName());
-			// if not set to ignore the stuck message, show it, set the ignore
-			// flag, and set an anonymous runnable to reset it after the
-			// configured delay.
-			if (!pdata.IgnoreStuckMessage) {
+			if(player.hasPermission(PermNodes.getCommandPermission("trapped"))){
+                final PlayerData pdata = GriefPrevention.instance.dataStore.getPlayerData(player.getName());
+                // if not set to ignore the stuck message, show it, set the ignore
+                // flag, and set an anonymous runnable to reset it after the
+                // configured delay.
+                if (!pdata.IgnoreStuckMessage) {
 
-				pdata.IgnoreStuckMessage = true;
+                    pdata.IgnoreStuckMessage = true;
 
-				Bukkit.getScheduler().runTaskLater(GriefPrevention.instance, new Runnable() {
-					public void run() {
-						pdata.IgnoreStuckMessage = false;
-					}
-				}, wc.getMessageCooldownStuck() * 20);
+                    Bukkit.getScheduler().runTaskLater(GriefPrevention.instance, new Runnable() {
+                        public void run() {
+                            pdata.IgnoreStuckMessage = false;
+                        }
+                    }, wc.getMessageCooldownStuck() * 20);
 
-				GriefPrevention.sendMessage(player, TextMode.Info, Messages.TrappedInstructions, 10L);
-			}
+                    GriefPrevention.sendMessage(player, TextMode.Info, Messages.TrappedInstructions, 10L);
+                }
+            }
 		}
 
 		// FEATURE: monitor for chat and command spam
@@ -656,33 +658,38 @@ class PlayerEventHandler implements Listener {
 		}
         PlayerData pdata = GriefPrevention.instance.dataStore.getPlayerData(player.getName());
 
-        //remove any recipients that have this sender on their list.
+        //remove any recipients that have this sender on their list,
+        //unless this player has the GriefPrevention.Permission.NotIgnorable permission set.
+
         Set<Player> removeplayers = new HashSet<Player>();
-        for(Player iterate:event.getRecipients()){
+        if(!player.hasPermission(PermNodes.NotIgnorablePermission))
+        {
+            for(Player iterate:event.getRecipients()){
 
-            PlayerData recipientData = GriefPrevention.instance.dataStore.getPlayerData(iterate.getName());
-
-
-
-
-
-            if(recipientData.isIgnored(event.getPlayer())){
-                removeplayers.add(iterate);
-            }
-            else if(pdata.getSoftMute() && !recipientData.getSoftMute()){
-                //don't show messages if the player sending the message has SoftMute set, but the
-                //recipient does not. If they both do, the recipient will receive the message.
-                //if the recipient has the Eavesdrop perm, they see the message but it get's displayed. with [MUTED] in front.
-                //in order to do this we still cancel it but send them a message manually.
-
-                if(iterate.hasPermission(PermNodes.EavesDropMute)){
-
-                    iterate.sendMessage(ChatColor.BLUE + "[MUTED]" + ChatColor.RESET + "<" + player.getDisplayName() + ">" + event.getMessage());
+                PlayerData recipientData = GriefPrevention.instance.dataStore.getPlayerData(iterate.getName());
 
 
+
+
+
+                if(recipientData.isIgnored(event.getPlayer())){
+                    removeplayers.add(iterate);
                 }
+                else if(pdata.getSoftMute() && !recipientData.getSoftMute()){
+                    //don't show messages if the player sending the message has SoftMute set, but the
+                    //recipient does not. If they both do, the recipient will receive the message.
+                    //if the recipient has the Eavesdrop perm, they see the message but it get's displayed. with [MUTED] in front.
+                    //in order to do this we still cancel it but send them a message manually.
 
-                removeplayers.add(iterate);
+                    if(iterate.hasPermission(PermNodes.EavesDropMute)){
+
+                        iterate.sendMessage(ChatColor.BLUE + "[MUTED]" + ChatColor.RESET + "<" + player.getDisplayName() + ">" + event.getMessage());
+
+
+                    }
+
+                    removeplayers.add(iterate);
+                }
             }
         }
         for(Player removeit:removeplayers)  event.getRecipients().remove(removeit);
