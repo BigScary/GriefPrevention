@@ -25,12 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import me.ryanhamshire.GriefPrevention.Debugger.DebugLevel;
 import me.ryanhamshire.GriefPrevention.Configuration.WorldConfig;
-import me.ryanhamshire.GriefPrevention.events.ClaimAfterCreateEvent;
-import me.ryanhamshire.GriefPrevention.events.ClaimBeforeCreateEvent;
-import me.ryanhamshire.GriefPrevention.events.ClaimDeletedEvent;
-import me.ryanhamshire.GriefPrevention.events.ClaimResizeEvent;
-import me.ryanhamshire.GriefPrevention.events.SiegeEndEvent;
-import me.ryanhamshire.GriefPrevention.events.SiegeStartEvent;
+import me.ryanhamshire.GriefPrevention.events.*;
 import me.ryanhamshire.GriefPrevention.exceptions.WorldNotFoundException;
 import me.ryanhamshire.GriefPrevention.tasks.PlayerRescueTask;
 import me.ryanhamshire.GriefPrevention.tasks.SecureClaimTask;
@@ -319,6 +314,14 @@ public abstract class DataStore {
 					result.succeeded = CreateClaimResult.Result.Canceled;
 					return result;
 				}
+                //also raise deprecated NewClaimCreated Event.
+                NewClaimCreated ncc = new NewClaimCreated(newClaim);
+                Bukkit.getServer().getPluginManager().callEvent(ncc);
+                if(claimevent.isCancelled()){
+                    result.succeeded = CreateClaimResult.Result.Canceled;
+                    return result;
+                }
+
 			}
 		} else {
 			/*
