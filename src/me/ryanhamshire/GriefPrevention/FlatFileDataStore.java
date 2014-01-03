@@ -581,7 +581,7 @@ public class FlatFileDataStore extends DataStore {
 						// reset...
 					}
 					// as such, try to read in the subclaim ID.
-					Claim subdivision = new Claim(lesserBoundaryCorner, greaterBoundaryCorner, "--subdivision--", builderNames, containerNames, accessorNames, managerNames, null, neverdelete);
+					Claim subdivision = new Claim(lesserBoundaryCorner, greaterBoundaryCorner,topLevelClaim.getOwnerName() , builderNames, containerNames, accessorNames, managerNames, null, neverdelete);
 					subdivision.subClaimid = usesubclaimid;
 					subdivision.modifiedDate = new Date(SourceFile.lastModified());
 					subdivision.parent = topLevelClaim;
