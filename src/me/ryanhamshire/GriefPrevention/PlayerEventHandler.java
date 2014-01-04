@@ -1785,9 +1785,11 @@ class PlayerEventHandler implements Listener {
 				if (result.succeeded == CreateClaimResult.Result.Success) {
 
 					// inform and show the player
+					if(result.claim.isAdminClaim()){
+                        GriefPrevention.sendMessage(player,TextMode.Success,Messages.ClaimResizeAdmin);
+                    }
 					
-					
-					if(result.claim.getOwnerName().equals(player.getName())){
+					else if(result.claim.getOwnerName().equals(player.getName())){
 						//they are resizing their own claim.
 					GriefPrevention.sendMessage(player, TextMode.Success, Messages.ClaimResizeSuccess, String.valueOf(playerData.getRemainingClaimBlocks()));
 					}
@@ -2147,6 +2149,7 @@ class PlayerEventHandler implements Listener {
                 //Item Frame.
                     if(wc.getItemFrameRules().Allowed(entity.getLocation(),player,true).Denied()){
                         event.setCancelled(true);
+                        return;
                     }
 
                 }

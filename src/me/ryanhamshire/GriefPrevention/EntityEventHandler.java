@@ -128,7 +128,7 @@ class EntityEventHandler implements Listener {
 	// when an entity is damaged
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
 	public void onEntityDamage(EntityDamageEvent event) {
-        Debugger.Write("onEntityDamage, instance:" + event.getEntity().getClass().getName(), Debugger.DebugLevel.Verbose);
+        Debugger.Write("onEntityDamage- " + event.getClass().getName() + "  instance:" + event.getEntity().getClass().getName(), Debugger.DebugLevel.Verbose);
 
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(event.getEntity().getWorld());
 		if (!wc.Enabled())
@@ -140,14 +140,19 @@ class EntityEventHandler implements Listener {
             if(event instanceof EntityDamageByEntityEvent){
 
             EntityDamageByEntityEvent subEvent = (EntityDamageByEntityEvent) event;
+                Entity Damager = subEvent.getDamager();
+                if(Damager!=null){
+                    Debugger.Write("Damager instance:" + subEvent.getDamager().getClass().getName(), Debugger.DebugLevel.Verbose);
+                }
+
             if(!wc.getPvPEnabled()){
-                if(subEvent.getDamager() instanceof Player && event.getEntity() instanceof Player){
+                if(Damager instanceof Player && event.getEntity() instanceof Player){
                     return;
                 }
             }
                     //tweak: use class data to determine if entities were Pixelmon, and if so, allow them
                 //to damage one another.
-                if(subEvent.getDamager().getClass().getName().endsWith("EntityPixelmon") &&
+                if(Damager.getClass().getName().endsWith("EntityPixelmon") &&
                         subEvent.getEntity().getClass().getName().endsWith("EntityPixelmon"))
                 {
 
@@ -193,6 +198,13 @@ class EntityEventHandler implements Listener {
 		Entity damageSource = subEvent.getDamager();
 		if (damageSource instanceof Player) {
 			attacker = (Player) damageSource;
+        }
+        else if(damageSource instanceof Fish){
+            Fish f = (Fish)damageSource;
+            if(f.getShooter() instanceof Player){
+                attacker = (Player)f.getShooter();
+            }
+
 		} else if (damageSource instanceof Arrow) {
 			arrow = (Arrow) damageSource;
 			if (arrow.getShooter() instanceof Player) {
@@ -968,6 +980,9 @@ class EntityEventHandler implements Listener {
 
 		// who is removing it?
 		Entity remover = entityEvent.getRemover();
+
+
+
 
 		// again, making sure the breaker is a player
 		if (!(remover instanceof Player)) {

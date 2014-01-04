@@ -1253,6 +1253,7 @@ public abstract class DataStore {
 		this.addDefault(defaults, Messages.ConfirmationReset, "Confirmation for {0} Reset.", "0:Name of confirmation flag");
 		this.addDefault(defaults, Messages.OtherPlayerResizeInsufficientWorldBlocks, "{0} Needs {1} more claim blocks for that.", "0:Player that needs more claim blocks;1:Claim blocks required");
 		this.addDefault(defaults, Messages.ClaimResizedOtherPlayer, "{0}'s Claim has been resized. They now have {1} Claim Blocks left.", "0:Owner of claim;1:Claim blocks remaining.");
+        this.addDefault(defaults,Messages.ClaimResizeAdmin,"Administrator Claim resized.",null);
         this.addDefault(defaults,Messages.StartIgnorePlayer,"You are now ignoring {0}.","0:Player being ignored");
         this.addDefault(defaults,Messages.StopIgnorePlayer,"You are no longer ignoring {0}.","0:Player being unignored");
         this.addDefault(defaults,Messages.IgnoreInstructions,"To ignore a player, you can use the /ignore command.",null);
