@@ -1190,7 +1190,7 @@ class EntityEventHandler implements Listener {
 		if (!wc.Enabled())
 			return;
 		// all of this is anti theft code
-                
+        Debugger.Write("Vehicle Damage, of " + event.getVehicle().getClass().getName(),Debugger.DebugLevel.Verbose);
 		// determine which player is attacking, if any
 		Player attacker = null;
 		Entity damageSource = event.getAttacker();
@@ -1207,6 +1207,12 @@ class EntityEventHandler implements Listener {
 				attacker = (Player) potion.getShooter();
 			}
 		}
+        else if(damageSource instanceof Fish){
+            Fish f = (Fish)damageSource;
+            if(f.getShooter() instanceof Player){
+                attacker = (Player) f.getShooter();
+            }
+        }
 		// if Damage source is unspecified and we allow environmental damage,
 		// don't cancel the event.
 		if(attacker==null && wc.getEnvironmentalVehicleDamage().Allowed(event.getVehicle().getLocation(), null,false).Denied()){

@@ -518,9 +518,24 @@ public class WorldConfig {
 
     private ClaimBehaviourData EnderPearlTargets;
 
+    //tweak: moved VehicleDamage to separate nodes.
+
     private ClaimBehaviourData VehicleDamage;
 
     private ClaimBehaviourData EnvironmentalVehicleDamage;
+
+    private ClaimBehaviourData Riding_Boat;
+
+    private ClaimBehaviourData Riding_Minecart;
+
+    private ClaimBehaviourData Riding_Pig;
+
+    private ClaimBehaviourData Riding_Horse;
+
+    public ClaimBehaviourData getBoatRiding(){ return Riding_Boat;}
+    public ClaimBehaviourData getMinecartRiding(){ return Riding_Minecart;}
+    public ClaimBehaviourData getPigRiding(){ return Riding_Pig;}
+    public ClaimBehaviourData getHorseRiding() { return Riding_Horse;}
 
     private ClaimBehaviourData EquineInventoryRules;
 
@@ -685,6 +700,20 @@ public class WorldConfig {
     public WorldConfig(String worldname) {
         this(worldname, new YamlConfiguration(), ConfigData.createTargetConfiguration(worldname));
     }
+    private boolean isValidRule(FileConfiguration Source, String NodePath){
+
+        ConfigurationSection wild = Source.getConfigurationSection(NodePath + ".wilderness");
+        ConfigurationSection claim = Source.getConfigurationSection(NodePath + "claims");
+        if(wild!=null && claim!=null)
+        {
+            return true; //if neither is null, it's likely a valid rule.
+        }
+
+     return false;
+    }
+
+
+
 
     // constructor accepts a Name and a FileConfiguration.
     public WorldConfig(String pName, FileConfiguration config, FileConfiguration outConfig) {
@@ -1272,6 +1301,14 @@ public class WorldConfig {
         VillagerTrades = new ClaimBehaviourData("Villager Trading", config, outConfig, "GriefPrevention.Rules.VillagerTrading", ClaimBehaviourData.getInsideClaims("Villager Trading").setBehaviourMode(ClaimBehaviourMode.RequireContainer));
         this.VehicleDamage = new ClaimBehaviourData("Vehicle Damage", config, outConfig, "GriefPrevention.Rules.VehicleDamage", ClaimBehaviourData.getAll("Vehicle Damage").setBehaviourMode(ClaimBehaviourMode.RequireContainer));
         this.EnvironmentalVehicleDamage = new ClaimBehaviourData("Environmental Vehicle Damage", config, outConfig, "GriefPrevention.Rules.EnvironmentalVehicleDamage", ClaimBehaviourData.getOutsideClaims("Environmental Vehicle Damage"));
+        //WIP: not applicable for this commit...
+        /*ClaimBehaviourData vehiclerule = new ClaimBehaviourData("Vehicle Boarding",config,outConfig,"GriefPrevention.Rules.VehicleBoarding")
+        if(isValidRule(config,"GriefPrevention.Rules.VehicleBoarding")){
+           Riding_Boat=Riding_Minecart=Riding_Horse=Riding_Pig =
+
+        }
+          */
+
         this.ZombieDoorBreaking = new ClaimBehaviourData("Zombie Door Breaking", config, outConfig, "GriefPrevention.Rules.ZombieDoorBreaking", ClaimBehaviourData.getNone("Zombie Door Breaking"));
         SheepShearingRules = new ClaimBehaviourData("Sheep Shearing", config, outConfig, "GriefPrevention.Rules.SheepShearing", ClaimBehaviourData.getAll("Sheep Shearing").setBehaviourMode(ClaimBehaviourMode.RequireContainer));
         SheepDyeing = new ClaimBehaviourData("Sheep Dyeing", config, outConfig, "GriefPrevention.Rules.SheepDyeing", ClaimBehaviourData.getAll("Sheep Dyeing").setBehaviourMode(ClaimBehaviourMode.RequireContainer));
