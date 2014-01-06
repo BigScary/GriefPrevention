@@ -813,10 +813,10 @@ class PlayerEventHandler implements Listener {
                           lastplayer.sendMessage(TextMode.Info.toString() + dcedplayer + "PvP Logged. I'm sure they won't miss their stuff...");
                           //drop all that players inventory naturally, where the other player was.
                           for(ItemStack is:dcedInventory.getContents()){
-                              if(is!=null) lastplayer.getWorld().dropItemNaturally(lastplayer.getLocation(),is);
+                              if(is!=null && !(is.getType() == Material.AIR)) lastplayer.getWorld().dropItemNaturally(lastplayer.getLocation(),is);
                           }
                           for(ItemStack is:dcedInventory.getArmorContents()){
-                              if(is!=null) lastplayer.getWorld().dropItemNaturally(lastplayer.getLocation(),is);
+                              if(is!=null && !(is.getType() == Material.AIR)) lastplayer.getWorld().dropItemNaturally(lastplayer.getLocation(),is);
                           }
                           player.getInventory().clear();
 
