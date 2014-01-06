@@ -167,13 +167,21 @@ public class FlatFileDataStore extends DataStore {
         //however previous installations may have upper-cased filenames. Thus we will
         //look for the filename for the file that it would be named if we create the path
         //with a case-insensitive player name.
-        File CaseInsensitive = new File(getPlayerDataFile(playerName,false));
+        File Casesensitive = new File(getPlayerDataFile(playerName,false));
         //convert to lowercase.
         playerName = playerName.toLowerCase();
         File playerFile;
         //if the case insensitive file exists, use it as the playerFile.
 
-        if(CaseInsensitive.exists()) playerFile = CaseInsensitive;
+        if(Casesensitive.exists()) {
+            playerFile = Casesensitive;
+            File CaseInsensitive = new File(getPlayerDataFile(playerName));
+            if(CaseInsensitive.exists() && !(Casesensitive.equals(CaseInsensitive))){
+                //delete the case insensitive version.
+                //CaseInsensitive.delete();
+            }
+
+        }
         else
         //otherwise, grab the case insensitive file.
 		playerFile = new File(getPlayerDataFile(playerName));
