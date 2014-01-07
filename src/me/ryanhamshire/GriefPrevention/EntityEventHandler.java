@@ -54,6 +54,8 @@ import org.bukkit.event.hanging.HangingBreakEvent;
 import org.bukkit.event.hanging.HangingPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.vehicle.VehicleDamageEvent;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.meta.BookMeta;
 
 //import com.gmail.nossr50.mcMMO;
@@ -601,165 +603,165 @@ class EntityEventHandler implements Listener {
 
     private Set<Entity> HandledEntities = new HashSet<Entity>();
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
-	public void onEntityExplode(EntityExplodeEvent explodeEvent) {
+    public void onEntityExplode(EntityExplodeEvent explodeEvent) {
 
 
 
-		// System.out.println("EntityExplode:" +
-		// explodeEvent.getEntity().getClass().getName());
-		List<Block> blocks = explodeEvent.blockList();
-		Location location = explodeEvent.getLocation();
-		WorldConfig wc = GriefPrevention.instance.getWorldCfg(location.getWorld());
-		if (!wc.Enabled())
-			return;
-		Claim claimatEntity = GriefPrevention.instance.dataStore.getClaimAt(location, true);
-		// quickest exit: if we are inside a claim and allowExplosions is false,
-		// break.
-		// if(claimatEntity!=null && claimatEntity.areExplosivesAllowed) return;
+        // System.out.println("EntityExplode:" +
+        // explodeEvent.getEntity().getClass().getName());
+        List<Block> blocks = explodeEvent.blockList();
+        Location location = explodeEvent.getLocation();
+        WorldConfig wc = GriefPrevention.instance.getWorldCfg(location.getWorld());
+        if (!wc.Enabled())
+            return;
+        Claim claimatEntity = GriefPrevention.instance.dataStore.getClaimAt(location, true);
+        // quickest exit: if we are inside a claim and allowExplosions is false,
+        // break.
+        // if(claimatEntity!=null && claimatEntity.areExplosivesAllowed) return;
 
-		// logic: we have Creeper and TNT Explosions currently. each one has
-		// special configuration options.
-		// make sure that we are allowed to explode, first.
-		Entity explodingEntity = explodeEvent.getEntity();
+        // logic: we have Creeper and TNT Explosions currently. each one has
+        // special configuration options.
+        // make sure that we are allowed to explode, first.
+        Entity explodingEntity = explodeEvent.getEntity();
 
 
-		boolean isCreeper = explodingEntity != null && explodingEntity instanceof Creeper;
-		boolean isTNT = explodingEntity != null && (explodingEntity instanceof TNTPrimed || explodingEntity instanceof ExplosiveMinecart);
+        boolean isCreeper = explodingEntity != null && explodingEntity instanceof Creeper;
+        boolean isTNT = explodingEntity != null && (explodingEntity instanceof TNTPrimed || explodingEntity instanceof ExplosiveMinecart);
 
-		boolean isWither = explodingEntity != null && (explodingEntity instanceof WitherSkull || explodingEntity instanceof Wither);
+        boolean isWither = explodingEntity != null && (explodingEntity instanceof WitherSkull || explodingEntity instanceof Wither);
+        boolean isEnderDragon = explodingEntity !=null && (explodingEntity instanceof EnderDragon || explodingEntity instanceof EnderDragonPart);
+        ClaimBehaviourData preExplodeCheck = null;
 
-        boolean isEnderDragon = explodingEntity !=null && (explodingEntity instanceof EnderDragon);
-		ClaimBehaviourData preExplodeCheck = null;
-
-		if (isCreeper) {
-			preExplodeCheck = wc.getCreeperExplosionBehaviour();
-		} else if (isWither)
-			preExplodeCheck = wc.getWitherExplosionBehaviour();
-		else if (isTNT)
-			preExplodeCheck = wc.getTNTExplosionBehaviour();
-        else if(isEnderDragon){
+        if (isCreeper) {
+            preExplodeCheck = wc.getCreeperExplosionBehaviour();
+        } else if (isWither)
+            preExplodeCheck = wc.getWitherExplosionBehaviour();
+        else if (isTNT)
+            preExplodeCheck = wc.getTNTExplosionBehaviour();
+        else if(isEnderDragon)
             preExplodeCheck = wc.getEnderDragonDamageBehaviour();
-        }
-		else
-			preExplodeCheck = wc.getOtherExplosionBehaviour();
+        else
+            preExplodeCheck = wc.getOtherExplosionBehaviour();
 
-		if (preExplodeCheck.Allowed(explodeEvent.getLocation(), null).Denied()) {
-			//Debugger.Write("Explosion cancelled.", DebugLevel.Verbose);
-			explodeEvent.setCancelled(true);
+        if (preExplodeCheck.Allowed(explodeEvent.getLocation(), null).Denied()) {
+            //Debugger.Write("Explosion cancelled.", DebugLevel.Verbose);
+            explodeEvent.setCancelled(true);
             explodeEvent.blockList().clear();
-			return;
-		}
+            return;
+        }
 
-		ClaimBehaviourData usebehaviour = null;
-		if (isCreeper)
-			usebehaviour = wc.getCreeperExplosionBlockDamageBehaviour();
-		else if (isWither)
-			usebehaviour = wc.getWitherExplosionBlockDamageBehaviour();
-        else if(isEnderDragon){
+        ClaimBehaviourData usebehaviour = null;
+        if (isCreeper)
+            usebehaviour = wc.getCreeperExplosionBlockDamageBehaviour();
+        else if (isWither)
+            usebehaviour = wc.getWitherExplosionBlockDamageBehaviour();
+        else if(isEnderDragon)
             usebehaviour = wc.getEnderDragonDamageBlocksBehaviour();
+        else if (isTNT){
+            usebehaviour = wc.getTNTExplosionBlockDamageBehaviour();
+
         }
-		else if (isTNT){
-			usebehaviour = wc.getTNTExplosionBlockDamageBehaviour();
-        }
-		else
-			usebehaviour = wc.getOtherExplosionBlockDamageBehaviour();
-		Claim claimpos = GriefPrevention.instance.dataStore.getClaimAt(explodeEvent.getLocation(),true);
-		// //go through each block that was affected...
-		for (int i = 0; i < blocks.size(); i++)
+        else
+            usebehaviour = wc.getOtherExplosionBlockDamageBehaviour();
+
+
+        Claim claimpos = GriefPrevention.instance.dataStore.getClaimAt(explodeEvent.getLocation(),true);
+        // //go through each block that was affected...
+        for (int i = 0; i < blocks.size(); i++)
         {
 
 
 
-			Block block = blocks.get(i);
+            Block block = blocks.get(i);
             Claim explodepos = GriefPrevention.instance.dataStore.getClaimAt(block.getLocation(),false);
+            if((explodepos!=null) && block.getState() instanceof InventoryHolder){
+                //System.out.println("Remove InventoryHolder item from explosion.");
+                blocks.remove(i--);
+                continue;
+            }
+
+
             if(explodepos!=null && explodepos.siegeData!=null){
                 //under siege...
                 Debugger.Write("Explosion Block in claim under siege.", Debugger.DebugLevel.Verbose);
-
-
-                    float gotpower=0;
+                float gotpower=0;
                 //-1 is returned if it is not in that list.
-                    if((i>0) && (-1==(gotpower=SiegeableData.getListPower(wc.getTNTSiegeBlocks(),block.getType())) ||
-                    (gotpower > explodeEvent.getYield()))){
-                        Debugger.Write("cancelling:" + block.getType().name() + "Power=" + gotpower + " Yield:" + explodeEvent.getYield() + " i=" + i, Debugger.DebugLevel.Verbose);
-                        //getListPower will return the power of the specified Material, or -1 if the material is
-                        //not in the list. if it's not in the list, remove it; if the retrieved power is greater than the explosion events
-                        //explosion yield, remove it.
+                if((i>0) && (-1==(gotpower=SiegeableData.getListPower(wc.getTNTSiegeBlocks(),block.getType())) ||
+                        (gotpower > explodeEvent.getYield()))){
+                    Debugger.Write("cancelling:" + block.getType().name() + "Power=" + gotpower + " Yield:" + explodeEvent.getYield() + " i=" + i, Debugger.DebugLevel.Verbose);
+                    //getListPower will return the power of the specified Material, or -1 if the material is
+                    //not in the list. if it's not in the list, remove it; if the retrieved power is greater than the explosion events
+                    //explosion yield, remove it.
 
-                        //remove it.
-                       blocks.remove(i--);
-
-                        String usekey = GriefPrevention.getfriendlyLocationString(block.getLocation());
-                        // if it already contains an entry, the block was broken
-                        // during this siege
-                        // and replaced with another block that is being broken
-                        // again.
-                        if (explodepos.siegeData.SiegedBlocks.containsKey(usekey)) {
-
-                        } else {
-                            // otherwise, we have to add it to the siege blocks
-                            // list.
-                            explodepos.siegeData.SiegedBlocks.put(usekey, new BrokenBlockInfo(block.getLocation()));
-                            // replace it manually
-                            block.setType(Material.AIR);
-
-
-
-                        }
-                        continue;
-
-
+                    //remove it.
+                    blocks.remove(i--);
+                    String usekey = GriefPrevention.getfriendlyLocationString(block.getLocation());
+                    // if it already contains an entry, the block was broken
+                    // during this siege
+                    // and replaced with another block that is being broken
+                    // again.
+                    if (explodepos.siegeData.SiegedBlocks.containsKey(usekey)) {
+                    } else {
+                        // otherwise, we have to add it to the siege blocks
+                        // list.
+                        explodepos.siegeData.SiegedBlocks.put(usekey, new BrokenBlockInfo(block.getLocation()));
+                        // replace it manually
+                        block.setType(Material.AIR);
                     }
-
-
+                    continue;
 
 
                 }
 
-			// if(wc.getModsExplodableIds().contains(new
-			// MaterialInfo(block.getTypeId(), block.getData(), null)))
-			// continue;
-			if (explodeEvent.getEntity()==null &&  block.getX() == explodeEvent.getLocation().getBlockX() && block.getY() == explodeEvent.getLocation().getBlockY() && block.getZ() == explodeEvent.getLocation().getBlockZ())
+
+
+
+            }
+
+            // if(wc.getModsExplodableIds().contains(new
+            // MaterialInfo(block.getTypeId(), block.getData(), null)))
+            // continue;
+            if (explodeEvent.getEntity()==null && block.getX() == explodeEvent.getLocation().getBlockX() && block.getY() == explodeEvent.getLocation().getBlockY() && block.getZ() == explodeEvent.getLocation().getBlockZ())
             {
 
-				continue;
+                continue;
 
             }
-			// creative rules stop all explosions, regardless of the other
-			// settings.
-			if (wc.getDenyAllExplosions() || (usebehaviour != null && usebehaviour.Allowed(block.getLocation(), null).Denied())) {
-				// if not allowed. remove it...
-				blocks.remove(i--);
+            // creative rules stop all explosions, regardless of the other
+            // settings.
+            if (wc.getDenyAllExplosions() || (usebehaviour != null && usebehaviour.Allowed(block.getLocation(), null).Denied())) {
+                // if not allowed. remove it...
+                blocks.remove(i--);
                 continue;
-			} else {
-				// it is allowed, however, if it is on a claim only allow if
-				// explosions are enabled for that claim.
-				claimpos = GriefPrevention.instance.dataStore.getClaimAt(block.getLocation(), false);
-				if ( i>0 && claimpos != null && !claimpos.areExplosivesAllowed) {
-					blocks.remove(i--);
-				} else if (block.getType() == Material.LOG) {
-					GriefPrevention.instance.handleLogBroken(block);
-				}
-
-			}
-
-
-        //now, check if we are in a claim, if so and if that claim is under siege, add all blocks still in the blocks list to
-        //the revert list of that claim.
-        if(claimpos!=null){
-            if(claimpos.siegeData!=null){
-                //claim is under siege.
-                if(wc.getSiegeBlockRevert()){
-                    for(Block iterate:blocks){
-                        String usekey = GriefPrevention.getfriendlyLocationString(iterate.getLocation());
-                        claimpos.siegeData.SiegedBlocks.put(usekey, new BrokenBlockInfo(iterate.getLocation()));
-                    }
+            } else {
+                // it is allowed, however, if it is on a claim only allow if
+                // explosions are enabled for that claim.
+                claimpos = GriefPrevention.instance.dataStore.getClaimAt(block.getLocation(), false);
+                if ( i>0 && claimpos != null && !claimpos.areExplosivesAllowed) {
+                    blocks.remove(i--);
+                } else if (block.getType() == Material.LOG) {
+                    GriefPrevention.instance.handleLogBroken(block);
                 }
 
+            }
 
+
+            //now, check if we are in a claim, if so and if that claim is under siege, add all blocks still in the blocks list to
+            //the revert list of that claim.
+            if(claimpos!=null){
+                if(claimpos.siegeData!=null){
+                    //claim is under siege.
+                    if(wc.getSiegeBlockRevert()){
+                        for(Block iterate:blocks){
+                            String usekey = GriefPrevention.getfriendlyLocationString(iterate.getLocation());
+                            claimpos.siegeData.SiegedBlocks.put(usekey, new BrokenBlockInfo(iterate.getLocation()));
+                        }
+                    }
+
+
+                }
             }
         }
-	}
     }
 	// don't allow entities to trample crops
 	/**
