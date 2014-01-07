@@ -1265,7 +1265,7 @@ public abstract class DataStore {
         this.addDefault(defaults,Messages.PlayerReceivesHorse,"This horse now belongs to you.",null);
         this.addDefault(defaults,Messages.MountOtherPlayersHorse,"You have mounted {0}'s horse.","0:owner of horse");
         this.addDefault(defaults,Messages.NoPermission,"You cannot do that here.",null);
-
+        this.addDefault(defaults,Messages.PvPLogAnnouncement,"{0} PvP Logged. I'm sure they won't miss their stuff...","0:Player Name");
 
 		// load the config file
 		FileConfiguration config = YamlConfiguration.loadConfiguration(new File(messagesFilePath));

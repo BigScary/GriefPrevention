@@ -810,8 +810,8 @@ class PlayerEventHandler implements Listener {
                           //I'm fairly certain this won't drop their items, since they DC'd.
                           //as such, let's hope we can access the inventory of offline players.
                           OfflinePlayer dcedplayer = Bukkit.getOfflinePlayer(playerData.lastPvpPlayer);
-                          lastplayer.sendMessage(TextMode.Info.toString() + dcedplayer + "PvP Logged. I'm sure they won't miss their stuff...");
-                          //drop all that players inventory naturally, where the other player was.
+                          GriefPrevention.sendMessage(lastplayer,TextMode.Info,Messages.PvPLogAnnouncement,dcedplayer.toString());
+
                           for(ItemStack is:dcedInventory.getContents()){
                               if(is!=null && !(is.getType() == Material.AIR)) lastplayer.getWorld().dropItemNaturally(lastplayer.getLocation(),is);
                           }
