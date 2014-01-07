@@ -484,6 +484,10 @@ public class WorldConfig {
 
     private ClaimBehaviourData CreeperExplosionsBehaviour;
 
+    private ClaimBehaviourData EnderDragonDamageBehaviour;
+
+    private ClaimBehaviourData EnderDragonDamageBlockBehaviour;
+
     private ClaimBehaviourData DispenserArrowBehaviour;
 
     private ClaimBehaviourData DispenserEggBehaviour;
@@ -1267,7 +1271,15 @@ public class WorldConfig {
         this.CreeperExplosionsBehaviour = new ClaimBehaviourData("Creeper Explosions", config, outConfig, "GriefPrevention.Rules.CreeperExplosions", new ClaimBehaviourData("Creeper Explosions", PlacementRules.AboveOnly, PlacementRules.Both, ClaimBehaviourMode.Disabled).setSeaLevelOffsets(SeaLevelOverrideTypes.Offset, -1));
         this.WitherExplosionBehaviour = new ClaimBehaviourData("Wither Explosions", config, outConfig, "GriefPrevention.Rules.WitherExplosions", new ClaimBehaviourData("Wither Explosions", PlacementRules.Neither, PlacementRules.Neither, ClaimBehaviourMode.Disabled).setSeaLevelOffsets(SeaLevelOverrideTypes.Offset, -1));
         this.TNTExplosionsBehaviour = new ClaimBehaviourData("TNT Explosions", config, outConfig, "GriefPrevention.Rules.TNTExplosions",
+
+
+
                 ClaimBehaviourData.getAll("TNT Explosions").setSeaLevelOffsets(SeaLevelOverrideTypes.Offset, -1));
+
+        this.EnderDragonDamageBehaviour = new ClaimBehaviourData("Ender Dragon Damage",config,outConfig,"GriefPrevention.Rules.EnderDragonDamage",
+                new ClaimBehaviourData("Ender Dragon Damage", PlacementRules.AboveOnly, PlacementRules.Both, ClaimBehaviourMode.Disabled).setSeaLevelOffsets(SeaLevelOverrideTypes.Offset, -1));
+        this.EnderDragonDamageBlockBehaviour = new ClaimBehaviourData("Ender Dragon Block Damage",config,outConfig,"GriefPrevention.Rules.EnderDragonDamage",
+                new ClaimBehaviourData("Ender Dragon Block Damage", PlacementRules.AboveOnly, PlacementRules.Both, ClaimBehaviourMode.Disabled).setSeaLevelOffsets(SeaLevelOverrideTypes.Offset, -1));
         this.TNTCoalesceBehaviour = new ClaimBehaviourData("TNT Coalescing", config, outConfig, "GriefPrevention.Rules.TNTCoalesce",
                 ClaimBehaviourData.getAll("TNT Coalescing").setSiegeOverrides(SiegePVPOverrideConstants.None, SiegePVPOverrideConstants.None, SiegePVPOverrideConstants.Allow));
         this.EnderEyePortalRules = new ClaimBehaviourData("Ender Portal Fill", config, outConfig, "GriefPrevention.Rules.EnderPortalFill",
@@ -1619,7 +1631,12 @@ public class WorldConfig {
     public ClaimBehaviourData getCreeperExplosionBlockDamageBehaviour() {
         return CreeperExplosionBlockDamageBehaviour;
     }
-
+    public ClaimBehaviourData getEnderDragonDamageBehaviour(){
+      return EnderDragonDamageBehaviour;
+    }
+    public ClaimBehaviourData getEnderDragonDamageBlocksBehaviour(){
+        return EnderDragonDamageBlockBehaviour;
+    }
     public boolean getDenyAllExplosions() {
         return config_deny_all_explosions;
     }

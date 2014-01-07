@@ -64,7 +64,7 @@ public class AbandonClaimCommand extends GriefPreventionCommand {
 		else if (!playerData.getWarned("AbandonClaim") && wc.getClaimsAbandonNatureRestoration()) {
 			GriefPrevention.sendMessage(player, TextMode.Warn, Messages.AbandonClaimRestoreWarning);
 			playerData.setWarned("AbandonClaim");
-		} else if (!playerData.getWarned("AbandonClaim") && costoverhead != claimarea) {
+		} else if (!playerData.getWarned("AbandonClaim") && costoverhead > 0) {
 			playerData.setWarned("AbandonClaim");
 			GriefPrevention.sendMessage(player, TextMode.Warn, Messages.AbandonCostWarning, String.valueOf(costoverhead));
 		}
@@ -103,7 +103,7 @@ public class AbandonClaimCommand extends GriefPreventionCommand {
 				GriefPrevention.instance.restoreClaim(claim, 20L * 60 * 2);
 			}
 			// remove the interest cost, and message the player.
-			if (costoverhead > 0) {
+			if (costoverhead > 0 && claim.parent==null) {
 				playerData.accruedClaimBlocks -= costoverhead;
 				//
 				GriefPrevention.sendMessage(player, TextMode.Warn, Messages.AbandonCost, 0, String.valueOf(costoverhead));

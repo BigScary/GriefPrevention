@@ -628,6 +628,7 @@ class EntityEventHandler implements Listener {
 
 		boolean isWither = explodingEntity != null && (explodingEntity instanceof WitherSkull || explodingEntity instanceof Wither);
 
+        boolean isEnderDragon = explodingEntity !=null && (explodingEntity instanceof EnderDragon);
 		ClaimBehaviourData preExplodeCheck = null;
 
 		if (isCreeper) {
@@ -636,6 +637,9 @@ class EntityEventHandler implements Listener {
 			preExplodeCheck = wc.getWitherExplosionBehaviour();
 		else if (isTNT)
 			preExplodeCheck = wc.getTNTExplosionBehaviour();
+        else if(isEnderDragon){
+            preExplodeCheck = wc.getEnderDragonDamageBehaviour();
+        }
 		else
 			preExplodeCheck = wc.getOtherExplosionBehaviour();
 
@@ -651,27 +655,12 @@ class EntityEventHandler implements Listener {
 			usebehaviour = wc.getCreeperExplosionBlockDamageBehaviour();
 		else if (isWither)
 			usebehaviour = wc.getWitherExplosionBlockDamageBehaviour();
+        else if(isEnderDragon){
+            usebehaviour = wc.getEnderDragonDamageBlocksBehaviour();
+        }
 		else if (isTNT){
 			usebehaviour = wc.getTNTExplosionBlockDamageBehaviour();
-            /*if(wc.getTNTCoalesceBehaviour().Allowed(explodeEvent.getLocation(), null).Allowed()
-                    && ! HandledEntities.contains(explodeEvent.getEntity())
-                    ){
-                  //try to coalesce nearby TNTPrimed Entities.
-                 //count nearby TNTPrimed and add 25% more power for each.
-                //we only do this if the entity being kerploded isn't a "handled" entity.
-
-                 float powerfactor = this.getCoalescedPower(explodeEvent.getEntity(),5,true);
-                 //generate a new TNTPrimed with a lower fuse time in this position, and set it to have a higher yield.
-                TNTPrimed newTNT = (TNTPrimed)(explodeEvent.getEntity().getWorld().spawnEntity(explodeEvent.getEntity().getLocation(),EntityType.PRIMED_TNT));
-                HandledEntities.add(newTNT);
-                newTNT.setFuseTicks(2);
-                float newYield= newTNT.getYield()*powerfactor;
-                newTNT.setYield(newYield);
-
-            } else if(HandledEntities.contains(explodeEvent.getEntity())){
-                HandledEntities.remove(explodeEvent.getEntity());
-            } */
-		}
+        }
 		else
 			usebehaviour = wc.getOtherExplosionBlockDamageBehaviour();
 		Claim claimpos = GriefPrevention.instance.dataStore.getClaimAt(explodeEvent.getLocation(),true);
