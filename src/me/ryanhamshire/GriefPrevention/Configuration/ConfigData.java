@@ -60,7 +60,16 @@ public class ConfigData {
 	private String TemplateFile;
 
 	private HashMap<String, WorldConfig> WorldCfg = new HashMap<String, WorldConfig>();
-
+    private boolean GlobalPVP = true;
+    private boolean GlobalSiege = true;
+    private boolean GlobalSpam = true;
+    private boolean GlobalClaims = true;
+    public boolean getGlobalPVPEnabled(){ return GlobalPVP;}
+    public boolean getGlobalSiegeEnabled(){ return GlobalSiege;}
+    public boolean getGlobalSpamEnabled(){ return GlobalSpam;}
+    public boolean getGlobalClaimsEnabled(){ return GlobalClaims;}
+    private boolean AllowAutomaticMigration =false;
+    public boolean getAllowAutomaticMigration(){ return AllowAutomaticMigration;}
 	private String WorldConfigLocation = null;
     private List<String> DisabledGPCommands = new ArrayList<String>();
 	public List<String> getDisabledGPCommands() { return DisabledGPCommands;}
@@ -91,6 +100,16 @@ public class ConfigData {
 			TemplateFile = DefaultTemplateFile;
 
 		}
+        this.GlobalClaims = CoreConfig.getBoolean("GriefPrevention.GlobalClaimsEnabled",true);
+        this.GlobalPVP = CoreConfig.getBoolean("GriefPrevention.GlobalPVPEnabled",true);
+        this.GlobalSiege = CoreConfig.getBoolean("GriefPrevention.GlobalSiegeEnabled",true);
+        this.GlobalSpam = CoreConfig.getBoolean("GriefPrevention.GlobalSpamEnabled",true);
+        this.AllowAutomaticMigration = CoreConfig.getBoolean("GriefPrevention.AllowAutomaticMigration",true);
+        CoreConfig.set("GriefPrevention.GlobalClaimsEnabled",GlobalClaims);
+        CoreConfig.set("GriefPrevention.GlobalPVPEnabled",GlobalPVP);
+        CoreConfig.set("GriefPrevention.GlobalSiegeEnabled",GlobalSiege);
+        CoreConfig.set("GriefPrevention.GlobalSpamEnabled",GlobalSpam);
+        CoreConfig.set("GriefPrevention.AllowAutomaticMigration",AllowAutomaticMigration);
         this.DisabledGPCommands = CoreConfig.getStringList("GriefPrevention.DisabledCommands");
         outConfig.set("GriefPrevention.DisabledCommands",DisabledGPCommands);
 

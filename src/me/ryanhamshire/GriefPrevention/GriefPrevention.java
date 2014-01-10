@@ -966,7 +966,8 @@ public class GriefPrevention extends JavaPlugin {
 						exx.printStackTrace();
 					}
 				}
-				if (FlatFileDataStore.hasData() && databaseStore != null) {
+                boolean allowmigrate = GriefPrevention.instance.Configuration.getAllowAutomaticMigration();
+				if (FlatFileDataStore.hasData() && databaseStore != null && allowmigrate) {
 					GriefPrevention.AddLogEntry("There appears to be some data on the hard drive.  Migrating that data to the database...");
 					FlatFileDataStore flatFileStore = new FlatFileDataStore();
 					flatFileStore.migrateData(databaseStore);
@@ -974,6 +975,9 @@ public class GriefPrevention extends JavaPlugin {
 					databaseStore.close();
 					databaseStore = new DatabaseDataStore(DataSettings, DataSettings);
 				}
+                else if(!allowmigrate){
+                    GriefPrevention.AddLogEntry("Flat File data detected. This data will NOT be migrated, because GriefPrevention.AllowAutomaticMigration is set to false.");
+                }
 
 				this.dataStore = databaseStore;
 			} catch (Exception e) {

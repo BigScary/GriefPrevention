@@ -18,12 +18,8 @@
 
 package me.ryanhamshire.GriefPrevention;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.nio.channels.FileChannel;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -150,41 +146,85 @@ public class FlatFileDataStore extends DataStore {
 			return "";
 		}
 	}
-    private String getPlayerDataFile(String sPlayerName){
-        return getPlayerDataFile(sPlayerName,true);
+    public static void copyFile(File sourceFile, File destFile) throws IOException {
+        if(!destFile.exists()) {
+            destFile.createNewFile();
+        }
+
+        FileChannel source = null;
+        FileChannel destination = null;
+
+        try {
+            source = new FileInputStream(sourceFile).getChannel();
+            destination = new FileOutputStream(destFile).getChannel();
+            destination.transferFrom(source, 0, source.size());
+        }
+        finally {
+            if(source != null) {
+                source.close();
+            }
+            if(destination != null) {
+                destination.close();
+            }
+        }
     }
-	private String getPlayerDataFile(String sPlayerName,boolean ForceLowerCase) {
+
+
+	private String getPlayerDataFile(String sPlayerName) {
         String usename = sPlayerName;
-        if(ForceLowerCase) usename = usename.toLowerCase();
-		return playerDataFolderPath + File.separator + usename;
+
+
+        String strPath = playerDataFolderPath + File.separator;
+        String scaseSensitive = strPath + sPlayerName;
+        String scaseInsensitive = strPath +sPlayerName.toLowerCase();
+        File examinepath = new File(strPath);
+
+        File CaseSensitive = null;
+        File CaseInsensitive=null;
+        //search for file.
+        for(File iterate:examinepath.listFiles()){
+            //if it equals the name case-sensitively,
+            if(iterate.getName().equals(sPlayerName)){
+                //assign our case sensitive name
+                CaseSensitive=iterate;
+            }
+            else if(iterate.getName().equalsIgnoreCase(sPlayerName)){
+                //otherwise assign our case insensitive name.
+                CaseInsensitive = iterate;
+            }
+        }
+        if(CaseSensitive!=null){
+            try {
+           copyFile(CaseSensitive,new File(scaseInsensitive));
+            }
+            catch(IOException iox){
+                //ignore
+            }
+        }
+        return scaseInsensitive;
+
+
+
 	}
 
 	@Override
 	synchronized PlayerData getPlayerDataFromStorage(String playerName) {
+
         //if the file exists when we check for the specific casing, use that file.
         //On Windows machines the FS will not be case sensitive, however, for *nix based machines
         //the file systems and the file I/O API are case sensitive. We save data lowercase now
         //however previous installations may have upper-cased filenames. Thus we will
         //look for the filename for the file that it would be named if we create the path
         //with a case-insensitive player name.
-        File Casesensitive = new File(getPlayerDataFile(playerName,false));
+
+        File CaseInsensitive = new File(getPlayerDataFile(playerName));
         //convert to lowercase.
-        playerName = playerName.toLowerCase();
+
         File playerFile;
         //if the case insensitive file exists, use it as the playerFile.
 
-        if(Casesensitive.exists()) {
-            playerFile = Casesensitive;
-            File CaseInsensitive = new File(getPlayerDataFile(playerName));
-            if(CaseInsensitive.exists() && !(Casesensitive.equals(CaseInsensitive))){
-                //delete the case insensitive version.
-                //CaseInsensitive.delete();
-            }
 
-        }
-        else
-        //otherwise, grab the case insensitive file.
-		playerFile = new File(getPlayerDataFile(playerName));
+		playerFile = CaseInsensitive;
 
 
 		PlayerData playerData = new PlayerData();

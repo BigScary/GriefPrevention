@@ -2196,7 +2196,7 @@ class PlayerEventHandler implements Listener {
 					}
 				}
 			}
-			if (isHorse(entity)) {
+			if (isHorse(entity) && wc.getHorseTrust()!= WorldConfig.HorseTrustConstants.Disabled) {
                 Debugger.Write("Horse Detected.",DebugLevel.Verbose);
 				Horse h = (Horse) entity;
 
@@ -2229,7 +2229,7 @@ class PlayerEventHandler implements Listener {
 
                             boolean SpecialHorseTrust = true;
 
-                            if(wc.getHorseTrust()){
+                            if(wc.getHorseTrust()== WorldConfig.HorseTrustConstants.Extended){
 
                             boolean HasTrust = false;
                             Claim targetclaim = GriefPrevention.instance.dataStore.getClaimAt(h.getLocation(),true);
