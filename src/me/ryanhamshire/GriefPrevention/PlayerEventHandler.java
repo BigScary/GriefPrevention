@@ -934,8 +934,9 @@ class PlayerEventHandler implements Listener {
         return new Location(ev.getClickedBlock().getWorld(),uselocation.getX()+xoffset,uselocation.getY()+yoffset,uselocation.getZ()+zoffset);
     }
     private Material[] IgnoreInteractionMaterials = new Material[]{Material.SIGN_POST,Material.SIGN,Material.WALL_SIGN};
+    
 	// when a player interacts with the world
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.NORMAL)
 	void onPlayerInteract(PlayerInteractEvent event) {
         Debugger.Write("onPlayerInteract",DebugLevel.Verbose);
 		if (event == null)
