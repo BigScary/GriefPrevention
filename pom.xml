@@ -56,25 +56,20 @@
         <dependency>
             <groupId>org.bukkit</groupId>
             <artifactId>bukkit</artifactId>
-            <version>${mc-ver}-${bukkit-ver}</version>
-            <type>jar</type>
-            <scope>compile</scope>
+            <version>1.6.4-R0.1-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>net.milkbowl.vault</groupId>
             <artifactId>Vault</artifactId>
-            <version>${vault-ver}</version>
-            <scope>provided</scope>
+            <version>1.2.16</version>
             <optional>true</optional>
         </dependency>
         
         <dependency>
-            <groupId>com.onarandombox</groupId>
-            <artifactId>MultiverseCore</artifactId>
-            <version>${mv-ver}</version>
-            <scope>provided</scope>
-            <optional>true</optional>
+        	<groupId>org.multiverse</groupId>
+        	<artifactId>multiverse-core</artifactId>
+        	<version>0.7.0</version>
         </dependency>
     </dependencies>
 
