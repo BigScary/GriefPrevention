@@ -501,7 +501,7 @@ public class GriefPrevention extends JavaPlugin {
 		if (forEntity instanceof Chicken) {
 			return new Material[] { Material.SEEDS };
 		} else if (forEntity instanceof Pig) {
-			return new Material[] { Material.CARROT };
+			return new Material[] { Material.CARROT_ITEM };
 		} else if (forEntity instanceof Sheep || forEntity instanceof Cow || forEntity instanceof MushroomCow) {
 			return new Material[] { Material.WHEAT };
 		} else if (forEntity instanceof Horse) {
