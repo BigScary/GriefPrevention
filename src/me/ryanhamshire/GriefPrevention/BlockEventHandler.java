@@ -126,7 +126,7 @@ public class BlockEventHandler implements Listener {
 	}
 
 	// when a player breaks a block...
-	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.NORMAL)
 	public void onBlockBreak(BlockBreakEvent breakEvent) {
         boolean DoCancelEvent = false;
         ClaimBehaviourData cbd = null;
@@ -238,7 +238,7 @@ public class BlockEventHandler implements Listener {
 	}
 
 	// blocks are not destroyed by fire, unless configured to do so
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.NORMAL)
 	public void onBlockBurn(BlockBurnEvent burnEvent) {
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(burnEvent.getBlock().getWorld().getName());
 		if(!wc.Enabled()) return;
@@ -365,7 +365,7 @@ public class BlockEventHandler implements Listener {
         }
 	}
 
-	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.NORMAL)
 	public void onBlockFromTo(BlockFromToEvent spreadEvent) {
 		
 		
@@ -450,7 +450,7 @@ public class BlockEventHandler implements Listener {
     }
 	// blocks are ignited ONLY by flint and steel (not by being near lava, open
 	// flames, etc), unless configured otherwise
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.NORMAL)
 	public void onBlockIgnite(BlockIgniteEvent igniteEvent) {
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(igniteEvent.getBlock().getWorld());
 		if(!wc.Enabled()) return;
@@ -483,7 +483,7 @@ public class BlockEventHandler implements Listener {
 
 	
 	
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.NORMAL)
 	public void onBlockPhysics(BlockPhysicsEvent event) {
 
 		// determine if location is inside a claim.
@@ -493,7 +493,7 @@ public class BlockEventHandler implements Listener {
 	}
 
 	// blocks "pushing" other players' blocks around (pistons)
-	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.NORMAL)
 	public void onBlockPistonExtend(BlockPistonExtendEvent event) {
 		List<Block> blocks = event.getBlocks();
 
@@ -585,7 +585,7 @@ public class BlockEventHandler implements Listener {
 
 	// blocks theft by pulling blocks out of a claim (again pistons)
 	boolean retracting=false;
-	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.NORMAL)
 	public void onBlockPistonRetract(BlockPistonRetractEvent event) {
 		// we only care about sticky pistons
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(event.getBlock().getWorld());
@@ -858,7 +858,7 @@ public class BlockEventHandler implements Listener {
 
 	// fire doesn't spread unless configured to, but other blocks still do
 	// (mushrooms and vines, for example)
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.NORMAL)
 	public void onBlockSpread(BlockSpreadEvent spreadEvent) {
 
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(spreadEvent.getBlock().getWorld());
@@ -901,7 +901,7 @@ public class BlockEventHandler implements Listener {
 
 	// ensures dispensers can't be used to dispense a block(like water or lava)
 	// or item across a claim boundary
-	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.NORMAL)
 	public void onDispense(BlockDispenseEvent dispenseEvent) {
 
 		// from where?

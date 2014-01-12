@@ -81,7 +81,7 @@ class EntityEventHandler implements Listener {
 	}
 
 	// don't allow endermen to change blocks
-	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.NORMAL)
 	public void onEntityChangeBlock(EntityChangeBlockEvent event) {
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(event.getEntity().getWorld());
 		if(!wc.Enabled()) return;
@@ -602,7 +602,7 @@ class EntityEventHandler implements Listener {
 	}
 
     private Set<Entity> HandledEntities = new HashSet<Entity>();
-	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.NORMAL)
     public void onEntityExplode(EntityExplodeEvent explodeEvent) {
 
 
@@ -767,7 +767,7 @@ class EntityEventHandler implements Listener {
 	/**
 	 * @param event
 	 */
-	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.NORMAL)
 	public void onEntityInteract(EntityInteractEvent event) {
         Debugger.Write("onEntityInteract, instance:" + event.getEntity().getClass().getName(), Debugger.DebugLevel.Verbose);
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(event.getEntity().getWorld());
@@ -858,7 +858,7 @@ class EntityEventHandler implements Listener {
 	}
 
 	// when an entity picks up an item
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.NORMAL)
 	public void onEntityPickup(EntityChangeBlockEvent event) {
 		// FEATURE: endermen don't steal claimed blocks
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(event.getEntity().getWorld());
@@ -874,7 +874,7 @@ class EntityEventHandler implements Listener {
 	}
 
 	// when a creature spawns...
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.NORMAL)
 	public void onEntitySpawn(CreatureSpawnEvent event) {
 
 		LivingEntity entity = event.getEntity();
@@ -940,7 +940,7 @@ class EntityEventHandler implements Listener {
 	}
 
 	// when an experience bottle explodes...
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.NORMAL)
 	public void onExpBottle(ExpBottleEvent event) {
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(event.getEntity().getWorld());
 		if (!wc.Enabled())
@@ -953,7 +953,7 @@ class EntityEventHandler implements Listener {
 	}
 
 	// when a painting is broken
-	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.NORMAL)
 	public void onHangingBreak(HangingBreakEvent event) {
 		// FEATURE: claimed paintings are protected from breakage
         Debugger.Write("onHangingBreak", Debugger.DebugLevel.Verbose);
@@ -993,7 +993,7 @@ class EntityEventHandler implements Listener {
 	/*
 	 * //when an entity explodes...
 	 * 
-	 * @EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
+	 * @EventHandler(ignoreCancelled = true, priority = EventPriority.NORMAL)
 	 * public void onEntityExplode(EntityExplodeEvent explodeEvent) {
 	 * 
 	 * List<Block> blocks = explodeEvent.blockList(); Location location =
@@ -1067,7 +1067,7 @@ class EntityEventHandler implements Listener {
 	 * GriefPrevention.instance.handleLogBroken(block); } } }
 	 */
 	// when an item spawns...
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.NORMAL)
 	public void onItemSpawn(ItemSpawnEvent event) {
 		// precheck: always allow Droppers to drop items when triggered.
 		// We do this by seeing of there is a Dropper within a few blocks of the
@@ -1126,7 +1126,7 @@ class EntityEventHandler implements Listener {
         return new Location(ev.getBlock().getWorld(),uselocation.getX()+xoffset,uselocation.getY()+yoffset,uselocation.getZ()+zoffset);
     }
 	// when a painting is placed...
-	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.NORMAL)
 	public void onPaintingPlace(HangingPlaceEvent event) {
 		// FEATURE: similar to above, placing a painting requires build
 		// permission in the claim
@@ -1173,7 +1173,7 @@ class EntityEventHandler implements Listener {
 	}
 
 	// when a vehicle is damaged
-	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.NORMAL)
 	public void onVehicleDamage(VehicleDamageEvent event) {
 		
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(event.getVehicle().getWorld());
@@ -1225,7 +1225,7 @@ class EntityEventHandler implements Listener {
 	}
 
 	// don't allow zombies to break down doors
-	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.NORMAL)
 	public void onZombieBreakDoor(EntityBreakDoorEvent event) {
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(event.getEntity().getWorld());
 		if (!wc.Enabled())

@@ -465,7 +465,7 @@ class PlayerEventHandler implements Listener {
 	}
 
 	// block players from entering beds they don't have permission for
-	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.NORMAL)
 	public void onPlayerBedEnter(PlayerBedEnterEvent bedEvent) {
 
 		Player player = bedEvent.getPlayer();
@@ -494,7 +494,7 @@ class PlayerEventHandler implements Listener {
 	}
 
 	// block use of buckets within other players' claims
-	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.NORMAL)
 	public void onPlayerBucketEmpty(PlayerBucketEmptyEvent bucketEvent) {
 		Player player = bucketEvent.getPlayer();
 		Block block = bucketEvent.getBlockClicked().getRelative(bucketEvent.getBlockFace());
@@ -608,7 +608,7 @@ class PlayerEventHandler implements Listener {
 	}
 
 	// see above
-	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.NORMAL)
 	public void onPlayerBucketFill(PlayerBucketFillEvent bucketEvent) {
 		try {
 			Player player = bucketEvent.getPlayer();
@@ -646,7 +646,7 @@ class PlayerEventHandler implements Listener {
 	}
 
 	// when a player chats, monitor for spam
-	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
 	synchronized void onPlayerChat(AsyncPlayerChatEvent event) {
 
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(event.getPlayer().getWorld());
@@ -704,7 +704,7 @@ class PlayerEventHandler implements Listener {
 	private Map<String,String> BanLookups = new HashMap<String,String>();
 	
 	// when a player uses a slash command...
-	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.NORMAL)
 	synchronized void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event) {
 
 		String[] args = event.getMessage().split(" ");
@@ -761,7 +761,7 @@ class PlayerEventHandler implements Listener {
 	}
 
 	// when a player dies...
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.NORMAL)
 	void onPlayerDeath(PlayerDeathEvent event) {
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(event.getEntity().getWorld());
 		if (!wc.Enabled())
@@ -893,7 +893,7 @@ class PlayerEventHandler implements Listener {
 	}
 
 	// when a player drops an item
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.NORMAL)
 	public void onPlayerDropItem(PlayerDropItemEvent event) {
 		Player player = event.getPlayer();
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(player.getWorld());
@@ -2116,7 +2116,7 @@ class PlayerEventHandler implements Listener {
 	}
 
 	// when a player interacts with an entity...
-	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.NORMAL)
 	public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
 		try {
             Debugger.Write("onPlayerInteractEntity, instance:" + event.getRightClicked().getClass().getName(), Debugger.DebugLevel.Verbose);
@@ -2594,7 +2594,7 @@ class PlayerEventHandler implements Listener {
 	}
 
 	// when a player picks up an item...
-	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.NORMAL)
 	public void onPlayerPickupItem(PlayerPickupItemEvent event) {
 		// we allow plugins to give players items regardless.
 		// eg: this only prevents "true" pickups.
@@ -2684,7 +2684,7 @@ class PlayerEventHandler implements Listener {
 		GriefPrevention.instance.checkPvpProtectionNeeded(event.getPlayer());
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.NORMAL)
 	public void onPlayerShearEntity(PlayerShearEntityEvent event) {
 
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(event.getEntity().getWorld());
@@ -2699,7 +2699,7 @@ class PlayerEventHandler implements Listener {
 	}
 
 	// when a player teleports
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.NORMAL)
 	public void onPlayerTeleport(PlayerTeleportEvent event) {
 		Player player = event.getPlayer();
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(player.getWorld());

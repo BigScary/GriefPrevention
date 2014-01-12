@@ -29,7 +29,7 @@ public class BuySellClaimBlocks extends GriefPreventionCommand {
 
 		
 		GriefPrevention inst = GriefPrevention.instance;
-		if (command.getName().equalsIgnoreCase("buyclaimblocks") && player != null) {
+		if (command.getName().equalsIgnoreCase("buyclaimblocks") ) {
 			// if economy is disabled, don't do anything
 			if (GriefPrevention.economy == null) {
 				GriefPrevention.sendMessage(player, TextMode.Err, Messages.BuySellNotConfigured);
@@ -103,7 +103,7 @@ public class BuySellClaimBlocks extends GriefPreventionCommand {
 		}
 
 		// sellclaimblocks <amount>
-		else if (command.getName().equalsIgnoreCase("sellclaimblocks") && player != null) {
+		else if (command.getName().equalsIgnoreCase("sellclaimblocks") ) {
 			// if economy is disabled, don't do anything
 			if (GriefPrevention.economy == null) {
 				GriefPrevention.sendMessage(player, TextMode.Err, Messages.BuySellNotConfigured);
