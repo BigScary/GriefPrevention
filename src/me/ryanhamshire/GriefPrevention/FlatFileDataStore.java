@@ -193,7 +193,7 @@ public class FlatFileDataStore extends DataStore {
                 CaseInsensitive = iterate;
             }
         }
-        if(CaseSensitive!=null){
+        if(CaseSensitive!=null && !scaseInsensitive.equals(scaseSensitive)){
             try {
            copyFile(CaseSensitive,new File(scaseInsensitive));
             }
@@ -278,16 +278,20 @@ public class FlatFileDataStore extends DataStore {
 				// fourth line is a double-semicolon-delimited list of claims,
 				// which is currently ignored
 				// String claimsString = inStream.readLine();
+                try {
 				inStream.readLine();
                 String playerinventoryclear = inStream.readLine();
                 playerData.ClearInventoryOnJoin = Boolean.parseBoolean(playerinventoryclear);
+                }
+                catch(Exception exx){} //do nothing, seems like there was no value. Oh well.
 				inStream.close();
 			}
 
 			// if there's any problem with the file's content, log an error
 			// message
 			catch (Exception e) {
-				GriefPrevention.AddLogEntry("Unable to load data for player \"" + playerName + "\": " + e.getMessage());
+				GriefPrevention.AddLogEntry("Unable to load data for player \"" + playerName + "\": ");
+
 			}
 
 			try {
