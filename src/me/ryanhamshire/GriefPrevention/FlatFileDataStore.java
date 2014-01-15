@@ -147,6 +147,7 @@ public class FlatFileDataStore extends DataStore {
 		}
 	}
     public static void copyFile(File sourceFile, File destFile) throws IOException {
+
         if(!destFile.exists()) {
             destFile.createNewFile();
         }
@@ -184,7 +185,7 @@ public class FlatFileDataStore extends DataStore {
         //search for file.
         for(File iterate:examinepath.listFiles()){
             //if it equals the name case-sensitively,
-            if(iterate.getName().equals(sPlayerName)){
+            if(iterate.getName().startsWith(sPlayerName)){
                 //assign our case sensitive name
                 CaseSensitive=iterate;
             }
@@ -196,6 +197,8 @@ public class FlatFileDataStore extends DataStore {
         if(CaseSensitive!=null && !scaseInsensitive.equals(scaseSensitive)){
             try {
            copyFile(CaseSensitive,new File(scaseInsensitive));
+               //CaseInsensitive.renameTo(new File(scaseInsensitive + "-backup"));
+                CaseInsensitive.delete();
             }
             catch(IOException iox){
                 //ignore

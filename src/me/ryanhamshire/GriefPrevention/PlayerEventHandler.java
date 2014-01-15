@@ -29,6 +29,7 @@ import me.ryanhamshire.GriefPrevention.Configuration.ClaimBehaviourData.ClaimAll
 import me.ryanhamshire.GriefPrevention.Configuration.ItemUsageRules;
 import me.ryanhamshire.GriefPrevention.Configuration.WorldConfig;
 import me.ryanhamshire.GriefPrevention.tasks.EquipShovelProcessingTask;
+import me.ryanhamshire.GriefPrevention.tasks.PermCheckTask;
 import me.ryanhamshire.GriefPrevention.tasks.PlayerKickBanTask;
 import me.ryanhamshire.GriefPrevention.visualization.Visualization;
 import me.ryanhamshire.GriefPrevention.visualization.VisualizationType;
@@ -116,6 +117,13 @@ class PlayerEventHandler implements Listener {
 			transparentMaterials.add(Byte.valueOf((byte) Material.LEVER.getId()));
 		}
 	}
+    private boolean checkPermission(Player p,String permission){
+        final Boolean permissionresult;
+        PermCheckTask pct = new PermCheckTask(p,permission);
+        Bukkit.getScheduler().runTask(GriefPrevention.instance,pct);
+        return pct.CheckResult;
+
+    }
     String sIgnoreRegExp = "\\signore\\s|\\sban\\s|\\sshut up\\s|\\sbe quiet\\s|\\splease ban\\s|\\splease kick\\s";
     Pattern IgnoreRegExp = Pattern.compile(sIgnoreRegExp);
 
@@ -137,7 +145,7 @@ class PlayerEventHandler implements Listener {
 			this.howToClaimPattern = Pattern.compile(GriefPrevention.instance.dataStore.getMessage(Messages.HowToClaimRegex), Pattern.CASE_INSENSITIVE);
 		}
 		Messages showclaimmessage = null;
-		if (this.howToClaimPattern.matcher(message).matches() && player.hasPermission(PermNodes.CreateClaimsShovelPermission)) {
+		if (this.howToClaimPattern.matcher(message).matches() && checkPermission(player,PermNodes.CreateClaimsShovelPermission)) {
 			if (GriefPrevention.instance.creativeRulesApply(player.getLocation())) {
 				showclaimmessage = Messages.CreativeBasicsDemoAdvertisement;
 
@@ -194,7 +202,7 @@ class PlayerEventHandler implements Listener {
 
 
 		if (!message.contains("/trapped") && (message.contains("trapped") || message.contains("stuck") || message.contains(GriefPrevention.instance.dataStore.getMessage(Messages.TrappedChatKeyword)))) {
-			if(player.hasPermission(PermNodes.getCommandPermission("trapped"))){
+			if(checkPermission(player,PermNodes.getCommandPermission("trapped"))){
                 final PlayerData pdata = GriefPrevention.instance.dataStore.getPlayerData(player.getName());
                 // if not set to ignore the stuck message, show it, set the ignore
                 // flag, and set an anonymous runnable to reset it after the
@@ -221,7 +229,7 @@ class PlayerEventHandler implements Listener {
 
 		// if the player has permission to spam, don't bother even examining the
 		// message
-		if (player.hasPermission(PermNodes.SpamPermission))
+		if (checkPermission(player,PermNodes.SpamPermission))
 			return false;
 
 		boolean spam = false;
@@ -1261,24 +1269,33 @@ class PlayerEventHandler implements Listener {
 				return;
 			}
 		}
+        else if(clickedBlockType==Material.GRASS && player.getItemInHand()!=null && player.getItemInHand().getType()==Material.INK_SACK){
 
-		// otherwise handle right click (shovel, stick, bonemeal)
+                if (wc.getBonemealGrassRules().Allowed(relevantPosition, event.getPlayer()).Denied()) {
+                    event.setCancelled(true);
+                }
+                return;
+
+        }
+        else if (GriefPrevention.isMCVersionorLater(GriefPrevention.MinecraftVersions.MC17) &&
+                clickedBlockType==Material.LONG_GRASS &&
+                player.getItemInHand().getType()==Material.INK_SACK){
+           //MC 1.7 let's you grow tall grass to double height.
+            if (wc.getBonemealGrassRules().Allowed(relevantPosition, event.getPlayer()).Denied()) {
+                event.setCancelled(true);
+            }
+            return;
+        }
+
 		else {
 			// ignore all actions except right-click on a block or in the air
 			Action action = event.getAction();
+            Material materialInHand=null;
+            if(player.getItemInHand()!=null) materialInHand = player.getItemInHand().getType();
 			if (action != Action.RIGHT_CLICK_BLOCK && action != Action.RIGHT_CLICK_AIR)
 				return;
 
-			// what's the player holding?
-			Material materialInHand = player.getItemInHand().getType();
 
-
-			if (materialInHand == Material.INK_SACK) {
-				if (wc.getBonemealGrassRules().Allowed(relevantPosition, event.getPlayer()).Denied()) {
-					event.setCancelled(true);
-				}
-				return;
-			}
 
 			else if (materialInHand == Material.BOAT) {
 				Claim claim = GriefPrevention.instance.dataStore.getClaimAt(relevantPosition, false);
@@ -2102,7 +2119,7 @@ class PlayerEventHandler implements Listener {
 					if (wc.getClaimsPerPlayerLimit() > 0 && !player.hasPermission(PermNodes.IgnoreClaimsLimitPermission)) {
 						int numclaims = playerData.getWorldClaims(player.getWorld()).size();
 						int remaining = wc.getClaimsPerPlayerLimit() - numclaims;
-						System.out.println("Sending notification that Player has " + remaining + " Claims left in this world.");
+						System.out.println("Sending notification that Player(" + player.getName() + "  has " + remaining + " Claims left in this world.");
 						GriefPrevention.sendMessage(player, TextMode.Success, Messages.RemainingClaimsWorld, String.valueOf(remaining));
 
 					}
@@ -2110,6 +2127,7 @@ class PlayerEventHandler implements Listener {
 					Visualization visualization = Visualization.FromClaim(result.claim, clickedBlock.getY(), VisualizationType.Claim, player.getLocation());
 					Visualization.Apply(player, visualization);
 					playerData.lastShovelLocation = null;
+
 				}
 			}
 		}

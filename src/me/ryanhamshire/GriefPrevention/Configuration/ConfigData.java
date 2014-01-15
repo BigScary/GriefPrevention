@@ -64,10 +64,12 @@ public class ConfigData {
     private boolean GlobalSiege = true;
     private boolean GlobalSpam = true;
     private boolean GlobalClaims = true;
+    private boolean GlobalSmartBan = true;
     public boolean getGlobalPVPEnabled(){ return GlobalPVP;}
     public boolean getGlobalSiegeEnabled(){ return GlobalSiege;}
     public boolean getGlobalSpamEnabled(){ return GlobalSpam;}
     public boolean getGlobalClaimsEnabled(){ return GlobalClaims;}
+    public boolean getGlobalSmartBan() { return GlobalSmartBan;}
     private boolean AllowAutomaticMigration =false;
     public boolean getAllowAutomaticMigration(){ return AllowAutomaticMigration;}
 	private String WorldConfigLocation = null;

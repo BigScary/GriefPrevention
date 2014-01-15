@@ -1974,7 +1974,7 @@ public class WorldConfig {
     }
 
     public boolean getSmartBan() {
-        return config_smartBan;
+        return config_smartBan && GriefPrevention.instance.Configuration.getGlobalSmartBan();
     }
 
     public ClaimBehaviourData getSnowGolemSpawnBehaviour() {

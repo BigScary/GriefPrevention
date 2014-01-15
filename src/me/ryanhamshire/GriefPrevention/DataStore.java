@@ -993,6 +993,7 @@ public abstract class DataStore {
 	 * @return
 	 */
 	synchronized public PlayerData getPlayerData(String playerName) {
+        playerName=playerName.toLowerCase();
 		// first, look in memory
 		PlayerData playerData = this.playerNameToPlayerDataMap.get(playerName);
 
