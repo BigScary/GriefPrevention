@@ -806,13 +806,13 @@ class PlayerEventHandler implements Listener {
         //tweak: delay for 10 seconds before we perform this check...
 		if (wc.getPvPPunishLogout() && playerData.inPvpCombat()) {
             final PlayerInventory dcedInventory = player.getInventory();
-            playerData.ClearInventoryOnJoin=true;
+
             Bukkit.getScheduler().runTaskLater(GriefPrevention.instance, new Runnable() {
                   public void run(){
                       //if the last player this Player attacked is still online...
-                      if(Bukkit.getPlayerExact(playerData.lastPvpPlayer).isOnline() && !player.isOnline()){
+                      if(Bukkit.getPlayerExact(playerData.lastPvpPlayer).isOnline()){
                           //make sure they didn't relog, either.
-
+                          if(!player.isOnline())playerData.ClearInventoryOnJoin=true;
 
                           Player lastplayer = Bukkit.getPlayerExact(playerData.lastPvpPlayer);
 
@@ -860,7 +860,7 @@ class PlayerEventHandler implements Listener {
                 GriefPrevention.instance.dataStore.endSiege(playerData.siegeData,otherplayer.getName(),player.getName(),false,false);
 
 
-                playerData.ClearInventoryOnJoin=true;
+
                 Bukkit.getScheduler().runTaskLater(GriefPrevention.instance, new Runnable() {
                     public void run(){
                         Debugger.Write("Siege Disconnect Timer, player:" + player.getName(),DebugLevel.Informational);
@@ -868,6 +868,7 @@ class PlayerEventHandler implements Listener {
 
                         Debugger.Write("Other Player: " + otherplayer.getName(),DebugLevel.Informational);
                         if(otherplayer.isOnline()){
+                            if(!player.isOnline())playerData.ClearInventoryOnJoin=true;
 
                             //kill the disconnected player. They will have disconnected by this point, naturally.
 
