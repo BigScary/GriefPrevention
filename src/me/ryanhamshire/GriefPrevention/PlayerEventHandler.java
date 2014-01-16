@@ -860,7 +860,7 @@ class PlayerEventHandler implements Listener {
                 GriefPrevention.instance.dataStore.endSiege(playerData.siegeData,otherplayer.getName(),player.getName(),false,false);
 
 
-
+                playerData.ClearInventoryOnJoin=true;
                 Bukkit.getScheduler().runTaskLater(GriefPrevention.instance, new Runnable() {
                     public void run(){
                         Debugger.Write("Siege Disconnect Timer, player:" + player.getName(),DebugLevel.Informational);
@@ -868,9 +868,9 @@ class PlayerEventHandler implements Listener {
 
                         Debugger.Write("Other Player: " + otherplayer.getName(),DebugLevel.Informational);
                         if(otherplayer.isOnline()){
-                            playerData.ClearInventoryOnJoin=true;
+
                             //kill the disconnected player. They will have disconnected by this point, naturally.
-                            player.setHealth(0);
+
                             //I'm fairly certain this won't drop their items, since they DC'd.
                             //as such, let's hope we can access the inventory of offline players.
                             OfflinePlayer dcedplayer = Bukkit.getOfflinePlayer(playerData.lastPvpPlayer);
@@ -886,7 +886,7 @@ class PlayerEventHandler implements Listener {
                             }
 
                             player.getInventory().clear();
-
+                            player.setHealth(0);
                             GriefPrevention.instance.getServer().broadcastMessage(otherplayer.getName() + " has defeated " + player.getName() + " in siege warfare!");
 
 
