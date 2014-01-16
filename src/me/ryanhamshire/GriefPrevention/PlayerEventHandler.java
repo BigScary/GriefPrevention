@@ -806,14 +806,16 @@ class PlayerEventHandler implements Listener {
         //tweak: delay for 10 seconds before we perform this check...
 		if (wc.getPvPPunishLogout() && playerData.inPvpCombat()) {
             final PlayerInventory dcedInventory = player.getInventory();
+            playerData.ClearInventoryOnJoin=true;
             Bukkit.getScheduler().runTaskLater(GriefPrevention.instance, new Runnable() {
                   public void run(){
                       //if the last player this Player attacked is still online...
-                      if(Bukkit.getPlayerExact(playerData.lastPvpPlayer).isOnline()){
-                          playerData.ClearInventoryOnJoin=true;
+                      if(Bukkit.getPlayerExact(playerData.lastPvpPlayer).isOnline() && !player.isOnline()){
+                          //make sure they didn't relog, either.
+
+
                           Player lastplayer = Bukkit.getPlayerExact(playerData.lastPvpPlayer);
-                          //kill the disconnected player. They will have disconnected by this point, naturally.
-                          player.setHealth(0);
+
 
                           //I'm fairly certain this won't drop their items, since they DC'd.
                           //as such, let's hope we can access the inventory of offline players.
@@ -827,7 +829,8 @@ class PlayerEventHandler implements Listener {
                               if(is!=null && !(is.getType() == Material.AIR)) lastplayer.getWorld().dropItemNaturally(lastplayer.getLocation(),is);
                           }
                           player.getInventory().clear();
-
+                          //kill the disconnected player. They will have disconnected by this point, naturally.
+                          player.setHealth(0);
 
 
                       }
@@ -2460,6 +2463,7 @@ class PlayerEventHandler implements Listener {
 	void onPlayerJoin(PlayerJoinEvent event) {
 
 		Player player = event.getPlayer();
+        GriefPrevention.AddLogEntry("Player:" + player.getName() + " UUID:" + player.getUniqueId());
 		String playerName = player.getName();
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(player.getWorld());
 		if(!wc.Enabled()) return;
@@ -2631,7 +2635,7 @@ class PlayerEventHandler implements Listener {
 
 		// if we're preventing spawn camping and the player was previously empty
 		// handed...
-		if (wc.getSpawnProtectEnabled() && (player.getItemInHand().getType() == Material.AIR)) {
+		if (wc.getSpawnProtectEnabled() && (player.getItemInHand()==null || player.getItemInHand().getType() == Material.AIR)) {
 			// if that player is currently immune to pvp
 			PlayerData playerData = GriefPrevention.instance.dataStore.getPlayerData(event.getPlayer().getName());
 			if (playerData.pvpImmune) {

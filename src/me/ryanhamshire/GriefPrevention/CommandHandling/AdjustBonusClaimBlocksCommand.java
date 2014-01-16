@@ -43,8 +43,6 @@ public class AdjustBonusClaimBlocksCommand extends GriefPreventionCommand {
 
 			if (player != null)
 				GriefPrevention.sendMessage(player, TextMode.Success, Messages.AdjustGroupBlocksSuccess, permissionIdentifier, String.valueOf(adjustment), String.valueOf(newTotal));
-			if (player != null)
-				GriefPrevention.AddLogEntry(player.getName() + " adjusted " + permissionIdentifier + "'s bonus claim blocks by " + adjustment + ".");
 
 			return true;
 		}
