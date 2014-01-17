@@ -194,7 +194,7 @@ public class FlatFileDataStore extends DataStore {
                 CaseInsensitive = iterate;
             }
         }
-        if(CaseSensitive!=null && !scaseInsensitive.equals(scaseSensitive)){
+        if(CaseSensitive!=null && CaseInsensitive!=null &&  !scaseInsensitive.equals(scaseSensitive)){
             try {
            copyFile(CaseSensitive,new File(scaseInsensitive));
                //CaseInsensitive.renameTo(new File(scaseInsensitive + "-backup"));
