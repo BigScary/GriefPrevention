@@ -260,7 +260,7 @@ class EntityEventHandler implements Listener {
             {
                 return;
             }
-            if(claimatpos==null){
+            if(h.getOwner()!=null && claimatpos==null){
 
                 if(!attacker.getName().equals(h.getOwner().getName())){
                     //deny
