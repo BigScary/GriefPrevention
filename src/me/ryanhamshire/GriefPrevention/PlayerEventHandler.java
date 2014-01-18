@@ -810,9 +810,8 @@ class PlayerEventHandler implements Listener {
             Bukkit.getScheduler().runTaskLater(GriefPrevention.instance, new Runnable() {
                   public void run(){
                       //if the last player this Player attacked is still online...
-                      if(Bukkit.getPlayerExact(playerData.lastPvpPlayer).isOnline()){
+                      if(Bukkit.getPlayerExact(playerData.lastPvpPlayer).isOnline() && !player.isOnline()){
                           //make sure they didn't relog, either.
-                          if(!player.isOnline())playerData.ClearInventoryOnJoin=true;
 
                           Player lastplayer = Bukkit.getPlayerExact(playerData.lastPvpPlayer);
 
@@ -820,7 +819,7 @@ class PlayerEventHandler implements Listener {
                           //I'm fairly certain this won't drop their items, since they DC'd.
                           //as such, let's hope we can access the inventory of offline players.
                           OfflinePlayer dcedplayer = Bukkit.getOfflinePlayer(playerData.lastPvpPlayer);
-                          GriefPrevention.sendMessage(lastplayer,TextMode.Info,Messages.PvPLogAnnouncement,dcedplayer.toString());
+                          GriefPrevention.sendMessage(lastplayer,TextMode.Info,Messages.PvPLogAnnouncement,dcedplayer.getName());
 
                           for(ItemStack is:dcedInventory.getContents()){
                               if(is!=null && !(is.getType() == Material.AIR)) lastplayer.getWorld().dropItemNaturally(lastplayer.getLocation(),is);
@@ -867,7 +866,8 @@ class PlayerEventHandler implements Listener {
                         //get other player in the siege
 
                         Debugger.Write("Other Player: " + otherplayer.getName(),DebugLevel.Informational);
-                        if(otherplayer.isOnline()){
+
+                        if(otherplayer.isOnline() && !player.isOnline()){
                             if(!player.isOnline())playerData.ClearInventoryOnJoin=true;
 
                             //kill the disconnected player. They will have disconnected by this point, naturally.
@@ -2560,7 +2560,8 @@ class PlayerEventHandler implements Listener {
 	// when a player attempts to join the server...
 	@EventHandler(priority = EventPriority.HIGHEST)
 	void onPlayerLogin(PlayerLoginEvent event) {
-		Player player = event.getPlayer();
+		final Player player = event.getPlayer();
+        if(player==null) return; //wat
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(player.getWorld());
 		if(!wc.Enabled()) return;
 		// all this is anti-spam code
@@ -2600,19 +2601,33 @@ class PlayerEventHandler implements Listener {
 		playerData.ipAddress = event.getAddress();
 
         if(playerData.ClearInventoryOnJoin){
+
             //clear their inventory.
             //set the flag to false, we don't want to clear it again!
             playerData.ClearInventoryOnJoin=false;
 
             player.getInventory().clear();
-            player.getInventory().setArmorContents( new ItemStack[]{null,null,null,null});
+
+            player.getInventory().setArmorContents( new ItemStack[4]);
+
             //now we kill them off.
             //we clear it first so they do not drop their inventory, since it was already
             //given away by the PvP and/or siege handling logic.
-            player.setHealth(0);
-            Debugger.Write("Cleared Inventory of " + player.getName() + " as they joined.",DebugLevel.Verbose);
+            //we'll defer this functionality a few seconds. seems to cause an exception, presumably as
+            //bukkit has not initialized some internal structures for the player.
+            Bukkit.getScheduler().runTaskLater(GriefPrevention.instance,new Runnable(){
+                public void run(){
+                    PlayerInventory invent = player.getInventory();
+                    invent.clear();
+
+                    invent.setArmorContents( new ItemStack[4]);
+                    player.setHealth(0);
+                    Debugger.Write("Cleared Inventory of " + player.getName() + " as they joined.",DebugLevel.Verbose);
+                }},20);
 
         }
+
+
 
 	}
 
