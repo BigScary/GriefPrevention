@@ -2623,7 +2623,7 @@ class PlayerEventHandler implements Listener {
                     invent.setArmorContents( new ItemStack[4]);
                     player.setHealth(0);
                     Debugger.Write("Cleared Inventory of " + player.getName() + " as they joined.",DebugLevel.Verbose);
-                }},20);
+                }},1);
 
         }
 
