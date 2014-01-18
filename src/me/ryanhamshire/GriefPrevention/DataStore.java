@@ -1267,6 +1267,9 @@ public abstract class DataStore {
         this.addDefault(defaults,Messages.MountOtherPlayersHorse,"You have mounted {0}'s horse.","0:owner of horse");
         this.addDefault(defaults,Messages.NoPermission,"You cannot do that here.",null);
         this.addDefault(defaults,Messages.PvPLogAnnouncement,"{0} PvP Logged. I'm sure they won't miss their stuff...","0:Player Name");
+        this.addDefault(defaults,Messages.PvPPunishDefenderWarning,"{0} has engaged you in PVP combat! fight or run away, but if you log out while in combat you will lose your inventory!","0:player engaging combat");
+        this.addDefault(defaults,Messages.PvPPunishAttackerWarning,"You have engaged {0} in PVP combat! fight or run away, but if you log out while in combat you will lose your inventory!","0:player engaging combat");
+        this.addDefault(defaults,Messages.PvPLogoutSafely,"You are no longer PvP Flagged. You may safely logout.",null);
 
 		// load the config file
 		FileConfiguration config = YamlConfiguration.loadConfiguration(new File(messagesFilePath));

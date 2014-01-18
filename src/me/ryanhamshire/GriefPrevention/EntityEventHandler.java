@@ -25,6 +25,7 @@ import me.ryanhamshire.GriefPrevention.Configuration.ClaimBehaviourData.ClaimAll
 import me.ryanhamshire.GriefPrevention.Configuration.SiegeableData;
 import me.ryanhamshire.GriefPrevention.Configuration.WorldConfig;
 
+import me.ryanhamshire.GriefPrevention.tasks.PvPSafePlayerTask;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -386,10 +387,26 @@ class EntityEventHandler implements Listener {
 			// to avoid being defeated
 
 			long now = Calendar.getInstance().getTimeInMillis();
+            //if punishlogout is true, show a message. We don't
+            //want to spam them if they are fighting in a group and get attacked/defended from
+            //by different players,
+            if(!defenderData.inPvpCombat() ){
+                if(wc.getPvPPunishLogout() && defenderData.siegeData==null){
+                GriefPrevention.sendMessage(defender,TextMode.Warn, Messages.PvPPunishDefenderWarning, attacker.getName());
+                PvPSafePlayerTask.RunningTasks.add(new PvPSafePlayerTask(defender,wc.getPvPCombatTimeoutSeconds()*5)); //*5 for a quarter of the PVP timeout interval.
+                }
+            }
 			defenderData.lastPvpTimestamp = now;
 			defenderData.lastPvpPlayer = attacker.getName();
+            if(!attackerData.inPvpCombat()){
+                if(wc.getPvPPunishLogout() && attackerData.siegeData==null){
+                    GriefPrevention.sendMessage(attacker,TextMode.Warn, Messages.PvPPunishAttackerWarning, defender.getName());
+                    PvPSafePlayerTask.RunningTasks.add(new PvPSafePlayerTask(attacker,wc.getPvPCombatTimeoutSeconds()*5));
+                }
+            }
 			attackerData.lastPvpTimestamp = now;
 			attackerData.lastPvpPlayer = defender.getName();
+
 
 		}
 
