@@ -2042,7 +2042,7 @@ public class WorldConfig {
     }
 
     public boolean getSpamProtectionEnabled() {
-        return config_spam_enabled || GriefPrevention.instance.Configuration.getGlobalSpamEnabled();
+        return GriefPrevention.instance.Configuration.getGlobalSpamEnabled() &&  config_spam_enabled;
     }
 
     public int getSpamShortMessageMaxLength() {
