@@ -713,7 +713,7 @@ public class FlatFileDataStore extends DataStore {
 		BufferedWriter outStream = null;
 		try {
 			// open the player's file
-			File playerDataFile = new File(playerDataFolderPath + File.separator + playerName);
+			File playerDataFile = new File(playerDataFolderPath + File.separator + playerName.toLowerCase());
 			playerDataFile.createNewFile();
 			outStream = new BufferedWriter(new FileWriter(playerDataFile));
 

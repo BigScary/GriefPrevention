@@ -260,6 +260,8 @@ public class WorldConfig {
     private boolean config_eavesdrop;
 
     private boolean config_eavesdrop_bookdrop;
+    private boolean config_eavesdrop_books;
+    public boolean getEavesDropBooks(){ return config_eavesdrop_books;}
     // list of whisper commands to eavesdrop on
     private ArrayList<String> config_eavesdrop_whisperCommands;
 
@@ -1019,6 +1021,9 @@ public class WorldConfig {
 
         this.config_eavesdrop_bookdrop = config.getBoolean("GriefPrevention.Eavesdrop.BookDrop", false);
         outConfig.set("GriefPrevention.Eavesdrop.BookDrop", false);
+        this.config_eavesdrop_books = config.getBoolean("GriefPrevention.Eavesdrop.Books",true);
+        outConfig.set("GriefPrevention.Eavesdrop.Books",config_eavesdrop_books);
+
         outConfig.set("GriefPrevention.Eavesdrop.WhisperCommands", whisperCommandsToMonitor);
 
         this.config_smartBan = config.getBoolean("GriefPrevention.SmartBan", true);

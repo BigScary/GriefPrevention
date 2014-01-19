@@ -196,6 +196,11 @@ commands:
       description: sets GriefPrevention debug options. 
       usage: /gpdebug <option> <value>
       permission: griefprevention.commands.gpdebug
+   viewbook:
+      description: Allows copying of books for eavesdropping purposes. 
+      usage: /viewbook <id>
+      permission: griefprevention.commands.viewbook
+      
 permissions:
     griefprevention.basicclaimcommands:
         description: Grants access to Basic GriefPrevention claim commands.
@@ -334,6 +339,9 @@ permissions:
         default: op
     griefprevention.commands.gpdebug:
         description: grants access to the gpdebug command.
+        default: op
+    griefprevention.commands.viewbook:
+        description: grants access to the viewbook command.
         default: op
     griefprevention.claims.transfer:
         description: grants access to allow transfer of claims.

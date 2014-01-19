@@ -23,6 +23,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import me.ryanhamshire.GriefPrevention.CommandHandling.IgnoreCommand;
+import me.ryanhamshire.GriefPrevention.CommandHandling.ViewBook;
 import me.ryanhamshire.GriefPrevention.Debugger.DebugLevel;
 import me.ryanhamshire.GriefPrevention.Configuration.ClaimBehaviourData;
 import me.ryanhamshire.GriefPrevention.Configuration.ClaimBehaviourData.ClaimAllowanceConstants;
@@ -52,28 +53,14 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.event.player.PlayerBedEnterEvent;
-import org.bukkit.event.player.PlayerBucketEmptyEvent;
-import org.bukkit.event.player.PlayerBucketFillEvent;
-import org.bukkit.event.player.PlayerCommandPreprocessEvent;
-import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerEvent;
-import org.bukkit.event.player.PlayerInteractEntityEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerItemHeldEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.entity.PlayerLeashEntityEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
-import org.bukkit.event.player.PlayerPickupItemEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.player.PlayerRespawnEvent;
-import org.bukkit.event.player.PlayerShearEntityEvent;
-import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.BookMeta;
 
 class PlayerEventHandler implements Listener {
 	private static HashSet<Material> ContainerMaterials = null;
@@ -948,7 +935,55 @@ class PlayerEventHandler implements Listener {
         return new Location(ev.getClickedBlock().getWorld(),uselocation.getX()+xoffset,uselocation.getY()+yoffset,uselocation.getZ()+zoffset);
     }
     private Material[] IgnoreInteractionMaterials = new Material[]{Material.SIGN_POST,Material.SIGN,Material.WALL_SIGN};
-    
+
+    //Leash/unleash.
+    //This might cause the plugin to stop working in 1.6.4, I'm not sure- if so, it will be removed.
+    @EventHandler(priority=EventPriority.NORMAL,ignoreCancelled = true)
+    void onPlayerLeashEntity(PlayerLeashEntityEvent event){
+        WorldConfig wc = GriefPrevention.instance.getWorldCfg(event.getEntity().getWorld());
+        if(wc.getLeadUsageRules().Allowed(event.getEntity(),event.getPlayer()).Denied()){
+            event.setCancelled(true);
+        }
+
+
+
+    }
+    @EventHandler(priority=EventPriority.NORMAL,ignoreCancelled = true)
+    void onPlayerUnleashEntity(PlayerUnleashEntityEvent event){
+        WorldConfig wc = GriefPrevention.instance.getWorldCfg(event.getEntity().getWorld());
+        if(wc.getLeadUsageRules().Allowed(event.getEntity(),event.getPlayer()).Denied()){
+            event.setCancelled(true);
+        }
+    }
+    @EventHandler(priority=EventPriority.NORMAL,ignoreCancelled=true)
+    void onPlayerEditBook(PlayerEditBookEvent event){
+        if(event.getPlayer().hasPermission(PermNodes.EavesDropPermission)) return;
+        WorldConfig wc = GriefPrevention.instance.getWorldCfg(event.getPlayer().getWorld());
+        if(wc.getEavesDropBooks())
+        {
+            String newTitle = event.getNewBookMeta().getTitle();
+            String oldTitle = event.getPreviousBookMeta().getTitle();
+            if(newTitle==null) newTitle="(unnamed)";
+
+
+
+               for(Player p:Bukkit.getOnlinePlayers()){
+                   if(p.hasPermission(PermNodes.EavesDropPermission)){
+                          GriefPrevention.sendMessage(p,TextMode.Instr,String.valueOf(ChatColor.ITALIC) + String.valueOf(ChatColor.GRAY) + "[BookEavesDrop]" + event.getPlayer().getName() + " has edited a book titled " + newTitle);
+                   }
+               }
+        }
+        ItemStack saveBook = new ItemStack(Material.WRITTEN_BOOK,1);
+        BookMeta bm = event.getNewBookMeta();
+        bm.setAuthor(event.getPlayer().getName());
+        saveBook.setItemMeta(bm);
+        ViewBook.AddRecentBook(saveBook);
+
+
+
+    }
+
+
 	// when a player interacts with the world
 	@EventHandler(priority = EventPriority.NORMAL)
 	void onPlayerInteract(PlayerInteractEvent event) {
@@ -2623,7 +2658,7 @@ class PlayerEventHandler implements Listener {
                     PlayerInventory invent = player.getInventory();
                     invent.clear();
 
-                    invent.setArmorContents( new ItemStack[4]);
+                    invent.setArmorContents(new ItemStack[4]);
                     player.setHealth(0);
                     Debugger.Write("Cleared Inventory of " + player.getName() + " as they joined.",DebugLevel.Verbose);
                 }},1);
