@@ -22,24 +22,24 @@ public class PvPSafePlayerTask implements Runnable{
         TickTimeout = Timeout;
         originalconfig = GriefPrevention.instance.getWorldCfg(checkplayer.getWorld());
         Bukkit.getScheduler().runTaskLater(GriefPrevention.instance,this,TickTimeout);
-        System.out.println("run: PvPSafePlayerTask, Ticks: " + TickTimeout);
+
     }
     public void run()
     {
         //if the player is offline, we're done here.
         if(!CheckSafetyPlayer.isOnline()) return;
         if(!RunningTasks.contains(this)) return;
-        System.out.println("run: PvPSafePlayerTask");
+
         PlayerData connectedData = GriefPrevention.instance.dataStore.getPlayerData(CheckSafetyPlayer.getName());
             if(connectedData.inPvpCombat()){
                 //reschedule...
-                System.out.println("still in PvP Combat...");
+
                 Bukkit.getScheduler().runTaskLater(GriefPrevention.instance,this,TickTimeout);
 
             }
             else{
                 //display safety message.
-                System.out.println("displaying safety message...");
+
                 GriefPrevention.sendMessage(CheckSafetyPlayer, TextMode.Info, Messages.PvPLogoutSafely);
                 RunningTasks.remove(this);
             }

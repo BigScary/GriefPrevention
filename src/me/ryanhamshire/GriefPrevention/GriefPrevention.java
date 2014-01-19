@@ -1077,11 +1077,8 @@ public class GriefPrevention extends JavaPlugin {
 
 		// go through all available worlds, and fire a "world load" event for
 		// them.
-        Debugger.Write("Looking Through " + Bukkit.getWorlds().size() + " Worlds, reloading Claim Data.",DebugLevel.Verbose);
-		for (World iterate : Bukkit.getWorlds()) {
-			WorldLoadEvent wle = new WorldLoadEvent(iterate);
-			ww.WorldLoad(wle);
-		}
+        ww.Refresh();
+
 
 		Bukkit.getPluginManager().callEvent(new GPLoadEvent(this));
 

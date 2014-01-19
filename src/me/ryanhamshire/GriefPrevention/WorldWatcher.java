@@ -44,7 +44,19 @@ public class WorldWatcher implements Listener {
 		// + " Equal:" + Source.getWorld().equals(Target));
 		return new Location(Target, Source.getX(), Source.getY(), Source.getZ());
 	}
-
+    public void Refresh()
+    {
+        //first stop existing tasks.
+        for(WorldClaimCleanupTask canceltask:WorldClaimTasks.values()){
+            Bukkit.getScheduler().cancelTask(canceltask.getTaskCookie());
+        }
+        storedloaded = new HashSet<World>();
+        WorldClaimTasks = new HashMap<String,WorldClaimCleanupTask>();
+        LoadedWorlds = new HashSet<World>();
+        for(World iterate:Bukkit.getWorlds()){
+            WorldLoad(new WorldLoadEvent(iterate));
+        }
+    }
 	@EventHandler
 	public void WorldLoad(WorldLoadEvent event) {
 
