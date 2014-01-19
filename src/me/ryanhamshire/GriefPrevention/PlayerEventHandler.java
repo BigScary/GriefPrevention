@@ -818,8 +818,8 @@ class PlayerEventHandler implements Listener {
 
                           //I'm fairly certain this won't drop their items, since they DC'd.
                           //as such, let's hope we can access the inventory of offline players.
-                          OfflinePlayer dcedplayer = Bukkit.getOfflinePlayer(playerData.lastPvpPlayer);
-                          GriefPrevention.sendMessage(lastplayer,TextMode.Info,Messages.PvPLogAnnouncement,dcedplayer.getName());
+
+                          GriefPrevention.sendMessage(lastplayer,TextMode.Info,Messages.PvPLogAnnouncement,player.getName());
 
                           for(ItemStack is:dcedInventory.getContents()){
                               if(is!=null && !(is.getType() == Material.AIR)) lastplayer.getWorld().dropItemNaturally(lastplayer.getLocation(),is);
@@ -830,6 +830,8 @@ class PlayerEventHandler implements Listener {
                           player.getInventory().clear();
                           //kill the disconnected player. They will have disconnected by this point, naturally.
                           player.setHealth(0);
+                          playerData.ClearInventoryOnJoin=true;
+
 
 
                       }
@@ -874,7 +876,7 @@ class PlayerEventHandler implements Listener {
 
                             //I'm fairly certain this won't drop their items, since they DC'd.
                             //as such, let's hope we can access the inventory of offline players.
-                            OfflinePlayer dcedplayer = Bukkit.getOfflinePlayer(playerData.lastPvpPlayer);
+
 
                             //drop all that players inventory naturally, where the other player was.
                             for(ItemStack is:dcedInventory.getContents()){

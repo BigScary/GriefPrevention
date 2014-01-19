@@ -26,6 +26,9 @@ public class PvPSafePlayerTask implements Runnable{
     }
     public void run()
     {
+        //if the player is offline, we're done here.
+        if(!CheckSafetyPlayer.isOnline()) return;
+        if(!RunningTasks.contains(this)) return;
         System.out.println("run: PvPSafePlayerTask");
         PlayerData connectedData = GriefPrevention.instance.dataStore.getPlayerData(CheckSafetyPlayer.getName());
             if(connectedData.inPvpCombat()){
