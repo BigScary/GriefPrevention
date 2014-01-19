@@ -1287,6 +1287,7 @@ class PlayerEventHandler implements Listener {
                 clickedBlockType==Material.LONG_GRASS &&
                 player.getItemInHand().getType()==Material.INK_SACK){
            //MC 1.7 let's you grow tall grass to double height.
+
             if (wc.getBonemealGrassRules().Allowed(relevantPosition, event.getPlayer()).Denied()) {
                 event.setCancelled(true);
             }
