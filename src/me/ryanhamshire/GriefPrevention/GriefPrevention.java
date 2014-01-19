@@ -829,7 +829,7 @@ public class GriefPrevention extends JavaPlugin {
 
         ww.clear();
         dataStore = null;
-
+        ClaimTask=null;
         this.cmdHandler = null;
         AddLogEntry("GriefPrevention disabled.");
 	}
