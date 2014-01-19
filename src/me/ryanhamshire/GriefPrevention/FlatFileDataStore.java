@@ -615,7 +615,7 @@ public class FlatFileDataStore extends DataStore {
 					else {
 						topLevelClaim.modifiedDate = new Date(SourceFile.lastModified());
 
-						this.claims.add(topLevelClaim);
+						addClaim(topLevelClaim);
 
 						topLevelClaim.inDataStore = true;
 					}
