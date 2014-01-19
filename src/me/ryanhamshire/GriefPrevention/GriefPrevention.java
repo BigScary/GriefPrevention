@@ -966,7 +966,7 @@ public class GriefPrevention extends JavaPlugin {
 						exx.printStackTrace();
 					}
 				}
-                boolean allowmigrate = GriefPrevention.instance.Configuration.getAllowAutomaticMigration();
+                boolean allowmigrate = Configuration.getAllowAutomaticMigration();
 				if (FlatFileDataStore.hasData() && databaseStore != null && allowmigrate) {
 					GriefPrevention.AddLogEntry("There appears to be some data on the hard drive.  Migrating that data to the database...");
 					FlatFileDataStore flatFileStore = new FlatFileDataStore();
@@ -1070,7 +1070,7 @@ public class GriefPrevention extends JavaPlugin {
 		MetaHandler = new ClaimMetaHandler();
 		try {
 			// new File(DataStore.configFilePath).delete();
-			outConfig.save(new File(DataStore.configFilePath).getAbsolutePath());
+			outConfig.save(new File(DataStore.configFilePath));
 		} catch (IOException exx) {
 			GriefPrevention.log.log(Level.SEVERE, "Failed to save primary configuration file:" + DataStore.configFilePath);
 		}

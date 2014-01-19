@@ -107,11 +107,11 @@ public class ConfigData {
         this.GlobalSiege = CoreConfig.getBoolean("GriefPrevention.GlobalSiegeEnabled",true);
         this.GlobalSpam = CoreConfig.getBoolean("GriefPrevention.GlobalSpamEnabled",true);
         this.AllowAutomaticMigration = CoreConfig.getBoolean("GriefPrevention.AllowAutomaticMigration",true);
-        CoreConfig.set("GriefPrevention.GlobalClaimsEnabled",GlobalClaims);
-        CoreConfig.set("GriefPrevention.GlobalPVPEnabled",GlobalPVP);
-        CoreConfig.set("GriefPrevention.GlobalSiegeEnabled",GlobalSiege);
-        CoreConfig.set("GriefPrevention.GlobalSpamEnabled",GlobalSpam);
-        CoreConfig.set("GriefPrevention.AllowAutomaticMigration",AllowAutomaticMigration);
+        outConfig.set("GriefPrevention.GlobalClaimsEnabled",GlobalClaims);
+        outConfig.set("GriefPrevention.GlobalPVPEnabled",GlobalPVP);
+        outConfig.set("GriefPrevention.GlobalSiegeEnabled",GlobalSiege);
+        outConfig.set("GriefPrevention.GlobalSpamEnabled",GlobalSpam);
+        outConfig.set("GriefPrevention.AllowAutomaticMigration",AllowAutomaticMigration);
         this.DisabledGPCommands = CoreConfig.getStringList("GriefPrevention.DisabledCommands");
         outConfig.set("GriefPrevention.DisabledCommands",DisabledGPCommands);
 
@@ -148,6 +148,7 @@ public class ConfigData {
 			ConfigLocation.mkdirs();
 
 		}
+
 		/*
 		 * GriefPrevention.instance.getLogger().log(Level.INFO,
 		 * "Reading WorldConfigurations from " +
