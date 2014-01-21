@@ -172,7 +172,8 @@ public class FlatFileDataStore extends DataStore {
 
 
 	private String getPlayerDataFile(String sPlayerName) {
-        String usename = sPlayerName;
+        String retval=null;
+        try {
 
 
         String strPath = playerDataFolderPath + File.separator;
@@ -198,16 +199,20 @@ public class FlatFileDataStore extends DataStore {
             try {
            copyFile(CaseSensitive,new File(scaseInsensitive));
                //CaseInsensitive.renameTo(new File(scaseInsensitive + "-backup"));
-                CaseInsensitive.delete();
+                CaseSensitive.delete();
+
             }
             catch(IOException iox){
                 //ignore
             }
         }
-        return scaseInsensitive;
+        return retval=scaseInsensitive;
 
 
-
+        }
+        finally {
+            Debugger.Write("Flat: Player Data retrieved for " + sPlayerName + ":" + retval, Debugger.DebugLevel.Verbose ) ;
+        }
 	}
 
 	@Override
