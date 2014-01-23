@@ -278,7 +278,12 @@ public class PlayerData {
 		// add any blocks this player might have based on group membership
 		// (permissions)
 		remainingBlocks += GriefPrevention.instance.dataStore.getGroupBonusBlocks(this.playerName);
-
+        if(remainingBlocks<0){
+            //This is going to screw somebody up I bet. sigh...
+            accruedClaimBlocks+=remainingBlocks;
+            GriefPrevention.AddLogEntry("Player " + this.playerName + " has negative claim blocks. giving them " + accruedClaimBlocks + " to offset to 0");
+            return 0;
+        }
 		return remainingBlocks;
 	}
 

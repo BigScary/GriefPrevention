@@ -226,15 +226,46 @@ class PlayerEventHandler implements Listener {
 
 		// remedy any CAPS SPAM, exception for very short messages which could
 		// be emoticons like =D or XD
-		if (message.length() > 4 && this.stringsAreSimilar(message.toUpperCase(), message)) {
+		if (!muted && message.length() > wc.getSpamCapsMinLength() && this.stringsAreSimilar(message.toUpperCase(), message)) {
 			// exception for strings containing forward slash to avoid changing
 			// a case-sensitive URL
 			if (event instanceof AsyncPlayerChatEvent && !message.contains("/")) {
 				((AsyncPlayerChatEvent) event).setMessage(message.toLowerCase());
 			}
 		}
+        if (!muted && message.length() > wc.getSpamCapsMinLength()) {
 
-		// where other types of spam are concerned, casing isn't significant
+            // check for caps in lengths greater than the specified limit.
+            StringBuilder sbuffer = new StringBuilder();
+            try {
+                for (int i = 0; i < message.length() - wc.getSpamCapsMinLength(); i++) {
+                    String teststr = "";
+                    try {
+                        teststr = message.substring(i, i + wc.getSpamCapsMinLength());
+                    } catch (StringIndexOutOfBoundsException exx) {
+                        // testing code for ticket 212
+                        // print out diagnostic info.
+                        exx.printStackTrace();
+                        System.out.println("Unexpected Error Processing Chat Command");
+                        System.out.println("Current Message:\"" + message + "\"");
+                        System.out.println("SpamCapsMinLength:" + wc.getSpamCapsMinLength());
+                        System.out.println("i:" + i);
+
+                    }
+                    if (teststr.equals(teststr.toUpperCase())) {
+                        // gotcha!
+                        sbuffer.append(teststr.toLowerCase());
+                        i += teststr.length();
+                    } else
+                        sbuffer.append(message.charAt(i));
+
+                }
+            } finally {
+            }
+
+        }
+
+        // where other types of spam are concerned, casing isn't significant
 		message = message.toLowerCase();
 
 		// check message content and timing
@@ -245,10 +276,12 @@ class PlayerEventHandler implements Listener {
 			// increment the spam counter
 			playerData.spamCount++;
 			spam = true;
+
 		}
 
 		// if it's very similar to the last message
 		if (!muted && this.stringsAreSimilar(message, playerData.lastMessage)) {
+            Debugger.Write("Blocking message, similar to last message.",DebugLevel.Verbose);
 			playerData.spamCount++;
 			spam = true;
 			muted = true;
@@ -271,40 +304,10 @@ class PlayerEventHandler implements Listener {
 					spam = true;
 
 					// block message
+                    Debugger.Write("Blocking message for IP spam",DebugLevel.Verbose);
 					muted = true;
 				}
 			}
-		}
-		if (!muted && message.length() > wc.getSpamCapsMinLength()) {
-
-			// check for caps in lengths greater than the specified limit.
-			StringBuilder sbuffer = new StringBuilder();
-			try {
-				for (int i = 0; i < message.length() - wc.getSpamCapsMinLength(); i++) {
-					String teststr = "";
-					try {
-						teststr = message.substring(i, i + wc.getSpamCapsMinLength());
-					} catch (StringIndexOutOfBoundsException exx) {
-						// testing code for ticket 212
-						// print out diagnostic info.
-						exx.printStackTrace();
-						System.out.println("Unexpected Error Processing Chat Command");
-						System.out.println("Current Message:\"" + message + "\"");
-						System.out.println("SpamCapsMinLength:" + wc.getSpamCapsMinLength());
-						System.out.println("i:" + i);
-
-					}
-					if (teststr.equals(teststr.toUpperCase())) {
-						// gotcha!
-						sbuffer.append(teststr.toLowerCase());
-						i += teststr.length();
-					} else
-						sbuffer.append(message.charAt(i));
-
-				}
-			} finally {
-			}
-
 		}
 
 		// if the message was mostly non-alpha-numerics or doesn't include much
@@ -327,6 +330,7 @@ class PlayerEventHandler implements Listener {
 			if (symbolsCount > message.length() / 2 || (message.length() > wc.getSpamASCIIArtMinLength() && whitespaceCount < message.length() / 10)) {
 				spam = true;
 				if (playerData.spamCount > 0)
+                    Debugger.Write("Exceeded symbol or whitespace count.",DebugLevel.Verbose);
 					muted = true;
 				playerData.spamCount++;
 			}
@@ -345,7 +349,8 @@ class PlayerEventHandler implements Listener {
 				GriefPrevention.AddLogEntry("Banning " + player.getName() + " for spam.");
 
 				// kick
-				PlayerKickBanTask task = new PlayerKickBanTask(player, wc.getSpamKickMessage());
+				//PlayerKickBanTask task = new PlayerKickBanTask(player, wc.getSpamKickMessage());
+                PlayerKickBanTask task = new PlayerKickBanTask(player,null);
 				GriefPrevention.instance.getServer().getScheduler().scheduleSyncDelayedTask(GriefPrevention.instance, task, 1L);
 
 			}

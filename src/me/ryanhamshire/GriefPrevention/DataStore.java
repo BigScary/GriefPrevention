@@ -1626,6 +1626,14 @@ public abstract class DataStore {
 				this.saveClaim(c);
 				this.getClaimArray().removeID(c.getID()); // remove this claim.;
 				accum++;
+                if(!c.isAdminClaim()){
+                    PlayerData pd = this.getPlayerData(c.claimOwnerName);
+                    if(pd.claims.contains(c)){
+                        pd.claims.remove(c);
+                    }
+
+                }
+
 			}
 		} catch (Exception exx) {
 		}
