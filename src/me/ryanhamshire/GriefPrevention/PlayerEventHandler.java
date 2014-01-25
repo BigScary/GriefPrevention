@@ -2250,9 +2250,12 @@ class PlayerEventHandler implements Listener {
                 else if (GriefPrevention.isMCVersionorLater(GriefPrevention.MinecraftVersions.MC16) &&
                         handItem!=null && handItem.getType()==Material.NAME_TAG) {
 					if (entity instanceof Tameable) {
-						if (((Tameable) entity).getOwner() == player) {
-							return;
-						}
+                        Tameable tamed = (Tameable)entity;
+                        if(tamed!=null){
+                            if (((Tameable) entity).getOwner() == player) {
+                                return;
+                            }
+                        }
 
 					}
 					if (wc.getNameTagUsageRules().Allowed(entity, player).Denied())
