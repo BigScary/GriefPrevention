@@ -54,6 +54,7 @@ public class WorldWatcher implements Listener {
         WorldClaimTasks = new HashMap<String,WorldClaimCleanupTask>();
         LoadedWorlds = new HashSet<World>();
         for(World iterate:Bukkit.getWorlds()){
+            Debugger.Write("force-loading world:" + iterate.getName(),DebugLevel.Verbose);
             WorldLoad(new WorldLoadEvent(iterate));
         }
     }

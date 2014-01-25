@@ -317,13 +317,8 @@ class EntityEventHandler implements Listener {
             Debugger.Write("PVP Damage detected between " + ((Player)event.getEntity()).getName() + " And " + attacker.getName(),Debugger.DebugLevel.Verbose);
 			// doesn't apply when the attacker has the no pvp immunity
 			// permission
-			// this rule is here to allow server owners to have a world with no
-			// spawn camp protection by assigning permissions based on the
-			// player's world
-			if (attacker.hasPermission(PermNodes.NoPvPImmunityPermission)){
-                Debugger.Write("PVP Damage: Attacker (" + attacker.getName() + ") has " + PermNodes.NoPvPImmunityPermission + " Permission.",Debugger.DebugLevel.Verbose);
-				return;
-            }
+
+
 
 			Player defender = (Player) (event.getEntity());
 
@@ -333,7 +328,7 @@ class EntityEventHandler implements Listener {
 				if (!defender.isOnline() || !attacker.isOnline())
 					return;
 			// otherwise if protecting spawning players
-			if (wc.getSpawnProtectEnabled()) {
+			if (wc.getSpawnProtectEnabled() && !defender.hasPermission(PermNodes.NoPvPImmunityPermission)) {
 
                 Debugger.Write("Spawn Protection Enabled...", Debugger.DebugLevel.Verbose);
                 Debugger.Write("Defender PvPImmune=" + defenderData.pvpImmune, Debugger.DebugLevel.Verbose);

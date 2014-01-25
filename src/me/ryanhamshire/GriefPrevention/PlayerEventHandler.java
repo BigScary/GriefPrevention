@@ -32,6 +32,7 @@ import me.ryanhamshire.GriefPrevention.Configuration.WorldConfig;
 import me.ryanhamshire.GriefPrevention.tasks.EquipShovelProcessingTask;
 import me.ryanhamshire.GriefPrevention.tasks.PermCheckTask;
 import me.ryanhamshire.GriefPrevention.tasks.PlayerKickBanTask;
+import me.ryanhamshire.GriefPrevention.tasks.PvPSafePlayerTask;
 import me.ryanhamshire.GriefPrevention.visualization.Visualization;
 import me.ryanhamshire.GriefPrevention.visualization.VisualizationType;
 
@@ -783,7 +784,7 @@ class PlayerEventHandler implements Listener {
 
 	private void onPlayerDisconnect(final Player player, String notificationMessage) {
 		String playerName = player.getName();
-
+        PvPSafePlayerTask.ClearPlayerTasks(player);
 		final PlayerData playerData = GriefPrevention.instance.dataStore.getPlayerData(playerName);
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(player.getWorld());
 		if (!wc.Enabled())
@@ -794,7 +795,7 @@ class PlayerEventHandler implements Listener {
 			claim.areExplosivesAllowed = false;
 		}
 
-		// FEATURE: players in pvp combat when they log out will die
+
         //tweak: delay for 10 seconds before we perform this check...
 		if (wc.getPvPPunishLogout() && playerData.inPvpCombat()) {
             final PlayerInventory dcedInventory = player.getInventory();
@@ -802,12 +803,10 @@ class PlayerEventHandler implements Listener {
             Bukkit.getScheduler().runTaskLater(GriefPrevention.instance, new Runnable() {
                   public void run(){
                       //if the last player this Player attacked is still online...
-                      if(Bukkit.getPlayerExact(playerData.lastPvpPlayer).isOnline() && !player.isOnline()){
+                      Player lastplayer = Bukkit.getPlayerExact(playerData.lastPvpPlayer);
+                      Player thisPlayer = Bukkit.getPlayerExact(playerData.playerName);
+                      if(lastplayer!=null && lastplayer.isOnline() && !(thisPlayer==null || thisPlayer.isOnline())){
                           //make sure they didn't relog, either.
-
-                          Player lastplayer = Bukkit.getPlayerExact(playerData.lastPvpPlayer);
-
-
                           //I'm fairly certain this won't drop their items, since they DC'd.
                           //as such, let's hope we can access the inventory of offline players.
 
@@ -820,6 +819,7 @@ class PlayerEventHandler implements Listener {
                               if(is!=null && !(is.getType() == Material.AIR)) lastplayer.getWorld().dropItemNaturally(lastplayer.getLocation(),is);
                           }
                           player.getInventory().clear();
+                          player.getInventory().setArmorContents(new ItemStack[]{null,null,null,null});
                           //kill the disconnected player. They will have disconnected by this point, naturally.
                           player.setHealth(0);
                           playerData.ClearInventoryOnJoin=true;

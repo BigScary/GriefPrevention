@@ -24,6 +24,15 @@ public class PvPSafePlayerTask implements Runnable{
         Bukkit.getScheduler().runTaskLater(GriefPrevention.instance,this,TickTimeout);
 
     }
+    public static void ClearPlayerTasks(Player forPlayer){
+        ArrayList<PvPSafePlayerTask> removeTasks = new ArrayList<PvPSafePlayerTask>();
+        for(PvPSafePlayerTask task:RunningTasks){
+            if(task.CheckSafetyPlayer.getName().equalsIgnoreCase(forPlayer.getName()))
+            {
+                removeTasks.remove(task);
+            }
+        }
+    }
     public void run()
     {
         //if the player is offline, we're done here.
