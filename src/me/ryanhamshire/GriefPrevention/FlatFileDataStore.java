@@ -243,15 +243,8 @@ public class FlatFileDataStore extends DataStore {
         //with a case-insensitive player name.
 
         File CaseInsensitive = new File(getPlayerDataFile(playerName));
-
-
         File playerFile;
-
-
-
 		playerFile = CaseInsensitive;
-
-
 		PlayerData playerData = new PlayerData();
 		playerData.playerName = playerName;
 

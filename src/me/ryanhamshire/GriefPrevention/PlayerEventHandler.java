@@ -1094,8 +1094,8 @@ class PlayerEventHandler implements Listener {
 
     Debugger.Write("Checking block:" + clickedBlockType.name(),DebugLevel.Verbose);
     for(Material checkmat:IgnoreInteractionMaterials){
-        if(checkmat.name().equals(clickedBlockType.name())){
-            Debugger.Write("Ignoring interaction with Material:" + event.getClickedBlock().getType().name() + " as it is on the Ignore List.",DebugLevel.Verbose);
+        if(checkmat !=null && checkmat.name().equals(clickedBlockType.name())){
+            Debugger.Write("Ignoring interaction with Material:" + clickedBlockType.name() + " as it is on the Ignore List.",DebugLevel.Verbose);
             return;
         }
     }

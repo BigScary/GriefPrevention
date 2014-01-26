@@ -778,6 +778,7 @@ public class WorldConfig {
             this.HorseTrust =  HorseTrustConstants.valueOf(newHorseTrust);
             }
             catch(Exception exx){
+                if(newHorseTrust.equalsIgnoreCase("Enabled")) HorseTrust = HorseTrustConstants.Standard; else
                 HorseTrust = HorseTrustConstants.Disabled;
             }
         }
