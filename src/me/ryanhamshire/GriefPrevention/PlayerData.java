@@ -280,8 +280,8 @@ public class PlayerData {
 		remainingBlocks += GriefPrevention.instance.dataStore.getGroupBonusBlocks(this.playerName);
         if(remainingBlocks<0){
             //This is going to screw somebody up I bet. sigh...
-            accruedClaimBlocks+=remainingBlocks;
-            GriefPrevention.AddLogEntry("Player " + this.playerName + " has negative claim blocks. giving them " + accruedClaimBlocks + " to offset to 0");
+            accruedClaimBlocks+=Math.abs(remainingBlocks);
+            GriefPrevention.AddLogEntry("Player " + this.playerName + " has negative claim blocks. giving them " + Math.abs(remainingBlocks) + " to offset to 0");
             return 0;
         }
 		return remainingBlocks;

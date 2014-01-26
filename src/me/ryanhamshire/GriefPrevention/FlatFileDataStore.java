@@ -147,26 +147,27 @@ public class FlatFileDataStore extends DataStore {
 		}
 	}
     public static void copyFile(File sourceFile, File destFile) throws IOException {
-
-        if(!destFile.exists()) {
-            destFile.createNewFile();
-        }
-
-        FileChannel source = null;
-        FileChannel destination = null;
-
+        Debugger.Write("Copying File:" + sourceFile.toString() + " To " + destFile.toString(), Debugger.DebugLevel.Verbose);
+        BufferedInputStream bsin = new BufferedInputStream(new FileInputStream(sourceFile));
+        BufferedOutputStream bsout = new BufferedOutputStream(new FileOutputStream(destFile));
+        int chunksize = 16*1024;
+        int readamount=0;
+        byte[] buffer = new byte[chunksize];
         try {
-            source = new FileInputStream(sourceFile).getChannel();
-            destination = new FileOutputStream(destFile).getChannel();
-            destination.transferFrom(source, 0, source.size());
+            //write in chunks of chunksize.
+            while((readamount=bsin.read(buffer,0,chunksize))==chunksize){
+                bsout.write(buffer,0,chunksize);
+            }
+            //write out the remainder.
+            bsout.write(buffer,0,readamount);
+
+        }
+        catch(Exception exx){
+            exx.printStackTrace();
         }
         finally {
-            if(source != null) {
-                source.close();
-            }
-            if(destination != null) {
-                destination.close();
-            }
+            bsin.close();
+            bsout.close();
         }
     }
 
@@ -177,32 +178,44 @@ public class FlatFileDataStore extends DataStore {
 
 
         String strPath = playerDataFolderPath + File.separator;
+
         String scaseSensitive = strPath + sPlayerName;
         String scaseInsensitive = strPath +sPlayerName.toLowerCase();
         File examinepath = new File(strPath);
 
         File CaseSensitive = null;
         File CaseInsensitive=null;
+
         //search for file.
         for(File iterate:examinepath.listFiles()){
             //if it equals the name case-sensitively,
-            if(iterate.getName().startsWith(sPlayerName)){
+
+            if(iterate.getName().equals(sPlayerName)){
                 //assign our case sensitive name
+
                 CaseSensitive=iterate;
             }
-            else if(iterate.getName().equalsIgnoreCase(sPlayerName)){
+            else if(iterate.getName().equalsIgnoreCase(sPlayerName)
+                    && iterate.getName().toLowerCase().equals(iterate.getName())){
                 //otherwise assign our case insensitive name.
+
                 CaseInsensitive = iterate;
+                scaseInsensitive = CaseInsensitive.getName();
             }
         }
+
+
         if(CaseSensitive!=null && CaseInsensitive!=null &&  !scaseInsensitive.equals(scaseSensitive)){
             try {
+
                 //delete caseinsensitive file...
                 new File(scaseInsensitive).delete();
                 //copy case sensitive version in it's place.
-           copyFile(CaseSensitive,new File(scaseInsensitive));
+
+           copyFile(CaseSensitive, CaseInsensitive);
                //CaseInsensitive.renameTo(new File(scaseInsensitive + "-backup"));
                 //delete the case sensitive file.
+
                 CaseSensitive.delete();
 
             }
@@ -230,10 +243,10 @@ public class FlatFileDataStore extends DataStore {
         //with a case-insensitive player name.
 
         File CaseInsensitive = new File(getPlayerDataFile(playerName));
-        //convert to lowercase.
+
 
         File playerFile;
-        //if the case insensitive file exists, use it as the playerFile.
+
 
 
 		playerFile = CaseInsensitive;
@@ -244,6 +257,7 @@ public class FlatFileDataStore extends DataStore {
 
 		// if it doesn't exist as a file
 		if (!playerFile.exists()) {
+
 			// create a file with defaults, but only if the player has been
 			// online before.
 			Player playerobj = Bukkit.getPlayer(playerName);
@@ -260,7 +274,7 @@ public class FlatFileDataStore extends DataStore {
 		else {
 			BufferedReader inStream = null;
 			try {
-				inStream = new BufferedReader(new FileReader(playerFile.getAbsolutePath()));
+                inStream = new BufferedReader(new FileReader(playerFile.getAbsolutePath()));
 
 				// first line is last login timestamp
 				String lastLoginTimestampString = inStream.readLine();
@@ -289,7 +303,7 @@ public class FlatFileDataStore extends DataStore {
 
 				// fourth line is a double-semicolon-delimited list of claims,
 				// which is currently ignored
-				// String claimsString = inStream.readLine();
+
                 try {
 				inStream.readLine();
                 String playerinventoryclear = inStream.readLine();
@@ -742,12 +756,13 @@ public class FlatFileDataStore extends DataStore {
 			outStream.newLine();
 
 			// fourth line is a double-semicolon-delimited list of claims
-			if (playerData.claims.size() > 0) {
+			/*if (playerData.claims.size() > 0) {
 				outStream.write(this.locationToString(playerData.claims.get(0).getLesserBoundaryCorner()));
 				for (int i = 1; i < playerData.claims.size(); i++) {
 					outStream.write(";;" + this.locationToString(playerData.claims.get(i).getLesserBoundaryCorner()));
 				}
-			}
+			} */
+
             //write out wether the player's inventory needs to be cleared on join.
             outStream.newLine();
             outStream.write(String.valueOf(playerData.ClearInventoryOnJoin));
