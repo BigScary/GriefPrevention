@@ -710,7 +710,10 @@ public class WorldConfig {
 
     private ClaimBehaviourData ZombieDoorBreaking;
 
-
+    private int MinLavaDistance = 10;
+    public int getMinLavaDistance(){
+        return MinLavaDistance;
+    }
     public WorldConfig(String worldname) {
         this(worldname, new YamlConfiguration(), ConfigData.createTargetConfiguration(worldname));
     }
@@ -789,6 +792,8 @@ public class WorldConfig {
         if (ccm == null) SiegeDefender = ClaimBehaviourMode.RequireOwner;
         else SiegeDefender = ccm;
 
+        this.MinLavaDistance = config.getInt("GriefPrevention.MinLavaPlacementDistance",10);
+        outConfig.set("GriefPrevention.MinLavaPlacementDistance",MinLavaDistance);
 
         this.config_entityClaimLimit = config.getInt("GriefPrevention.Claims.EntityLimit", 0);
         outConfig.set("GriefPrevention.Claims.EntityLimit", 0);

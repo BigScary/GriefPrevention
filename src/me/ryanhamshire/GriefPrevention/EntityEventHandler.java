@@ -244,8 +244,9 @@ class EntityEventHandler implements Listener {
 				attacker = (Player) wskull.getShooter();
 			}
 		}
+
         if(event.getEntity() instanceof Hanging){
-            if(wc.getItemFrameRules().Allowed(event.getEntity().getLocation(),attacker).Denied()){
+            if(attacker== null || wc.getItemFrameRules().Allowed(event.getEntity().getLocation(),attacker).Denied()){
                 event.setCancelled(true);
                 return;
             }

@@ -502,7 +502,7 @@ class PlayerEventHandler implements Listener {
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(block.getWorld());
 		if (!wc.Enabled())
 			return;
-		int minLavaDistance = 10;
+		int minLavaDistance = wc.getMinLavaDistance();
 
 		if (bucketEvent.getBucket() == Material.LAVA_BUCKET) {
 			switch (wc.getLavaBucketEmptyBehaviour().Allowed(block.getLocation(), player)) {
@@ -822,6 +822,7 @@ class PlayerEventHandler implements Listener {
                           player.getInventory().setArmorContents(new ItemStack[]{null,null,null,null});
                           //kill the disconnected player. They will have disconnected by this point, naturally.
                           player.setHealth(0);
+
                           playerData.ClearInventoryOnJoin=true;
 
 

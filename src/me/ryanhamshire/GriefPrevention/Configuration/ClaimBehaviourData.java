@@ -49,6 +49,13 @@ public class ClaimBehaviourData {
         ClaimRule_Claim, //allows on a claim. Will still test set permission value.
         ClaimRule_Wilderness  //allows in wilderness.
     }
+    public enum AllowEntityTypes
+    {
+        Entity_Players,
+        Entity_Mobs
+    }
+    private AllowEntityTypes AllowedEntities = AllowEntityTypes.Entity_Players;
+    public AllowEntityTypes getAllowedEntities(){ return AllowedEntities;}
 	//enum for "overriding" the default permissions during PvP or during a siege.
 	
 		public enum SiegePVPOverrideConstants{
