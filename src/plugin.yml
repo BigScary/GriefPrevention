@@ -74,6 +74,11 @@ commands:
       usage: /AdjustBonusClaimBlocks <player> <amount>
       permission: griefprevention.commands.adjustbonusclaimblocks
       aliases: acb
+   adjustaccruedclaimblocks:
+      description: Adds or subtracts accrued claim blocks for a player.
+      usage: /AdjustAccruedClaimBlocks <player> <amount>
+      permission: griefprevention.commands.adjustaccruedclaimblocks
+      aliases: aab
    transferclaimblocks:
       description: transfers claim blocks from one player to another.
       usage: /TransferClaimBlocks <sourceplayer> <targetplayer> <amount>
@@ -258,6 +263,9 @@ permissions:
         default: true
     griefprevention.commands.adjustbonusclaimblocks:
         description: grants access to the adjustbonusclaimblocks command.
+        default: op
+    griefprevention.commands.adjustaccruedclaimblocks:
+        description: grants access to the adjustaccruedclaimblocks command.
         default: op
     griefprevention.commands.transferclaimblocks:
         description: grants access to the transferclaimblocks command.
