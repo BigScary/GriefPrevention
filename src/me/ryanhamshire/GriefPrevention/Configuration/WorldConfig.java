@@ -750,7 +750,8 @@ public class WorldConfig {
         }
 
         Debugger.Write("Reading Configuration for World:" + pName, DebugLevel.Verbose);
-
+        this.griefprevention_enabled = config.getBoolean("GriefPrevention.Enabled", true);
+        outConfig.set("GriefPrevention.Enabled", this.griefprevention_enabled);
         this.config_seaLevelOverride = config.getInt("GriefPrevention.SeaLevelOverride", -1);
         if (this.config_seaLevelOverride == -1) {
 
@@ -767,8 +768,7 @@ public class WorldConfig {
         }
         outConfig.set("GriefPrevention.SeaLevelOverride.Enabled", config_seaLevelOverride != -1);
 
-        this.griefprevention_enabled = config.getBoolean("GriefPrevention.Enabled", true);
-        outConfig.set("GriefPrevention.Enabled", this.griefprevention_enabled);
+
         // read in the data for TNT explosions and Golem/Wither placements.
         this.config_afkDistanceCheck = config.getInt("GriefPrevention.AFKDistance", 3);
         if(outConfig.getConfigurationSection("GriefPrevention").contains("ExtendedHorseTrust")){

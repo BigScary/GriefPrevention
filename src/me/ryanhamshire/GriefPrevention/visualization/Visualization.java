@@ -19,6 +19,7 @@
 package me.ryanhamshire.GriefPrevention.visualization;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import me.ryanhamshire.GriefPrevention.Claim;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
@@ -94,13 +95,42 @@ public class Visualization {
 
 	// helper method for above. allows visualization blocks to sit underneath
 	// partly transparent blocks like grass and fence
+    private static List<Material> TransparentMaterials= null;
 	private static boolean isTransparent(Block block) {
+        if(TransparentMaterials==null){
+            List<Material> BuildList  = new ArrayList<Material>();
+            BuildList.add(Material.AIR);
+            BuildList.add(Material.LONG_GRASS);
+            BuildList.add(Material.FENCE);
+            BuildList.add(Material.NETHER_FENCE);
+            BuildList.add(Material.CHEST);
+            BuildList.add(Material.TRAPPED_CHEST);
+            BuildList.add(Material.TRAP_DOOR);
+            BuildList.add(Material.WOODEN_DOOR);
+            BuildList.add(Material.IRON_DOOR);
+            BuildList.add(Material.ENDER_CHEST);
+            BuildList.add(Material.IRON_FENCE);
+            BuildList.add(Material.THIN_GLASS);
+            BuildList.add(Material.YELLOW_FLOWER);
+            BuildList.add(Material.RED_ROSE);
+            if(GriefPrevention.isMCVersionorLater(GriefPrevention.MinecraftVersions.MC16)){
+                BuildList.add(Material.FLOWER_POT);
+            }
+            if(GriefPrevention.isMCVersionorLater(GriefPrevention.MinecraftVersions.MC17)){
+              BuildList.add(Material.STAINED_GLASS);
+                BuildList.add(Material.STAINED_GLASS_PANE);
+                BuildList.add(Material.DOUBLE_PLANT);
+            }
+            TransparentMaterials=BuildList;
+        }
 		WorldConfig applicableWorld = GriefPrevention.instance.getWorldCfg(block.getWorld());
 		if (applicableWorld.getModsContainerTrustIds() != null && applicableWorld.getModsContainerTrustIds().contains(block.getType()))
 			return true;
 		if (applicableWorld.getModsAccessTrustIds() != null && applicableWorld.getModsAccessTrustIds().contains(block.getType()))
 			return true;
-		return (block.getType() == Material.AIR || block.getType() == Material.LONG_GRASS || block.getType() == Material.FENCE || block.getType() == Material.LEAVES || block.getType() == Material.RED_ROSE || block.getType() == Material.CHEST || block.getType() == Material.TORCH || block.getType() == Material.VINE || block.getType() == Material.YELLOW_FLOWER || block.getType() == Material.CHEST || block.getType() == Material.ENDER_CHEST);
+
+        return TransparentMaterials.contains(block.getType());
+
 	}
 
 	// reverts a visualization by sending another block change list, this time
