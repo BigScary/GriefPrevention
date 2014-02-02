@@ -164,7 +164,11 @@ public class MaterialInfo {
                    //46:*:X46$0
 
         StringBuffer sb = new StringBuffer();
-        sb.append(Material.getMaterial(this.typeID).name());
+        Material material = Material.getMaterial(this.typeID);
+        if(material == null){
+            return null;
+        }
+        sb.append(material.name());
         sb.append(":");
         sb.append(this.allDataValues?"*":String.valueOf(this.data));
 		if(this.description!=null) sb.append(":" + description);
