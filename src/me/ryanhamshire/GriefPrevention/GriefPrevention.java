@@ -1098,6 +1098,13 @@ public class GriefPrevention extends JavaPlugin {
 			// null value returned indicates an error parsing the string from
 			// the config file
 			if (materialInfo == null) {
+				// ignore and remove null entries
+				if(stringsToParse.get(i) == null){
+				    stringsToParse.remove(i);
+				    i -= 1;
+				    continue;
+				}
+				
 				// show error in log
 				GriefPrevention.AddLogEntry("ERROR: Unable to read a material entry from the config file.  Please update your config.yml.");
 

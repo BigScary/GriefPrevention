@@ -1054,7 +1054,10 @@ public class WorldConfig {
         // add found items if applicable.
         if (GriefPrevention.instance.ModdedBlocks != null) {
             for (MaterialInfo mi : GriefPrevention.instance.ModdedBlocks.FoundAccess.getMaterials()) {
-                accessTrustStrings.add(mi.toString());
+        	String miString = mi.toString();
+        	if (miString != null){
+        	    accessTrustStrings.add(miString);
+        	}
             }
         }
         // parse the list we got from the cfg file. This will ADD to the list,
