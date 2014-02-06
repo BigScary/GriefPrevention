@@ -344,10 +344,27 @@ public class DatabaseDataStore extends DataStore {
 
 			SimpleDateFormat sqlFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			String dateString = sqlFormat.format(playerData.lastLogin);
+            String Existsquery = "SELECT true from griefprevention_playerdata WHERE name='%1$s'";
+            String UpdateFormat = "UPDATE griefprevention_playerdata SET name='%1$s',lastlogin='%2$s',accruedblocks='%3$s',bonusblocks='%4$s',clearonjoin='%5$s' WHERE name='%1$s'";
+            String insertFormat =
+                    "INSERT INTO griefprevention_playerdata ('name','lastlogin','accruedblocks','bonusblocks','clearonjoin')  VALUES " +
+                            "('%1$s', '%2$s', '%3$s','%4$s','%5$s');";
 
-			Statement statement = databaseConnection.createStatement();
-			statement.execute("DELETE FROM griefprevention_playerdata WHERE name='" + playerName + "';");
-			statement.execute("INSERT INTO griefprevention_playerdata VALUES ('" + playerName + "', '" + dateString + "', " + playerData.accruedClaimBlocks + ", " + playerData.bonusClaimBlocks + ", " + playerData.ClearInventoryOnJoin  + ");");
+            Statement statement = databaseConnection.createStatement();
+			//statement.execute("DELETE FROM griefprevention_playerdata WHERE name='" + playerName + "';");
+            String buildexists = String.format(Existsquery,playerName);
+            String useSaveQuery = null;
+            ResultSet rs = statement.executeQuery(buildexists);
+            if(rs.next()){
+                useSaveQuery = String.format(UpdateFormat,playerName,dateString,playerData.accruedClaimBlocks,playerData.bonusClaimBlocks,playerData.ClearInventoryOnJoin?1:0);
+            }
+            else {
+                useSaveQuery = String.format(insertFormat,playerName,dateString,playerData.accruedClaimBlocks,playerData.bonusClaimBlocks,playerData.ClearInventoryOnJoin?1:0);
+            }
+
+             statement.execute(useSaveQuery);
+
+
 		} catch (SQLException e) {
 			GriefPrevention.AddLogEntry("Unable to save data for player " + playerName + ".  Details:");
 			e.printStackTrace();
@@ -443,6 +460,7 @@ public class DatabaseDataStore extends DataStore {
 					ResultSet childResults = statement2.executeQuery("SELECT * FROM griefprevention_claimdata WHERE parentid=" + topLevelClaim.id + ";");
 
 					while (childResults.next()) {
+
 						lesserCornerString = childResults.getString("lessercorner");
 						lesserBoundaryCorner = this.locationFromString(lesserCornerString);
 						Long subid = childResults.getLong("id");
@@ -463,13 +481,13 @@ public class DatabaseDataStore extends DataStore {
 
 						neverdelete = results.getBoolean("neverdelete");
 
-						Claim childClaim = new Claim(lesserBoundaryCorner, greaterBoundaryCorner, ownerName, builderNames, containerNames, accessorNames, managerNames, null, neverdelete);
+						Claim childClaim = new Claim(lesserBoundaryCorner, greaterBoundaryCorner, ownerName, builderNames, containerNames, accessorNames, managerNames, subid, neverdelete);
 
 						// add this claim to the list of children of the current
 						// top level claim
 						childClaim.parent = topLevelClaim;
 						topLevelClaim.children.add(childClaim);
-						childClaim.subClaimid = subid;
+
 						childClaim.inDataStore = true;
 					}
 				} catch (SQLException e) {
@@ -532,12 +550,10 @@ public class DatabaseDataStore extends DataStore {
 			parentId = -1;
 		} else {
 			parentId = claim.parent.id;
-
-			id = claim.getSubClaimID() != null ? claim.getSubClaimID() : claim.parent.children.indexOf(claim);
 		}
 
 		if (claim.id == null) {
-			id = claim.getSubClaimID() != null ? claim.getSubClaimID() : -1;
+			claim.id = id = getNextClaimID();
 		} else {
 			id = claim.id;
 		}

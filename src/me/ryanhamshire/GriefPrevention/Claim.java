@@ -170,23 +170,12 @@ public class Claim {
 	 * currently impacting this claim
 	 */
 	public SiegeData siegeData = null;
-	/**
-	 * Subclaim ID. null for top-level claims, unique among subclaims otherwise.
-	 */
-	Long subClaimid = null;
+
 
 	// whether or not this is an administrative claim
 	// administrative claims are created and maintained by players with the
 	// griefprevention.adminclaims permission.
 
-	/**
-	 * retrieves the index/ID of a given subclaim.
-	 * 
-	 * @param childclaim
-	 *            Claim to get the index of.
-	 * @return -1 if the given claim is not a subdivided claim of this claim.
-	 *         otherwise, the index of the claim
-	 */
 
 	// basic constructor, just notes the creation time
 	// see above declarations for other defaults
@@ -1030,28 +1019,7 @@ public class Claim {
 		return GriefPrevention.instance.getMetaHandler().getClaimMeta(PluginKey, this);
 	}
 
-	/**
-	 * retrieves a Subclaim by the Subclaim's unique index.
-	 * 
-	 * @param pID
-	 * @return
-	 */
-	public Claim getSubClaim(long pID) {
-		for (Claim subclaim : children) {
-			if (subclaim.getSubClaimID() == pID)
-				return subclaim;
-		}
-		return null;
-	}
 
-	/**
-	 * Retrieves the subclaimID associated with this claim, if any.
-	 * 
-	 * @return
-	 */
-	public Long getSubClaimID() {
-		return this.subClaimid;
-	}
 
 	/**
 	 * Gets the width of the claim.

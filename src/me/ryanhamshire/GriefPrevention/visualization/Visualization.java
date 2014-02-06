@@ -113,6 +113,7 @@ public class Visualization {
             BuildList.add(Material.THIN_GLASS);
             BuildList.add(Material.YELLOW_FLOWER);
             BuildList.add(Material.RED_ROSE);
+            BuildList.add(Material.SNOW);
             if(GriefPrevention.isMCVersionorLater(GriefPrevention.MinecraftVersions.MC16)){
                 BuildList.add(Material.FLOWER_POT);
             }
@@ -157,6 +158,26 @@ public class Visualization {
 
 	public ArrayList<VisualizationElement> elements = new ArrayList<VisualizationElement>();
 
+    private void cosmeticCleanup()
+    {
+
+        ArrayList<VisualizationElement> AdditionalElements = new ArrayList<VisualizationElement>();
+        if(elements==null) return;
+        for(int i=0;i<elements.size();i++){
+            VisualizationElement currelement = elements.get(i);
+            //check the block above; if it's a cosmetic block, create a cosmetic "air" block and add it to this visualization instance.
+            Location abovespot = new Location(currelement.location.getWorld(),currelement.location.getX(),currelement.location.getY()+1,currelement.location.getZ());
+            if(abovespot.getBlock().getType()==Material.SNOW){
+
+                AdditionalElements.add(new VisualizationElement(new Location(abovespot.getWorld(), abovespot.getX(), abovespot.getY(), abovespot.getZ()), Material.AIR, (byte) 0));
+            }
+        }
+
+        for(int i=0;i<AdditionalElements.size();i++){
+            elements.add(AdditionalElements.get(i));
+        }
+
+    }
 	// adds a claim's visualization to the current visualization
 	// handy for combining several visualizations together, as when
 	// visualization a top level claim with several subdivisions inside
@@ -215,6 +236,7 @@ public class Visualization {
 		this.elements.add(new VisualizationElement(getVisibleLocation(world, smallx + 1, height, bigz), accentMaterial, (byte) 0));
 		this.elements.add(new VisualizationElement(getVisibleLocation(world, smallx, height, bigz - 1), accentMaterial, (byte) 0));
 
+        cosmeticCleanup();
 		// locality
 		int minx = locality.getBlockX() - 100;
 		int minz = locality.getBlockZ() - 100;

@@ -313,6 +313,10 @@ class EntityEventHandler implements Listener {
 
 		// if the attacker is a player and defender is a player (pvp combat)
 		if (attacker != null && event.getEntity() instanceof Player && event.getEntity().getWorld().getPVP()) {
+            if(attacker.getName().equals(((Player)event.getEntity()).getName()))
+            {
+                return;
+            }
 			// FEATURE: prevent pvp in the first minute after spawn, and prevent
 			// pvp when one or both players have no inventory
             Debugger.Write("PVP Damage detected between " + ((Player)event.getEntity()).getName() + " And " + attacker.getName(),Debugger.DebugLevel.Verbose);
@@ -419,8 +423,12 @@ class EntityEventHandler implements Listener {
 		// if theft protection is enabled
 		//
 			if (subEvent.getEntity() instanceof Creature) {
-
+                if(!(subEvent.getEntity() instanceof Villager) && wc.getCreatureDamage().Allowed(subEvent.getEntity(),attacker).Denied()){
+                    event.setCancelled(true);
+                    return;
+                }
 				Claim cachedClaim = null;
+
 				PlayerData playerData = null;
 				if (attacker != null) {
 					playerData = this.getDataStore().getPlayerData(attacker.getName());

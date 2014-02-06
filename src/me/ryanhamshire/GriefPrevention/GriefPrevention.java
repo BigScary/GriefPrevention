@@ -798,7 +798,7 @@ public class GriefPrevention extends JavaPlugin {
 		// cancel ALL pending tasks.
 		Bukkit.getScheduler().cancelTasks(this);
         ClaimTask = null;
-		
+		GriefPrevention.AddLogEntry("GriefPrevention is being Disabled.");
 		if(dataStore!=null) this.dataStore.saveClaimData();
 
 		GPUnloadEvent uevent = new GPUnloadEvent(this);
@@ -811,13 +811,16 @@ public class GriefPrevention extends JavaPlugin {
                 Player player = players[i];
                 String playerName = player.getName();
                 PlayerData playerData = this.dataStore.getPlayerData(playerName);
+                Debugger.Write("Saving Player Data for Player:" + playerName,DebugLevel.Verbose);
                 this.dataStore.savePlayerData(playerName, playerData);
             }
             if(ww!=null){
               for (World iterate : Bukkit.getWorlds()) {
+                  Debugger.Write("Unloading World:" + iterate.getName(),DebugLevel.Verbose);
                   ww.WorldUnload(new WorldUnloadEvent(iterate));
               }
             }
+
             this.dataStore.close();
             dataStore=null;
         }

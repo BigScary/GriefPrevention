@@ -68,7 +68,7 @@ public class ClaimInfoCommand extends GriefPreventionCommand {
 				childinfo = claimatpos.children.size() + " (";
 
 				for (Claim childclaim : claimatpos.children) {
-					childinfo += String.valueOf(childclaim.getSubClaimID()) + ",";
+					childinfo += String.valueOf(childclaim.getID()) + ",";
 				}
 				// remove the last character since it is a comma we do not want.
 				childinfo = childinfo.substring(0, childinfo.length() - 1);

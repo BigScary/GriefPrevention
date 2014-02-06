@@ -538,11 +538,11 @@ public class FlatFileDataStore extends DataStore {
 			FileReader fr = new FileReader(SourceFile.getAbsolutePath());
 			inStream = new BufferedReader(fr);
 			String line = inStream.readLine();
-
+            String subclaimtext = null;
 			while (line != null) {
-				Long usesubclaimid = null;
+
 				if (line.toUpperCase().startsWith("SUB:")) {
-					usesubclaimid = Long.parseLong(line.substring(4));
+                    subclaimtext=line.substring(4);
 					line = inStream.readLine(); // read to the next line.
 				}
 				// first line is lesser boundary corner location
@@ -642,18 +642,14 @@ public class FlatFileDataStore extends DataStore {
 				else {
 
 					// if it starts with "sub:" then it is a subid.
-					if (usesubclaimid == null) {
 
-						// otherwise, must be older file without subclaim ID.
-						// default to current count of children.
-						usesubclaimid = (long) topLevelClaim.children.size();
-						// System.out.println("Older file: Assigned SubID:" +
-						// usesubid +" with Parent claim:" + topLevelClaim);
-						// reset...
-					}
 					// as such, try to read in the subclaim ID.
-					Claim subdivision = new Claim(lesserBoundaryCorner, greaterBoundaryCorner,topLevelClaim.getOwnerName() , builderNames, containerNames, accessorNames, managerNames, null, neverdelete);
-					subdivision.subClaimid = usesubclaimid;
+
+					Claim subdivision = new Claim(lesserBoundaryCorner, greaterBoundaryCorner,topLevelClaim.getOwnerName() , builderNames, containerNames, accessorNames, managerNames, claimID, neverdelete);
+                    try {subdivision.id = Long.parseLong(subclaimtext);}
+                    catch(NumberFormatException nfe){
+                        subdivision.id=new Long(-1);
+                    }
 					subdivision.modifiedDate = new Date(SourceFile.lastModified());
 					subdivision.parent = topLevelClaim;
 					topLevelClaim.children.add(subdivision);
@@ -840,8 +836,9 @@ public class FlatFileDataStore extends DataStore {
 	// actually writes claim data to an output stream
 	synchronized private void writeClaimData(Claim claim, BufferedWriter outStream) throws IOException {
 		if (claim.parent != null) {
-			Long ChildID = claim.getSubClaimID() == null ? claim.getID() : claim.getSubClaimID();
-			outStream.write("sub:" + String.valueOf(ChildID));
+            if(claim.id<0-1) claim.id = getNextClaimID();
+			Long ChildID = claim.getID();
+			outStream.write("SUB:" + String.valueOf(ChildID));
 			outStream.newLine();
 
 		}
@@ -899,6 +896,7 @@ public class FlatFileDataStore extends DataStore {
 
 	@Override
 	synchronized void writeClaimToStorage(Claim claim) {
+        if(claim.id<0) claim.id = getNextClaimID();
 		String claimID = String.valueOf(claim.id);
 
 		BufferedWriter outStream = null;

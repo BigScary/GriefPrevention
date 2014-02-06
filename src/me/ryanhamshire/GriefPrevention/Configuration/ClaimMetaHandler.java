@@ -69,7 +69,7 @@ public class ClaimMetaHandler {
 			if (parentclaim == null)
 				return null;
 
-			return parentclaim.getSubClaim(subid);
+			return GriefPrevention.instance.dataStore.getClaim(subid);
 
 		}
 
@@ -153,7 +153,7 @@ public class ClaimMetaHandler {
 
 	public String getClaimTag(Claim c) {
 		if (c.parent != null)
-			return c.parent.getID() + "-" + String.valueOf(c.getSubClaimID());
+			return c.parent.getID() + "-" + String.valueOf(c.getID());
 		else
 			return String.valueOf(c.getID());
 	}
@@ -201,7 +201,7 @@ public class ClaimMetaHandler {
 		if (c.parent == null)
 			useclaimkey = String.valueOf(c.getID());
 		if (c.parent != null)
-			useclaimkey = String.valueOf(c.parent.getID()) + "-" + String.valueOf(c.getSubClaimID());
+			useclaimkey = String.valueOf(c.parent.getID()) + "-" + String.valueOf(c.getID());
 		setClaimMeta(PluginKey, useclaimkey, result);
 	}
 

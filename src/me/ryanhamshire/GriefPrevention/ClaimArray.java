@@ -102,25 +102,7 @@ public class ClaimArray implements Iterable<Claim> {
 		return claimmap.get(i);
 	}
 
-	/**
-	 * Retrieves a Sub Claim given it's parent ID and Subclaim ID.
-	 * 
-	 * @param ClaimID
-	 *            ID of parent Claim.
-	 * @param SubClaimID
-	 *            SubClaimID of child claim. Unique only among child claims.
-	 * @return Child claim of the claim with the Parent ID with the given
-	 *         Subclaim ID, or null if the parent or subclaim ID is not valid.
-	 */
-	public Claim getID(long ClaimID, long SubClaimID) {
 
-		Claim grabclaim = getID(ClaimID);
-		if (grabclaim == null)
-			return null;
-		Claim getchild = grabclaim.getSubClaim(SubClaimID);
-		return getchild;
-
-	}
 
 	public List<Claim> getWorldClaims(String worldname) {
 		if (!claimworldmap.containsKey(worldname))

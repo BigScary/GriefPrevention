@@ -90,24 +90,22 @@ public abstract class DataStore {
 		// ClaimCreatedEvent createevent = new ClaimCreatedEvent();
 		// ClaimCreatedEvent ev
 
+        // Get a unique identifier for the claim which will be used to name the
+        // file on disk
+        if (newClaim.id == null) {
+            newClaim.id = this.nextClaimID;
+            this.incrementNextClaimID();
+        }
 		// subdivisions are easy
 		if (newClaim.parent != null) {
-			if (newClaim.subClaimid == null) {
-				GriefPrevention.AddLogEntry("Setting Subclaim ID to:" + String.valueOf(1 + newClaim.parent.children.size()));
-				newClaim.subClaimid = (long) (newClaim.parent.children.size() + 1);
-			}
+
 			newClaim.parent.children.add(newClaim);
 			newClaim.inDataStore = true;
 			this.saveClaim(newClaim);
 			return;
 		}
 
-		// Get a unique identifier for the claim which will be used to name the
-		// file on disk
-		if (newClaim.id == null) {
-			newClaim.id = this.nextClaimID;
-			this.incrementNextClaimID();
-		}
+
 
 		// add it and mark it as added
 		int j = 0;
@@ -238,7 +236,9 @@ public abstract class DataStore {
 		CreateClaimResult result = new CreateClaimResult();
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(world);
 		int smallx, bigx, smally, bigy, smallz, bigz;
-
+        if(parent!=null){
+            Debugger.Write("Creating Subclaim of Claim with ID:" + parent.getID(),DebugLevel.Verbose);
+        }
 		Player gotplayer = Bukkit.getPlayer(ownerName);
 		// determine small versus big inputs
 		if (x1 < x2) {
