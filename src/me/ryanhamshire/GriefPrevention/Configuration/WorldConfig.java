@@ -771,7 +771,7 @@ public class WorldConfig {
            HorseTrust = oldHorseTrust?HorseTrustConstants.Extended:HorseTrustConstants.Standard;
         }
         else {
-           String newHorseTrust = config.getString("GriefPrevention.HorseTrust");
+           String newHorseTrust = config.getString("GriefPrevention.HorseTrust","");
             try {
             this.HorseTrust =  HorseTrustConstants.valueOf(newHorseTrust);
             }
@@ -781,7 +781,7 @@ public class WorldConfig {
             }
         }
         outConfig.set("GriefPrevention.HorseTrust",HorseTrust.name());
-        String SiegeDefenderStr = config.getString("GriefPrevention.SiegeDefendable", ClaimBehaviourMode.RequireOwner.name());
+        String SiegeDefenderStr = config.getString("GriefPrevention.SiegeDefendable", "RequireOwner");
         ClaimBehaviourMode ccm = ClaimBehaviourMode.parseMode(SiegeDefenderStr);
         outConfig.set("GriefPrevention.SiegeDefendable",SiegeDefenderStr);
         if (ccm == null) SiegeDefender = ClaimBehaviourMode.RequireOwner;
