@@ -647,12 +647,7 @@ public class WorldConfig {
 
     private ClaimBehaviourData TNTExplosionsBehaviour;
 
-    private ClaimBehaviourData TNTCoalesceBehaviour;
 
-    public ClaimBehaviourData getTNTCoalesceBehaviour() {
-
-        return TNTCoalesceBehaviour;
-    }
 
     private ClaimBehaviourData TrapDoors;
 
@@ -1314,8 +1309,7 @@ public class WorldConfig {
                 new ClaimBehaviourData("Ender Dragon Damage", PlacementRules.AboveOnly, PlacementRules.Both, ClaimBehaviourMode.Disabled).setSeaLevelOffsets(SeaLevelOverrideTypes.Offset, -1));
         this.EnderDragonDamageBlockBehaviour = new ClaimBehaviourData("Ender Dragon Block Damage",config,outConfig,"GriefPrevention.Rules.EnderDragonDamage",
                 new ClaimBehaviourData("Ender Dragon Block Damage", PlacementRules.AboveOnly, PlacementRules.Both, ClaimBehaviourMode.Disabled).setSeaLevelOffsets(SeaLevelOverrideTypes.Offset, -1));
-        this.TNTCoalesceBehaviour = new ClaimBehaviourData("TNT Coalescing", config, outConfig, "GriefPrevention.Rules.TNTCoalesce",
-                ClaimBehaviourData.getAll("TNT Coalescing").setSiegeOverrides(SiegePVPOverrideConstants.None, SiegePVPOverrideConstants.None, SiegePVPOverrideConstants.Allow));
+
         this.EnderEyePortalRules = new ClaimBehaviourData("Ender Portal Fill", config, outConfig, "GriefPrevention.Rules.EnderPortalFill",
                 ClaimBehaviourData.getAll("Ender Portal Fill").setBehaviourMode(ClaimBehaviourMode.RequireBuild));
         this.FlowerPotRules = new ClaimBehaviourData("Flower Pots", config, outConfig, "GriefPrevention.Rules.FlowerPots",
