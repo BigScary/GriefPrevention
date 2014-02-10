@@ -546,6 +546,11 @@ public class WorldConfig {
 
     private ClaimBehaviourData Riding_Horse;
 
+    private ClaimBehaviourData Placement_Boat;
+    private ClaimBehaviourData Placement_Minecart;
+
+    public ClaimBehaviourData getBoatPlacement(){ return Placement_Boat;}
+    public ClaimBehaviourData getMinecartPlacement() { return Placement_Minecart;}
     public ClaimBehaviourData getBoatRiding(){ return Riding_Boat;}
     public ClaimBehaviourData getMinecartRiding(){ return Riding_Minecart;}
     public ClaimBehaviourData getPigRiding(){ return Riding_Pig;}
@@ -1342,12 +1347,28 @@ public class WorldConfig {
         this.VehicleDamage = new ClaimBehaviourData("Vehicle Damage", config, outConfig, "GriefPrevention.Rules.VehicleDamage", ClaimBehaviourData.getAll("Vehicle Damage").setBehaviourMode(ClaimBehaviourMode.RequireContainer));
         this.EnvironmentalVehicleDamage = new ClaimBehaviourData("Environmental Vehicle Damage", config, outConfig, "GriefPrevention.Rules.EnvironmentalVehicleDamage", ClaimBehaviourData.getOutsideClaims("Environmental Vehicle Damage"));
         //WIP: not applicable for this commit...
-        /*ClaimBehaviourData vehiclerule = new ClaimBehaviourData("Vehicle Boarding",config,outConfig,"GriefPrevention.Rules.VehicleBoarding")
+        ClaimBehaviourData vehiclerule = new ClaimBehaviourData("Vehicle Boarding",config,outConfig,"GriefPrevention.Rules.VehicleBoarding",
+                ClaimBehaviourData.getAll("Vehicle Boarding").setBehaviourMode(ClaimBehaviourMode.RequireContainer));
         if(isValidRule(config,"GriefPrevention.Rules.VehicleBoarding")){
-           Riding_Boat=Riding_Minecart=Riding_Horse=Riding_Pig =
+           Riding_Pig = Riding_Horse = vehiclerule;
 
         }
-          */
+
+        //Pig,Boat,Minecart, Horse.
+        if(isValidRule(config,"GriefPrevention.Rules.Riding.Boat")){
+            Riding_Boat = new ClaimBehaviourData("Boat Riding",config,outConfig,
+                    "GriefPrevention.Rules.Riding.Boat",
+                    ClaimBehaviourData.getAll("Boat Riding").setBehaviourMode(ClaimBehaviourMode.RequireContainer));
+        }
+        else {
+            Riding_Boat = vehiclerule;
+        }
+        if(isValidRule(config,"GriefPrevention.Rules.Riding.Minecart")){
+            Riding_Minecart = new ClaimBehaviourData("Minecart Riding",config,outConfig,
+                    "GriefPrevention.Rules.Riding.Minecart",
+            ClaimBehaviourData.getAll("Minecart Riding").setBehaviourMode(ClaimBehaviourMode.RequireContainer));
+        }
+
 
         this.ZombieDoorBreaking = new ClaimBehaviourData("Zombie Door Breaking", config, outConfig, "GriefPrevention.Rules.ZombieDoorBreaking", ClaimBehaviourData.getNone("Zombie Door Breaking"));
         SheepShearingRules = new ClaimBehaviourData("Sheep Shearing", config, outConfig, "GriefPrevention.Rules.SheepShearing", ClaimBehaviourData.getAll("Sheep Shearing").setBehaviourMode(ClaimBehaviourMode.RequireContainer));

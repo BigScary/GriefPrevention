@@ -1345,23 +1345,23 @@ class PlayerEventHandler implements Listener {
 
 
 
-			else if (materialInHand == Material.BOAT) {
-				Claim claim = GriefPrevention.instance.dataStore.getClaimAt(relevantPosition, false);
-				if (claim != null) {
-					String noAccessReason = claim.allowAccess(player);
-					if (noAccessReason != null) {
-						GriefPrevention.sendMessage(player, TextMode.Err, noAccessReason);
-						event.setCancelled(true);
-					}
-				}
+			if (materialInHand == Material.BOAT) {
+                if(wc.getBoatPlacement().Allowed(relevantPosition,player).Denied()){
+                    event.setCancelled(true);
+                    return;
+                }
 
-				return;
 			}
-
+            else if(materialInHand==Material.MINECART){
+                if(wc.getMinecartPlacement().Allowed(relevantPosition,player).Denied()){
+                    event.setCancelled(true);
+                    return;
+                }
+            }
 
 			// if it's a spawn egg, minecart, or boat, and this is a creative
 			// world, apply special rules
-			else if (materialInHand == Material.MINECART || materialInHand == Material.POWERED_MINECART || materialInHand == Material.STORAGE_MINECART || materialInHand == Material.HOPPER_MINECART || materialInHand == Material.EXPLOSIVE_MINECART || materialInHand == Material.BOAT && GriefPrevention.instance.creativeRulesApply(clickedBlock.getLocation())) {
+			else if (materialInHand == Material.POWERED_MINECART || materialInHand == Material.STORAGE_MINECART || materialInHand == Material.HOPPER_MINECART || materialInHand == Material.EXPLOSIVE_MINECART && GriefPrevention.instance.creativeRulesApply(clickedBlock.getLocation())) {
 				// player needs build permission at this location
 				String noBuildReason = GriefPrevention.instance.allowBuild(player, relevantPosition);
 				if (noBuildReason != null) {
@@ -2228,6 +2228,19 @@ class PlayerEventHandler implements Listener {
 				}
 
 			}
+            else if(entity instanceof Boat){
+                if(wc.getBoatRiding().Allowed(entity.getLocation(),player,true).Denied()){
+                    event.setCancelled(true);
+                    return;
+                }
+
+            }
+            else if(entity instanceof Minecart){
+                if(wc.getMinecartRiding().Allowed(entity.getLocation(),player,true).Denied()){
+                    event.setCancelled(true);
+                    return;
+                }
+            }
 
 			if (entity instanceof Creature) {
 				// check for usage of Leads.

@@ -275,6 +275,7 @@ public class GriefPrevention extends JavaPlugin {
 	private MovementWatcher moveWatcher = null;
 
 	public RegExTestHelper OreBlockRegexHelper;
+
 	public WorldWatcher ww = new WorldWatcher();
     public String allowBreak(Player player,Location location){
         return allowBreak(player,location,true);
@@ -610,7 +611,7 @@ public class GriefPrevention extends JavaPlugin {
 	 * @param world
 	 *            World to retrieve configuration for.
 	 * @return WorldConfig representing the configuration of the given world.
-	 * @see getWorldCfg
+	 *
 	 */
 	public WorldConfig getWorldCfg(World world) {
 		return Configuration.getWorldConfig(world);

@@ -24,8 +24,7 @@ import java.util.List;
 //holds data pertaining to an option and where it works. 
 //used primarily for information on explosions.
 public class ClaimBehaviourData {
-
-	public enum ClaimAllowanceConstants {
+ 	public enum ClaimAllowanceConstants {
 		None, Allow, Allow_Forced, Deny, Deny_Forced  ;
 		public boolean Allowed() {
 
@@ -238,7 +237,7 @@ public class ClaimBehaviourData {
 	private SiegePVPOverrideConstants SiegeDefenderOverride = SiegePVPOverrideConstants.None;
 	private SiegePVPOverrideConstants SiegeBystanderOverride = SiegePVPOverrideConstants.None;
 	private SiegePVPOverrideConstants SiegeNonPlayerOverride = SiegePVPOverrideConstants.None;
-	
+
 	public SiegePVPOverrideConstants getSiegeAttackerOverride(){ return SiegeAttackerOverride;}
 	public SiegePVPOverrideConstants getSiegeDefenderOverride(){ return SiegeDefenderOverride;}
 	public SiegePVPOverrideConstants getSiegeBystanderOverride(){ return SiegeBystanderOverride;}
