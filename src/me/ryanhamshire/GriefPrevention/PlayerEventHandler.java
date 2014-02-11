@@ -2063,7 +2063,7 @@ class PlayerEventHandler implements Listener {
 						return;
 					}
 
-				} else if (handItem!=null && (handItem.getType() == Material.WHEAT || handItem.getType() == Material.HAY_BLOCK || handItem.getType() == Material.APPLE || handItem.getType() == Material.GOLDEN_APPLE)) {
+				} else if (handItem!=null && h.getHealth() < h.getMaxHealth() && (handItem.getType() == Material.WHEAT || handItem.getType() == Material.HAY_BLOCK || handItem.getType() == Material.APPLE || handItem.getType() == Material.GOLDEN_APPLE)) {
 					// apply feeding rules.
 					if (wc.getFeedingRules().Allowed(h, player).Denied()) {
 						event.setCancelled(true);
