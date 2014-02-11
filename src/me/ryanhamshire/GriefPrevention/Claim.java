@@ -899,7 +899,7 @@ public class Claim {
 	 */
 	@Deprecated
 	public Long getSubClaimID() {
-		return this.id
+		return this.parent == null ? null : this.id;
 	}
 
 	/**
