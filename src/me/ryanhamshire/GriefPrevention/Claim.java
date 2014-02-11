@@ -895,6 +895,14 @@ public class Claim {
 	}
 
 	/**
+	 * @deprecated use Claim.getID() instead
+	 */
+	@Deprecated
+	public Long getSubClaimID() {
+		return this.id
+	}
+
+	/**
 	 * Returns a copy of the location representing lower x, y, z limits
 	 * 
 	 * @return
