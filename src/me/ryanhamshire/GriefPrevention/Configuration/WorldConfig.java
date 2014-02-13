@@ -1236,7 +1236,7 @@ public class WorldConfig {
         outConfig.set("GriefPrevention.PvP.ProtectPlayersInLandClaims.PlayerOwnedClaims", this.config_pvp_noCombatInPlayerLandClaims);
         outConfig.set("GriefPrevention.PvP.ProtectPlayersInLandClaims.AdministrativeClaims", this.config_pvp_noCombatInAdminLandClaims);
 
-        this.SpawnProtectEnabled = config.getBoolean("GriefPrevention.PvP.ProtectFreshSpawns", true);
+        //this.SpawnProtectEnabled = config.getBoolean("GriefPrevention.PvP.ProtectFreshSpawns", true);
         // outConfig.set("GriefPrevention.Claims.Worlds",
         // claimsEnabledWorldNames);
         // outConfig.set("GriefPrevention.Claims.CreativeRulesWorlds",
@@ -1368,7 +1368,12 @@ public class WorldConfig {
                     "GriefPrevention.Rules.Riding.Minecart",
             ClaimBehaviourData.getAll("Minecart Riding").setBehaviourMode(ClaimBehaviourMode.RequireContainer));
         }
-
+        Placement_Boat =new ClaimBehaviourData("Boat Placement",config,outConfig,
+                "GriefPrevention.Rules.VehiclePlacement.Boat",
+                ClaimBehaviourData.getAll("Boat Placement").setBehaviourMode(ClaimBehaviourMode.RequireBuild));
+        Placement_Minecart = new ClaimBehaviourData("Minecart Placement",config,outConfig,
+                "GriefPrevention.Rules.VehiclePlacement.Minecart",
+                ClaimBehaviourData.getAll("Minecart Placement").setBehaviourMode(ClaimBehaviourMode.RequireBuild));
 
         this.ZombieDoorBreaking = new ClaimBehaviourData("Zombie Door Breaking", config, outConfig, "GriefPrevention.Rules.ZombieDoorBreaking", ClaimBehaviourData.getNone("Zombie Door Breaking"));
         SheepShearingRules = new ClaimBehaviourData("Sheep Shearing", config, outConfig, "GriefPrevention.Rules.SheepShearing", ClaimBehaviourData.getAll("Sheep Shearing").setBehaviourMode(ClaimBehaviourMode.RequireContainer));

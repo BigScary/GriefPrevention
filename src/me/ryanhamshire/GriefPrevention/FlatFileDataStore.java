@@ -181,6 +181,7 @@ public class FlatFileDataStore extends DataStore {
 
         String scaseSensitive = strPath + sPlayerName;
         String scaseInsensitive = strPath +sPlayerName.toLowerCase();
+
         File examinepath = new File(strPath);
 
         File CaseSensitive = null;
