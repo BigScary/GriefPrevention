@@ -12,7 +12,7 @@ import me.ryanhamshire.GriefPrevention.MaterialInfo;
 
 /**
  * 
- * @author BC_Programming Helper class designed to try to scour for certain Mod
+ * Helper class designed to try to scour for certain Mod
  *         config files on modded installations.
  * 
  */
@@ -21,20 +21,9 @@ public class ModBlockHelper {
 
 	private static List<String> CachedConfigs = null;
 	public final static String moddedConfigPath = "plugins" + File.separator + "../config/";
-	private static HashMap<Integer, String> ModdedNameLookup = new HashMap<Integer, String>(); // lookup
-																								// of
-																								// Modded
-																								// Item
-																								// IDs
-																								// to
-																								// Modded
-																								// Item
-																								// Names
-																								// where
-																								// applicable.
-																								// usually
-																								// for
-																								// blocks.
+	private static HashMap<Integer, String> ModdedNameLookup = new HashMap<Integer, String>(); 
+	// lookup of Modded Item IDs to Item namers where applicable.
+    //usually used for blocks.
 
 	private static void AddSearchResults(String CfgFile, ModdedBlocksSearchResults ResultStore) {
 

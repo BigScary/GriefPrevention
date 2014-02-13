@@ -92,7 +92,25 @@ public class Visualization {
 
 		return block.getLocation();
 	}
+    private static List<Location> getVisibleLocations(World world,int x,int y,int z){
+        ArrayList<Location> results = new ArrayList<Location>();
+        boolean LastSolid=false;
+        for(int currY=0;currY<world.getHighestBlockYAt(x,z)+2;currY++){
 
+            Block blockatpos = world.getBlockAt(x,currY,z);
+            boolean currsolid = !isTransparent(blockatpos);
+            Location appearpos = new Location(world,x,currY-1,z);
+            if(currsolid!=LastSolid){
+                if(!currsolid)
+                    results.add(appearpos);
+                else
+                    results.add(blockatpos.getLocation());
+            }
+
+            LastSolid=currsolid;
+        }
+        return results;
+    }
 	// helper method for above. allows visualization blocks to sit underneath
 	// partly transparent blocks like grass and fence
     private static List<Material> TransparentMaterials= null;
@@ -171,6 +189,7 @@ public class Visualization {
 
                 AdditionalElements.add(new VisualizationElement(new Location(abovespot.getWorld(), abovespot.getX(), abovespot.getY(), abovespot.getZ()), Material.AIR, (byte) 0));
             }
+
         }
 
         for(int i=0;i<AdditionalElements.size();i++){
@@ -217,24 +236,40 @@ public class Visualization {
 		}
 
 		// bottom left corner
-		this.elements.add(new VisualizationElement(getVisibleLocation(world, smallx, height, smallz), cornerMaterial, (byte) 0));
-		this.elements.add(new VisualizationElement(getVisibleLocation(world, smallx + 1, height, smallz), accentMaterial, (byte) 0));
-		this.elements.add(new VisualizationElement(getVisibleLocation(world, smallx, height, smallz + 1), accentMaterial, (byte) 0));
+        for(Location addposition:getVisibleLocations(world,smallx,height,smallz))
+		    this.elements.add(new VisualizationElement(addposition, cornerMaterial, (byte) 0));
+
+        for(Location addposition:getVisibleLocations(world,smallx+1,height,smallz))
+		    this.elements.add(new VisualizationElement(addposition, accentMaterial, (byte) 0));
+
+        for(Location addposition:getVisibleLocations(world, smallx, height, smallz + 1))
+		    this.elements.add(new VisualizationElement(addposition, accentMaterial, (byte) 0));
 
 		// bottom right corner
-		this.elements.add(new VisualizationElement(getVisibleLocation(world, bigx, height, smallz), cornerMaterial, (byte) 0));
-		this.elements.add(new VisualizationElement(getVisibleLocation(world, bigx - 1, height, smallz), accentMaterial, (byte) 0));
-		this.elements.add(new VisualizationElement(getVisibleLocation(world, bigx, height, smallz + 1), accentMaterial, (byte) 0));
+        for(Location addposition:getVisibleLocations(world, bigx, height, smallz))
+		    this.elements.add(new VisualizationElement(addposition, cornerMaterial, (byte) 0));
+        for(Location addposition:getVisibleLocations(world, bigx - 1, height, smallz))
+		    this.elements.add(new VisualizationElement(addposition, accentMaterial, (byte) 0));
+        for(Location addposition:getVisibleLocations(world, bigx, height, smallz + 1))
+		    this.elements.add(new VisualizationElement(addposition, accentMaterial, (byte) 0));
 
 		// top right corner
-		this.elements.add(new VisualizationElement(getVisibleLocation(world, bigx, height, bigz), cornerMaterial, (byte) 0));
-		this.elements.add(new VisualizationElement(getVisibleLocation(world, bigx - 1, height, bigz), accentMaterial, (byte) 0));
-		this.elements.add(new VisualizationElement(getVisibleLocation(world, bigx, height, bigz - 1), accentMaterial, (byte) 0));
+        for(Location addposition:getVisibleLocations(world, bigx, height, bigz))
+		    this.elements.add(new VisualizationElement(addposition, cornerMaterial, (byte) 0));
+		for(Location addposition:getVisibleLocations(world, bigx - 1, height, bigz))
+            this.elements.add(new VisualizationElement(addposition, accentMaterial, (byte) 0));
+        for(Location addposition:getVisibleLocations(world, bigx, height, bigz - 1))
+		    this.elements.add(new VisualizationElement(addposition, accentMaterial, (byte) 0));
 
 		// top left corner
-		this.elements.add(new VisualizationElement(getVisibleLocation(world, smallx, height, bigz), cornerMaterial, (byte) 0));
-		this.elements.add(new VisualizationElement(getVisibleLocation(world, smallx + 1, height, bigz), accentMaterial, (byte) 0));
-		this.elements.add(new VisualizationElement(getVisibleLocation(world, smallx, height, bigz - 1), accentMaterial, (byte) 0));
+
+        for(Location addposition:getVisibleLocations(world, smallx, height, bigz))
+		    this.elements.add(new VisualizationElement(addposition, cornerMaterial, (byte) 0));
+
+        for(Location addposition:getVisibleLocations(world, smallx + 1, height, bigz))
+		    this.elements.add(new VisualizationElement(addposition, accentMaterial, (byte) 0));
+		for(Location addposition:getVisibleLocations(world, smallx, height, bigz - 1))
+            this.elements.add(new VisualizationElement(addposition, accentMaterial, (byte) 0));
 
         cosmeticCleanup();
 		// locality
@@ -246,25 +281,29 @@ public class Visualization {
 		// top line
 		for (int x = smallx + 10; x < bigx - 10; x += 10) {
 			if (x > minx && x < maxx)
-				this.elements.add(new VisualizationElement(getVisibleLocation(world, x, height, bigz), accentMaterial, (byte) 0));
+                for(Location addlocation:getVisibleLocations(world, x, height, bigz))
+				    this.elements.add(new VisualizationElement(addlocation, accentMaterial, (byte) 0));
 		}
 
 		// bottom line
 		for (int x = smallx + 10; x < bigx - 10; x += 10) {
 			if (x > minx && x < maxx)
-				this.elements.add(new VisualizationElement(getVisibleLocation(world, x, height, smallz), accentMaterial, (byte) 0));
+                for(Location addlocation:getVisibleLocations(world, x, height, smallz))
+				    this.elements.add(new VisualizationElement(addlocation, accentMaterial, (byte) 0));
 		}
 
 		// left line
 		for (int z = smallz + 10; z < bigz - 10; z += 10) {
 			if (z > minz && z < maxz)
-				this.elements.add(new VisualizationElement(getVisibleLocation(world, smallx, height, z), accentMaterial, (byte) 0));
+                for(Location addlocation:getVisibleLocations(world, smallx, height, z))
+				    this.elements.add(new VisualizationElement(addlocation, accentMaterial, (byte) 0));
 		}
 
 		// right line
 		for (int z = smallz + 10; z < bigz - 10; z += 10) {
 			if (z > minz && z < maxz)
-				this.elements.add(new VisualizationElement(getVisibleLocation(world, bigx, height, z), accentMaterial, (byte) 0));
+                for(Location addlocation:getVisibleLocations(world, bigx, height, z))
+				    this.elements.add(new VisualizationElement(addlocation, accentMaterial, (byte) 0));
 		}
 	}
 }
