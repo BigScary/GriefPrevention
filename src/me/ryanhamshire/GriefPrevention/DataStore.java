@@ -1270,7 +1270,7 @@ public abstract class DataStore {
         this.addDefault(defaults,Messages.PvPPunishDefenderWarning,"{0} has engaged you in PVP combat! fight or run away, but if you log out while in combat you will lose your inventory!","0:player engaging combat");
         this.addDefault(defaults,Messages.PvPPunishAttackerWarning,"You have engaged {0} in PVP combat! fight or run away, but if you log out while in combat you will lose your inventory!","0:player engaging combat");
         this.addDefault(defaults,Messages.PvPLogoutSafely,"You are no longer PvP Flagged. You may safely logout.",null);
-
+        this.addDefault(defaults,Messages.PvPPunished,"You have been punished for Logging out during a siege or PvP. You were warned...",null);
 		// load the config file
 		FileConfiguration config = YamlConfiguration.loadConfiguration(new File(messagesFilePath));
 

@@ -786,6 +786,10 @@ class PlayerEventHandler implements Listener {
 		String playerName = player.getName();
         PvPSafePlayerTask.ClearPlayerTasks(player);
 		final PlayerData playerData = GriefPrevention.instance.dataStore.getPlayerData(playerName);
+        final PlayerData lastPvPData = playerData.lastPvpPlayer==null?null:GriefPrevention.instance.dataStore.getPlayerData(playerData.lastPvpPlayer);
+        if(playerData.lastPvpPlayer!=null){
+
+        }
 		WorldConfig wc = GriefPrevention.instance.getWorldCfg(player.getWorld());
 		if (!wc.Enabled())
 			return;
@@ -799,16 +803,28 @@ class PlayerEventHandler implements Listener {
         //tweak: delay for 10 seconds before we perform this check...
 		if (wc.getPvPPunishLogout() && playerData.inPvpCombat()) {
             final PlayerInventory dcedInventory = player.getInventory();
-
+            Debugger.Write("Disconnected player:" + player.getName() + " was in PVP Combat.",DebugLevel.Verbose);
             Bukkit.getScheduler().runTaskLater(GriefPrevention.instance, new Runnable() {
                   public void run(){
+                      Debugger.Write("Punishment Task, player:" + player.getName(),DebugLevel.Verbose);
+
+
+
                       //if the last player this Player attacked is still online...
-                      Player lastplayer = Bukkit.getPlayerExact(playerData.lastPvpPlayer);
-                      Player thisPlayer = Bukkit.getPlayerExact(playerData.playerName);
-                      if(lastplayer!=null && lastplayer.isOnline() && !(thisPlayer==null || thisPlayer.isOnline())){
+                      Player lastplayer = lastPvPData==null?null:Bukkit.getPlayerExact(lastPvPData.playerName);
+                      OfflinePlayer thisPlayer = Bukkit.getOfflinePlayer(playerData.playerName);
+
+                      Debugger.Write("Logged player:" + player.getName() + " online:" + thisPlayer.isOnline(),DebugLevel.Verbose);
+                      if(lastplayer==null) Debugger.Write("No other player.",DebugLevel.Verbose);
+                      else Debugger.Write("other Player:" + lastplayer.getName(),DebugLevel.Verbose);
+                      Debugger.Write("lastplayer!=null && lastplayer.isOnline:" + (lastplayer!=null && lastplayer.isOnline()),DebugLevel.Verbose);
+                      Debugger.Write("!(thisPlayer==null || thisPlayer.isOnline())" + (!(thisPlayer==null || thisPlayer.isOnline())),DebugLevel.Verbose);
+                      if(lastplayer!=null && lastplayer.isOnline() && (thisPlayer==null || !thisPlayer.isOnline())){
+
                           //make sure they didn't relog, either.
                           //I'm fairly certain this won't drop their items, since they DC'd.
-                          //as such, let's hope we can access the inventory of offline players.
+                          //so we need to drop it manually.
+
 
                           GriefPrevention.sendMessage(lastplayer,TextMode.Info,Messages.PvPLogAnnouncement,player.getName());
 
@@ -831,7 +847,7 @@ class PlayerEventHandler implements Listener {
                   }
 
 
-            },20*10);
+            },20*5);
 
 
 		}
@@ -2669,6 +2685,8 @@ class PlayerEventHandler implements Listener {
             player.getInventory().clear();
 
             player.getInventory().setArmorContents( new ItemStack[4]);
+            //send them the inventory clear message.
+            GriefPrevention.sendMessage(player,TextMode.Err,Messages.PvPPunished);
 
             //now we kill them off.
             //we clear it first so they do not drop their inventory, since it was already
