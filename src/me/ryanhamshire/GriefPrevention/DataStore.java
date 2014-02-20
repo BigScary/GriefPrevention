@@ -1079,7 +1079,7 @@ public abstract class DataStore {
 		this.addDefault(defaults, Messages.AdminClaimsMode, "Administrative claims mode active.  Any claims created will be free and editable by other administrators.", null);
 		this.addDefault(defaults, Messages.BasicClaimsMode, "Returned to basic claim creation mode.", null);
 		this.addDefault(defaults, Messages.SubdivisionMode, "Subdivision mode.  Use your shovel to create subdivisions in your existing claims.  Use /basicclaims to exit.", null);
-		this.addDefault(defaults, Messages.SubdivisionDemo, "Land Claim Help:  http://tinyurl.com/7urdtue", null);
+		this.addDefault(defaults, Messages.SubdivisionDemo, "Land Claim Help:  http://youtu.be/I3FLCFam5LI", null);
 		this.addDefault(defaults, Messages.DeleteClaimMissing, "There's no claim here.", null);
 		this.addDefault(defaults, Messages.DeletionSubdivisionWarning, "This claim includes subdivisions.  If you're sure you want to delete it, use /DeleteClaim again.", null);
 		this.addDefault(defaults, Messages.DeleteLockedClaimWarning, "This claim is locked.  If you're sure you want to delete it, use /DeleteClaim again.", null);
@@ -1141,8 +1141,8 @@ public abstract class DataStore {
 		this.addDefault(defaults, Messages.RemainingBlocksWorld, "You may claim up to {0} more blocks in this world.", "0: remaining blocks in world");
 
 		this.addDefault(defaults, Messages.RemainingClaimsWorld, "You may make {0} more claims in this world.", "0: remaining claims in world.");
-		this.addDefault(defaults, Messages.CreativeBasicsDemoAdvertisement, "Land Claim Help:  http://tinyurl.com/c7bajb8", null);
-		this.addDefault(defaults, Messages.SurvivalBasicsDemoAdvertisement, "Land Claim Help:  http://tinyurl.com/6nkwegj", null);
+		this.addDefault(defaults, Messages.CreativeBasicsDemoAdvertisement, "Land Claim Help:  http://youtu.be/of88cxVmfSM", null);
+		this.addDefault(defaults, Messages.SurvivalBasicsDemoAdvertisement, "Land Claim Help:  http://youtu.be/VDsjXB-BaE0", null);
 		this.addDefault(defaults, Messages.TrappedChatKeyword, "trapped", "When mentioned in chat, players get information about the /trapped command.");
 		this.addDefault(defaults, Messages.TrappedInstructions, "Are you trapped in someone's land claim?  Try the /trapped command.", null);
 		this.addDefault(defaults, Messages.PvPNoDrop, "You can't drop items while in PvP combat.", null);
