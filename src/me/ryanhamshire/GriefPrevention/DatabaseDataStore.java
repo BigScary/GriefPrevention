@@ -336,6 +336,7 @@ public class DatabaseDataStore extends DataStore {
 	synchronized public void savePlayerData(String playerName, PlayerData playerData) {
 		// never save data for the "administrative" account. an empty string for
 		// player name indicates administrative account
+
 		if (playerName.length() == 0)
 			return;
 
@@ -347,7 +348,7 @@ public class DatabaseDataStore extends DataStore {
             String Existsquery = "SELECT true from griefprevention_playerdata WHERE name='%1$s'";
             String UpdateFormat = "UPDATE griefprevention_playerdata SET name='%1$s',lastlogin='%2$s',accruedblocks='%3$s',bonusblocks='%4$s',clearonjoin='%5$s' WHERE name='%1$s'";
             String insertFormat =
-                    "INSERT INTO griefprevention_playerdata ('name','lastlogin','accruedblocks','bonusblocks','clearonjoin')  VALUES " +
+                    "INSERT INTO griefprevention_playerdata (name,lastlogin,accruedblocks,bonusblocks,clearonjoin)  VALUES " +
                             "('%1$s', '%2$s', '%3$s','%4$s','%5$s');";
 
             Statement statement = databaseConnection.createStatement();
