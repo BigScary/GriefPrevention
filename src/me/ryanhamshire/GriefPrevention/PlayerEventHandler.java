@@ -1364,15 +1364,17 @@ class PlayerEventHandler implements Listener {
 			if (materialInHand == Material.BOAT) {
                 if(wc.getBoatPlacement().Allowed(relevantPosition,player).Denied()){
                     event.setCancelled(true);
-                    return;
+
                 }
+                return;
 
 			}
             else if(materialInHand==Material.MINECART){
                 if(wc.getMinecartPlacement().Allowed(relevantPosition,player).Denied()){
                     event.setCancelled(true);
-                    return;
+
                 }
+                return;
             }
 
 			// if it's a spawn egg, minecart, or boat, and this is a creative
