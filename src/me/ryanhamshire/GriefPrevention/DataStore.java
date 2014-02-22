@@ -130,7 +130,8 @@ public abstract class DataStore {
         for(Claim c:claimslook){
 
             if(c.getLesserBoundaryCorner().equals(check.getLesserBoundaryCorner()) &&
-                    c.getGreaterBoundaryCorner().equals(check.getGreaterBoundaryCorner()))
+                    c.getGreaterBoundaryCorner().equals(check.getGreaterBoundaryCorner() )
+                    && (c.getLesserBoundaryCorner().getWorld().equals(check.getLesserBoundaryCorner().getWorld())))
                 return true;
 
         }
