@@ -451,7 +451,7 @@ public class DatabaseDataStore extends DataStore {
 
 					// otherwise, add this claim to the claims collection
 					else {
-						this.claims.add(topLevelClaim);
+                        addClaim(topLevelClaim);
 						topLevelClaim.inDataStore = true;
 					}
 

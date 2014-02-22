@@ -117,6 +117,8 @@ public abstract class DataStore {
 		// owner's playerData with the new claim
 		if (!newClaim.isAdminClaim()) {
 			PlayerData ownerData = this.getPlayerData(newClaim.getOwnerName());
+
+            if(!containsClaim(newClaim,ownerData.claims))
 			ownerData.claims.add(newClaim);
 			this.savePlayerData(newClaim.getOwnerName(), ownerData);
 		}
@@ -124,7 +126,16 @@ public abstract class DataStore {
 		// make sure the claim is saved to disk
 		this.saveClaim(newClaim);
 	}
+    private boolean containsClaim(Claim check,Vector<Claim> claimslook){
+        for(Claim c:claimslook){
 
+            if(c.getLesserBoundaryCorner().equals(check.getLesserBoundaryCorner()) &&
+                    c.getGreaterBoundaryCorner().equals(check.getGreaterBoundaryCorner()))
+                return true;
+
+        }
+        return false;
+    }
 	private void addDefault(HashMap<String, CustomizableMessage> defaults, Messages id, String text, String notes) {
 		CustomizableMessage message = new CustomizableMessage(id, text, notes);
 		defaults.put(id.name(), message);
