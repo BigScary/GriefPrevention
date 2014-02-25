@@ -1289,16 +1289,46 @@ public class WorldConfig {
         outConfig.set("GriefPrevention.Mods.BlockIdsRequiringContainerTrust", containerTrustStrings);
         this.BlockBreakOverrides = new PlaceBreakOverrides(config, outConfig, "GriefPrevention.Rules.BreakOverrides", PlaceBreakOverrides.Default);
         this.BlockPlaceOverrides = new PlaceBreakOverrides(config, outConfig, "GriefPrevention.Rules.PlaceOverrides", PlaceBreakOverrides.Default);
-        this.SilverfishBreakRules = new ClaimBehaviourData("Silverfish Break", config, outConfig, "GriefPrevention.Rules.SilverfishBreak", new ClaimBehaviourData("Silverfish Break", PlacementRules.Both, PlacementRules.Neither, ClaimBehaviourMode.Disabled));
         this.config_BlockPlacementRules = BlockPlacementRules.ParseRules(config, outConfig, "GriefPrevention.BlockPlacementRules");
         this.config_BlockBreakRules = BlockPlacementRules.ParseRules(config, outConfig, "GriefPrevention.BlockBreakRules");
+        this.PlaceBlockRules = new ClaimBehaviourData("Block Placement", config, outConfig, "GriefPrevention.Rules.BlockPlacement", new ClaimBehaviourData("Block Placement", PlacementRules.Both, PlacementRules.Both, ClaimBehaviourMode.RequireBuild).setPVPOverride(SiegePVPOverrideConstants.Deny).setSiegeOverrides(SiegePVPOverrideConstants.Deny, SiegePVPOverrideConstants.Deny));
+        this.BreakBlockRules = new ClaimBehaviourData("Block Breaking", config, outConfig, "GriefPrevention.Rules.BlockBreaking", new ClaimBehaviourData("Block Breaking", PlacementRules.Both, PlacementRules.Both, ClaimBehaviourMode.RequireBuild).setPVPOverride(SiegePVPOverrideConstants.Deny).setSiegeOverrides(SiegePVPOverrideConstants.Allow, SiegePVPOverrideConstants.Deny));
+
+        boolean nosurvivalbuilding = config.getBoolean("GriefPrevention.NoSurvivalBuildingOutsideClaims",false);
+        if(nosurvivalbuilding){
+            outConfig.set("GriefPrevention.NoSurvivalBuildingOutsideClaims",true);
+            GriefPrevention.AddLogEntry("NoSurvivalBuildingOutsideClaims option detected: attempting conversion to appropriate overrides.");
+            //PlaceBlockRules = ClaimBehaviourData.getAll("Block Placement").setBehaviourMode(ClaimBehaviourMode.RequireBuild);
+            PlaceBlockRules = new ClaimBehaviourData("Block Placement",
+                    new PlacementRules(PlacementRules.BasicPermissionConstants.Force_Deny,PlacementRules.BasicPermissionConstants.Force_Deny),
+                    PlacementRules.Both,
+                    ClaimBehaviourMode.RequireBuild).setPVPOverride(SiegePVPOverrideConstants.Deny).setSiegeOverrides(SiegePVPOverrideConstants.Allow, SiegePVPOverrideConstants.Deny);
+            BreakBlockRules =
+                    new ClaimBehaviourData("Block Breaking",
+                            new PlacementRules(PlacementRules.BasicPermissionConstants.Force_Deny,PlacementRules.BasicPermissionConstants.Force_Deny),
+                            PlacementRules.Both,
+                            ClaimBehaviourMode.RequireBuild).setPVPOverride(SiegePVPOverrideConstants.Deny).setSiegeOverrides(SiegePVPOverrideConstants.Allow, SiegePVPOverrideConstants.Deny);
+            //create an override for chests and trapped chests.
+            Material[] addforMaterials = new Material[]{Material.CHEST,Material.TRAPPED_CHEST};
+            for(Material overridemat:addforMaterials){
+                this.getBlockPlaceOverrides().AddOverride("Chests:" + overridemat.name(),overridemat.getId(),
+                        ClaimBehaviourData.getOutsideClaims("Chests" + overridemat.name()).setBehaviourMode(ClaimBehaviourMode.RequireBuild).addSpecialRule(ClaimBehaviourData.SpecialRules.ClaimRule_RequireNoClaims));
+            }
+
+
+            Debugger.Write(this.getBlockPlaceOverrides().toString(),DebugLevel.Verbose);
+        }
+
+        this.SilverfishBreakRules = new ClaimBehaviourData("Silverfish Break", config, outConfig, "GriefPrevention.Rules.SilverfishBreak", new ClaimBehaviourData("Silverfish Break", PlacementRules.Both, PlacementRules.Neither, ClaimBehaviourMode.Disabled));
+
+
+
         // outConfig.set("GriefPrevention.Mods.BlockIdsExplodable",
         // explodableStrings);
 
         //placement requires build permission by default, and isn't allowed during PVP or Siege.
 
-        this.PlaceBlockRules = new ClaimBehaviourData("Block Placement", config, outConfig, "GriefPrevention.Rules.BlockPlacement", new ClaimBehaviourData("Block Placement", PlacementRules.Both, PlacementRules.Both, ClaimBehaviourMode.RequireBuild).setPVPOverride(SiegePVPOverrideConstants.Deny).setSiegeOverrides(SiegePVPOverrideConstants.Deny, SiegePVPOverrideConstants.Deny));
-        this.BreakBlockRules = new ClaimBehaviourData("Block Breaking", config, outConfig, "GriefPrevention.Rules.BlockBreaking", new ClaimBehaviourData("Block Breaking", PlacementRules.Both, PlacementRules.Both, ClaimBehaviourMode.RequireBuild).setPVPOverride(SiegePVPOverrideConstants.Deny).setSiegeOverrides(SiegePVPOverrideConstants.Allow, SiegePVPOverrideConstants.Deny));
+
         this.FireDestroyBehaviour = new ClaimBehaviourData("Fire Destruction", config, outConfig, "GriefPrevention.Rules.FireDestroys", new ClaimBehaviourData("GriefPrevention.Rules.FireDestroys", PlacementRules.Neither, PlacementRules.Neither, ClaimBehaviourMode.Disabled));
         this.FireSpreadOriginBehaviour = new ClaimBehaviourData("Fire Spread Origin", config, outConfig, "GriefPrevention.Rules.FireSpreadOrigin", new ClaimBehaviourData("Fire Spread Origin", PlacementRules.Neither, PlacementRules.Neither, ClaimBehaviourMode.Disabled));
         this.FireSpreadTargetBehaviour = new ClaimBehaviourData("Fire Spread Target", config, outConfig, "GriefPrevention.Rules.FireSpreadTarget", new ClaimBehaviourData("Fire Spread Target", PlacementRules.Neither, PlacementRules.Neither, ClaimBehaviourMode.Disabled));

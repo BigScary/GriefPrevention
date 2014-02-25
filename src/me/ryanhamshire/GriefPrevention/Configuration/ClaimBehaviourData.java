@@ -18,6 +18,7 @@ import org.bukkit.entity.Player;
 //this enum is used for some of the configuration options.
 import org.bukkit.entity.Tameable;
 
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 
@@ -250,6 +251,20 @@ public class ClaimBehaviourData {
 	public SiegePVPOverrideConstants getPvPOverride(){ return PvPOverride;}
 	public boolean getTameableAllowOwner(){ return TameableAllowOwner;}
 	public ClaimBehaviourData setTameableAllowOwner(boolean value){ TameableAllowOwner = value; return this;}
+
+    public ClaimBehaviourData setSpecialRules(EnumSet<SpecialRules> sr){
+        SpecialRuleFlags = sr;
+        return this;
+    }
+    public ClaimBehaviourData addSpecialRule(SpecialRules sr){
+        SpecialRuleFlags.add(sr);
+        return this;
+    }
+    public ClaimBehaviourData removeSpecialRule(SpecialRules sr){
+        SpecialRuleFlags.remove(sr);
+        return this;
+    }
+
 	public ClaimBehaviourData setSiegeOverrides(SiegePVPOverrideConstants Attacker,SiegePVPOverrideConstants Defender){
 		return setSiegeOverrides(Attacker,Defender,SiegeBystanderOverride);
 	}
@@ -788,7 +803,19 @@ public class ClaimBehaviourData {
 
 	@Override
 	public String toString() {
-		return BehaviourName + " in the wilderness " + getWildernessRules().toString() + " and in claims " + getClaimsRules().toString() + " Required Trust Level:" + this.getBehaviourMode().name();
+        String SpecialFlagString = "None";
+
+        List<String> BuildList = new ArrayList<String>();
+        for(SpecialRules sr:SpecialRuleFlags){
+            BuildList.add(sr.name());
+        }
+        if(SpecialRuleFlags.size() > 0){
+            for(int i=0;i<BuildList.size();i++){
+                SpecialFlagString+=BuildList.get(i);
+                if(i<BuildList.size()-1) SpecialFlagString+=",";
+            }
+        }
+		return BehaviourName + " in the wilderness " + getWildernessRules().toString() + " and in claims " + getClaimsRules().toString() + " Required Trust Level:" + this.getBehaviourMode().name() + " SpecialFlags:" + SpecialFlagString;
 
 	}
 }

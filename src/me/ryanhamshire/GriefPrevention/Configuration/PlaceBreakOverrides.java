@@ -137,6 +137,25 @@ public class PlaceBreakOverrides {
         this.BreakOverrides = Source.BreakOverrides;
 
     }
+    @Override
+    public String toString(){
+        StringBuffer sb = new StringBuffer();
+        sb.append("Overrides:");
+        sb.append(" " + this.getOverrideNames().size() + " Overrides.");
+        for(String iterate:this.getOverrideNames()){
+
+            OverrideData od = this.getOverrideByName(iterate);
+            sb.append("Name:" + od.getName());
+            for(MaterialInfo mat:od.getMaterials().getMaterials()){
+                sb.append("Material:" + mat.getTypeID() + " Desc:" + mat.getDescription());
+            }
+            sb.append("Rule:" + od.getRule().toString());
+
+
+        }
+
+      return sb.toString();
+    }
     public OverrideData getOverrideByName(String pName){
         Debugger.Write("Looking for Override by name of " + pName,Debugger.DebugLevel.Verbose);
         Debugger.Write("getOverrideByName: BreakOverrides has " + String.valueOf(this.BreakOverrides.size()) + " values.",Debugger.DebugLevel.Verbose);
