@@ -1,0 +1,109 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>me.ryanhamshire</groupId>
+    <artifactId>GriefPrevention</artifactId>
+    <version>7.8-SNAPSHOT</version>
+    <name>GriefPrevention</name>
+	<url>http://dev.bukkit.org/bukkit-plugins/grief-prevention/</url>
+
+    <properties>
+        <depend-dir>C:\dependencies</depend-dir>
+        <!-- Versions of dependencies, just update the version numbers here -->
+        <mc-ver>1.6.2</mc-ver>
+        <bukkit-ver>R0.1</bukkit-ver>
+        <vault-ver>1.2.16</vault-ver>
+        <mv-ver>2.5</mv-ver>
+    </properties>
+
+    <repositories>
+        <repository>
+            <id>bukkit-repo</id>
+            <url>http://repo.bukkit.org/content/groups/public</url>
+        </repository>
+
+        <repository>
+            <id>vault-repo</id>
+            <url>http://maven.sk89q.com/repo/</url>
+        </repository>
+
+        <repository>
+            <id>OnARandomBox</id> <!-- Multiverse-Core -->
+            <url>http://repo.onarandombox.com/content/repositories/multiverse</url>
+        </repository>
+    </repositories>
+    
+    <dependencies>
+        <!-- Unmanaged Dependencies -->
+        <dependency>
+            <groupId>com.bergerkiller.bukkit.mw</groupId>
+            <artifactId>MyWorlds</artifactId>
+            <systemPath>${depend-dir}\MyWorlds-1.66.jar</systemPath>
+            <version>1.66</version>
+            <scope>system</scope>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>com.frdfsnlght.transporter</groupId>
+            <artifactId>Transporter</artifactId>
+            <systemPath>${depend-dir}\Transporter.jar</systemPath>
+            <version>8.14</version>
+            <scope>system</scope>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- Managed Dependencies -->
+        <dependency>
+            <groupId>org.bukkit</groupId>
+            <artifactId>bukkit</artifactId>
+            <version>1.6.4-R0.1-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>net.milkbowl.vault</groupId>
+            <artifactId>Vault</artifactId>
+            <version>1.2.16</version>
+            <optional>true</optional>
+        </dependency>
+        
+        <dependency>
+        	<groupId>org.multiverse</groupId>
+        	<artifactId>multiverse-core</artifactId>
+        	<version>0.7.0</version>
+        </dependency>
+    </dependencies>
+
+	<scm>
+		<connection>scm:git:git://github.com/Tux2/GriefPrevention.git</connection>
+		<developerConnection>scm:git:git@github.com:Tux2/GriefPrevention.git</developerConnection>
+		<url>https://github.com/Tux2/GriefPrevention</url>
+		<tag>master</tag>
+	</scm>
+
+    <build>
+        <sourceDirectory>src</sourceDirectory>
+        <defaultGoal>package</defaultGoal>
+        <resources>
+            <resource>
+                <targetPath>.</targetPath>
+                <directory>${basedir}</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>plugin.yml</include>
+                </includes>
+            </resource>
+        </resources>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.1</version>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
