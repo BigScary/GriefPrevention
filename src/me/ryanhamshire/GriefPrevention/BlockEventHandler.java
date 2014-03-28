@@ -939,7 +939,7 @@ public class BlockEventHandler implements Listener {
 		Claim fromClaim = GriefPrevention.instance.dataStore.getClaimAt(fromBlock.getLocation(), false);
 		Claim toClaim = GriefPrevention.instance.dataStore.getClaimAt(toBlock.getLocation(), false);
 		// if the target is a claim but the source is not, cancel.
-		if (toClaim != null && fromClaim == null) {
+		if (toClaim != null && (fromClaim == null || !fromClaim.equals(toClaim))) {
 			// cancel.
 			dispenseEvent.setCancelled(true);
 			return;

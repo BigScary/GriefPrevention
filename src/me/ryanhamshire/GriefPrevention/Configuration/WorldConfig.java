@@ -1397,6 +1397,8 @@ public class WorldConfig {
             Riding_Minecart = new ClaimBehaviourData("Minecart Riding",config,outConfig,
                     "GriefPrevention.Rules.Riding.Minecart",
             ClaimBehaviourData.getAll("Minecart Riding").setBehaviourMode(ClaimBehaviourMode.RequireContainer));
+        } else {
+            Riding_Minecart = vehiclerule;
         }
         Placement_Boat =new ClaimBehaviourData("Boat Placement",config,outConfig,
                 "GriefPrevention.Rules.VehiclePlacement.Boat",
