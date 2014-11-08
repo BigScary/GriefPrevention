@@ -29,7 +29,7 @@ class DeliverClaimBlocksTask implements Runnable
 	@Override
 	public void run()
 	{
-		Player [] players = GriefPrevention.instance.getServer().getOnlinePlayers();
+	   Player[] players = (Player[])GriefPrevention.instance.getServer().getOnlinePlayers().toArray();
 		
 		//ensure players get at least 1 block (if accrual is totally disabled, this task won't even be scheduled)
 		int accruedBlocks = GriefPrevention.instance.config_claims_blocksAccruedPerHour / 12;

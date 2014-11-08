@@ -2,21 +2,21 @@
 
 package me.ryanhamshire.GriefPrevention;
 
-import com.google.common.base.Charsets;
-import com.google.common.collect.ImmutableList;
-
-import org.bukkit.OfflinePlayer;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
- 
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.ByteBuffer;
-import java.util.*;
-import java.util.concurrent.Callable;
+import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
+
+import org.bukkit.OfflinePlayer;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+
+import com.google.common.base.Charsets;
  
 class UUIDFetcher {
     private static final double PROFILES_PER_REQUEST = 100;
