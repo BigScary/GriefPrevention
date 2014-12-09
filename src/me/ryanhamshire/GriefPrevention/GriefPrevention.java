@@ -22,7 +22,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -30,6 +29,8 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Logger;
+
+import com.google.common.collect.ImmutableList;
 
 import net.milkbowl.vault.economy.Economy;
 
@@ -2243,7 +2244,7 @@ public class GriefPrevention extends JavaPlugin
 	public void onDisable()
 	{ 
 		//save data for any online players
-		Collection<Player> players = (Collection<Player>)this.getServer().getOnlinePlayers();
+		ImmutableList<Player> players = ImmutableList.copyOf(this.getServer().getOnlinePlayers());
 		for(Player player : players)
 		{
 			UUID playerID = player.getUniqueId();
