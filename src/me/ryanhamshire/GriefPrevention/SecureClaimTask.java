@@ -16,9 +16,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
  
- package me.ryanhamshire.GriefPrevention;
+package me.ryanhamshire.GriefPrevention;
 
-import java.util.Collection;
+import com.google.common.collect.ImmutableList;
 
 import org.bukkit.entity.Player;
 
@@ -43,7 +43,7 @@ class SecureClaimTask implements Runnable
 			claim.doorsOpen = false;
 			
 			//eject bad guys
-			Collection<Player> onlinePlayers = (Collection<Player>)GriefPrevention.instance.getServer().getOnlinePlayers();
+			ImmutableList<Player> onlinePlayers = ImmutableList.copyOf(GriefPrevention.instance.getServer().getOnlinePlayers());
 			for(Player player : onlinePlayers)
 			{
 				if(claim.contains(player.getLocation(), false, false) && claim.allowAccess(player) != null)
