@@ -19,8 +19,9 @@
 package me.ryanhamshire.GriefPrevention;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
+
+import com.google.common.collect.ImmutableList;
 
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -123,7 +124,7 @@ public class BlockEventHandler implements Listener
 			
 			if(!player.hasPermission("griefprevention.eavesdrop"))
 			{
-				Collection<Player> players = (Collection<Player>)GriefPrevention.instance.getServer().getOnlinePlayers();
+				ImmutableList<Player> players = ImmutableList.copyOf(GriefPrevention.instance.getServer().getOnlinePlayers());
 				for(Player otherPlayer : players)
 				{
 					if(otherPlayer.hasPermission("griefprevention.eavesdrop"))
