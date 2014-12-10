@@ -17,10 +17,10 @@
  */
 
 package me.ryanhamshire.GriefPrevention;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -29,6 +29,8 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import com.google.common.collect.ImmutableList;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
@@ -407,7 +409,7 @@ class PlayerEventHandler implements Listener
 			
 			String logMessage = logMessageBuilder.toString();
 			
-			Collection<Player> players = (Collection<Player>)GriefPrevention.instance.getServer().getOnlinePlayers();
+			ImmutableList<Player> players = ImmutableList.copyOf(GriefPrevention.instance.getServer().getOnlinePlayers());
 			for(Player player : players)
 			{
 				if(player.hasPermission("griefprevention.eavesdrop") && !player.getName().equalsIgnoreCase(args[1]))
@@ -564,7 +566,7 @@ class PlayerEventHandler implements Listener
 						GriefPrevention.AddLogEntry("Auto-banned " + player.getName() + " because that account is using an IP address very recently used by banned player " + info.bannedAccountName + " (" + info.address.toString() + ").");
 						
 						//notify any online ops
-						Collection<Player> players = (Collection<Player>)GriefPrevention.instance.getServer().getOnlinePlayers();
+						ImmutableList<Player> players = ImmutableList.copyOf(GriefPrevention.instance.getServer().getOnlinePlayers());
 						for(Player otherPlayer : players)
 						{
 							if(otherPlayer.isOp())

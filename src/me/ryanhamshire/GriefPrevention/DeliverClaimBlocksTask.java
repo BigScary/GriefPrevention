@@ -16,9 +16,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
  
- package me.ryanhamshire.GriefPrevention;
+package me.ryanhamshire.GriefPrevention;
 
-import java.util.Collection;
+import com.google.common.collect.ImmutableList;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -41,7 +41,7 @@ class DeliverClaimBlocksTask implements Runnable
 		//if no player specified, this task will create a player-specific task for each online player, scheduled one tick apart
 	    if(this.player == null && GriefPrevention.instance.config_claims_blocksAccruedPerHour > 0)
 		{
-	        Collection<Player> players = (Collection<Player>)GriefPrevention.instance.getServer().getOnlinePlayers();
+	        ImmutableList<Player> players = ImmutableList.copyOf(GriefPrevention.instance.getServer().getOnlinePlayers());
 	        
 	        long i = 0;
 	        for(Player onlinePlayer : players)
