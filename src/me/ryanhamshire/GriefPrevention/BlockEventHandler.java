@@ -23,22 +23,18 @@ import java.util.Collection;
 import java.util.List;
 
 import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.World.Environment;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
-import org.bukkit.block.Chest;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockBurnEvent;
-import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.block.BlockDispenseEvent;
 import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockIgniteEvent;
@@ -49,11 +45,8 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.BlockSpreadEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.world.StructureGrowEvent;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.material.Dispenser;
-import org.bukkit.util.Vector;
 
 //event handlers related to blocks
 public class BlockEventHandler implements Listener 
@@ -101,7 +94,10 @@ public class BlockEventHandler implements Listener
 	@EventHandler(ignoreCancelled = true)
 	public void onSignChanged(SignChangeEvent event)
 	{
-		Player player = event.getPlayer();
+	    //send sign content to online administrators
+	    if(!GriefPrevention.instance.config_signNotifications) return;
+	    
+	    Player player = event.getPlayer();
 		if(player == null) return;
 		
 		StringBuilder lines = new StringBuilder();
@@ -109,7 +105,7 @@ public class BlockEventHandler implements Listener
 		for(int i = 0; i < event.getLines().length; i++)
 		{
 			if(event.getLine(i).length() != 0) notEmpty = true;
-			lines.append(event.getLine(i) + ";");
+			lines.append("\n" + event.getLine(i));
 		}
 		
 		String signMessage = lines.toString();
@@ -118,7 +114,7 @@ public class BlockEventHandler implements Listener
 		PlayerData playerData = this.dataStore.getPlayerData(player.getUniqueId());
 		if(notEmpty && playerData.lastMessage != null && !playerData.lastMessage.equals(signMessage))
 		{		
-			GriefPrevention.AddLogEntry("[Sign Placement] <" + player.getName() + "> " + lines.toString() + " @ " + GriefPrevention.getfriendlyLocationString(event.getBlock().getLocation()));
+			GriefPrevention.AddLogEntry("[Sign Placement] <" + player.getName() + "> " + " @ " + GriefPrevention.getfriendlyLocationString(event.getBlock().getLocation()) + lines.toString());
 			playerData.lastMessage = signMessage;
 			
 			if(!player.hasPermission("griefprevention.eavesdrop"))
@@ -128,7 +124,7 @@ public class BlockEventHandler implements Listener
 				{
 					if(otherPlayer.hasPermission("griefprevention.eavesdrop"))
 					{
-						otherPlayer.sendMessage(ChatColor.GRAY + player.getName() + "(sign): " + signMessage);
+						otherPlayer.sendMessage(ChatColor.GRAY + player.getName() + " sign @ " + GriefPrevention.getfriendlyLocationString(event.getBlock().getLocation()) + " :" + signMessage);
 					}
 				}
 			}
@@ -180,40 +176,7 @@ public class BlockEventHandler implements Listener
 		{
 		    playerData.lastClaim = claim;
 		    
-			//FEATURE: prevent theft from container using a hopper when the container is at the very bottom of a land claim
-		    
-	        if(block.getType() == Material.HOPPER)
-	        {
-	            //is the above block inside the land claim?
-	            Block aboveBlock = block.getRelative(BlockFace.UP);
-	            if(claim.contains(aboveBlock.getLocation(), false, false))
-	            {
-	                //then the player needs container trust to place the  hopper
-	                String failureMessage = claim.allowContainers(player);
-	                if(failureMessage != null)
-	                {
-	                    placeEvent.setCancelled(true);
-	                    GriefPrevention.sendMessage(player, TextMode.Err, failureMessage);
-	                    return;
-	                }
-	            }
-	        }
-	        
-	        //rails can't be placed ANYWHERE under a claim, because they could be pushed up to the 
-	        //target container using pistons
-	        if(block.getType().name().contains("RAIL"))
-	        {
-	            //then the player needs container trust to place the  hopper
-                String failureMessage = claim.allowContainers(player);
-                if(failureMessage != null)
-                {
-                    placeEvent.setCancelled(true);
-                    GriefPrevention.sendMessage(player, TextMode.Err, failureMessage);
-                    return;
-                }
-	        }
-	        
-	        //warn about TNT not destroying claimed blocks
+			//warn about TNT not destroying claimed blocks
             if(block.getType() == Material.TNT && !claim.areExplosivesAllowed)
             {
                 GriefPrevention.sendMessage(player, TextMode.Warn, Messages.NoTNTDamageClaims);
@@ -329,7 +292,8 @@ public class BlockEventHandler implements Listener
 		//warn players when they place TNT above sea level, since it doesn't destroy blocks there
 		if(	GriefPrevention.instance.config_blockSurfaceOtherExplosions && block.getType() == Material.TNT &&
 			block.getWorld().getEnvironment() != Environment.NETHER &&
-			block.getY() > GriefPrevention.instance.getSeaLevel(block.getWorld()) - 5)
+			block.getY() > GriefPrevention.instance.getSeaLevel(block.getWorld()) - 5 &&
+			claim == null)
 		{
 			GriefPrevention.sendMessage(player, TextMode.Warn, Messages.NoTNTDamageAboveSeaLevel);
 		}
@@ -527,7 +491,11 @@ public class BlockEventHandler implements Listener
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onBlockIgnite (BlockIgniteEvent igniteEvent)
 	{
-		if(!GriefPrevention.instance.config_fireSpreads && igniteEvent.getCause() != IgniteCause.FLINT_AND_STEEL &&  igniteEvent.getCause() != IgniteCause.LIGHTNING)
+	    //don't track in worlds where claims are not enabled
+        if(!GriefPrevention.instance.claimsEnabledForWorld(igniteEvent.getBlock().getWorld())) return;
+        
+	    
+	    if(!GriefPrevention.instance.config_fireSpreads && igniteEvent.getCause() != IgniteCause.FLINT_AND_STEEL &&  igniteEvent.getCause() != IgniteCause.LIGHTNING)
 		{	
 			igniteEvent.setCancelled(true);			
 		}
@@ -539,6 +507,9 @@ public class BlockEventHandler implements Listener
 	{
 		if(spreadEvent.getSource().getType() != Material.FIRE) return;
 		
+		//don't track in worlds where claims are not enabled
+        if(!GriefPrevention.instance.claimsEnabledForWorld(spreadEvent.getBlock().getWorld())) return;
+        
 		if(!GriefPrevention.instance.config_fireSpreads)
 		{
 			spreadEvent.setCancelled(true);
@@ -551,9 +522,6 @@ public class BlockEventHandler implements Listener
 			
 			return;
 		}
-		
-		//don't track in worlds where claims are not enabled
-        if(!GriefPrevention.instance.claimsEnabledForWorld(spreadEvent.getBlock().getWorld())) return;
 		
 		//never spread into a claimed area, regardless of settings
 		if(this.dataStore.getClaimAt(spreadEvent.getBlock().getLocation(), false, null) != null)
@@ -573,7 +541,10 @@ public class BlockEventHandler implements Listener
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onBlockBurn (BlockBurnEvent burnEvent)
 	{
-		if(!GriefPrevention.instance.config_fireDestroys)
+	    //don't track in worlds where claims are not enabled
+        if(!GriefPrevention.instance.claimsEnabledForWorld(burnEvent.getBlock().getWorld())) return;
+        
+	    if(!GriefPrevention.instance.config_fireDestroys)
 		{
 			burnEvent.setCancelled(true);
 			Block block = burnEvent.getBlock();
@@ -605,9 +576,6 @@ public class BlockEventHandler implements Listener
 			return;
 		}
 		
-		//don't track in worlds where claims are not enabled
-        if(!GriefPrevention.instance.claimsEnabledForWorld(burnEvent.getBlock().getWorld())) return;
-		
 		//never burn claimed blocks, regardless of settings
 		if(this.dataStore.getClaimAt(burnEvent.getBlock().getLocation(), false, null) != null)
 		{
@@ -635,7 +603,7 @@ public class BlockEventHandler implements Listener
         if(toClaim != null)
         {
             this.lastSpreadClaim = toClaim;
-            if(!toClaim.contains(spreadEvent.getBlock().getLocation(), false, false))
+            if(!toClaim.contains(spreadEvent.getBlock().getLocation(), false, true))
             {
                 spreadEvent.setCancelled(true);
             }

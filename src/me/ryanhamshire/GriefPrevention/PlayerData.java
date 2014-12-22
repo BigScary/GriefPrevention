@@ -30,6 +30,7 @@ import me.ryanhamshire.GriefPrevention.SiegeData;
 import me.ryanhamshire.GriefPrevention.Visualization;
 
 import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
 
 //holds all of GriefPrevention's player-tied data
 public class PlayerData 
@@ -108,6 +109,18 @@ public class PlayerData
 	public boolean warnedAboutMajorDeletion = false;
 
 	public InetAddress ipAddress;
+
+    //whether or not this player has received a message about unlocking death drops since his last death
+	boolean receivedDropUnlockAdvertisement = false;
+
+    //whether or not this player's dropped items (on death) are unlocked for other players to pick up
+	boolean dropsAreUnlocked = false;
+
+    //message to send to player after he respawns
+	String messageOnRespawn = null;
+
+    //player which a pet will be given to when it's right-clicked
+	OfflinePlayer petGiveawayRecipient = null;
 	
 	//whether or not this player is "in" pvp combat
 	public boolean inPvpCombat()

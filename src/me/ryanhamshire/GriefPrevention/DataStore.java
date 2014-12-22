@@ -696,12 +696,18 @@ public abstract class DataStore
 		
 		if(claim.parent != null) claim = claim.parent;
 		
+		//note any subdivisions
+		ArrayList<Claim> subdivisions = new ArrayList<Claim>(claim.children);
+		
 		//delete the claim
 		this.deleteClaim(claim);
 		
 		//re-create it at the new depth
 		claim.lesserBoundaryCorner.setY(newDepth);
 		claim.greaterBoundaryCorner.setY(newDepth);
+		
+		//re-add the subdivisions (deleteClaim() removed them)
+		claim.children.addAll(subdivisions);
 		
 		//make all subdivisions reach to the same depth
 		for(int i = 0; i < claim.children.size(); i++)
@@ -918,7 +924,7 @@ public abstract class DataStore
 		for(int i = 0; i < this.claims.size(); i++)
 		{
 			Claim claim = this.claims.get(i);
-			if(playerID.equals(claim.ownerID) && (deleteCreativeClaims || !GriefPrevention.instance.creativeRulesApply(claim.getLesserBoundaryCorner())))
+			if((playerID == claim.ownerID || (playerID != null && playerID.equals(claim.ownerID))) && (deleteCreativeClaims || !GriefPrevention.instance.creativeRulesApply(claim.getLesserBoundaryCorner())))
 				claimsToDelete.add(claim);
 		}
 		
@@ -942,7 +948,10 @@ public abstract class DataStore
 	//see CreateClaim() for details on return value
 	synchronized public CreateClaimResult resizeClaim(Claim claim, int newx1, int newx2, int newy1, int newy2, int newz1, int newz2)
 	{
-		//remove old claim
+		//note any subdivisions before deleting the claim
+	    ArrayList<Claim> subdivisions = new ArrayList<Claim>(claim.children);
+	    
+	    //remove old claim
 		this.deleteClaim(claim);					
 		
 		//try to create this new claim, ignoring the original when checking for overlap
@@ -972,13 +981,8 @@ public abstract class DataStore
 				result.claim.managers.add(managers.get(i));
 			}
 			
-			//copy subdivisions from old claim
-			for(int i = 0; i < claim.children.size(); i++)
-			{
-				Claim subdivision = claim.children.get(i);
-				subdivision.parent = result.claim;
-				result.claim.children.add(subdivision);
-			}
+			//restore subdivisions
+			result.claim.children.addAll(subdivisions);
 			
 			//save those changes
 			this.saveClaim(result.claim);
@@ -1166,6 +1170,16 @@ public abstract class DataStore
 		this.addDefault(defaults, Messages.NoPistonsOutsideClaims, "Warning: Pistons won't move blocks outside land claims.", null);
 		this.addDefault(defaults, Messages.SoftMuted, "Soft-muted {0}.", "0: The changed player's name.");
 		this.addDefault(defaults, Messages.UnSoftMuted, "Un-soft-muted {0}.", "0: The changed player's name.");
+		this.addDefault(defaults, Messages.DropUnlockAdvertisement, "Other players can't pick up your dropped items unless you /UnlockDrops first.", null);
+		this.addDefault(defaults, Messages.PickupBlockedExplanation, "You can't pick this up unless {0} uses /UnlockDrops.", "0: The item stack's owner.");
+		this.addDefault(defaults, Messages.DropUnlockConfirmation, "Unlocked your drops.  Other players may now pick them up (until you die again).", null);
+		this.addDefault(defaults, Messages.AdvertiseACandACB, "You may use /ACB to give yourself more claim blocks, or /AdminClaims to create a free administrative claim.", null);
+		this.addDefault(defaults, Messages.AdvertiseAdminClaims, "You could create an administrative land claim instead using /AdminClaims, which you'd share with other administrators.", null);
+		this.addDefault(defaults, Messages.AdvertiseACB, "You may use /ACB to give yourself more claim blocks.", null);
+		this.addDefault(defaults, Messages.NotYourPet, "That belongs to {0} until it's given to you with /GivePet.", "0: owner name");
+		this.addDefault(defaults, Messages.PetGiveawayConfirmation, "Pet transferred.", null);
+		this.addDefault(defaults, Messages.PetTransferCancellation, "Pet giveaway cancelled.", null);
+		this.addDefault(defaults, Messages.ReadyToTransferPet, "Ready to transfer!  Right-click the pet you'd like to give away, or cancel with /GivePet cancel.", null);
 		
 		//load the config file
 		FileConfiguration config = YamlConfiguration.loadConfiguration(new File(messagesFilePath));
@@ -1294,4 +1308,29 @@ public abstract class DataStore
 	        asyncSavePlayerData(this.playerID, this.playerData);
 	    }
 	}
+
+    //gets all the claims "near" a location
+	ArrayList<Claim> getNearbyClaims(Location location)
+    {
+        ArrayList<Claim> claims = new ArrayList<Claim>();
+        
+        Chunk lesserChunk = location.getWorld().getChunkAt(location.subtract(150, 0, 150));
+        Chunk greaterChunk = location.getWorld().getChunkAt(location.add(300, 0, 300));
+        
+        for(int chunk_x = lesserChunk.getX(); chunk_x <= greaterChunk.getX(); chunk_x++)
+        {
+            for(int chunk_z = lesserChunk.getZ(); chunk_z <= greaterChunk.getZ(); chunk_z++)
+            {
+                Chunk chunk = location.getWorld().getChunkAt(chunk_x, chunk_z);
+                String chunkID = this.getChunkString(chunk.getBlock(0,  0,  0).getLocation());
+                ArrayList<Claim> claimsInChunk = this.chunksToClaimsMap.get(chunkID);
+                if(claimsInChunk != null)
+                {
+                    claims.addAll(claimsInChunk);
+                }
+            }
+        }
+        
+        return claims;        
+    }
 }

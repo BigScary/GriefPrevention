@@ -21,14 +21,11 @@ package me.ryanhamshire.GriefPrevention;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Logger;
 
 import net.milkbowl.vault.economy.Economy;
@@ -42,10 +39,10 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.World.Environment;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
 import org.bukkit.command.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -121,6 +118,9 @@ public class GriefPrevention extends JavaPlugin
 	public boolean config_pvp_noCombatInAdminLandClaims;			//whether players may fight in admin-owned land claims
 	public boolean config_pvp_noCombatInAdminSubdivisions;          //whether players may fight in subdivisions of admin-owned land claims
 	
+	public boolean config_lockDeathDropsInPvpWorlds;                //whether players' dropped on death items are protected in pvp worlds
+	public boolean config_lockDeathDropsInNonPvpWorlds;             //whether players' dropped on death items are protected in non-pvp worlds
+	
 	public double config_economy_claimBlocksPurchaseCost;			//cost to purchase a claim block.  set to zero to disable purchase.
 	public double config_economy_claimBlocksSellValue;				//return on a sold claim block.  set to zero to disable sale.
 	
@@ -131,7 +131,8 @@ public class GriefPrevention extends JavaPlugin
 	public boolean config_fireSpreads;								//whether fire spreads outside of claims
 	public boolean config_fireDestroys;								//whether fire destroys blocks outside of claims
 	
-	public boolean config_eavesdrop; 								//whether whispered messages will be visible to administrators
+	public boolean config_whisperNotifications; 					//whether whispered messages will broadcast to administrators in game
+	public boolean config_signNotifications;                        //whether sign content will broadcast to administrators in game
 	public ArrayList<String> config_eavesdrop_whisperCommands;		//list of whisper commands to eavesdrop on
 	
 	public boolean config_smartBan;									//whether to ban accounts which very likely owned by a banned player
@@ -527,6 +528,9 @@ public class GriefPrevention extends JavaPlugin
         this.config_economy_claimBlocksPurchaseCost = config.getDouble("GriefPrevention.Economy.ClaimBlocksPurchaseCost", 0);
         this.config_economy_claimBlocksSellValue = config.getDouble("GriefPrevention.Economy.ClaimBlocksSellValue", 0);
         
+        this.config_lockDeathDropsInPvpWorlds = config.getBoolean("GriefPrevention.ProtectItemsDroppedOnDeath.PvPWorlds", false);
+        this.config_lockDeathDropsInNonPvpWorlds = config.getBoolean("GriefPrevention.ProtectItemsDroppedOnDeath.NonPvPWorlds", true);
+        
         this.config_blockSurfaceCreeperExplosions = config.getBoolean("GriefPrevention.BlockSurfaceCreeperExplosions", true);
         this.config_blockSurfaceOtherExplosions = config.getBoolean("GriefPrevention.BlockSurfaceOtherExplosions", true);
         this.config_blockSkyTrees = config.getBoolean("GriefPrevention.LimitSkyTrees", true);
@@ -536,8 +540,9 @@ public class GriefPrevention extends JavaPlugin
         this.config_fireSpreads = config.getBoolean("GriefPrevention.FireSpreads", false);
         this.config_fireDestroys = config.getBoolean("GriefPrevention.FireDestroys", false);
         
-        this.config_eavesdrop = config.getBoolean("GriefPrevention.EavesdropEnabled", true);
-        String whisperCommandsToMonitor = config.getString("GriefPrevention.WhisperCommands", "/tell;/pm;/r;/w;/t;/msg");
+        this.config_whisperNotifications = config.getBoolean("GriefPrevention.AdminsGetWhispers", true);
+        this.config_signNotifications = config.getBoolean("GriefPrevention.AdminsGetSignNotifications", true);
+        String whisperCommandsToMonitor = config.getString("GriefPrevention.WhisperCommands", "/tell;/pm;/r;/w;/whisper;/t;/msg");
         
         this.config_smartBan = config.getBoolean("GriefPrevention.SmartBan", true);
         
@@ -553,12 +558,6 @@ public class GriefPrevention extends JavaPlugin
         this.config_mods_accessTrustIds = new MaterialCollection();
         List<String> accessTrustStrings = config.getStringList("GriefPrevention.Mods.BlockIdsRequiringAccessTrust");
         
-        //default values for access trust mod blocks
-        if(accessTrustStrings == null || accessTrustStrings.size() == 0)
-        {
-            //none by default
-        }
-        
         this.parseMaterialListFromConfig(accessTrustStrings, this.config_mods_accessTrustIds);
         
         this.config_mods_containerTrustIds = new MaterialCollection();
@@ -567,36 +566,7 @@ public class GriefPrevention extends JavaPlugin
         //default values for container trust mod blocks
         if(containerTrustStrings == null || containerTrustStrings.size() == 0)
         {
-            containerTrustStrings.add(new MaterialInfo(227, "Battery Box").toString());
-            containerTrustStrings.add(new MaterialInfo(130, "Transmutation Tablet").toString());
-            containerTrustStrings.add(new MaterialInfo(128, "Alchemical Chest and Energy Condenser").toString());
-            containerTrustStrings.add(new MaterialInfo(181, "Various Chests").toString());
-            containerTrustStrings.add(new MaterialInfo(178, "Ender Chest").toString());
-            containerTrustStrings.add(new MaterialInfo(150, "Various BuildCraft Gadgets").toString());
-            containerTrustStrings.add(new MaterialInfo(155, "Filler").toString());
-            containerTrustStrings.add(new MaterialInfo(157, "Builder").toString());
-            containerTrustStrings.add(new MaterialInfo(158, "Template Drawing Table").toString());
-            containerTrustStrings.add(new MaterialInfo(126, "Various EE Gadgets").toString());
-            containerTrustStrings.add(new MaterialInfo(138, "Various RedPower Gadgets").toString());
-            containerTrustStrings.add(new MaterialInfo(137, "BuildCraft Project Table and Furnaces").toString());
-            containerTrustStrings.add(new MaterialInfo(250, "Various IC2 Machines").toString());
-            containerTrustStrings.add(new MaterialInfo(161, "BuildCraft Engines").toString());
-            containerTrustStrings.add(new MaterialInfo(169, "Automatic Crafting Table").toString());
-            containerTrustStrings.add(new MaterialInfo(177, "Wireless Components").toString());
-            containerTrustStrings.add(new MaterialInfo(183, "Solar Arrays").toString());
-            containerTrustStrings.add(new MaterialInfo(187, "Charging Benches").toString());
-            containerTrustStrings.add(new MaterialInfo(188, "More IC2 Machines").toString());
-            containerTrustStrings.add(new MaterialInfo(190, "Generators, Fabricators, Strainers").toString());
-            containerTrustStrings.add(new MaterialInfo(194, "More Gadgets").toString());
-            containerTrustStrings.add(new MaterialInfo(207, "Computer").toString());
-            containerTrustStrings.add(new MaterialInfo(208, "Computer Peripherals").toString());
-            containerTrustStrings.add(new MaterialInfo(246, "IC2 Generators").toString());
-            containerTrustStrings.add(new MaterialInfo(24303, "Teleport Pipe").toString());
-            containerTrustStrings.add(new MaterialInfo(24304, "Waterproof Teleport Pipe").toString());
-            containerTrustStrings.add(new MaterialInfo(24305, "Power Teleport Pipe").toString());
-            containerTrustStrings.add(new MaterialInfo(4311, "Diamond Sorting Pipe").toString());
-            containerTrustStrings.add(new MaterialInfo(216, "Turtle").toString());
-            
+            containerTrustStrings.add(new MaterialInfo(99999, "Example - ID 99999, all data values.").toString());
         }
         
         //parse the strings from the config file
@@ -604,13 +574,6 @@ public class GriefPrevention extends JavaPlugin
         
         this.config_mods_explodableIds = new MaterialCollection();
         List<String> explodableStrings = config.getStringList("GriefPrevention.Mods.BlockIdsExplodable");
-        
-        //default values for explodable mod blocks
-        if(explodableStrings == null || explodableStrings.size() == 0)
-        {
-            explodableStrings.add(new MaterialInfo(161, "BuildCraft Engines").toString());          
-            explodableStrings.add(new MaterialInfo(246, (byte)5 ,"Nuclear Reactor").toString());
-        }
         
         //parse the strings from the config file
         this.parseMaterialListFromConfig(explodableStrings, this.config_mods_explodableIds);
@@ -779,6 +742,9 @@ public class GriefPrevention extends JavaPlugin
         outConfig.set("GriefPrevention.Economy.ClaimBlocksPurchaseCost", this.config_economy_claimBlocksPurchaseCost);
         outConfig.set("GriefPrevention.Economy.ClaimBlocksSellValue", this.config_economy_claimBlocksSellValue);
         
+        outConfig.set("GriefPrevention.ProtectItemsDroppedOnDeath.PvPWorlds", this.config_lockDeathDropsInPvpWorlds);
+        outConfig.set("GriefPrevention.ProtectItemsDroppedOnDeath.NonPvPWorlds", this.config_lockDeathDropsInNonPvpWorlds);
+        
         outConfig.set("GriefPrevention.BlockSurfaceCreeperExplosions", this.config_blockSurfaceCreeperExplosions);
         outConfig.set("GriefPrevention.BlockSurfaceOtherExplosions", this.config_blockSurfaceOtherExplosions);
         outConfig.set("GriefPrevention.LimitSkyTrees", this.config_blockSkyTrees);
@@ -788,7 +754,9 @@ public class GriefPrevention extends JavaPlugin
         outConfig.set("GriefPrevention.FireSpreads", this.config_fireSpreads);
         outConfig.set("GriefPrevention.FireDestroys", this.config_fireDestroys);
         
-        outConfig.set("GriefPrevention.EavesdropEnabled", this.config_eavesdrop);       
+        outConfig.set("GriefPrevention.AdminsGetWhispers", this.config_whisperNotifications);
+        outConfig.set("GriefPrevention.AdminsGetSignNotifications", this.config_signNotifications);
+        
         outConfig.set("GriefPrevention.WhisperCommands", whisperCommandsToMonitor);     
         outConfig.set("GriefPrevention.SmartBan", this.config_smartBan);
         
@@ -1664,68 +1632,18 @@ public class GriefPrevention extends JavaPlugin
 			return true;
 		}
 		
-		//deathblow <player> [recipientPlayer]
-		else if(cmd.getName().equalsIgnoreCase("deathblow"))
+		//unlockItems
+		else if(cmd.getName().equalsIgnoreCase("unlockdrops") && player != null)
 		{
-			//requires at least one parameter, the target player's name
-			if(args.length < 1) return false;
-			
-			//try to find that player
-			Player targetPlayer = this.getServer().getPlayer(args[0]);
-			if(targetPlayer == null)
-			{
-				GriefPrevention.sendMessage(player, TextMode.Err, Messages.PlayerNotFound2);
-				return true;
-			}
-			
-			//try to find the recipient player, if specified
-			Player recipientPlayer = null;
-			if(args.length > 1)
-			{
-				recipientPlayer = this.getServer().getPlayer(args[1]);
-				if(recipientPlayer == null)
-				{
-					GriefPrevention.sendMessage(player, TextMode.Err, Messages.PlayerNotFound2);
-					return true;
-				}
-			}
-			
-			//if giving inventory to another player, teleport the target player to that receiving player
-			if(recipientPlayer != null)
-			{
-				targetPlayer.teleport(recipientPlayer);
-			}
-			
-			//otherwise, plan to "pop" the player in place
-			else
-			{
-				//if in a normal world, shoot him up to the sky first, so his items will fall on the surface.
-				if(targetPlayer.getWorld().getEnvironment() == Environment.NORMAL)
-				{
-					Location location = targetPlayer.getLocation();
-					location.setY(location.getWorld().getMaxHeight());
-					targetPlayer.teleport(location);
-				}
-			}
-			 
-			//kill target player
-			targetPlayer.setHealth(0);
-			
-			//log entry
-			if(player != null)
-			{
-				GriefPrevention.AddLogEntry(player.getName() + " used /DeathBlow to kill " + targetPlayer.getName() + ".");
-			}
-			else
-			{
-				GriefPrevention.AddLogEntry("Killed " + targetPlayer.getName() + ".");
-			}
+			PlayerData playerData = this.dataStore.getPlayerData(player.getUniqueId());
+		    playerData.dropsAreUnlocked = true;
+		    GriefPrevention.sendMessage(player, TextMode.Success, Messages.DropUnlockConfirmation);
 			
 			return true;
 		}
 		
 		//deletealladminclaims
-		else if(cmd.getName().equalsIgnoreCase("deletealladminclaims"))
+		else if(player != null && cmd.getName().equalsIgnoreCase("deletealladminclaims"))
 		{
 			if(!player.hasPermission("griefprevention.deleteclaims"))
 			{
@@ -2001,6 +1919,39 @@ public class GriefPrevention extends JavaPlugin
 		    return true;
 		}
 		
+		//givepet
+		else if(cmd.getName().equalsIgnoreCase("givepet") && player != null)
+		{
+		    //requires one parameter
+            if(args.length < 1) return false;
+            
+            PlayerData playerData = this.dataStore.getPlayerData(player.getUniqueId());
+            
+            //special case: cancellation
+            if(args[0].equalsIgnoreCase("cancel"))
+            {
+                playerData.petGiveawayRecipient = null;
+                GriefPrevention.sendMessage(player, TextMode.Success, Messages.PetTransferCancellation);
+                return true;
+            }
+            
+            //find the specified player
+            OfflinePlayer targetPlayer = this.resolvePlayerByName(args[0]);
+            if(targetPlayer == null)
+            {
+                GriefPrevention.sendMessage(player, TextMode.Err, Messages.PlayerNotFound2);
+                return true;
+            }
+            
+            //remember the player's ID for later pet transfer
+            playerData.petGiveawayRecipient = targetPlayer;
+            
+            //send instructions
+            GriefPrevention.sendMessage(player, TextMode.Instr, Messages.ReadyToTransferPet);
+            
+            return true;
+		}
+		
 		return false; 
 	}
 	
@@ -2249,6 +2200,7 @@ public class GriefPrevention extends JavaPlugin
 
 	//helper method to resolve a player by name
 	ConcurrentHashMap<String, UUID> playerNameToIDMap = new ConcurrentHashMap<String, UUID>();
+
 	private OfflinePlayer resolvePlayerByName(String name) 
 	{
 		//try online players first
@@ -2371,8 +2323,8 @@ public class GriefPrevention extends JavaPlugin
 		PlayerData playerData = this.dataStore.getPlayerData(player.getUniqueId());
 		playerData.pvpImmune = true;
 		
-		//inform the player
-		GriefPrevention.sendMessage(player, TextMode.Success, Messages.PvPImmunityStart);
+		//inform the player after he finishes respawning
+		GriefPrevention.sendMessage(player, TextMode.Success, Messages.PvPImmunityStart, 5L);
 	}
 	
 	//checks whether players siege in a world
@@ -2637,4 +2589,7 @@ public class GriefPrevention extends JavaPlugin
 			return overrideValue;
 		}		
 	}
+	
+	//this tracks item stacks expected to drop which will need protection
+    ArrayList<PendingItemProtection> pendingItemWatchList = new ArrayList<PendingItemProtection>();
 }
