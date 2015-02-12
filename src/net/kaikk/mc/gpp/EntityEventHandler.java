@@ -888,7 +888,7 @@ class EntityEventHandler implements Listener
 	        PotionEffectType effectType = effect.getType();
 	        
 	        //restrict jump potions on claimed animals (griefers could use this to steal animals over fences)
-	        if(effectType == PotionEffectType.JUMP)
+	        if(effectType.getName().equals("JUMP") || effectType.getName().equals("POISON"))
 	        {
 	            for(LivingEntity effected : event.getAffectedEntities())
 	            {
@@ -902,6 +902,7 @@ class EntityEventHandler implements Listener
 	                          if(claim.allowContainers(thrower) != null)
 	                          {
 	                              event.setCancelled(true);
+	                              GriefPreventionPlus.sendMessage(thrower, TextMode.Err, Messages.NoDamageClaimedEntity, claim.getOwnerName());
 	                              return;
 	                          }
 	                      }

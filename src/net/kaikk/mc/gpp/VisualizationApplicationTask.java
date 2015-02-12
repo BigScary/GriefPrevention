@@ -1,7 +1,6 @@
 /*
-    GriefPreventionPlus Server Plugin for Minecraft
-    Copyright (C) 2015 Antonino Kai Pocorobba
-    (forked from GriefPrevention by Ryan Hamshire)
+    GriefPrevention Server Plugin for Minecraft
+    Copyright (C) 2015 Ryan Hamshire
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by

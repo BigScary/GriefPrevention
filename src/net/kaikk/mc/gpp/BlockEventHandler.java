@@ -213,14 +213,6 @@ public class BlockEventHandler implements Listener
                 GriefPreventionPlus.sendMessage(player, TextMode.Instr, Messages.ClaimExplosivesAdvertisement);
             }
 			
-            // FIXME imo no need for extension. just warn the player he's building outside the claim.
-			//if the player has permission for the claim and he's placing UNDER the claim
-			/*if(block.getY() <= claim.lesserBoundaryCorner.getBlockY() && claim.allowBuild(player, block.getType()) == null)
-			{
-				//extend the claim downward
-				this.dataStore.extendClaim(claim, block.getY() - GriefPreventionPlus.instance.config_claims_claimsExtendIntoGroundDistance);
-			}*/
-			
 			//allow for a build warning in the future 
 			playerData.warnedAboutBuildingOutsideClaims = false;
 		}

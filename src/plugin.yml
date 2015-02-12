@@ -2,7 +2,7 @@ name: GriefPreventionPlus
 main: net.kaikk.mc.gpp.GriefPreventionPlus
 softdepend: [Vault, Multiverse-Core, My Worlds, MystCraft, Transporter, TheUnderground, WorldGuard, WorldEdit]
 loadbefore: [TheUnderground, GriefPrevention]
-version: 10.6.3
+version: 10.7
 commands:
    abandonclaim:
       description: Deletes a claim.
@@ -119,7 +119,7 @@ commands:
       description: Converts an administrative claim to a private claim.
       usage: /TransferClaim <player>
       aliases: giveclaim
-      permission: griefprevention.adjustclaimblocks
+      permission: griefprevention.transferclaim
    unlockdrops:
       description: Allows other players to pick up the items you dropped when you died.
       usage: /UnlockDrops
@@ -141,6 +141,7 @@ commands:
    givepet:
       description: Allows a player to give away a pet he or she tamed.
       usage: /GivePet <player>
+      permission: griefprevention.givepet
    gpblockinfo:
       description: Allows an administrator to get technical information about blocks in the world and items in hand.
       usage: /GPBlockInfo
@@ -166,8 +167,19 @@ permissions:
             griefprevention.reload: true
             griefprevention.visualizenearbyclaims: true
             griefprevention.overrideclaimcountlimit: true
+            griefprevention.transferclaim: true
+            griefprevention.claimslistother: true
+    griefprevention.givepet:
+        description: Grants permission to use /GivePet.
+        default: true
+    griefprevention.claimslistother:
+        description: Grants permission to use /ClaimsList to get another player's information.
+        default: op
     griefprevention.restorenature:
         description: Grants permission to use /RestoreNature.
+        default: op
+    griefprevention.transferclaim:
+        description: Grants permission to use /TransferClaim.
         default: op
     griefprevention.ignoreclaims:
         description: Grants permission to use /IgnoreClaims.

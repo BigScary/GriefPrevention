@@ -226,6 +226,11 @@ public class PlayerData
         {
             if(storageData.accruedClaimBlocks != null) {
                 this.accruedClaimBlocks = storageData.accruedClaimBlocks;
+                //ensure at least minimum accrued are accrued (in case of settings changes to increase initial amount)
+                if(this.accruedClaimBlocks < GriefPreventionPlus.instance.config_claims_initialBlocks)
+                {
+                    this.accruedClaimBlocks = GriefPreventionPlus.instance.config_claims_initialBlocks;
+                }
             } else {
                 this.accruedClaimBlocks = GriefPreventionPlus.instance.config_claims_initialBlocks;
             }
@@ -245,12 +250,37 @@ public class PlayerData
     {
         if(this.claims == null)
         {
-            this.claims = new Vector<Claim>();
+        	int totalClaimsArea = 0;
+        	this.claims = new Vector<Claim>();
             
             //find all the claims belonging to this player and note them for future reference
             for(Claim claim : GriefPreventionPlus.instance.dataStore.claims.values()) {
                 if(playerID.equals(claim.ownerID)) {
                     this.claims.add(claim);
+                    totalClaimsArea += claim.getArea();
+                }
+            }
+            
+            //ensure player has claim blocks for his claims, and at least the minimum accrued
+            this.loadDataFromSecondaryStorage();
+
+            //if total claimed area is more than total blocks available
+            int totalBlocks = this.accruedClaimBlocks + this.getBonusClaimBlocks() + GriefPreventionPlus.instance.dataStore.getGroupBonusBlocks(this.playerID);
+            if(totalBlocks < totalClaimsArea)
+            {
+                //try to fix it by adding to accrued blocks
+                this.accruedClaimBlocks = totalClaimsArea;
+                if(this.accruedClaimBlocks > GriefPreventionPlus.instance.config_claims_maxAccruedBlocks)
+                {
+                    //remember to respect the maximum on accrued blocks
+                    this.accruedClaimBlocks = GriefPreventionPlus.instance.config_claims_maxAccruedBlocks;
+                }
+                
+                //if that didn't fix it, then make up the difference with bonus blocks
+                totalBlocks = this.accruedClaimBlocks + this.getBonusClaimBlocks() + GriefPreventionPlus.instance.dataStore.getGroupBonusBlocks(this.playerID);
+                if(totalBlocks < totalClaimsArea)
+                {
+                    this.bonusClaimBlocks += totalClaimsArea - totalBlocks;
                 }
             }
         }

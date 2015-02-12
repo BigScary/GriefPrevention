@@ -20,6 +20,7 @@
 package net.kaikk.mc.gpp;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -170,16 +171,6 @@ public class CommandExec implements CommandExecutor {
 		//transferclaim <player>
 		else if(cmd.getName().equalsIgnoreCase("transferclaim") && player != null)
 		{
-			//requires exactly one parameter, the other player's name
-			if(args.length != 1) return false;
-			
-			//check additional permission
-			if(!player.hasPermission("griefprevention.adminclaims"))
-			{
-				GriefPreventionPlus.sendMessage(player, TextMode.Err, Messages.TransferClaimPermission);
-				return true;
-			}
-			
 			//which claim is the user in?
 			Claim claim = gpp.dataStore.getClaimAt(player.getLocation(), true, null);
 			if(claim == null)
@@ -188,27 +179,43 @@ public class CommandExec implements CommandExecutor {
 				return true;
 			}
 			
-			OfflinePlayer targetPlayer = gpp.resolvePlayerByName(args[0]);
-			if(targetPlayer == null)
+			//check additional permission for admin claims
+			if(claim.isAdminClaim() && !player.hasPermission("griefprevention.adminclaims"))
 			{
-				GriefPreventionPlus.sendMessage(player, TextMode.Err, Messages.PlayerNotFound2);
+				GriefPreventionPlus.sendMessage(player, TextMode.Err, Messages.TransferClaimPermission);
 				return true;
+			}
+
+			UUID newOwnerID = GriefPreventionPlus.UUID1;
+			String ownerName = "admin";
+
+			if(args.length > 0)
+			{
+				OfflinePlayer targetPlayer = GriefPreventionPlus.instance.resolvePlayerByName(args[0]);
+				if(targetPlayer == null)
+				{
+					GriefPreventionPlus.sendMessage(player, TextMode.Err, Messages.PlayerNotFound2);
+					return true;
+				}
+				newOwnerID = targetPlayer.getUniqueId();
+				ownerName = targetPlayer.getName();
 			}
 			
 			//change ownerhsip
 			try
 			{
-				gpp.dataStore.changeClaimOwner(claim, targetPlayer.getUniqueId());
+				gpp.dataStore.changeClaimOwner(claim, newOwnerID);
 			}
 			catch(Exception e)
 			{
+				e.printStackTrace();
 				GriefPreventionPlus.sendMessage(player, TextMode.Instr, Messages.TransferTopLevel);
 				return true;
 			}
 			
 			//confirm
 			GriefPreventionPlus.sendMessage(player, TextMode.Success, Messages.TransferSuccess);
-			GriefPreventionPlus.AddLogEntry(player.getName() + " transferred a claim at " + GriefPreventionPlus.getfriendlyLocationString(claim.getLesserBoundaryCorner()) + " to " + targetPlayer.getName() + ".");
+			GriefPreventionPlus.AddLogEntry(player.getName() + " transferred a claim at " + GriefPreventionPlus.getfriendlyLocationString(claim.getLesserBoundaryCorner()) + " to " + ownerName + ".");
 			
 			return true;
 		}
@@ -300,17 +307,14 @@ public class CommandExec implements CommandExecutor {
 			Claim claim = gpp.dataStore.getClaimAt(player.getLocation(), true /*ignore height*/, null);
 
 			if (claim==null) { // all player's claims
-				PlayerData playerData = gpp.dataStore.getPlayerData(player.getUniqueId());
-				if (playerData.getClaims().size()>0) {
+				if (gpp.dataStore.getPlayerData(player.getUniqueId()).getClaims().size()>0) {
 					GriefPreventionPlus.sendMessage(player, TextMode.Err, Messages.YouHaveNoClaims);
 					return false;
 				}
 				
 				if(args[0].equals("all")) { // clear all permissions from player's claims
-					gpp.dataStore.dbUnsetPerm(player.getUniqueId());
-					for (Claim c : playerData.getClaims()) {
-						c.clearPermissions();
-					}
+					gpp.dataStore.clearPermissionsOnPlayerClaims(player.getUniqueId());
+					
 					GriefPreventionPlus.AddLogEntry(player.getName()+" removed all permissions from his claims");
 					
 					GriefPreventionPlus.sendMessage(player, TextMode.Success, Messages.UntrustEveryoneAllClaims);
@@ -320,29 +324,19 @@ public class CommandExec implements CommandExecutor {
 							GriefPreventionPlus.sendMessage(player, TextMode.Err, Messages.InvalidPermissionID);
 							return false;
 						}
-						gpp.dataStore.dbUnsetPerm(player.getUniqueId(), permBukkit);
-						for (Claim c : playerData.getClaims()) {
-							c.dropPermission(permBukkit);
-						}
+						gpp.dataStore.dropPermissionOnPlayerClaims(player.getUniqueId(), permBukkit);
 						GriefPreventionPlus.AddLogEntry(player.getName()+" removed "+args[0]+" permission from his claims");
 						
 					} else if(args[0].equals("public")) { // public
-						gpp.dataStore.dbUnsetPerm(player.getUniqueId(), GriefPreventionPlus.UUID0);
-						for (Claim c : playerData.getClaims()) {
-							c.dropPermission(GriefPreventionPlus.UUID0);
-						}
+						gpp.dataStore.dropPermissionOnPlayerClaims(player.getUniqueId(), GriefPreventionPlus.UUID0);
 						GriefPreventionPlus.AddLogEntry(player.getName()+" removed public permission from his claims");
-						
 					} else { // player?
 						OfflinePlayer otherPlayer = gpp.resolvePlayerByName(args[0]);
 						if (otherPlayer==null) {// player not found
 							GriefPreventionPlus.sendMessage(player, TextMode.Err, Messages.PlayerNotFound2);
 							return true;
 						}
-						gpp.dataStore.dbUnsetPerm(player.getUniqueId(), otherPlayer.getUniqueId());
-						for (Claim c : playerData.getClaims()) {
-							c.dropPermission(otherPlayer.getUniqueId());
-						}
+						gpp.dataStore.dropPermissionOnPlayerClaims(player.getUniqueId(), otherPlayer.getUniqueId());
 						GriefPreventionPlus.AddLogEntry(player.getName()+" removed "+otherPlayer.getName()+" permission from his claims");
 					}
 					GriefPreventionPlus.sendMessage(player, TextMode.Success, Messages.UntrustIndividualAllClaims, args[0]);
@@ -354,12 +348,11 @@ public class CommandExec implements CommandExecutor {
 						return true;
 					}
 					gpp.dataStore.dbUnsetPerm(claim.id);
-					claim.clearPermissions();
+					claim.clearMemoryPermissions();
 					
 					GriefPreventionPlus.sendMessage(player, TextMode.Success, Messages.UntrustOwnerOnly, claim.getOwnerName());
 					GriefPreventionPlus.AddLogEntry(player.getName()+" removed all permissions from claim id "+claim.id);
 				} else {
-					// TODO who has manager pemission should manage perms up to his level (manager level excluded)
 					if(claim.allowGrantPermission(player) != null) {
 						GriefPreventionPlus.sendMessage(player, TextMode.Err, Messages.NoPermissionTrust, claim.getOwnerName());
 						return true;
@@ -378,11 +371,11 @@ public class CommandExec implements CommandExecutor {
 						}
 						
 						gpp.dataStore.dbUnsetPerm(claim.id, permBukkit);
-						claim.dropPermission(permBukkit);
+						claim.unsetPermission(permBukkit);
 						GriefPreventionPlus.AddLogEntry(player.getName()+" removed "+args[0]+" permission from claim id "+claim.id);
 					} else if(args[0].equals("public")) { // public
 						gpp.dataStore.dbUnsetPerm(claim.id, GriefPreventionPlus.UUID0);
-						claim.dropPermission(GriefPreventionPlus.UUID0);
+						claim.unsetPermission(GriefPreventionPlus.UUID0);
 						GriefPreventionPlus.AddLogEntry(player.getName()+" removed public permission from claim id "+claim.id);
 					} else { // player?
 						OfflinePlayer otherPlayer = gpp.resolvePlayerByName(args[0]);
@@ -398,7 +391,7 @@ public class CommandExec implements CommandExecutor {
 						}
 						
 						gpp.dataStore.dbUnsetPerm(claim.id, otherPlayer.getUniqueId());
-						claim.dropPermission(otherPlayer.getUniqueId());
+						claim.unsetPermission(otherPlayer.getUniqueId());
 						GriefPreventionPlus.AddLogEntry(player.getName()+" removed "+otherPlayer.getName()+" permission from claim id "+claim.id);
 					}
 					GriefPreventionPlus.sendMessage(player, TextMode.Success, Messages.UntrustIndividualSingleClaim, args[0]);
@@ -772,7 +765,7 @@ public class CommandExec implements CommandExecutor {
 			}
 			
 			//otherwise if no permission to delve into another player's claims data
-			else if(player != null && !player.hasPermission("griefprevention.deleteclaims"))
+			else if(player != null && !player.hasPermission("griefprevention.claimslistother"))
 			{
 				GriefPreventionPlus.sendMessage(player, TextMode.Err, Messages.ClaimsListNoPermission);
 				return true;

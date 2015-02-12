@@ -33,7 +33,6 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
@@ -576,7 +575,12 @@ public class DataStore
 		}
 		
 		//determine new owner
-		PlayerData newOwnerData = this.getPlayerData(newOwnerID);
+		PlayerData newOwnerData = null;
+				
+		if(newOwnerID != null)
+	    {
+		    newOwnerData = this.getPlayerData(newOwnerID);
+	    }
 		
 		//transfer
 		claim.ownerID = newOwnerID;
@@ -585,13 +589,12 @@ public class DataStore
 		//adjust blocks and other records
 		if(ownerData != null) {
 			ownerData.getClaims().remove(claim);
-			ownerData.setBonusClaimBlocks(ownerData.getBonusClaimBlocks() - claim.getArea());
-			this.savePlayerData(claim.ownerID, ownerData);
 		}
 		
-		newOwnerData.getClaims().add(claim);
-		newOwnerData.setBonusClaimBlocks(newOwnerData.getBonusClaimBlocks() + claim.getArea());
-		this.savePlayerData(newOwnerID, newOwnerData);
+		if(newOwnerData != null)
+		{
+		    newOwnerData.getClaims().add(claim);
+		}
 	}
 
 	//adds a claim to the datastore, making it an effective claim
@@ -638,54 +641,37 @@ public class DataStore
 		}
 	}
 	
-	//turns a location into a string FIXME
-	private String locationStringDelimiter = ";";	
-	String locationToString(Location location)
-	{
-		StringBuilder stringBuilder = new StringBuilder(location.getWorld().getName());
-		stringBuilder.append(locationStringDelimiter);
-		stringBuilder.append(location.getBlockX());
-		stringBuilder.append(locationStringDelimiter);
-		stringBuilder.append(location.getBlockY());
-		stringBuilder.append(locationStringDelimiter);
-		stringBuilder.append(location.getBlockZ());
-		
-		return stringBuilder.toString();
+	public void clearPermissionsOnPlayerClaims(UUID ownerId) {
+		PlayerData ownerData = getPlayerData(ownerId);
+		if (ownerData!=null) {
+			this.dbUnsetPerm(ownerId);
+			for (Claim c : ownerData.getClaims()) {
+				c.clearMemoryPermissions();
+			}
+		}
 	}
 	
-	//turns a location string back into a location
-	Location locationFromString(String string) throws Exception
-	{
-		//split the input string on the space
-		String [] elements = string.split(locationStringDelimiter);
-	    
-		//expect four elements - world name, X, Y, and Z, respectively
-		if(elements.length < 4)
-		{
-			throw new Exception("Expected four distinct parts to the location string: \"" + string + "\"");
+	public void dropPermissionOnPlayerClaims(UUID ownerId, UUID playerId) {
+		PlayerData ownerData = getPlayerData(ownerId);
+		if (ownerData!=null) {
+			this.dbUnsetPerm(ownerId, playerId);
+			for (Claim c : ownerData.getClaims()) {
+				c.unsetPermission(playerId);
+			}
 		}
-		
-		String worldName = elements[0];
-		String xString = elements[1];
-		String yString = elements[2];
-		String zString = elements[3];
-	    
-		//identify world the claim is in
-		World world = GriefPreventionPlus.instance.getServer().getWorld(worldName);
-		if(world == null)
-		{
-			throw new Exception("World not found: \"" + worldName + "\"");
-		}
-		
-		//convert those numerical strings to integer values
-	    int x = Integer.parseInt(xString);
-	    int y = Integer.parseInt(yString);
-	    int z = Integer.parseInt(zString);
-	    
-	    return new Location(world, x, y, z);
 	}
 	
-	synchronized public void dbNewClaim(Claim claim) {
+	public void dropPermissionOnPlayerClaims(UUID ownerId, String permBukkit) {
+		PlayerData ownerData = getPlayerData(ownerId);
+		if (ownerData!=null) {
+			this.dbUnsetPerm(ownerId, permBukkit);
+			for (Claim c : ownerData.getClaims()) {
+				c.unsetPermission(permBukkit);
+			}
+		}
+	}
+	
+	synchronized void dbNewClaim(Claim claim) {
 		try {
 			this.refreshDataConnection();
 			Statement statement = databaseConnection.createStatement();
@@ -708,7 +694,7 @@ public class DataStore
 		}
 	}
 	
-	synchronized public void dbUpdateOwner(Claim claim) {
+	synchronized void dbUpdateOwner(Claim claim) {
 		try {
 			this.refreshDataConnection();
 			Statement statement = databaseConnection.createStatement();
@@ -720,7 +706,7 @@ public class DataStore
 		}
 	}
 	
-	synchronized public void dbUpdateLocation(Claim claim) {
+	synchronized void dbUpdateLocation(Claim claim) {
 		try {
 			this.refreshDataConnection();
 			Statement statement = databaseConnection.createStatement();
@@ -732,7 +718,7 @@ public class DataStore
 		}
 	}
 	
-	synchronized public void dbSetPerm(Integer claimId, UUID playerId, int perm) {
+	synchronized void dbSetPerm(Integer claimId, UUID playerId, int perm) {
 		try {
 			this.refreshDataConnection();
 			Statement statement = databaseConnection.createStatement();
@@ -744,7 +730,7 @@ public class DataStore
 		}
 	}
 	
-	synchronized public void dbSetPerm(Integer claimId, String permString, int perm) {
+	synchronized void dbSetPerm(Integer claimId, String permString, int perm) {
 		try {
 			this.refreshDataConnection();
 			Statement statement = databaseConnection.createStatement();
@@ -757,7 +743,7 @@ public class DataStore
 	}
 	
 	/** Unset all claim's perms */
-	synchronized public void dbUnsetPerm(Integer claimId) {
+	synchronized void dbUnsetPerm(Integer claimId) {
 		try {
 			this.refreshDataConnection();
 			Statement statement = databaseConnection.createStatement();
@@ -770,7 +756,7 @@ public class DataStore
 		}
 	}
 	/** Unset all player claims' perms */
-	synchronized public void dbUnsetPerm(UUID playerId) {
+	synchronized void dbUnsetPerm(UUID playerId) {
 		try {
 			this.refreshDataConnection();
 			Statement statement = databaseConnection.createStatement();
@@ -784,7 +770,7 @@ public class DataStore
 	}
 	
 	/** Unset playerId perms from all owner's claim */
-	synchronized public void dbUnsetPerm(UUID owner, UUID playerId) {
+	synchronized void dbUnsetPerm(UUID owner, UUID playerId) {
 		try {
 			this.refreshDataConnection();
 			Statement statement = databaseConnection.createStatement();
@@ -797,7 +783,7 @@ public class DataStore
 	}
 	
 	/** Unset permbukkit perms from all owner's claim */
-	synchronized public void dbUnsetPerm(UUID owner, String permString) {
+	synchronized void dbUnsetPerm(UUID owner, String permString) {
 		try {
 			this.refreshDataConnection();
 			Statement statement = databaseConnection.createStatement();
@@ -810,7 +796,7 @@ public class DataStore
 	}
 	
 	/** Unset playerId's perm from claim */
-	synchronized public void dbUnsetPerm(Integer claimId, UUID playerId) {
+	synchronized void dbUnsetPerm(Integer claimId, UUID playerId) {
 		try {
 			this.refreshDataConnection();
 			Statement statement = databaseConnection.createStatement();
@@ -823,7 +809,7 @@ public class DataStore
 	}	
 	
 	/** Unset permBukkit's perm from claim */
-	synchronized public void dbUnsetPerm(Integer claimId, String permString) {
+	synchronized void dbUnsetPerm(Integer claimId, String permString) {
 		try {
 			this.refreshDataConnection();
 			Statement statement = databaseConnection.createStatement();
@@ -992,7 +978,7 @@ public class DataStore
 	}
 	
 	/**get a claim by ID*/
-	public synchronized Claim getClaim(long id) {
+	public synchronized Claim getClaim(int id) {
 	    return this.claims.get(id);
 	}
 	
@@ -1036,11 +1022,6 @@ public class DataStore
 			smallz = z2;
 			bigz = z1;
 		}
-		
-		//creative mode claims always go to bedrock FIXME wat?
-		/*if(GriefPreventionPlus.instance.config_claims_worldModes.get(world) == ClaimsMode.Creative) {
-			smally = 2;
-		}*/
 		
 		//create a new claim instance (but don't save it, yet)
 		Claim newClaim = new Claim(
@@ -1665,48 +1646,6 @@ public class DataStore
 		
 		return message;		
 	}
-	
-	//used in updating the data schema from 0 to 1.
-	//converts player names in a list to uuids
-	protected String[] convertNameListToUUIDList(String[] names)
-	{
-	    //list to build results
-	    List<String> resultNames = new ArrayList<String>();
-	    
-	    for(String name : names)
-	    {
-	        //skip non-player-names (groups and "public"), leave them as-is
-	        if(name.startsWith("[") || name.equals("public"))
-            {
-	            resultNames.add(name);
-	            continue;
-            }
-	        
-	        //otherwise try to convert to a UUID
-	        UUID playerID = null;
-	        try
-	        {
-	            playerID = UUIDFetcher.getUUIDOf(name);
-	        }
-	        catch(Exception ex){ }
-	        
-	        //if successful, replace player name with corresponding UUID
-	        if(playerID != null)
-	        {
-	            resultNames.add(playerID.toString());
-	        }
-	    }
-	    
-	    //return final result of conversion
-	    String [] resultArray = new String [resultNames.size()];
-	    for(int i = 0; i < resultNames.size(); i++)
-	    {
-	        resultArray[i] = resultNames.get(i);
-	    }
-	    
-	    return resultArray;
-    }
-	
 
 	synchronized void close()
 	{

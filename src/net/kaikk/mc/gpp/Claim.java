@@ -45,7 +45,7 @@ public class Claim {
 	Integer id = null;
 	
 	// Coordinates
-	World world;
+	public World world;
 	int lesserX, lesserZ, greaterX, greaterZ; // corners
 	
 	//ownerID.  for admin claims, this is NULL
@@ -544,7 +544,6 @@ public class Claim {
 	//grant permission check, relatively simple
 	public String allowGrantPermission(Player player) // add permission level
 	{
-		// TODO who has manager pemission should manage perms up to his level (managers excluded)
 		//if we don't know who's asking, always say no (i've been told some mods can make this happen somehow)
 		if(player == null) return "";
 		
@@ -619,27 +618,48 @@ public class Claim {
 		GriefPreventionPlus.instance.dataStore.dbSetPerm(this.id, permissionBukkit, permissionLevel.perm);
 	}
 	
-	//revokes a permission for a player or the public
-	public void dropPermission(UUID playerID)
+	/** (this won't affect the database)
+	 * revokes a permission for a player or the public */
+	void unsetPermission(UUID playerID)
 	{
 		this.permissionMapPlayers.remove(playerID);
 	}
 	
-	//revokes a permission for a bukkit permission
-	public void dropPermission(String permissionBukkit)
+	/** (this won't affect the database)
+	 * revokes a permission for a bukkit permission*/
+	void unsetPermission(String permissionBukkit)
 	{
 		this.permissionMapBukkit.remove(permissionBukkit);
 	}
 	
-	//clears all permissions (except owner of course)
-	public void clearPermissions()
+	/** (this won't affect the database)
+	 * clears all permissions (except owner of course)*/
+	void clearMemoryPermissions()
 	{
 		this.permissionMapPlayers.clear();
 		this.permissionMapBukkit.clear();
 	}
 	
-	//gets ALL permissions
-	//useful for  making copies of permissions during a claim resize and listing all permissions in a claim
+	/** revokes a permission for a bukkit permission */
+	public void dropPermission(UUID playerId) {
+		this.unsetPermission(playerId);
+		GriefPreventionPlus.instance.dataStore.dbUnsetPerm(this.id, playerId);
+	}
+	
+	/** revokes a permission for a bukkit permission */
+	public void dropPermission(String permBukkit) {
+		this.unsetPermission(permBukkit);
+		GriefPreventionPlus.instance.dataStore.dbUnsetPerm(this.id, permBukkit);
+	}
+	
+	/** clears all permissions (except owner of course)*/
+	public void clearPermissions() {
+		this.clearMemoryPermissions();
+		GriefPreventionPlus.instance.dataStore.dbUnsetPerm(this.id);
+	}
+	
+	/**gets ALL permissions
+	 * useful for listing all permissions in a claim*/
 	public void getPermissions(ArrayList<String> builders, ArrayList<String> containers, ArrayList<String> accessors, ArrayList<String> managers)
 	{
 		//loop through all the entries in the hash map
@@ -672,7 +692,8 @@ public class Claim {
 		}
 	}
 	
-	//returns a copy of the location representing lower x, y, z limits
+	/**returns a copy of the location representing lower x, y, z limits
+	 * NOTE: remember upper Y will always be ignored, all claims always extend to the sky*/
 	public Location getLesserBoundaryCorner() {
 		return new Location(this.world, this.lesserX, 0, this.lesserZ);
 	}
