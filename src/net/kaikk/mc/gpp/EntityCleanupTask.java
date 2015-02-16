@@ -122,7 +122,7 @@ class EntityCleanupTask implements Runnable
 		}
 		
 		//starting and stopping point.  each execution of the task scans 5% of the server's claims
-		List<Claim> claims = new ArrayList<Claim>(GriefPreventionPlus.instance.dataStore.claims.values()); //TODO better performances needed
+		List<Claim> claims = new ArrayList<Claim>(GriefPreventionPlus.instance.dataStore.claims.values());
 		int j = (int)(claims.size() * this.percentageStart);
 		int k = (int)(claims.size() * (this.percentageStart + .05));
 

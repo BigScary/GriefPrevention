@@ -297,28 +297,11 @@ public class GriefPreventionPlus extends JavaPlugin
 		OfflinePlayer [] offlinePlayers = this.getServer().getOfflinePlayers();
 		long now = System.currentTimeMillis();
 		final long millisecondsPerDay = 1000 * 60 * 60 * 24;
-		for(OfflinePlayer player : offlinePlayers)
-		{
-		    try
-		    {
-    		    String playerName = player.getName();
-    		    UUID playerID = player.getUniqueId();
-    		    if(playerName == null || playerID == null) continue;
-    		    long lastSeen = player.getLastPlayed();
-    		    
-    		    //if the player has been seen in the last 30 days, cache his name/UUID pair
-    		    long diff = now - lastSeen;
-    		    long daysDiff = diff / millisecondsPerDay;
-    		    if(daysDiff <= 30)
-    		    {
-    		        this.playerNameToIDMap.put(playerName, playerID);
-    		        this.playerNameToIDMap.put(playerName.toLowerCase(), playerID);
-    		        playersCached++;
-    		    }
-		    }
-		    catch(Exception e)
-		    {
-		        e.printStackTrace();
+		for(OfflinePlayer player : offlinePlayers) {
+		    //if the player has been seen in the last 30 days, cache his name/UUID pair
+		    if((now - player.getLastPlayed())/millisecondsPerDay <= 30) {
+		        this.playerNameToIDMap.put(player.getName().toLowerCase(), player.getUniqueId());
+		        playersCached++;
 		    }
 		}
 		
@@ -854,42 +837,33 @@ public class GriefPreventionPlus extends JavaPlugin
 	//helper method to resolve a player by name
 	public ConcurrentHashMap<String, UUID> playerNameToIDMap = new ConcurrentHashMap<String, UUID>();
 	
-	//  FIXME
-    OfflinePlayer resolvePlayerByName(String name) 
-	{
+
+    public OfflinePlayer resolvePlayer(String name)  {
 		//try online players first
-		Player targetPlayer = this.getServer().getPlayerExact(name);
-		if(targetPlayer != null) return targetPlayer;
-		
-		targetPlayer = this.getServer().getPlayer(name);
+		Player targetPlayer = this.getServer().getPlayer(name);
         if(targetPlayer != null) return targetPlayer;
+
+        UUID bestMatchID = this.playerNameToIDMap.get(name.toLowerCase());
         
-        UUID bestMatchID = null;
-        
-        //try exact match first
-        bestMatchID = this.playerNameToIDMap.get(name);
-        
-        //if failed, try ignore case
-        if(bestMatchID == null)
-        {
-            bestMatchID = this.playerNameToIDMap.get(name.toLowerCase());
-        }
-        if(bestMatchID == null)
-        {
+        if(bestMatchID == null) {
             return null;
         }
 
 		return this.getServer().getOfflinePlayer(bestMatchID);
+	}
+    
+    public UUID resolvePlayerId(String name)  {
+		//try online players first
+        return this.playerNameToIDMap.get(name.toLowerCase());
 	}
 
 	//helper method to resolve a player name from the player's UUID
     static String lookupPlayerName(UUID playerID) 
     {
         //parameter validation
-        if(playerID == null) return "somebody";
+        if(playerID == null || playerID == UUID0) return "somebody";
+        if(playerID == UUID1) return "an administrator";
         
-        if(playerID == UUID0) return "somebody";
-            
         //check the cache
         OfflinePlayer player = GriefPreventionPlus.instance.getServer().getOfflinePlayer(playerID);
         if(player.hasPlayedBefore() || player.isOnline()) {
@@ -903,21 +877,7 @@ public class GriefPreventionPlus extends JavaPlugin
     static void cacheUUIDNamePair(UUID playerID, String playerName)
     {
         //store the reverse mapping
-        GriefPreventionPlus.instance.playerNameToIDMap.put(playerName, playerID);
         GriefPreventionPlus.instance.playerNameToIDMap.put(playerName.toLowerCase(), playerID);
-    }
-
-    //string overload for above helper
-    static String lookupPlayerName(String playerID)  {
-        UUID id;
-        try {
-            id = UUID.fromString(playerID);
-        } catch(IllegalArgumentException ex) {
-            GriefPreventionPlus.AddLogEntry("Error: Tried to look up a local player name for invalid UUID: " + playerID);
-            return "someone";
-        }
-        
-        return lookupPlayerName(id);
     }
 	
 	public void onDisable()

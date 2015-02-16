@@ -191,7 +191,7 @@ public class CommandExec implements CommandExecutor {
 
 			if(args.length > 0)
 			{
-				OfflinePlayer targetPlayer = GriefPreventionPlus.instance.resolvePlayerByName(args[0]);
+				OfflinePlayer targetPlayer = GriefPreventionPlus.instance.resolvePlayer(args[0]);
 				if(targetPlayer == null)
 				{
 					GriefPreventionPlus.sendMessage(player, TextMode.Err, Messages.PlayerNotFound2);
@@ -331,7 +331,7 @@ public class CommandExec implements CommandExecutor {
 						gpp.dataStore.dropPermissionOnPlayerClaims(player.getUniqueId(), GriefPreventionPlus.UUID0);
 						GriefPreventionPlus.AddLogEntry(player.getName()+" removed public permission from his claims");
 					} else { // player?
-						OfflinePlayer otherPlayer = gpp.resolvePlayerByName(args[0]);
+						OfflinePlayer otherPlayer = gpp.resolvePlayer(args[0]);
 						if (otherPlayer==null) {// player not found
 							GriefPreventionPlus.sendMessage(player, TextMode.Err, Messages.PlayerNotFound2);
 							return true;
@@ -378,7 +378,7 @@ public class CommandExec implements CommandExecutor {
 						claim.unsetPermission(GriefPreventionPlus.UUID0);
 						GriefPreventionPlus.AddLogEntry(player.getName()+" removed public permission from claim id "+claim.id);
 					} else { // player?
-						OfflinePlayer otherPlayer = gpp.resolvePlayerByName(args[0]);
+						OfflinePlayer otherPlayer = gpp.resolvePlayer(args[0]);
 						if (otherPlayer==null) {// player not found
 							GriefPreventionPlus.sendMessage(player, TextMode.Err, Messages.PlayerNotFound2);
 							return true;
@@ -724,7 +724,7 @@ public class CommandExec implements CommandExecutor {
 			if(args.length != 1) return false;
 			
 			//try to find that player
-			OfflinePlayer otherPlayer = gpp.resolvePlayerByName(args[0]);
+			OfflinePlayer otherPlayer = gpp.resolvePlayer(args[0]);
 			if(otherPlayer == null)
 			{
 				GriefPreventionPlus.sendMessage(player, TextMode.Err, Messages.PlayerNotFound2);
@@ -774,7 +774,7 @@ public class CommandExec implements CommandExecutor {
 			//otherwise try to find the specified player
 			else
 			{
-				otherPlayer = gpp.resolvePlayerByName(args[0]);
+				otherPlayer = gpp.resolvePlayer(args[0]);
 				if(otherPlayer == null)
 				{
 					GriefPreventionPlus.sendMessage(player, TextMode.Err, Messages.PlayerNotFound2);
@@ -866,7 +866,7 @@ public class CommandExec implements CommandExecutor {
 			}
 			
 			//otherwise, find the specified player
-			OfflinePlayer targetPlayer = gpp.resolvePlayerByName(args[0]);
+			OfflinePlayer targetPlayer = gpp.resolvePlayer(args[0]);
 			if(targetPlayer == null)
 			{
 				GriefPreventionPlus.sendMessage(player, TextMode.Err, Messages.PlayerNotFound2);
@@ -1053,7 +1053,7 @@ public class CommandExec implements CommandExecutor {
 		    if(args.length != 1) return false;
 		    
 		    //find the specified player
-            OfflinePlayer targetPlayer = gpp.resolvePlayerByName(args[0]);
+            OfflinePlayer targetPlayer = gpp.resolvePlayer(args[0]);
             if(targetPlayer == null)
             {
                 GriefPreventionPlus.sendMessage(player, TextMode.Err, Messages.PlayerNotFound2);
@@ -1106,7 +1106,7 @@ public class CommandExec implements CommandExecutor {
             }
             
             //find the specified player
-            OfflinePlayer targetPlayer = gpp.resolvePlayerByName(args[0]);
+            OfflinePlayer targetPlayer = gpp.resolvePlayer(args[0]);
             if(targetPlayer == null)
             {
                 GriefPreventionPlus.sendMessage(player, TextMode.Err, Messages.PlayerNotFound2);
@@ -1222,7 +1222,7 @@ public class CommandExec implements CommandExecutor {
 				}
 				GriefPreventionPlus.AddLogEntry(player.getName()+" added public permission to all his claims");
 			} else { //player?
-				OfflinePlayer otherPlayer = gpp.resolvePlayerByName(recipientName);
+				OfflinePlayer otherPlayer = gpp.resolvePlayer(recipientName);
 				if (otherPlayer==null) {// player not found
 					GriefPreventionPlus.sendMessage(player, TextMode.Err, Messages.PlayerNotFound2);
 					return;
@@ -1274,7 +1274,7 @@ public class CommandExec implements CommandExecutor {
 				claim.setPermission(GriefPreventionPlus.UUID0, permissionLevel);
 				GriefPreventionPlus.AddLogEntry(player.getName()+" added public permission to claim id "+claim.id);
 			} else { //player?
-				OfflinePlayer otherPlayer = gpp.resolvePlayerByName(recipientName);
+				OfflinePlayer otherPlayer = gpp.resolvePlayer(recipientName);
 				if (otherPlayer==null) {// player not found
 					GriefPreventionPlus.sendMessage(player, TextMode.Err, Messages.PlayerNotFound2);
 					return;

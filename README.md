@@ -2,6 +2,7 @@
 While I was developing GriefPrevention-Cities, I found that GriefPrevention has lots of performance issues (expecially with MySQL database) and some limitation. Currently, most of MC servers are version 1.7.10, so I found very bad to not apply new fixes to Grief Prevention for MC1.7.10. This became GriefPreventionPlus!
 
 Feedback are needed! If you found an issue, please report it!
+Please use the "issues" page on Github!
 
 ###Installation
 - If you've installed GriefPrevention, remove GriefPrevention jar from plugins folder
