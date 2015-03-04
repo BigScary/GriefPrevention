@@ -679,8 +679,17 @@ public class BlockEventHandler implements Listener
 		//wilderness to wilderness is OK
 		if(fromClaim == null && toClaim == null) return;
 		
-		//within claim is OK
-		if(fromClaim == toClaim) return;
+		if (fromClaim != null && toClaim != null)
+		{
+			//within claim is OK
+			if(fromClaim == toClaim) return;
+
+			//from subclaim into parent claim is OK
+			if(fromClaim.parent == toClaim) return;
+
+			//between two adjacent subclaims within the same parent claim is OK
+			if(fromClaim.parent == toClaim.parent) return;
+		}
 		
 		//everything else is NOT OK
 		dispenseEvent.setCancelled(true);
