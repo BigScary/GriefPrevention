@@ -19,7 +19,6 @@
 package me.ryanhamshire.GriefPrevention;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.bukkit.ChatColor;
@@ -96,49 +95,55 @@ public class BlockEventHandler implements Listener
 			return;
 		}
 	}
-	
-	//when a player places a sign...
-	@EventHandler(ignoreCancelled = true)
+
+	// when a player places a sign...
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onSignChanged(SignChangeEvent event)
 	{
-	    //send sign content to online administrators
-	    if(!GriefPrevention.instance.config_signNotifications) return;
-	    
-	    Player player = event.getPlayer();
-		if(player == null) return;
-		
-		StringBuilder lines = new StringBuilder();
+		// send sign content to online administrators
+		if (!GriefPrevention.instance.config_signNotifications) return;
+
+		Player player = event.getPlayer();
+		if (player == null) return;
+
 		boolean notEmpty = false;
-		for(int i = 0; i < event.getLines().length; i++)
+		StringBuilder notification = new StringBuilder();
+
+		String[] lines = event.getLines();
+		for (String line : lines)
 		{
-			String withoutSpaces = event.getLine(i).replace(" ", ""); 
-		    if(!withoutSpaces.isEmpty()) notEmpty = true;
-			lines.append("\n  " + event.getLine(i));
-		}
-		
-		String signMessage = lines.toString();
-		
-		//if not empty and wasn't the same as the last sign, log it and remember it for later
-		PlayerData playerData = this.dataStore.getPlayerData(player.getUniqueId());
-		if(notEmpty && playerData.lastMessage != null && !playerData.lastMessage.equals(signMessage))
-		{		
-			GriefPrevention.AddLogEntry("[Sign Placement] <" + player.getName() + "> " + " @ " + GriefPrevention.getfriendlyLocationString(event.getBlock().getLocation()) + lines.toString());
-			playerData.lastMessage = signMessage;
-			
-			if(!player.hasPermission("griefprevention.eavesdrop"))
+			String trimmed = line.trim();
+			if (!trimmed.isEmpty())
 			{
-				Collection<Player> players = (Collection<Player>)GriefPrevention.instance.getServer().getOnlinePlayers();
-				for(Player otherPlayer : players)
+				notification.append("\n" + line);
+				notEmpty = true;
+			}
+		}
+
+		String message = notification.toString();
+		String location = GriefPrevention.getfriendlyLocationString(event.getBlock().getLocation());
+
+		// if not empty and wasn't the same as the last sign, log it and remember it for later
+		PlayerData playerData = dataStore.getPlayerData(player.getUniqueId());
+		if (notEmpty && (playerData.lastMessage == null || !playerData.lastMessage.equals(message)))
+		{
+			// sanitize the log message, replace new lines with colons
+			GriefPrevention.AddLogEntry(String.format("[Sign Placement] <%s> (@%s): %s",
+					player.getName(), location, message.replaceAll("\n", ";").replaceFirst(";", "")));
+
+			playerData.lastMessage = message;
+
+			if (! player.hasPermission("griefprevention.eavesdrop"))
+			{
+				for (Player online : GriefPrevention.instance.getServer().getOnlinePlayers())
 				{
-					if(otherPlayer.hasPermission("griefprevention.eavesdrop"))
-					{
-						otherPlayer.sendMessage(ChatColor.GRAY + player.getName() + " sign @ " + GriefPrevention.getfriendlyLocationString(event.getBlock().getLocation()) + " :" + signMessage);
-					}
+					if (online.hasPermission("griefprevention.eavesdrop"))
+						online.sendMessage(ChatColor.GRAY + player.getName() + " sign @" + location + ": " + message);
 				}
 			}
 		}
 	}
-	
+
 	//when a player places multiple blocks...
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
 	public void onBlocksPlace(BlockMultiPlaceEvent placeEvent)
