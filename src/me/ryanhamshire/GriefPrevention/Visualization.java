@@ -149,7 +149,7 @@ public class Visualization
 		else if(visualizationType == VisualizationType.AdminClaim)
         {
             cornerMaterial = Material.GLOWSTONE;
-            accentMaterial = Material.PUMPKIN;
+            accentMaterial = Material.EMERALD_BLOCK;
         }
 		
 		else if(visualizationType == VisualizationType.Subdivision)
