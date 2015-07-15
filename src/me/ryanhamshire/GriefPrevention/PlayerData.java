@@ -260,11 +260,14 @@ public class PlayerData
             {
                 this.accruedClaimBlocks = storageData.accruedClaimBlocks;
 
+		// This allows players to get infinite claimblocks by simply relogging
+                /*
                 //ensure at least minimum accrued are accrued (in case of settings changes to increase initial amount)
                 if(this.accruedClaimBlocks < GriefPrevention.instance.config_claims_initialBlocks)
                 {
                     this.accruedClaimBlocks = GriefPrevention.instance.config_claims_initialBlocks;
                 }
+                */
                 
             }
             else
