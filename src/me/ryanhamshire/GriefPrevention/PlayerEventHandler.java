@@ -29,10 +29,10 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
+import me.ryanhamshire.GriefPrevention.events.ChatEvent;
 
 
 import org.bukkit.Achievement;
-import org.bukkit.BanList;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
@@ -41,7 +41,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.TravelAgent;
-import org.bukkit.BanList.Type;
 import org.bukkit.World.Environment;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -114,6 +113,8 @@ class PlayerEventHandler implements Listener
 		{
 		    recipients.clear();
 		    recipients.add(player);
+                    ChatEvent chatEvent = new ChatEvent(event, ChatMode.MUTED);
+                    Bukkit.getPluginManager().callEvent(chatEvent);
 		}
 		
 		//soft muted messages go out to all soft muted players
@@ -136,6 +137,9 @@ class PlayerEventHandler implements Listener
 		    recipients.addAll(recipientsToKeep);
 		    
 		    GriefPrevention.AddLogEntry(notificationMessage, CustomLogEntryTypes.Debug, true);
+                    
+                    ChatEvent chatEvent = new ChatEvent(event, ChatMode.SOFTMUTED);
+                    Bukkit.getPluginManager().callEvent(chatEvent);
 		}
 		
 		//remaining messages
@@ -164,6 +168,9 @@ class PlayerEventHandler implements Listener
 		    }
 		    
 		    recipients.removeAll(recipientsToRemove);
+                    
+                    ChatEvent chatEvent = new ChatEvent(event, ChatMode.NORMAL);
+                    Bukkit.getPluginManager().callEvent(chatEvent);
 		}
 	}
 	
