@@ -10,6 +10,8 @@ class WordFinder
     
     WordFinder(List<String> wordsToFind)
     {
+        if(wordsToFind.size() == 0) return;
+        
         StringBuilder patternBuilder = new StringBuilder();
         for(String word : wordsToFind)
         {
@@ -28,6 +30,8 @@ class WordFinder
     
     boolean hasMatch(String input)
     {
+        if(this.pattern == null) return false;
+        
         Matcher matcher = this.pattern.matcher(input);
         return matcher.find();
     }

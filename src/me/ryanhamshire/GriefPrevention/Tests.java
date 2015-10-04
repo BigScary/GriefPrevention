@@ -2,6 +2,7 @@ package me.ryanhamshire.GriefPrevention;
 
 import static org.junit.Assert.*;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.junit.Test;
@@ -56,5 +57,12 @@ public class Tests
    {
        WordFinder finder = new WordFinder(Arrays.asList("alpha"));
        assertFalse(finder.hasMatch("Unit testing is smart."));
+   }
+   
+   @Test
+   public void WordFinder_EmptyList()
+   {
+       WordFinder finder = new WordFinder(new ArrayList<String>());
+       assertFalse(finder.hasMatch("alpha"));
    }
 }
