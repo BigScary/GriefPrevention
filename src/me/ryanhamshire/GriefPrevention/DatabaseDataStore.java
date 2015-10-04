@@ -79,16 +79,16 @@ public class DatabaseDataStore extends DataStore
 			
 			statement.execute("CREATE TABLE IF NOT EXISTS griefprevention_nextclaimid (nextid INT(15));");
 			
-			statement.execute("CREATE TABLE IF NOT EXISTS griefprevention_claimdata (id INT(15), owner VARCHAR(50), lessercorner VARCHAR(100), greatercorner VARCHAR(100), builders VARCHAR(65000), containers VARCHAR(65000), accessors VARCHAR(65000), managers VARCHAR(65000), parentid INT(15));");
+			statement.execute("CREATE TABLE IF NOT EXISTS griefprevention_claimdata (id INT(15), owner VARCHAR(50), lessercorner VARCHAR(100), greatercorner VARCHAR(100), builders TEXT, containers TEXT, accessors TEXT, managers TEXT, parentid INT(15));");
 			
 			statement.execute("CREATE TABLE IF NOT EXISTS griefprevention_playerdata (name VARCHAR(50), lastlogin DATETIME, accruedblocks INT(15), bonusblocks INT(15));");
 			
 			statement.execute("CREATE TABLE IF NOT EXISTS griefprevention_schemaversion (version INT(15));");
 			
-			statement.execute("ALTER TABLE griefprevention_claimdata MODIFY builders VARCHAR(65000);");
-			statement.execute("ALTER TABLE griefprevention_claimdata MODIFY containers VARCHAR(65000);");
-			statement.execute("ALTER TABLE griefprevention_claimdata MODIFY accessors VARCHAR(65000);");
-			statement.execute("ALTER TABLE griefprevention_claimdata MODIFY managers VARCHAR(65000);");
+			statement.execute("ALTER TABLE griefprevention_claimdata MODIFY builders TEXT;");
+			statement.execute("ALTER TABLE griefprevention_claimdata MODIFY containers TEXT;");
+			statement.execute("ALTER TABLE griefprevention_claimdata MODIFY accessors TEXT;");
+			statement.execute("ALTER TABLE griefprevention_claimdata MODIFY managers TEXT;");
 			
 			//if the next claim id table is empty, this is a brand new database which will write using the latest schema
 			//otherwise, schema version is determined by schemaversion table (or =0 if table is empty, see getSchemaVersion())
