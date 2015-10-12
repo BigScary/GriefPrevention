@@ -35,6 +35,7 @@ import java.util.regex.Pattern;
 import me.ryanhamshire.GriefPrevention.DataStore.NoTransferException;
 import net.milkbowl.vault.economy.Economy;
 
+import org.bukkit.Achievement;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.GameMode;
@@ -3040,5 +3041,15 @@ public class GriefPrevention extends JavaPlugin
         Boolean configSetting = this.config_pvp_specifiedWorlds.get(world);
         if(configSetting != null) return configSetting;
         return world.getPVP();
+    }
+
+    public static boolean isNewToServer(Player player)
+    {
+        if(player.hasAchievement(Achievement.MINE_WOOD)) return false;
+        
+        PlayerData playerData = instance.dataStore.getPlayerData(player.getUniqueId());
+        if(playerData.getClaims().size() > 0) return false;
+        
+        return true;
     }
 }

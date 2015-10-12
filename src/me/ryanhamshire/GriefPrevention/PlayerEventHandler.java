@@ -151,7 +151,7 @@ class PlayerEventHandler implements Listener
             recipients.add(player);
 		    
 		    //if player not new warn for the first infraction per play session.
-            if(player.hasAchievement(Achievement.MINE_WOOD))
+            if(!GriefPrevention.isNewToServer(player))
             {
                 PlayerData playerData = GriefPrevention.instance.dataStore.getPlayerData(player.getUniqueId());
                 if(!playerData.profanityWarned)
@@ -690,7 +690,7 @@ class PlayerEventHandler implements Listener
 		this.lastLoginThisServerSessionMap.put(playerID, nowDate);
 		
 		//if newish, prevent chat until he's moved a bit to prove he's not a bot
-		if(!player.hasAchievement(Achievement.MINE_WOOD))
+		if(GriefPrevention.isNewToServer(player))
 		{
 		    playerData.noChatLocation = player.getLocation();
 		}
@@ -920,7 +920,7 @@ class PlayerEventHandler implements Listener
         this.dataStore.clearCachedPlayerData(playerID);
         
         //reduce count of players with that player's IP address
-        if(GriefPrevention.instance.config_ipLimit > 0 && !player.hasAchievement(Achievement.MINE_WOOD))
+        if(GriefPrevention.instance.config_ipLimit > 0 && GriefPrevention.isNewToServer(player))
         {
             InetAddress ipAddress = playerData.ipAddress;
             if(ipAddress != null)
