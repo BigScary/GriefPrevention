@@ -65,4 +65,20 @@ public class Tests
        WordFinder finder = new WordFinder(new ArrayList<String>());
        assertFalse(finder.hasMatch("alpha"));
    }
+   
+   @Test
+   public void WordFinder_PunctuationOnly()
+   {
+       WordFinder finder = new WordFinder(Arrays.asList("alpha"));
+       assertFalse(finder.hasMatch("!"));
+       assertFalse(finder.hasMatch("?"));
+   }
+   
+   @Test
+   public void WordFinder_StartingPunctuation()
+   {
+       WordFinder finder = new WordFinder(Arrays.asList("alpha"));
+       assertFalse(finder.hasMatch("!asas dfasdf"));
+       assertFalse(finder.hasMatch("?asdfa sdfas df"));
+   }
 }

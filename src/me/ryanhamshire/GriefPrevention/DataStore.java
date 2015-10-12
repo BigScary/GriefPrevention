@@ -1358,6 +1358,7 @@ public abstract class DataStore
 		this.addDefault(defaults, Messages.UntrustAllOwnerOnly, "Only the claim owner can clear all its permissions.", null);
 		this.addDefault(defaults, Messages.ManagersDontUntrustManagers, "Only the claim owner can demote a manager.", null);
 		this.addDefault(defaults, Messages.PlayerNotIgnorable, "You can't ignore that player.", null);
+		this.addDefault(defaults, Messages.NoEnoughBlocksForChestClaim, "Because you don't have any claim blocks available, no automatic land claim was created for you.  You can use /ClaimsList to monitor your available claim block total.", null);
 		
 		this.addDefault(defaults, Messages.BookAuthor, "BigScary", null);
 		this.addDefault(defaults, Messages.BookTitle, "How to Claim Land", null);
