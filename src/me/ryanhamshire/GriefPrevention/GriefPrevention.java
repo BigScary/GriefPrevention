@@ -2141,15 +2141,10 @@ public class GriefPrevention extends JavaPlugin
             if(args.length < 1) return false;
             
             //validate target player
-            Player targetPlayer = this.getServer().getPlayer(args[0]);
+            OfflinePlayer targetPlayer = this.resolvePlayerByName(args[0]);
             if(targetPlayer == null)
             {
                 GriefPrevention.sendMessage(player, TextMode.Err, Messages.PlayerNotFound2);
-                return true;
-            }
-            else if(targetPlayer.hasPermission("griefprevention.notignorable"))
-            {
-                GriefPrevention.sendMessage(player, TextMode.Err, Messages.PlayerNotIgnorable);
                 return true;
             }
             

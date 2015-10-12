@@ -178,25 +178,28 @@ class PlayerEventHandler implements Listener
 		    makeSocialLogEntry(player.getName(), message);
 		    
 		    //based on ignore lists, remove some of the audience
-		    Set<Player> recipientsToRemove = new HashSet<Player>();
-		    PlayerData playerData = this.dataStore.getPlayerData(player.getUniqueId());
-		    for(Player recipient : recipients)
+		    if(!player.hasPermission("griefprevention.notignorable"))
 		    {
-		        if(playerData.ignoredPlayers.containsKey(recipient.getUniqueId()))
-		        {
-		            recipientsToRemove.add(recipient);
-		        }
-		        else
-		        {
-		            PlayerData targetPlayerData = this.dataStore.getPlayerData(recipient.getUniqueId());
-		            if(targetPlayerData.ignoredPlayers.containsKey(player.getUniqueId()))
-		            {
-		                recipientsToRemove.add(recipient);
-		            }
-		        }
+    		    Set<Player> recipientsToRemove = new HashSet<Player>();
+    		    PlayerData playerData = this.dataStore.getPlayerData(player.getUniqueId());
+    		    for(Player recipient : recipients)
+    		    {
+    		        if(playerData.ignoredPlayers.containsKey(recipient.getUniqueId()))
+    		        {
+    		            recipientsToRemove.add(recipient);
+    		        }
+    		        else
+    		        {
+    		            PlayerData targetPlayerData = this.dataStore.getPlayerData(recipient.getUniqueId());
+    		            if(targetPlayerData.ignoredPlayers.containsKey(player.getUniqueId()))
+    		            {
+    		                recipientsToRemove.add(recipient);
+    		            }
+    		        }
+    		    }
+    		    
+    		    recipients.removeAll(recipientsToRemove);
 		    }
-		    
-		    recipients.removeAll(recipientsToRemove);
 		}
 	}
 	
