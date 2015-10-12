@@ -213,6 +213,7 @@ permissions:
             griefprevention.eavesdropsigns: true
             griefprevention.claimbook: true
             griefprevention.notignorable: true
+            griefprevention.seeinactivity: true
     griefprevention.siegeimmune:
         description: Makes a player immune to /Siege.
         default: op
@@ -290,4 +291,7 @@ permissions:
         default: op
     griefprevention.notignorable:
         description: Players with this permission can't be ignored.
+        default: op
+    griefprevention.seeinactivity:
+        description: Players with this permission can see how long a claim owner has been offline.
         default: op
