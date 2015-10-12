@@ -1391,7 +1391,7 @@ class PlayerEventHandler implements Listener
 		}
 		
 		//lava buckets can't be dumped near other players unless pvp is on
-		if(!GriefPrevention.instance.pvpRulesApply(block.getWorld()) && !player.hasPermission("griefprevention.lava"))
+		if((!GriefPrevention.instance.pvpRulesApply(block.getWorld()) || !GriefPrevention.instance.config_pvp_allowLavaNearPlayers) && !player.hasPermission("griefprevention.lava"))
 		{
 			if(bucketEvent.getBucket() == Material.LAVA_BUCKET)
 			{
