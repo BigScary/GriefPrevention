@@ -137,9 +137,11 @@ commands:
       description: Lists information about a player's claim blocks and claims.
       usage: /ClaimsList or /ClaimsList <player>
       aliases: [claimlist, listclaims]
+      permission: griefprevention.claims
    claimexplosions:
       description: Toggles whether explosives may be used in a specific land claim.
       usage: /ClaimExplosions
+      permission: griefprevention.claims
    softmute:
       description: Toggles whether a player's messages will only reach other soft-muted players.
       usage: /SoftMute <player>
