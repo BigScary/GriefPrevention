@@ -2064,6 +2064,9 @@ class PlayerEventHandler implements Listener
 				return;
 			}
 			
+			//if event is cancelled, don't do anything
+			if(event.isCancelled) return;
+			
 			//if the player doesn't have claims permission, don't do anything
 			if(!player.hasPermission("griefprevention.createclaims"))
 			{
