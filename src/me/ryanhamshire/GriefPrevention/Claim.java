@@ -586,7 +586,7 @@ public class Claim
 	
 	//gets ALL permissions
 	//useful for  making copies of permissions during a claim resize and listing all permissions in a claim
-	public void getPermissions(ArrayList<String> builders, ArrayList<String> containers, ArrayList<String> accessors, ArrayList<String> managers)
+	public void getPermissions(List<String> builders, List<String> containers, List<String> accessors, List<String> managers)
 	{
 		//loop through all the entries in the hash map
 		Iterator<Map.Entry<String, ClaimPermission>> mappingsIterator = this.playerIDToClaimPermissionMap.entrySet().iterator(); 
@@ -759,7 +759,7 @@ public class Claim
 		
 		//count current entities (ignoring players)
 		int totalEntities = 0;
-		ArrayList<Chunk> chunks = this.getChunks();
+		List<Chunk> chunks = this.getChunks();
 		for(Chunk chunk : chunks)
 		{
 			Entity [] entities = chunk.getEntities();
@@ -853,7 +853,7 @@ public class Claim
 		return (long)score;
 	}
 
-    public ArrayList<Chunk> getChunks()
+    public List<Chunk> getChunks()
     {
         ArrayList<Chunk> chunks = new ArrayList<Chunk>();
         
@@ -872,7 +872,7 @@ public class Claim
         return chunks;
     }
 
-    public ArrayList<String> getChunkStrings()
+    public List<String> getChunkStrings()
     {
         ArrayList<String> chunkStrings = new ArrayList<String>();
         int smallX = this.getLesserBoundaryCorner().getBlockX() >> 4;

@@ -409,7 +409,7 @@ public abstract class DataStore
 		
 		//add it and mark it as added
 		this.claims.add(newClaim);
-		ArrayList<String> chunkStrings = newClaim.getChunkStrings();
+		List<String> chunkStrings = newClaim.getChunkStrings();
 		for(String chunkString : chunkStrings)
 		{
 		    ArrayList<Claim> claimsInChunk = this.chunksToClaimsMap.get(chunkString);
@@ -568,7 +568,7 @@ public abstract class DataStore
 			}
 		}
 		
-		ArrayList<String> chunkStrings = claim.getChunkStrings();
+		List<String> chunkStrings = claim.getChunkStrings();
         for(String chunkString : chunkStrings)
         {
             ArrayList<Claim> claimsInChunk = this.chunksToClaimsMap.get(chunkString);
