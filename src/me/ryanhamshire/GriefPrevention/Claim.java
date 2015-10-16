@@ -597,22 +597,26 @@ public class Claim
 			//build up a list for each permission level
 			if(entry.getValue() == ClaimPermission.Build)
 			{
-				builders.add(entry.getKey());
+			   if (builders != null)
+			      builders.add(entry.getKey());
 			}
 			else if(entry.getValue() == ClaimPermission.Inventory)
 			{
-				containers.add(entry.getKey());
+            if (containers != null)
+               containers.add(entry.getKey());
 			}
 			else
 			{
-				accessors.add(entry.getKey());
+			   if (accessors != null)
+			      accessors.add(entry.getKey());
 			}			
 		}
 		
 		//managers are handled a little differently
 		for(int i = 0; i < this.managers.size(); i++)
 		{
-			managers.add(this.managers.get(i));
+		   if (managers != null)
+		      managers.add(this.managers.get(i));
 		}
 	}
 	
