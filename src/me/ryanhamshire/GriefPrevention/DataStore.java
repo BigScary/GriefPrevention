@@ -661,10 +661,29 @@ public abstract class DataStore
 	    return Collections.unmodifiableCollection(this.claims);
 	}
 	
+	public Collection<Claim> getClaims(int chunkx, int chunkz)
+	{
+	    ArrayList<Claim> chunkClaims = this.chunksToClaimsMap.get(this.getChunkString(chunkx, chunkz));
+	    if(chunkClaims != null)
+	    {
+	        return Collections.unmodifiableCollection(chunkClaims);
+	    }
+	    else
+	    {
+	        return Collections.unmodifiableCollection(new ArrayList<Claim>());
+	    }
+	}
+	
+	//gets an almost-unique, persistent identifier string for a chunk
+    String getChunkString(int chunkx, int chunkz)
+    {
+        return String.valueOf(chunkx) + (chunkz);
+    }
+	
 	//gets an almost-unique, persistent identifier string for a chunk
 	String getChunkString(Location location)
 	{
-        return String.valueOf(location.getBlockX() >> 4) + (location.getBlockZ() >> 4);
+        return this.getChunkString(location.getBlockX() >> 4, location.getBlockZ() >> 4);
     }
 	
     //creates a claim.
