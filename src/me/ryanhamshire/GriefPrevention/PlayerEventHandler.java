@@ -140,7 +140,7 @@ class PlayerEventHandler implements Listener
 		    recipients.clear();
 		    recipients.addAll(recipientsToKeep);
 		    
-		    GriefPrevention.AddLogEntry(notificationMessage, CustomLogEntryTypes.Debug, true);
+		    GriefPrevention.AddLogEntry(notificationMessage, CustomLogEntryTypes.AdminActivity, false);
 		}
 		
 		//troll and excessive profanity filter
