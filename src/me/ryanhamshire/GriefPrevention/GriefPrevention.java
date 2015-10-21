@@ -162,6 +162,7 @@ public class GriefPrevention extends JavaPlugin
 	public boolean config_endermenMoveBlocks;						//whether or not endermen may move blocks around
 	public boolean config_silverfishBreakBlocks;					//whether silverfish may break blocks
 	public boolean config_creaturesTrampleCrops;					//whether or not non-player entities may trample crops
+	public boolean config_rabbitsEatCrops;                          //whether or not rabbits may eat crops
 	public boolean config_zombiesBreakDoors;						//whether or not hard-mode zombies may break down wooden doors
 	
 	public int config_ipLimit;                                      //how many players can share an IP address
@@ -562,6 +563,7 @@ public class GriefPrevention extends JavaPlugin
         this.config_endermenMoveBlocks = config.getBoolean("GriefPrevention.EndermenMoveBlocks", false);
         this.config_silverfishBreakBlocks = config.getBoolean("GriefPrevention.SilverfishBreakBlocks", false);
         this.config_creaturesTrampleCrops = config.getBoolean("GriefPrevention.CreaturesTrampleCrops", false);
+        this.config_rabbitsEatCrops = config.getBoolean("GriefPrevention.RabbitsEatCrops", true);
         this.config_zombiesBreakDoors = config.getBoolean("GriefPrevention.HardModeZombiesBreakDoors", false);
         
         this.config_mods_ignoreClaimsAccounts = config.getStringList("GriefPrevention.Mods.PlayersIgnoringAllClaims");
@@ -801,6 +803,7 @@ public class GriefPrevention extends JavaPlugin
         outConfig.set("GriefPrevention.EndermenMoveBlocks", this.config_endermenMoveBlocks);
         outConfig.set("GriefPrevention.SilverfishBreakBlocks", this.config_silverfishBreakBlocks);      
         outConfig.set("GriefPrevention.CreaturesTrampleCrops", this.config_creaturesTrampleCrops);
+        outConfig.set("GriefPrevention.RabbitsEatCrops", this.config_rabbitsEatCrops);
         outConfig.set("GriefPrevention.HardModeZombiesBreakDoors", this.config_zombiesBreakDoors);      
         
         outConfig.set("GriefPrevention.Database.URL", this.databaseUrl);
@@ -2546,7 +2549,7 @@ public class GriefPrevention extends JavaPlugin
 	//helper method to resolve a player by name
 	ConcurrentHashMap<String, UUID> playerNameToIDMap = new ConcurrentHashMap<String, UUID>();
 
-        //thread to build the above cache
+    //thread to build the above cache
 	private class CacheOfflinePlayerNamesThread extends Thread
     {
         private OfflinePlayer [] offlinePlayers;
