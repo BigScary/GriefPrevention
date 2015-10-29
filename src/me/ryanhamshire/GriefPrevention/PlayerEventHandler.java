@@ -47,6 +47,7 @@ import org.bukkit.World;
 import org.bukkit.World.Environment;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.command.Command;
 import org.bukkit.entity.Animals;
 import org.bukkit.entity.Boat;
 import org.bukkit.entity.Creature;
@@ -71,6 +72,8 @@ import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.MetadataValue;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.BlockIterator;
 
 class PlayerEventHandler implements Listener 
@@ -484,11 +487,13 @@ class PlayerEventHandler implements Listener
 		
 		String command = args[0].toLowerCase();
 		
+		CommandCategory category = this.getCommandCategory(command);
+		
 		Player player = event.getPlayer();
 		PlayerData playerData = null;
 		
 		//if a whisper
-		if(GriefPrevention.instance.config_eavesdrop_whisperCommands.contains(command) && args.length > 1)
+		if(category == CommandCategory.Whisper && args.length > 1)
 		{
 		    //determine target player, might be NULL
             Player targetPlayer = GriefPrevention.instance.getServer().getPlayer(args[1]);
@@ -551,16 +556,7 @@ class PlayerEventHandler implements Listener
 		}
 		
 		//if the slash command used is in the list of monitored commands, treat it like a chat message (see above)
-		boolean isMonitoredCommand = false;
-		for(String monitoredCommand : GriefPrevention.instance.config_spam_monitorSlashCommands)
-		{
-			if(args[0].equalsIgnoreCase(monitoredCommand))
-			{
-				isMonitoredCommand = true;
-				break;
-			}
-		}
-		
+		boolean isMonitoredCommand = (category == CommandCategory.Chat || category == CommandCategory.Whisper);
 		if(isMonitoredCommand)
 		{
 		    //if anti spam enabled, check for spam
@@ -578,7 +574,7 @@ class PlayerEventHandler implements Listener
 		            builder.append(arg + " ");
 		        }
 		        
-	            this.makeSocialLogEntry(event.getPlayer().getName(), builder.toString());
+	            makeSocialLogEntry(event.getPlayer().getName(), builder.toString());
 		    }
 		}
 		
@@ -610,7 +606,68 @@ class PlayerEventHandler implements Listener
         }
 	}
 	
-	static int longestNameLength = 10;
+	private ConcurrentHashMap<String, CommandCategory> commandCategoryMap = new ConcurrentHashMap<String, CommandCategory>();
+	private CommandCategory getCommandCategory(String commandName)
+	{
+	    if(commandName.startsWith("/")) commandName = commandName.substring(1);
+	    
+	    //if we've seen this command or alias before, return the category determined previously
+	    CommandCategory category = this.commandCategoryMap.get(commandName);
+	    if(category != null) return category;
+	    
+	    //otherwise build a list of all the aliases of this command across all installed plugins
+	    HashSet<String> aliases = new HashSet<String>();
+	    aliases.add(commandName);
+	    for(Plugin plugin : Bukkit.getServer().getPluginManager().getPlugins())
+        {
+            JavaPlugin javaPlugin = (JavaPlugin)plugin;
+            Command command = javaPlugin.getCommand(commandName);
+            if(command != null)
+            {
+                aliases.add(command.getName().toLowerCase());
+                aliases.add(plugin.getName().toLowerCase() + ":" + command.getName().toLowerCase());
+                for(String alias : command.getAliases())
+                {
+                    aliases.add(alias.toLowerCase());
+                    aliases.add(plugin.getName().toLowerCase() + ":" + alias.toLowerCase());
+                }
+            }
+        }
+	    
+	    //also consider vanilla commands
+	    Command command = Bukkit.getServer().getPluginCommand(commandName);
+        if(command != null)
+        {
+            aliases.add(command.getName().toLowerCase());
+            aliases.add("minecraft:" + command.getName().toLowerCase());
+            for(String alias : command.getAliases())
+            {
+                aliases.add(alias.toLowerCase());
+                aliases.add("minecraft:" + alias.toLowerCase());
+            }
+        }
+	    
+	    //if any of those aliases are in the chat list or whisper list, then we know the category for that command
+	    category = CommandCategory.None;
+	    for(String alias : aliases)
+	    {
+	        if(GriefPrevention.instance.config_eavesdrop_whisperCommands.contains("/" + alias))
+	        {
+	            category = CommandCategory.Whisper;
+	        }
+	        else if(GriefPrevention.instance.config_spam_monitorSlashCommands.contains("/" + alias))
+	        {
+	            category = CommandCategory.Chat;
+	        }
+	        
+	        //remember the categories for later
+	        this.commandCategoryMap.put(alias.toLowerCase(), category);
+	    }
+	    
+	    return category;
+    }
+
+    static int longestNameLength = 10;
 	static void makeSocialLogEntry(String name, String message)
 	{
         StringBuilder entryBuilder = new StringBuilder(name);

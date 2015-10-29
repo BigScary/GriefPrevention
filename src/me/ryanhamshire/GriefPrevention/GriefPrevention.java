@@ -529,7 +529,8 @@ public class GriefPrevention extends JavaPlugin
         this.config_spam_allowedIpAddresses = config.getString("GriefPrevention.Spam.AllowedIpAddresses", "1.2.3.4; 5.6.7.8");
         this.config_spam_banOffenders = config.getBoolean("GriefPrevention.Spam.BanOffenders", true);       
         this.config_spam_banMessage = config.getString("GriefPrevention.Spam.BanMessage", "Banned for spam.");
-        String slashCommandsToMonitor = config.getString("GriefPrevention.Spam.MonitorSlashCommands", "/me;/tell;/global;/local;/w;/msg;/r;/t");
+        String slashCommandsToMonitor = config.getString("GriefPrevention.Spam.MonitorSlashCommands", "/me;/global;/local");
+        slashCommandsToMonitor = config.getString("GriefPrevention.Spam.ChatSlashCommands", slashCommandsToMonitor);
         this.config_spam_deathMessageCooldownSeconds = config.getInt("GriefPrevention.Spam.DeathMessageCooldownSeconds", 60);       
         
         this.config_pvp_protectFreshSpawns = config.getBoolean("GriefPrevention.PvP.ProtectFreshSpawns", true);
@@ -556,7 +557,8 @@ public class GriefPrevention extends JavaPlugin
         
         this.config_whisperNotifications = config.getBoolean("GriefPrevention.AdminsGetWhispers", true);
         this.config_signNotifications = config.getBoolean("GriefPrevention.AdminsGetSignNotifications", true);
-        String whisperCommandsToMonitor = config.getString("GriefPrevention.WhisperCommands", "/tell;/pm;/r;/w;/whisper;/t;/msg");
+        String whisperCommandsToMonitor = config.getString("GriefPrevention.WhisperCommands", "/tell;/pm;/r;/whisper;/msg");
+        whisperCommandsToMonitor = config.getString("GriefPrevention.Spam.WhisperSlashCommands", whisperCommandsToMonitor);
         
         this.config_smartBan = config.getBoolean("GriefPrevention.SmartBan", true);
         this.config_ipLimit = config.getInt("GriefPrevention.MaxPlayersPerIpAddress", 3); 
@@ -753,7 +755,8 @@ public class GriefPrevention extends JavaPlugin
         
         outConfig.set("GriefPrevention.Spam.Enabled", this.config_spam_enabled);
         outConfig.set("GriefPrevention.Spam.LoginCooldownSeconds", this.config_spam_loginCooldownSeconds);
-        outConfig.set("GriefPrevention.Spam.MonitorSlashCommands", slashCommandsToMonitor);
+        outConfig.set("GriefPrevention.Spam.ChatSlashCommands", slashCommandsToMonitor);
+        outConfig.set("GriefPrevention.Spam.WhisperSlashCommands", whisperCommandsToMonitor);     
         outConfig.set("GriefPrevention.Spam.WarningMessage", this.config_spam_warningMessage);
         outConfig.set("GriefPrevention.Spam.BanOffenders", this.config_spam_banOffenders);      
         outConfig.set("GriefPrevention.Spam.BanMessage", this.config_spam_banMessage);
@@ -794,7 +797,6 @@ public class GriefPrevention extends JavaPlugin
         outConfig.set("GriefPrevention.AdminsGetWhispers", this.config_whisperNotifications);
         outConfig.set("GriefPrevention.AdminsGetSignNotifications", this.config_signNotifications);
         
-        outConfig.set("GriefPrevention.WhisperCommands", whisperCommandsToMonitor);     
         outConfig.set("GriefPrevention.SmartBan", this.config_smartBan);
         outConfig.set("GriefPrevention.MaxPlayersPerIpAddress", this.config_ipLimit);
         
@@ -851,7 +853,7 @@ public class GriefPrevention extends JavaPlugin
         commands = slashCommandsToMonitor.split(";");
         for(int i = 0; i < commands.length; i++)
         {
-            this.config_spam_monitorSlashCommands.add(commands[i].trim());
+            this.config_spam_monitorSlashCommands.add(commands[i].trim().toLowerCase());
         }
         
         //try to parse the list of commands which should be included in eavesdropping
@@ -859,7 +861,7 @@ public class GriefPrevention extends JavaPlugin
         commands = whisperCommandsToMonitor.split(";");
         for(int i = 0; i < commands.length; i++)
         {
-            this.config_eavesdrop_whisperCommands.add(commands[i].trim());
+            this.config_eavesdrop_whisperCommands.add(commands[i].trim().toLowerCase());
         }       
         
         //try to parse the list of commands which should be banned during pvp combat
@@ -867,7 +869,7 @@ public class GriefPrevention extends JavaPlugin
         commands = bannedPvPCommandsList.split(";");
         for(int i = 0; i < commands.length; i++)
         {
-            this.config_pvp_blockedCommands.add(commands[i].trim());
+            this.config_pvp_blockedCommands.add(commands[i].trim().toLowerCase());
         }
     }
 
