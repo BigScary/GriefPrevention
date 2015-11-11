@@ -61,7 +61,7 @@ class CustomLogger
         }
     }
     
-    private static final Pattern inlineFormatterPattern = Pattern.compile("ง."); 
+    private static final Pattern inlineFormatterPattern = Pattern.compile("ยง."); 
     void AddEntry(String entry, CustomLogEntryTypes entryType)
     {
         //if disabled, do nothing
@@ -181,7 +181,7 @@ class CustomLogger
     }
 }
 
-enum CustomLogEntryTypes
+public enum CustomLogEntryTypes
 {
     SocialActivity,
     SuspiciousActivity,
