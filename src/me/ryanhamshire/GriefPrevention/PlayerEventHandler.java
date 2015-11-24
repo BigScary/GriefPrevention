@@ -498,7 +498,14 @@ class PlayerEventHandler implements Listener
 		    //determine target player, might be NULL
             Player targetPlayer = GriefPrevention.instance.getServer().getPlayer(args[1]);
 		    
-		    //if eavesdrop enabled and sender doesn't have the eavesdrop permission, eavesdrop
+            //softmute feature
+            if(this.dataStore.isSoftMuted(player.getUniqueId()) && targetPlayer != null && !this.dataStore.isSoftMuted(targetPlayer.getUniqueId()))
+            {
+                event.setCancelled(true);
+                return;
+            }
+            
+            //if eavesdrop enabled and sender doesn't have the eavesdrop permission, eavesdrop
 		    if(GriefPrevention.instance.config_whisperNotifications && !player.hasPermission("griefprevention.eavesdrop"))
     		{			
                 //except for when the recipient has eavesdrop permission
@@ -524,8 +531,8 @@ class PlayerEventHandler implements Listener
         			}
                 }
     		}
-            
-            //ignore feature
+		    
+		    //ignore feature
             if(targetPlayer != null && targetPlayer.isOnline())
             {
                 //if either is ignoring the other, cancel this command
@@ -554,6 +561,13 @@ class PlayerEventHandler implements Listener
 			GriefPrevention.sendMessage(event.getPlayer(), TextMode.Err, Messages.CommandBannedInPvP);
 			return;
 		}
+		
+		//soft mute for chat slash commands
+		if(category == CommandCategory.Chat && this.dataStore.isSoftMuted(player.getUniqueId()))
+        {
+            event.setCancelled(true);
+            return;
+        }
 		
 		//if the slash command used is in the list of monitored commands, treat it like a chat message (see above)
 		boolean isMonitoredCommand = (category == CommandCategory.Chat || category == CommandCategory.Whisper);
