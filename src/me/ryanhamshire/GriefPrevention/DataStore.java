@@ -1409,6 +1409,9 @@ public abstract class DataStore
 			this.messages[messageID.ordinal()] = config.getString("Messages." + messageID.name() + ".Text", messageData.text);
 			config.set("Messages." + messageID.name() + ".Text", this.messages[messageID.ordinal()]);
 			
+			//support color codes
+			this.messages[messageID.ordinal()] = this.messages[messageID.ordinal()].replace('$', (char)0x00A7);
+			
 			if(messageData.notes != null)
 			{
 				messageData.notes = config.getString("Messages." + messageID.name() + ".Notes", messageData.notes);
