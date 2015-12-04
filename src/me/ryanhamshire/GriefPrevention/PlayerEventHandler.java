@@ -862,7 +862,7 @@ class PlayerEventHandler implements Listener
         {
             String ipAddressString = ipAddress.toString();
             int ipLimit = GriefPrevention.instance.config_ipLimit;
-            if(ipLimit > 0 && !player.hasAchievement(Achievement.MINE_WOOD))
+            if(ipLimit > 0 && GriefPrevention.isNewToServer(player))
             {
                 Integer ipCount = this.ipCountHash.get(ipAddressString);
                 if(ipCount == null) ipCount = 0;
@@ -873,12 +873,13 @@ class PlayerEventHandler implements Listener
                     GriefPrevention.instance.getServer().getScheduler().scheduleSyncDelayedTask(GriefPrevention.instance, task, 10L);
                     
                     //silence join message
-                    event.setJoinMessage("");               
+                    event.setJoinMessage(null);
                     return;
                 }
                 else
                 {
                     this.ipCountHash.put(ipAddressString, ipCount + 1);
+                    playerData.ipLimited = true;
                 }
             }
         }
@@ -990,11 +991,8 @@ class PlayerEventHandler implements Listener
             if(player.getHealth() > 0) player.setHealth(0);  //might already be zero from above, this avoids a double death message
         }
         
-        //drop data about this player
-        this.dataStore.clearCachedPlayerData(playerID);
-        
         //reduce count of players with that player's IP address
-        if(GriefPrevention.instance.config_ipLimit > 0 && GriefPrevention.isNewToServer(player))
+        if(GriefPrevention.instance.config_ipLimit > 0 && playerData.ipLimited)
         {
             InetAddress ipAddress = playerData.ipAddress;
             if(ipAddress != null)
@@ -1005,6 +1003,9 @@ class PlayerEventHandler implements Listener
                 this.ipCountHash.put(ipAddressString, count - 1);
             }
         }
+        
+        //drop data about this player
+        this.dataStore.clearCachedPlayerData(playerID);
 	}
 	
 	//determines whether or not a login or logout notification should be silenced, depending on how many there have been in the last minute
