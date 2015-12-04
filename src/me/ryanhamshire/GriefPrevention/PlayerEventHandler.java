@@ -1218,7 +1218,7 @@ class PlayerEventHandler implements Listener
                    
                    return;
                }
-               if(!GriefPrevention.instance.pvpRulesApply(entity.getLocation().getWorld()))
+               if(!GriefPrevention.instance.pvpRulesApply(entity.getLocation().getWorld()) || GriefPrevention.instance.config_pvp_protectPets)
                {
                    //otherwise disallow
                    OfflinePlayer owner = GriefPrevention.instance.getServer().getOfflinePlayer(ownerID); 

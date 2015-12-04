@@ -180,12 +180,3 @@ class CustomLogger
         }
     }
 }
-
-public enum CustomLogEntryTypes
-{
-    SocialActivity,
-    SuspiciousActivity,
-    AdminActivity,
-    Debug,
-    Exception
-}

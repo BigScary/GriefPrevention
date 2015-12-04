@@ -763,8 +763,8 @@ public class EntityEventHandler implements Listener
     		                PlayerData attackerData = this.dataStore.getPlayerData(attacker.getUniqueId());
     		                if(attackerData.ignoreClaims) return;
     		               
-    		                //otherwise disallow in non-pvp worlds
-    		                if(!GriefPrevention.instance.pvpRulesApply(subEvent.getEntity().getLocation().getWorld()))
+    		                //otherwise disallow in non-pvp worlds (and also pvp worlds if configured to do so)
+    		                if(!GriefPrevention.instance.pvpRulesApply(subEvent.getEntity().getLocation().getWorld()) || (GriefPrevention.instance.config_pvp_protectPets && subEvent.getEntityType() != EntityType.WOLF))
                             {
     		                    OfflinePlayer owner = GriefPrevention.instance.getServer().getOfflinePlayer(ownerID); 
                                 String ownerName = owner.getName();
