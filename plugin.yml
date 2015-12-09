@@ -145,6 +145,7 @@ commands:
       description: Toggles whether explosives may be used in a specific land claim.
       usage: /ClaimExplosions
       permission: griefprevention.claims
+      aliases: claimexplosion
    softmute:
       description: Toggles whether a player's messages will only reach other soft-muted players.
       usage: /SoftMute <player>
