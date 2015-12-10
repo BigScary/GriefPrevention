@@ -2827,7 +2827,8 @@ public class GriefPrevention extends JavaPlugin
 	//checks whether players can create claims in a world
     public boolean claimsEnabledForWorld(World world)
     {
-        return this.config_claims_worldModes.get(world) != ClaimsMode.Disabled;
+        ClaimsMode mode = this.config_claims_worldModes.get(world);
+        return mode != null && mode != ClaimsMode.Disabled;
     }
     
     //determines whether creative anti-grief rules apply at a location
