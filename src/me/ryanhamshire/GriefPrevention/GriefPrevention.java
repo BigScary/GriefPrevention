@@ -1560,8 +1560,8 @@ public class GriefPrevention extends JavaPlugin
 						claim.removeSurfaceFluids(null);
 						this.dataStore.deleteClaim(claim, true);
 						
-						//if in a creative mode world, /restorenature the claim
-						if(GriefPrevention.instance.creativeRulesApply(claim.getLesserBoundaryCorner()))
+						//if in a creative mode world or if survival claims are configured to be restored, /restorenature the claim
+						if(GriefPrevention.instance.creativeRulesApply(claim.getLesserBoundaryCorner()) || GriefPrevention.instance.config_claims_survivalAutoNatureRestoration)
 						{
 							GriefPrevention.instance.restoreClaim(claim, 0);
 						}
