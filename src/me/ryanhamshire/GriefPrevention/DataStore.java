@@ -498,7 +498,7 @@ public abstract class DataStore
 	synchronized public void saveClaim(Claim claim)
 	{
 		//ensure a unique identifier for the claim which will be used to name the file on disk
-		if(claim.id == null)
+		if(claim.id == null || claim.id == -1)
 		{
 			claim.id = this.nextClaimID;
 			this.incrementNextClaimID();
