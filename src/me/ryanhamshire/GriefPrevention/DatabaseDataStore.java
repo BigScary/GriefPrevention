@@ -257,7 +257,7 @@ public class DatabaseDataStore extends DataStore
 				{
 				    if(e.getMessage().contains("World not found"))
 				    {
-				        GriefPrevention.AddLogEntry("Failed to load a claim because its world isn't loaded (yet?).  Please delete the claim or contact the GriefPrevention developer with information about which plugin(s) you're using to load or create worlds.");
+				        GriefPrevention.AddLogEntry("Failed to load a claim because its world isn't loaded (yet?).  Please delete the claim or contact the GriefPrevention developer with information about which plugin(s) you're using to load or create worlds.  " + lesserCornerString);
 				        continue;
 				    }
 				    else
