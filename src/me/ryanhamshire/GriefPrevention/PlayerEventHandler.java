@@ -2655,7 +2655,6 @@ class PlayerEventHandler implements Listener
 	    {
 	        result = iterator.next();
 	        if(result.getType() != Material.AIR && 
-	           result.getType() != Material.STATIONARY_WATER &&
 	           result.getType() != Material.LONG_GRASS) return result;
 	    }
 	    
