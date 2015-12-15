@@ -540,6 +540,7 @@ class PlayerEventHandler implements Listener
                 if(playerData.ignoredPlayers.containsKey(targetPlayer.getUniqueId()))
                 {
                     event.setCancelled(true);
+                    GriefPrevention.sendMessage(player, TextMode.Err, Messages.IsIgnoringYou);
                     return;
                 }
                 
@@ -547,6 +548,7 @@ class PlayerEventHandler implements Listener
                 if(targetPlayerData.ignoredPlayers.containsKey(player.getUniqueId()))
                 {
                     event.setCancelled(true);
+                    GriefPrevention.sendMessage(player, TextMode.Err, Messages.IsIgnoringYou);
                     return;
                 }
             }
