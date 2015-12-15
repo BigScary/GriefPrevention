@@ -15,7 +15,10 @@ class WordFinder
         StringBuilder patternBuilder = new StringBuilder();
         for(String word : wordsToFind)
         {
-            patternBuilder.append("|(([^\\w]|^)" + Pattern.quote(word) + "([^\\w]|$))");
+            if(!word.isEmpty() && !word.trim().isEmpty())
+            {
+                patternBuilder.append("|(([^\\w]|^)" + Pattern.quote(word) + "([^\\w]|$))");
+            }
         }
         
         String patternString = patternBuilder.toString();
