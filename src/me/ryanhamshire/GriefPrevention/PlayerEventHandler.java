@@ -1774,7 +1774,7 @@ class PlayerEventHandler implements Listener
 				return;
 			}
 			
-			else if(clickedBlock != null && materialInHand ==  Material.BOAT)
+			else if(clickedBlock != null && materialInHand == Material.BOAT)
 			{
 			    if(playerData == null) playerData = this.dataStore.getPlayerData(player.getUniqueId());
 			    Claim claim = this.dataStore.getClaimAt(clickedBlock.getLocation(), false, playerData.lastClaim);
@@ -1790,6 +1790,26 @@ class PlayerEventHandler implements Listener
 				
 				return;
 			}
+			
+			//survival world minecart placement requires container trust, which is the permission required to remove the minecart later
+			else if(clickedBlock != null &&
+			        (materialInHand == Material.MINECART || materialInHand == Material.POWERED_MINECART || materialInHand == Material.STORAGE_MINECART) &&
+			        !GriefPrevention.instance.creativeRulesApply(clickedBlock.getLocation()))
+            {
+                if(playerData == null) playerData = this.dataStore.getPlayerData(player.getUniqueId());
+                Claim claim = this.dataStore.getClaimAt(clickedBlock.getLocation(), false, playerData.lastClaim);
+                if(claim != null)
+                {
+                    String reason = claim.allowContainers(player);
+                    if(reason != null)
+                    {
+                        GriefPrevention.sendMessage(player, TextMode.Err, reason);
+                        event.setCancelled(true);
+                    }
+                }
+                
+                return;
+            }
 			
 			//if it's a spawn egg, minecart, or boat, and this is a creative world, apply special rules
 			else if(clickedBlock != null && (materialInHand == Material.MINECART || materialInHand == Material.POWERED_MINECART || materialInHand == Material.STORAGE_MINECART || materialInHand == Material.BOAT) && GriefPrevention.instance.creativeRulesApply(clickedBlock.getLocation()))
