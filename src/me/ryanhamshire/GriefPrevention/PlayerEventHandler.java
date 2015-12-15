@@ -779,7 +779,7 @@ class PlayerEventHandler implements Listener
 		    if(GriefPrevention.instance.config_claims_worldModes.get(player.getWorld()) == ClaimsMode.Survival && !player.hasPermission("griefprevention.adminclaims") && this.dataStore.claims.size() > 10)
 		    {
 		        WelcomeTask task = new WelcomeTask(player);
-		        Bukkit.getScheduler().scheduleSyncDelayedTask(GriefPrevention.instance, task, 2400L);  //2 minutes after join
+		        Bukkit.getScheduler().scheduleSyncDelayedTask(GriefPrevention.instance, task, GriefPrevention.instance.config_claims_manualDeliveryDelaySeconds * 20L);
 		    }
 		}
 		
