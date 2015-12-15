@@ -1530,7 +1530,13 @@ public abstract class DataStore
                 ArrayList<Claim> claimsInChunk = this.chunksToClaimsMap.get(chunkID);
                 if(claimsInChunk != null)
                 {
-                    claims.addAll(claimsInChunk);
+                    for(Claim claim : claimsInChunk)
+                    {
+                        if(claim.getLesserBoundaryCorner().getWorld().equals(location.getWorld()))
+                        {
+                            claims.add(claim);
+                        }
+                    }
                 }
             }
         }
