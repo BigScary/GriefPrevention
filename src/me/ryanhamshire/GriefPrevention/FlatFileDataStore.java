@@ -361,7 +361,7 @@ public class FlatFileDataStore extends DataStore
                 {
                     if(e.getMessage().contains("World not found"))
                     {
-                        GriefPrevention.AddLogEntry("Failed to load a claim because its world isn't loaded (yet?).  Please delete the claim or contact the GriefPrevention developer with information about which plugin(s) you're using to load or create worlds.  " + lesserCornerString);
+                        GriefPrevention.AddLogEntry("Failed to load a claim " + files[i].getName() + " because its world isn't loaded (yet?).  Please delete the claim file or contact the GriefPrevention developer with information about which plugin(s) you're using to load or create worlds.  " + lesserCornerString);
                         inStream.close();
                         
                     }

@@ -232,6 +232,7 @@ public class DatabaseDataStore extends DataStore
 		ArrayList<Claim> subdivisionsToLoad = new ArrayList<Claim>();
 		List<World> validWorlds = Bukkit.getServer().getWorlds();
 		
+		Long claimID = null;
 		while(results.next())
 		{
 			try
@@ -240,7 +241,7 @@ public class DatabaseDataStore extends DataStore
 			    boolean removeClaim = false;
 			    
 			    long parentId = results.getLong("parentid");
-				long claimID = results.getLong("id");
+				claimID = results.getLong("id");
 					
 				Location lesserBoundaryCorner = null;
 				Location greaterBoundaryCorner = null;
@@ -257,7 +258,7 @@ public class DatabaseDataStore extends DataStore
 				{
 				    if(e.getMessage().contains("World not found"))
 				    {
-				        GriefPrevention.AddLogEntry("Failed to load a claim because its world isn't loaded (yet?).  Please delete the claim or contact the GriefPrevention developer with information about which plugin(s) you're using to load or create worlds.  " + lesserCornerString);
+				        GriefPrevention.AddLogEntry("Failed to load a claim (ID:" + claimID.toString() + ") because its world isn't loaded (yet?).  Please delete the claim or contact the GriefPrevention developer with information about which plugin(s) you're using to load or create worlds.  " + lesserCornerString);
 				        continue;
 				    }
 				    else
