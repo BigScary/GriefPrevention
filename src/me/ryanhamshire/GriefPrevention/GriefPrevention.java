@@ -2642,7 +2642,7 @@ public class GriefPrevention extends JavaPlugin
         }
         else
         {
-            return "someone";
+            return "someone(" + playerID.toString() + ")";
         }
     }
     
