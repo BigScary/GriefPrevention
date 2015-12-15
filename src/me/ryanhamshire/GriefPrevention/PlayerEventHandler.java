@@ -533,7 +533,7 @@ class PlayerEventHandler implements Listener
     		}
 		    
 		    //ignore feature
-            if(targetPlayer != null && targetPlayer.isOnline())
+            if(!player.hasPermission("griefprevention.notignorable") && targetPlayer != null && targetPlayer.isOnline())
             {
                 //if either is ignoring the other, cancel this command
                 playerData = this.dataStore.getPlayerData(player.getUniqueId());
