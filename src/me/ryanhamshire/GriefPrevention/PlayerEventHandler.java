@@ -533,11 +533,11 @@ class PlayerEventHandler implements Listener
     		}
 		    
 		    //ignore feature
-            if(!player.hasPermission("griefprevention.notignorable") && targetPlayer != null && targetPlayer.isOnline())
+            if(targetPlayer != null && targetPlayer.isOnline())
             {
                 //if either is ignoring the other, cancel this command
                 playerData = this.dataStore.getPlayerData(player.getUniqueId());
-                if(playerData.ignoredPlayers.containsKey(targetPlayer.getUniqueId()))
+                if(playerData.ignoredPlayers.containsKey(targetPlayer.getUniqueId()) && !targetPlayer.hasPermission("griefprevention.notignorable"))
                 {
                     event.setCancelled(true);
                     GriefPrevention.sendMessage(player, TextMode.Err, Messages.IsIgnoringYou);
