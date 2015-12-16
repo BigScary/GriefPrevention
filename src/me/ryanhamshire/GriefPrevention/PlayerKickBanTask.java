@@ -54,14 +54,7 @@ class PlayerKickBanTask implements Runnable
 		if(this.ban)
 		{		
 			//ban
-			BanList bans = Bukkit.getServer().getBanList(Type.NAME);
-			bans.addBan(this.player.getName(), this.reason, null, source);
-		
-			//kick
-			if(this.player.isOnline())
-			{
-				this.player.kickPlayer(this.reason);
-			}
+			GriefPrevention.banPlayer(this.player, this.reason, this.source);
 		}	
 		else if(this.player.isOnline())
 		{

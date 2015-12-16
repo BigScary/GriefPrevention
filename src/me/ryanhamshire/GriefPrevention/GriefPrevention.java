@@ -36,6 +36,8 @@ import me.ryanhamshire.GriefPrevention.DataStore.NoTransferException;
 import net.milkbowl.vault.economy.Economy;
 
 import org.bukkit.Achievement;
+import org.bukkit.BanList;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.GameMode;
@@ -43,6 +45,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
+import org.bukkit.BanList.Type;
 import org.bukkit.World.Environment;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -185,6 +188,10 @@ public class GriefPrevention extends JavaPlugin
     public boolean config_logs_suspiciousEnabled;
     public boolean config_logs_adminEnabled;
     public boolean config_logs_debugEnabled;
+    
+    //ban management plugin interop settings
+    public boolean config_ban_useCommand;
+    public String config_ban_commandFormat;
 	
 	private String databaseUrl;
 	private String databaseUserName;
@@ -571,6 +578,8 @@ public class GriefPrevention extends JavaPlugin
         this.config_creaturesTrampleCrops = config.getBoolean("GriefPrevention.CreaturesTrampleCrops", false);
         this.config_rabbitsEatCrops = config.getBoolean("GriefPrevention.RabbitsEatCrops", true);
         this.config_zombiesBreakDoors = config.getBoolean("GriefPrevention.HardModeZombiesBreakDoors", false);
+        this.config_ban_useCommand = config.getBoolean("GriefPrevention.UseBanCommand", false);
+        this.config_ban_commandFormat = config.getString("GriefPrevention.BanCommandPattern", "ban %name% %reason%");
         
         this.config_mods_ignoreClaimsAccounts = config.getStringList("GriefPrevention.Mods.PlayersIgnoringAllClaims");
         
@@ -813,11 +822,14 @@ public class GriefPrevention extends JavaPlugin
         outConfig.set("GriefPrevention.SilverfishBreakBlocks", this.config_silverfishBreakBlocks);      
         outConfig.set("GriefPrevention.CreaturesTrampleCrops", this.config_creaturesTrampleCrops);
         outConfig.set("GriefPrevention.RabbitsEatCrops", this.config_rabbitsEatCrops);
-        outConfig.set("GriefPrevention.HardModeZombiesBreakDoors", this.config_zombiesBreakDoors);      
+        outConfig.set("GriefPrevention.HardModeZombiesBreakDoors", this.config_zombiesBreakDoors);
         
         outConfig.set("GriefPrevention.Database.URL", this.databaseUrl);
         outConfig.set("GriefPrevention.Database.UserName", this.databaseUserName);
-        outConfig.set("GriefPrevention.Database.Password", this.databasePassword);       
+        outConfig.set("GriefPrevention.Database.Password", this.databasePassword);
+        
+        outConfig.set("GriefPrevention.UseBanCommand", this.config_ban_useCommand);
+        outConfig.set("GriefPrevention.BanCommandPattern", this.config_ban_commandFormat);
         
         outConfig.set("GriefPrevention.Mods.BlockIdsRequiringAccessTrust", this.config_mods_accessTrustIds);
         outConfig.set("GriefPrevention.Mods.BlockIdsRequiringContainerTrust", this.config_mods_containerTrustIds);
@@ -3065,5 +3077,26 @@ public class GriefPrevention extends JavaPlugin
         if(playerData.getClaims().size() > 0) return false;
         
         return true;
+    }
+
+    static void banPlayer(Player player, String reason, String source)
+    {
+        if(GriefPrevention.instance.config_ban_useCommand)
+        {
+            Bukkit.getServer().dispatchCommand(
+                Bukkit.getConsoleSender(),
+                GriefPrevention.instance.config_ban_commandFormat.replace("%name%", player.getName()).replace("%reason%", reason));
+        }
+        else
+        {
+            BanList bans = Bukkit.getServer().getBanList(Type.NAME);
+            bans.addBan(player.getName(), reason, null, source);
+        
+            //kick
+            if(player.isOnline())
+            {
+                player.kickPlayer(reason);
+            }
+        }
     }
 }
