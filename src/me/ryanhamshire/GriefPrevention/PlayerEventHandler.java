@@ -505,11 +505,11 @@ class PlayerEventHandler implements Listener
                 return;
             }
             
-            //if eavesdrop enabled and sender doesn't have the eavesdrop permission, eavesdrop
-		    if(GriefPrevention.instance.config_whisperNotifications && !player.hasPermission("griefprevention.eavesdrop"))
+            //if eavesdrop enabled and sender doesn't have the eavesdrop immunity permission, eavesdrop
+		    if(GriefPrevention.instance.config_whisperNotifications && !player.hasPermission("griefprevention.eavesdropimmune"))
     		{			
-                //except for when the recipient has eavesdrop permission
-                if(targetPlayer == null || !targetPlayer.hasPermission("griefprevention.eavesdrop"))
+                //except for when the recipient has eavesdrop immunity
+                if(targetPlayer == null || !targetPlayer.hasPermission("griefprevention.eavesdropimmune"))
                 {
                     StringBuilder logMessageBuilder = new StringBuilder();
         			logMessageBuilder.append("[[").append(event.getPlayer().getName()).append("]] ");
@@ -524,7 +524,7 @@ class PlayerEventHandler implements Listener
         			Collection<Player> players = (Collection<Player>)GriefPrevention.instance.getServer().getOnlinePlayers();
         			for(Player onlinePlayer : players)
         			{
-        				if(onlinePlayer.hasPermission("griefprevention.eavesdrop") && !onlinePlayer.equals(targetPlayer))
+        				if(onlinePlayer.hasPermission("griefprevention.eavesdrop") && !onlinePlayer.equals(targetPlayer) && !onlinePlayer.equals(player))
         				{
         				    onlinePlayer.sendMessage(ChatColor.GRAY + logMessage);
         				}
