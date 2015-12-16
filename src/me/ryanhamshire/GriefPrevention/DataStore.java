@@ -1387,6 +1387,7 @@ public abstract class DataStore
 		this.addDefault(defaults, Messages.BookDisabledChestClaims, "  On this server, placing a chest will NOT claim land for you.", null);
 		this.addDefault(defaults, Messages.BookUsefulCommands, "Useful Commands:", null);
 		this.addDefault(defaults, Messages.NoProfanity, "Please moderate your language.", null);
+		this.addDefault(defaults, Messages.IsIgnoringYou, "That player is ignoring you.", null);
 		
 		//load the config file
 		FileConfiguration config = YamlConfiguration.loadConfiguration(new File(messagesFilePath));

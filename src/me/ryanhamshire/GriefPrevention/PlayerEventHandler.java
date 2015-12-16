@@ -2671,14 +2671,19 @@ class PlayerEventHandler implements Listener
 
     static Block getTargetBlock(Player player, int maxDistance) throws IllegalStateException
 	{
-	    BlockIterator iterator = new BlockIterator(player.getLocation(), player.getEyeHeight(), maxDistance);
+        Location eye = player.getEyeLocation();
+        Material eyeMaterial = eye.getBlock().getType();
+        boolean passThroughWater = (eyeMaterial == Material.WATER || eyeMaterial == Material.STATIONARY_WATER); 
+        BlockIterator iterator = new BlockIterator(player.getLocation(), player.getEyeHeight(), maxDistance);
 	    Block result = player.getLocation().getBlock().getRelative(BlockFace.UP);
 	    while (iterator.hasNext())
 	    {
 	        result = iterator.next();
-	        if(result.getType() != Material.AIR && 
-	           result.getType() != Material.STATIONARY_WATER &&
-	           result.getType() != Material.LONG_GRASS) return result;
+	        Material type = result.getType();
+	        if(type != Material.AIR && 
+	           (!passThroughWater || type != Material.STATIONARY_WATER) &&
+	           (!passThroughWater || type != Material.WATER) &&
+	           type != Material.LONG_GRASS) return result;
 	    }
 	    
 	    return result;
