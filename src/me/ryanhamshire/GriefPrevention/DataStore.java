@@ -29,7 +29,9 @@ import me.ryanhamshire.GriefPrevention.events.ClaimDeletedEvent;
 import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Tameable;
 import org.bukkit.inventory.ItemStack;
 
 import com.google.common.io.Files;
@@ -537,10 +539,16 @@ public abstract class DataStore
 	//deletes a claim or subdivision
     synchronized public void deleteClaim(Claim claim)
     {
-        this.deleteClaim(claim, true);
+        this.deleteClaim(claim, true, false);
+    }
+    
+    //deletes a claim or subdivision
+    synchronized public void deleteClaim(Claim claim, boolean releasePets)
+    {
+        this.deleteClaim(claim, true, releasePets);
     }
 	
-	synchronized void deleteClaim(Claim claim, boolean fireEvent)
+	synchronized void deleteClaim(Claim claim, boolean fireEvent, boolean releasePets)
 	{
 	    //delete any children
         for(int j = 0; j < claim.children.size(); j++)
@@ -605,6 +613,26 @@ public abstract class DataStore
 		    ClaimDeletedEvent ev = new ClaimDeletedEvent(claim);
             Bukkit.getPluginManager().callEvent(ev);
 		}
+		
+		//optionally set any pets free which belong to the claim owner
+		if(releasePets && claim.ownerID != null && claim.parent == null)
+        {
+            for(Chunk chunk : claim.getChunks())
+            {
+                Entity [] entities = chunk.getEntities();
+                for(Entity entity : entities)
+                {
+                    if(entity instanceof Tameable)
+                    {
+                        Tameable pet = (Tameable)entity;
+                        if(pet.isTamed() && pet.getOwner().getUniqueId().equals(claim.ownerID))
+                        {
+                            pet.setTamed(false);
+                        }
+                    }
+                }
+            }
+        }
 	}
 	
 	abstract void deleteClaimFromSecondaryStorage(Claim claim);

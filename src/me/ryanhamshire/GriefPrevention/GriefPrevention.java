@@ -1561,7 +1561,7 @@ public class GriefPrevention extends JavaPlugin
 					else
 					{
 						claim.removeSurfaceFluids(null);
-						this.dataStore.deleteClaim(claim, true);
+						this.dataStore.deleteClaim(claim, true, true);
 						
 						//if in a creative mode world, /restorenature the claim
 						if(GriefPrevention.instance.creativeRulesApply(claim.getLesserBoundaryCorner()))
@@ -2354,7 +2354,7 @@ public class GriefPrevention extends JavaPlugin
 		{
 			//delete it
 			claim.removeSurfaceFluids(null);
-			this.dataStore.deleteClaim(claim, true);
+			this.dataStore.deleteClaim(claim, true, false);
 			
 			//if in a creative mode world, restore the claim area
 			if(GriefPrevention.instance.creativeRulesApply(claim.getLesserBoundaryCorner()))
