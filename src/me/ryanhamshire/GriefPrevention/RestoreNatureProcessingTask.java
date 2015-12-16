@@ -99,6 +99,7 @@ class RestoreNatureProcessingTask implements Runnable
 		if(this.aggressiveMode)
 		{
 			this.playerBlocks.add(Material.LEAVES.getId());
+			this.playerBlocks.add(Material.LEAVES_2.getId());
 			this.playerBlocks.add(Material.LOG.getId());
 			this.playerBlocks.add(Material.LOG_2.getId());
 			this.playerBlocks.add(Material.VINE.getId());
@@ -702,7 +703,53 @@ class RestoreNatureProcessingTask implements Runnable
 		playerBlocks.add(Material.WOOD_BUTTON.getId());
 		playerBlocks.add(Material.SKULL.getId());
 		playerBlocks.add(Material.ANVIL.getId());
-		
+		playerBlocks.add(Material.SPONGE.getId());
+		playerBlocks.add(Material.DOUBLE_STONE_SLAB2.getId());
+		playerBlocks.add(Material.STAINED_GLASS.getId());
+		playerBlocks.add(Material.STAINED_GLASS_PANE.getId());
+		playerBlocks.add(Material.BANNER.getId());
+		playerBlocks.add(Material.STANDING_BANNER.getId());
+		playerBlocks.add(Material.ACACIA_STAIRS.getId());
+		playerBlocks.add(Material.BIRCH_WOOD_STAIRS.getId());
+		playerBlocks.add(Material.DARK_OAK_STAIRS.getId());
+		playerBlocks.add(Material.TRAPPED_CHEST.getId());
+		playerBlocks.add(Material.GOLD_PLATE.getId());
+		playerBlocks.add(Material.IRON_PLATE.getId());
+		playerBlocks.add(Material.REDSTONE_COMPARATOR_OFF.getId());
+		playerBlocks.add(Material.REDSTONE_COMPARATOR_ON.getId());
+		playerBlocks.add(Material.DAYLIGHT_DETECTOR.getId());
+		playerBlocks.add(Material.DAYLIGHT_DETECTOR_INVERTED.getId());
+		playerBlocks.add(Material.REDSTONE_BLOCK.getId());
+		playerBlocks.add(Material.HOPPER.getId());
+		playerBlocks.add(Material.QUARTZ_BLOCK.getId());
+		playerBlocks.add(Material.QUARTZ_STAIRS.getId());
+		playerBlocks.add(Material.DROPPER.getId());
+		playerBlocks.add(Material.SLIME_BLOCK.getId());
+		playerBlocks.add(Material.IRON_TRAPDOOR.getId());
+		playerBlocks.add(Material.PRISMARINE.getId());
+		playerBlocks.add(Material.HAY_BLOCK.getId());
+		playerBlocks.add(Material.CARPET.getId());
+		playerBlocks.add(Material.SEA_LANTERN.getId());
+		playerBlocks.add(Material.RED_SANDSTONE_STAIRS.getId());
+		playerBlocks.add(Material.STONE_SLAB2.getId());
+		playerBlocks.add(Material.ACACIA_FENCE.getId());
+		playerBlocks.add(Material.ACACIA_FENCE_GATE.getId());
+		playerBlocks.add(Material.BIRCH_FENCE.getId());
+		playerBlocks.add(Material.BIRCH_FENCE_GATE.getId());
+		playerBlocks.add(Material.DARK_OAK_FENCE.getId());
+		playerBlocks.add(Material.DARK_OAK_FENCE_GATE.getId());
+		playerBlocks.add(Material.JUNGLE_FENCE.getId());
+        playerBlocks.add(Material.JUNGLE_FENCE_GATE.getId());
+        playerBlocks.add(Material.SPRUCE_FENCE.getId());
+        playerBlocks.add(Material.SPRUCE_FENCE_GATE.getId());
+        playerBlocks.add(Material.ACACIA_DOOR.getId());
+        playerBlocks.add(Material.SPRUCE_DOOR.getId());
+        playerBlocks.add(Material.DARK_OAK_DOOR.getId());
+        playerBlocks.add(Material.JUNGLE_DOOR.getId());
+        playerBlocks.add(Material.BIRCH_DOOR.getId());
+        playerBlocks.add(Material.COAL_BLOCK.getId());
+        playerBlocks.add(Material.REDSTONE_LAMP_OFF.getId());
+        playerBlocks.add(Material.REDSTONE_LAMP_ON.getId());
 		
 		//these are unnatural in the standard world, but not in the nether
 		if(environment != Environment.NETHER)
@@ -727,6 +774,7 @@ class RestoreNatureProcessingTask implements Runnable
 		if(biome == Biome.DESERT || biome == Biome.DESERT_HILLS || biome == Biome.BEACH || environment != Environment.NORMAL)
 		{
 			playerBlocks.add(Material.LEAVES.getId());
+			playerBlocks.add(Material.LEAVES_2.getId());
 			playerBlocks.add(Material.LOG.getId());
 			playerBlocks.add(Material.LOG_2.getId());
 		}
