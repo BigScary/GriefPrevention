@@ -55,7 +55,8 @@ public class WelcomeTask implements Runnable
             page2.append("/Trust /UnTrust /TrustList\n");
             page2.append("/ClaimsList\n");
             page2.append("/AbandonClaim\n\n");
-
+            page2.append("/Claim /ExtendClaim\n");
+                        
             page2.append("/IgnorePlayer\n\n");
             
             page2.append("/SubdivideClaims\n");

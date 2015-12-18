@@ -2211,143 +2211,7 @@ class PlayerEventHandler implements Listener
 				newy1 = playerData.claimResizing.getLesserBoundaryCorner().getBlockY();
 				newy2 = clickedBlock.getY() - GriefPrevention.instance.config_claims_claimsExtendIntoGroundDistance;
 				
-				//for top level claims, apply size rules and claim blocks requirement
-				if(playerData.claimResizing.parent == null)
-				{				
-					//measure new claim, apply size rules
-					int newWidth = (Math.abs(newx1 - newx2) + 1);
-					int newHeight = (Math.abs(newz1 - newz2) + 1);
-					boolean smaller = newWidth < playerData.claimResizing.getWidth() || newHeight < playerData.claimResizing.getHeight();
-							
-					if(!player.hasPermission("griefprevention.adminclaims") && !playerData.claimResizing.isAdminClaim() && smaller)
-					{
-					    if(newWidth < GriefPrevention.instance.config_claims_minWidth || newHeight < GriefPrevention.instance.config_claims_minWidth)
-					    {
-    						GriefPrevention.sendMessage(player, TextMode.Err, Messages.ResizeClaimTooNarrow, String.valueOf(GriefPrevention.instance.config_claims_minWidth));
-    						return;
-					    }
-					    
-					    int newArea = newWidth * newHeight;
-					    if(newArea < GriefPrevention.instance.config_claims_minArea)
-					    {
-					        GriefPrevention.sendMessage(player, TextMode.Err, Messages.ResizeClaimInsufficientArea, String.valueOf(GriefPrevention.instance.config_claims_minArea));
-                            return;
-					    }
-					}
-					
-					//make sure player has enough blocks to make up the difference
-					if(!playerData.claimResizing.isAdminClaim() && player.getName().equals(playerData.claimResizing.getOwnerName()))
-					{
-						int newArea =  newWidth * newHeight;
-						int blocksRemainingAfter = playerData.getRemainingClaimBlocks() + playerData.claimResizing.getArea() - newArea;
-						
-						if(blocksRemainingAfter < 0)
-						{
-							GriefPrevention.sendMessage(player, TextMode.Err, Messages.ResizeNeedMoreBlocks, String.valueOf(Math.abs(blocksRemainingAfter)));
-							this.tryAdvertiseAdminAlternatives(player);
-							return;
-						}
-					}
-				}
-				
-				//special rule for making a top-level claim smaller.  to check this, verifying the old claim's corners are inside the new claim's boundaries.
-				//rule: in any mode, shrinking a claim removes any surface fluids
-				Claim oldClaim = playerData.claimResizing;
-				boolean smaller = false;
-				if(oldClaim.parent == null)
-				{				
-					//temporary claim instance, just for checking contains()
-					Claim newClaim = new Claim(
-							new Location(oldClaim.getLesserBoundaryCorner().getWorld(), newx1, newy1, newz1), 
-							new Location(oldClaim.getLesserBoundaryCorner().getWorld(), newx2, newy2, newz2),
-							null, new ArrayList<String>(), new ArrayList<String>(), new ArrayList<String>(), new ArrayList<String>(), null);
-					
-					//if the new claim is smaller
-					if(!newClaim.contains(oldClaim.getLesserBoundaryCorner(), true, false) || !newClaim.contains(oldClaim.getGreaterBoundaryCorner(), true, false))
-					{
-						smaller = true;
-						
-						//remove surface fluids about to be unclaimed
-						oldClaim.removeSurfaceFluids(newClaim);
-					}
-				}
-				
-				//ask the datastore to try and resize the claim, this checks for conflicts with other claims
-				CreateClaimResult result = GriefPrevention.instance.dataStore.resizeClaim(playerData.claimResizing, newx1, newx2, newy1, newy2, newz1, newz2, player);
-				
-				if(result.succeeded)
-				{
-					//decide how many claim blocks are available for more resizing
-				    int claimBlocksRemaining = 0;
-				    if(!playerData.claimResizing.isAdminClaim())
-				    {
-				        UUID ownerID = playerData.claimResizing.ownerID;
-				        if(playerData.claimResizing.parent != null)
-				        {
-				            ownerID = playerData.claimResizing.parent.ownerID;
-				        }
-				        if(ownerID == player.getUniqueId())
-				        {
-				            claimBlocksRemaining = playerData.getRemainingClaimBlocks();
-				        }
-				        else
-				        {
-				            PlayerData ownerData = this.dataStore.getPlayerData(ownerID);
-				            claimBlocksRemaining = ownerData.getRemainingClaimBlocks();
-				            OfflinePlayer owner = GriefPrevention.instance.getServer().getOfflinePlayer(ownerID);
-				            if(!owner.isOnline())
-				            {
-				                this.dataStore.clearCachedPlayerData(ownerID);
-				            }
-				        }
-				    }
-					
-				    //inform about success, visualize, communicate remaining blocks available
-				    GriefPrevention.sendMessage(player, TextMode.Success, Messages.ClaimResizeSuccess, String.valueOf(claimBlocksRemaining));
-					Visualization visualization = Visualization.FromClaim(result.claim, clickedBlock.getY(), VisualizationType.Claim, player.getLocation());
-					Visualization.Apply(player, visualization);
-					
-					//if resizing someone else's claim, make a log entry
-					if(!playerID.equals(playerData.claimResizing.ownerID) && playerData.claimResizing.parent == null)
-					{
-						GriefPrevention.AddLogEntry(player.getName() + " resized " + playerData.claimResizing.getOwnerName() + "'s claim at " + GriefPrevention.getfriendlyLocationString(playerData.claimResizing.lesserBoundaryCorner) + ".");
-					}
-					
-					//if increased to a sufficiently large size and no subdivisions yet, send subdivision instructions
-					if(oldClaim.getArea() < 1000 && result.claim.getArea() >= 1000 && result.claim.children.size() == 0 && !player.hasPermission("griefprevention.adminclaims"))
-					{
-					  GriefPrevention.sendMessage(player, TextMode.Info, Messages.BecomeMayor, 200L);
-	                  GriefPrevention.sendMessage(player, TextMode.Instr, Messages.SubdivisionVideo2, 201L, DataStore.SUBDIVISION_VIDEO_URL);
-					}
-					
-					//if in a creative mode world and shrinking an existing claim, restore any unclaimed area
-					if(smaller && GriefPrevention.instance.creativeRulesApply(oldClaim.getLesserBoundaryCorner()))
-					{
-						GriefPrevention.sendMessage(player, TextMode.Warn, Messages.UnclaimCleanupWarning);
-						GriefPrevention.instance.restoreClaim(oldClaim, 20L * 60 * 2);  //2 minutes
-						GriefPrevention.AddLogEntry(player.getName() + " shrank a claim @ " + GriefPrevention.getfriendlyLocationString(playerData.claimResizing.getLesserBoundaryCorner()));
-					}
-					
-					//clean up
-					playerData.claimResizing = null;
-					playerData.lastShovelLocation = null;
-				}
-				else
-				{
-					if(result.claim != null)
-					{
-    				    //inform player
-    					GriefPrevention.sendMessage(player, TextMode.Err, Messages.ResizeFailOverlap);
-    					
-    					//show the player the conflicting claim
-    					Visualization visualization = Visualization.FromClaim(result.claim, clickedBlock.getY(), VisualizationType.ErrorClaim, player.getLocation());
-    					Visualization.Apply(player, visualization);
-					}
-					else
-					{
-					    GriefPrevention.sendMessage(player, TextMode.Err, Messages.ResizeFailOverlapRegion);
-					}
-				}
+				this.dataStore.resizeClaimWithChecks(player, playerData, newx1, newx2, newy1, newy2, newz1, newz2);
 				
 				return;
 			}
@@ -2541,7 +2405,7 @@ class PlayerEventHandler implements Listener
 					if(newClaimArea > remainingBlocks)
 					{
 						GriefPrevention.sendMessage(player, TextMode.Err, Messages.CreateClaimInsufficientBlocks, String.valueOf(newClaimArea - remainingBlocks));
-						this.tryAdvertiseAdminAlternatives(player);
+						GriefPrevention.instance.dataStore.tryAdvertiseAdminAlternatives(player);
 						return;
 					}
 				}					
@@ -2593,46 +2457,12 @@ class PlayerEventHandler implements Listener
 		                GriefPrevention.sendMessage(player, TextMode.Instr, Messages.SubdivisionVideo2, 201L, DataStore.SUBDIVISION_VIDEO_URL);
 		            }
 					
-					//auto-extend it downward to cover anything already built underground
-					Claim newClaim = result.claim;
-					Location lesserCorner = newClaim.getLesserBoundaryCorner();
-					Location greaterCorner = newClaim.getGreaterBoundaryCorner();
-					World world = lesserCorner.getWorld();
-					ArrayList<ChunkSnapshot> snapshots = new ArrayList<ChunkSnapshot>();
-					for(int chunkx = lesserCorner.getBlockX() / 16; chunkx <= greaterCorner.getBlockX() / 16; chunkx++)
-					{
-					    for(int chunkz = lesserCorner.getBlockZ() / 16; chunkz <= greaterCorner.getBlockZ() / 16; chunkz++)
-					    {
-					        if(world.isChunkLoaded(chunkx, chunkz))
-					        {
-					            snapshots.add(world.getChunkAt(chunkx, chunkz).getChunkSnapshot(true, true, true));
-					        }
-					    }
-					}
-					
-					Bukkit.getScheduler().runTaskAsynchronously(GriefPrevention.instance, new AutoExtendClaimTask(newClaim, snapshots, world.getEnvironment()));
+					GriefPrevention.instance.autoExtendClaim(result.claim);
 				}
 			}
 		}
 	}
 	
-	//educates a player about /adminclaims and /acb, if he can use them 
-	private void tryAdvertiseAdminAlternatives(Player player)
-	{
-        if(player.hasPermission("griefprevention.adminclaims") && player.hasPermission("griefprevention.adjustclaimblocks"))
-        {
-            GriefPrevention.sendMessage(player, TextMode.Info, Messages.AdvertiseACandACB);
-        }
-        else if(player.hasPermission("griefprevention.adminclaims"))
-        {
-            GriefPrevention.sendMessage(player, TextMode.Info, Messages.AdvertiseAdminClaims);
-        }
-        else if(player.hasPermission("griefprevention.adjustclaimblocks"))
-        {
-            GriefPrevention.sendMessage(player, TextMode.Info, Messages.AdvertiseACB);
-        }
-    }
-
     //determines whether a block type is an inventory holder.  uses a caching strategy to save cpu time
 	private ConcurrentHashMap<Integer, Boolean> inventoryHolderCache = new ConcurrentHashMap<Integer, Boolean>();
 	private boolean isInventoryHolder(Block clickedBlock)

@@ -92,6 +92,16 @@ commands:
       usage: /BasicClaims
       aliases: bc
       permission: griefprevention.claims
+   extendclaim:
+      description: Resizes the land claim you're standing in by pushing or pulling its boundary in the direction you're facing.
+      usage: /ExtendClaim <numberOfBlocks>
+      aliases: [expandclaim, resizeclaim]
+      permission: griefprevention.claims
+   claim:
+      description: Creates a land claim centered at your current location.
+      usage: /Claim
+      aliases: [createclaim, makeclaim, newclaim]
+      permission: griefprevention.claims
    buyclaimblocks:
       description: Purchases additional claim blocks with server money.  Doesn't work on servers without a Vault-compatible economy plugin.
       usage: /BuyClaimBlocks <numberOfBlocks>

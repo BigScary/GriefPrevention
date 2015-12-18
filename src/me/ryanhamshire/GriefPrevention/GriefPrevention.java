@@ -40,6 +40,7 @@ import org.bukkit.BanList;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
+import org.bukkit.ChunkSnapshot;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -923,6 +924,227 @@ public class GriefPrevention extends JavaPlugin
 		{
 			player = (Player) sender;
 		}
+		
+		//claim
+        if(cmd.getName().equalsIgnoreCase("claim") && player != null)
+        {
+            if(!GriefPrevention.instance.claimsEnabledForWorld(player.getWorld()))
+            {
+                GriefPrevention.sendMessage(player, TextMode.Err, Messages.ClaimsDisabledWorld);
+                return true;
+            }
+            
+            //if player already has a land claim, this requires the claim modification tool to be in hand
+            PlayerData playerData = this.dataStore.getPlayerData(player.getUniqueId());
+            int radius = GriefPrevention.instance.config_claims_automaticClaimsForNewPlayersRadius;
+            if(radius < 0) radius = 0;
+            if(playerData.getClaims().size() > 0)
+            {
+                if(player.getGameMode() != GameMode.CREATIVE && player.getItemInHand().getType() != GriefPrevention.instance.config_claims_modificationTool)
+                {
+                    GriefPrevention.sendMessage(player, TextMode.Err, Messages.MustHoldModificationToolForThat);
+                    return true;
+                }
+                radius = (int)Math.ceil(Math.sqrt(GriefPrevention.instance.config_claims_minArea) / 2);
+            }
+            
+            Location lc = player.getLocation().add(-radius, 0, -radius);
+            Location gc = player.getLocation().add(radius, 0, radius);
+            
+            //player must have sufficient unused claim blocks
+            if(playerData.getClaims().size() > 0)
+            {
+                int area = Math.abs((gc.getBlockX() - lc.getBlockX() + 1) * (gc.getBlockZ() - lc.getBlockZ() + 1));
+                int remaining = playerData.getRemainingClaimBlocks();
+                if(remaining < area)
+                {
+                    GriefPrevention.sendMessage(player, TextMode.Err, Messages.CreateClaimInsufficientBlocks, String.valueOf(area - remaining));
+                    GriefPrevention.instance.dataStore.tryAdvertiseAdminAlternatives(player);
+                    return true;
+                }
+            }
+
+            CreateClaimResult result = this.dataStore.createClaim(lc.getWorld(), 
+                    lc.getBlockX(), gc.getBlockX(),
+                    lc.getBlockY() - GriefPrevention.instance.config_claims_claimsExtendIntoGroundDistance - 1,
+                    gc.getWorld().getHighestBlockYAt(gc) - GriefPrevention.instance.config_claims_claimsExtendIntoGroundDistance - 1,
+                    lc.getBlockZ(), gc.getBlockZ(),
+                    player.getUniqueId(), null, null, player);
+            if(!result.succeeded)
+            {
+                if(result.claim != null)
+                {
+                    GriefPrevention.sendMessage(player, TextMode.Err, Messages.CreateClaimFailOverlapShort);
+                    
+                    Visualization visualization = Visualization.FromClaim(result.claim, player.getEyeLocation().getBlockY(), VisualizationType.ErrorClaim, player.getLocation());
+                    Visualization.Apply(player, visualization);
+                }
+                else
+                {
+                    GriefPrevention.sendMessage(player, TextMode.Err, Messages.CreateClaimFailOverlapRegion);
+                }
+            }
+            else
+            {
+                GriefPrevention.sendMessage(player, TextMode.Success, Messages.CreateClaimSuccess);
+                
+                //link to a video demo of land claiming, based on world type
+                if(GriefPrevention.instance.creativeRulesApply(player.getLocation()))
+                {
+                    GriefPrevention.sendMessage(player, TextMode.Instr, Messages.CreativeBasicsVideo2, DataStore.CREATIVE_VIDEO_URL);           
+                }
+                else if(GriefPrevention.instance.claimsEnabledForWorld(player.getLocation().getWorld()))
+                {
+                    GriefPrevention.sendMessage(player, TextMode.Instr, Messages.SurvivalBasicsVideo2, DataStore.SURVIVAL_VIDEO_URL);
+                }
+                Visualization visualization = Visualization.FromClaim(result.claim, player.getEyeLocation().getBlockY(), VisualizationType.Claim, player.getLocation());
+                Visualization.Apply(player, visualization);
+                playerData.lastShovelLocation = null;
+                
+                this.autoExtendClaim(result.claim);
+            }
+            
+            return true;
+        }
+		
+		//extendclaim
+        if(cmd.getName().equalsIgnoreCase("extendclaim") && player != null)
+        {
+            if(args.length < 1)
+            {
+                //link to a video demo of land claiming, based on world type
+                if(GriefPrevention.instance.creativeRulesApply(player.getLocation()))
+                {
+                    GriefPrevention.sendMessage(player, TextMode.Instr, Messages.CreativeBasicsVideo2, DataStore.CREATIVE_VIDEO_URL);           
+                }
+                else if(GriefPrevention.instance.claimsEnabledForWorld(player.getLocation().getWorld()))
+                {
+                    GriefPrevention.sendMessage(player, TextMode.Instr, Messages.SurvivalBasicsVideo2, DataStore.SURVIVAL_VIDEO_URL);
+                }
+                return false;
+            }
+            
+            int amount;
+            try
+            {
+                amount = Integer.parseInt(args[0]);
+            }
+            catch(NumberFormatException e)
+            {
+                //link to a video demo of land claiming, based on world type
+                if(GriefPrevention.instance.creativeRulesApply(player.getLocation()))
+                {
+                    GriefPrevention.sendMessage(player, TextMode.Instr, Messages.CreativeBasicsVideo2, DataStore.CREATIVE_VIDEO_URL);           
+                }
+                else if(GriefPrevention.instance.claimsEnabledForWorld(player.getLocation().getWorld()))
+                {
+                    GriefPrevention.sendMessage(player, TextMode.Instr, Messages.SurvivalBasicsVideo2, DataStore.SURVIVAL_VIDEO_URL);
+                }
+                return false;
+            }
+            
+            //requires claim modification tool in hand
+            if(player.getGameMode() != GameMode.CREATIVE && player.getItemInHand().getType() != GriefPrevention.instance.config_claims_modificationTool)
+            {
+                GriefPrevention.sendMessage(player, TextMode.Err, Messages.MustHoldModificationToolForThat);
+                return true;
+            }
+            
+            //must be standing in a land claim
+            PlayerData playerData = this.dataStore.getPlayerData(player.getUniqueId());
+            Claim claim = this.dataStore.getClaimAt(player.getLocation(), true, playerData.lastClaim);
+            if(claim == null)
+            {
+                GriefPrevention.sendMessage(player, TextMode.Err, Messages.StandInClaimToResize);
+                return true;
+            }
+            
+            //must have permission to edit the land claim you're in
+            String errorMessage = claim.allowEdit(player);
+            if(errorMessage != null)
+            {
+                GriefPrevention.sendMessage(player, TextMode.Err, Messages.NotYourClaim);
+                return true;
+            }
+            
+            //determine new corner coordinates
+            org.bukkit.util.Vector direction = player.getLocation().getDirection();
+GriefPrevention.AddLogEntry(direction.toString());            
+            if(direction.getY() > .75)
+            {
+                GriefPrevention.sendMessage(player, TextMode.Info, Messages.ClaimsExtendToSky);
+                return true;
+            }
+            
+            if(direction.getY() < -.75)
+            {
+                GriefPrevention.sendMessage(player, TextMode.Info, Messages.ClaimsAutoExtendDownward);
+                return true;
+            }
+            
+            Location lc = claim.getLesserBoundaryCorner();
+            Location gc = claim.getGreaterBoundaryCorner();
+            int newx1 = lc.getBlockX();
+            int newx2 = gc.getBlockX();
+            int newy1 = lc.getBlockY();
+            int newy2 = gc.getBlockY();
+            int newz1 = lc.getBlockZ();
+            int newz2 = gc.getBlockZ();
+            
+            //if changing Z only
+            if(Math.abs(direction.getX()) < .3)
+            {
+                if(direction.getZ() > 0)
+                {
+                    newz2 += amount;  //north
+                }
+                else
+                {
+                    newz1 -= amount;  //south
+                }
+            }
+            
+            //if changing X only
+            else if(Math.abs(direction.getZ()) < .3)
+            {
+                if(direction.getX() > 0)
+                {
+                    newx2 += amount;  //east
+                }
+                else
+                {
+                    newx1 -= amount;  //west
+                }
+            }
+            
+            //diagonals
+            else
+            {
+                if(direction.getX() > 0)
+                {
+                    newx2 += amount;
+                }
+                else
+                {
+                    newx1 -= amount;
+                }
+                
+                if(direction.getZ() > 0)
+                {
+                    newz2 += amount;
+                }
+                else
+                {
+                    newz1 -= amount;
+                }
+            }
+            
+            //attempt resize
+            playerData.claimResizing = claim;
+            this.dataStore.resizeClaimWithChecks(player, playerData, newx1, newx2, newy1, newy2, newz1, newz2);
+            
+            return true;
+        }
 		
 		//abandonclaim
 		if(cmd.getName().equalsIgnoreCase("abandonclaim") && player != null)
@@ -3060,6 +3282,27 @@ public class GriefPrevention extends JavaPlugin
         }
         
         return false;
+    }
+    
+    void autoExtendClaim(Claim newClaim)
+    {
+        //auto-extend it downward to cover anything already built underground
+        Location lesserCorner = newClaim.getLesserBoundaryCorner();
+        Location greaterCorner = newClaim.getGreaterBoundaryCorner();
+        World world = lesserCorner.getWorld();
+        ArrayList<ChunkSnapshot> snapshots = new ArrayList<ChunkSnapshot>();
+        for(int chunkx = lesserCorner.getBlockX() / 16; chunkx <= greaterCorner.getBlockX() / 16; chunkx++)
+        {
+            for(int chunkz = lesserCorner.getBlockZ() / 16; chunkz <= greaterCorner.getBlockZ() / 16; chunkz++)
+            {
+                if(world.isChunkLoaded(chunkx, chunkz))
+                {
+                    snapshots.add(world.getChunkAt(chunkx, chunkz).getChunkSnapshot(true, true, true));
+                }
+            }
+        }
+        
+        Bukkit.getScheduler().runTaskAsynchronously(GriefPrevention.instance, new AutoExtendClaimTask(newClaim, snapshots, world.getEnvironment()));
     }
 
     public boolean pvpRulesApply(World world)
