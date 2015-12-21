@@ -1434,7 +1434,7 @@ public abstract class DataStore
 		this.addDefault(defaults, Messages.DonateItemsInstruction, "To give away the item(s) in your hand, left-click the chest again.", null);
 		this.addDefault(defaults, Messages.ChestFull, "This chest is full.", null);
 		this.addDefault(defaults, Messages.DonationSuccess, "Item(s) transferred to chest!", null);
-		this.addDefault(defaults, Messages.PlayerTooCloseForFire, "You can't start a fire this close to {0}.", "0: other player's name");
+		this.addDefault(defaults, Messages.PlayerTooCloseForFire2, "You can't start a fire this close to another player.", null);
 		this.addDefault(defaults, Messages.TooDeepToClaim, "This chest can't be protected because it's too deep underground.  Consider moving it.", null);
 		this.addDefault(defaults, Messages.ChestClaimConfirmation, "This chest is protected.", null);
 		this.addDefault(defaults, Messages.AutomaticClaimNotification, "This chest and nearby blocks are protected from breakage and theft.", null);

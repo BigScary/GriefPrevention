@@ -183,7 +183,7 @@ public class BlockEventHandler implements Listener
 		//FEATURE: limit fire placement, to prevent PvP-by-fire
 		
 		//if placed block is fire and pvp is off, apply rules for proximity to other players 
-		if(block.getType() == Material.FIRE && !GriefPrevention.instance.pvpRulesApply(block.getWorld()) && !player.hasPermission("griefprevention.lava"))
+		if(block.getType() == Material.FIRE && (!GriefPrevention.instance.pvpRulesApply(block.getWorld()) || !GriefPrevention.instance.config_pvp_allowFireNearPlayers))
 		{
 			List<Player> players = block.getWorld().getPlayers();
 			for(int i = 0; i < players.size(); i++)
@@ -192,7 +192,7 @@ public class BlockEventHandler implements Listener
 				Location location = otherPlayer.getLocation();
 				if(!otherPlayer.equals(player) && location.distanceSquared(block.getLocation()) < 9)
 				{
-					GriefPrevention.sendMessage(player, TextMode.Err, Messages.PlayerTooCloseForFire, otherPlayer.getName());
+					GriefPrevention.sendMessage(player, TextMode.Err, Messages.PlayerTooCloseForFire2);
 					placeEvent.setCancelled(true);
 					return;
 				}					
