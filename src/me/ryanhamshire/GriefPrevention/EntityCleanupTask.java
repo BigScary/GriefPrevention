@@ -132,7 +132,7 @@ class EntityCleanupTask implements Runnable
 			if(GriefPrevention.instance.creativeRulesApply(claim.getLesserBoundaryCorner()))
 			{
 				//check its entity count and remove any extras
-				claim.allowMoreEntities();
+				claim.allowMoreEntities(true);
 			}			
 		}
 		

@@ -736,9 +736,9 @@ public class Claim
 	}
 	
 	//whether more entities may be added to a claim
-	public String allowMoreEntities()
+	public String allowMoreEntities(boolean remove)
 	{
-		if(this.parent != null) return this.parent.allowMoreEntities();
+		if(this.parent != null) return this.parent.allowMoreEntities(remove);
 		
 		//this rule only applies to creative mode worlds
 		if(!GriefPrevention.instance.creativeRulesApply(this.getLesserBoundaryCorner())) return null;
@@ -765,12 +765,12 @@ public class Claim
 				if(!(entity instanceof Player) && this.contains(entity.getLocation(), false, false))
 				{
 					totalEntities++;
-					if(totalEntities > maxEntities) entity.remove();
+					if(remove && totalEntities > maxEntities) entity.remove();
 				}
 			}
 		}
 
-		if(totalEntities > maxEntities) return GriefPrevention.instance.dataStore.getMessage(Messages.TooManyEntitiesInClaim);
+		if(totalEntities >= maxEntities) return GriefPrevention.instance.dataStore.getMessage(Messages.TooManyEntitiesInClaim);
 		
 		return null;
 	}

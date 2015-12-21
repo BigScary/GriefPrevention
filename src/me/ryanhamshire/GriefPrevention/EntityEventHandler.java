@@ -389,7 +389,7 @@ public class EntityEventHandler implements Listener
 
 		//otherwise, just apply the limit on total entities per claim (and no spawning in the wilderness!)
 		Claim claim = this.dataStore.getClaimAt(event.getLocation(), false, null);
-		if(claim == null || claim.allowMoreEntities() != null)
+		if(claim == null || claim.allowMoreEntities(true) != null)
 		{
 			event.setCancelled(true);
 			return;
@@ -544,7 +544,7 @@ public class EntityEventHandler implements Listener
 			Claim claim = this.dataStore.getClaimAt(event.getBlock().getLocation(), false, playerData.lastClaim);
 			if(claim == null) return;
 			
-			String noEntitiesReason = claim.allowMoreEntities();
+			String noEntitiesReason = claim.allowMoreEntities(false);
 			if(noEntitiesReason != null)
 			{
 				GriefPrevention.sendMessage(event.getPlayer(), TextMode.Err, noEntitiesReason);

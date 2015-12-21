@@ -56,6 +56,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Hanging;
 import org.bukkit.entity.Horse;
 import org.bukkit.entity.Item;
+import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Tameable;
 import org.bukkit.entity.Vehicle;
@@ -1248,6 +1249,22 @@ class PlayerEventHandler implements Listener
 			}			
 		}
 		
+		//limit armor placements when entity count is too high
+		if(entity.getType() == EntityType.ARMOR_STAND && GriefPrevention.instance.creativeRulesApply(player.getLocation()))
+		{
+		    if(playerData == null) playerData = this.dataStore.getPlayerData(player.getUniqueId());
+            Claim claim = this.dataStore.getClaimAt(entity.getLocation(), false, playerData.lastClaim);
+            if(claim == null) return;
+            
+            String noEntitiesReason = claim.allowMoreEntities(false);
+            if(noEntitiesReason != null)
+            {
+                GriefPrevention.sendMessage(player, TextMode.Err, noEntitiesReason);
+                event.setCancelled(true);
+                return;
+            }
+		}
+		
 		//always allow interactions when player is in ignore claims mode
         if(playerData.ignoreClaims) return;
         
@@ -1814,7 +1831,7 @@ class PlayerEventHandler implements Listener
             }
 			
 			//if it's a spawn egg, minecart, or boat, and this is a creative world, apply special rules
-			else if(clickedBlock != null && (materialInHand == Material.MINECART || materialInHand == Material.POWERED_MINECART || materialInHand == Material.STORAGE_MINECART || materialInHand == Material.BOAT) && GriefPrevention.instance.creativeRulesApply(clickedBlock.getLocation()))
+			else if(clickedBlock != null && (materialInHand == Material.MINECART || materialInHand == Material.POWERED_MINECART || materialInHand == Material.STORAGE_MINECART || materialInHand == Material.BOAT || materialInHand == Material.ARMOR_STAND || materialInHand == Material.ITEM_FRAME || materialInHand == Material.MONSTER_EGG || materialInHand == Material.MONSTER_EGGS) && GriefPrevention.instance.creativeRulesApply(clickedBlock.getLocation()))
 			{
 				//player needs build permission at this location
 				String noBuildReason = GriefPrevention.instance.allowBuild(player, clickedBlock.getLocation(), Material.MINECART);
@@ -1830,7 +1847,7 @@ class PlayerEventHandler implements Listener
 				Claim claim = this.dataStore.getClaimAt(clickedBlock.getLocation(), false, playerData.lastClaim);
 				if(claim == null) return;
 				
-				String noEntitiesReason = claim.allowMoreEntities();
+				String noEntitiesReason = claim.allowMoreEntities(false);
 				if(noEntitiesReason != null)
 				{
 					GriefPrevention.sendMessage(player, TextMode.Err, noEntitiesReason);
