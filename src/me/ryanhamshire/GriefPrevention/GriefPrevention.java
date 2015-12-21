@@ -1142,6 +1142,7 @@ GriefPrevention.AddLogEntry(direction.toString());
             //attempt resize
             playerData.claimResizing = claim;
             this.dataStore.resizeClaimWithChecks(player, playerData, newx1, newx2, newy1, newy2, newz1, newz2);
+            playerData.claimResizing = null;
             
             return true;
         }
