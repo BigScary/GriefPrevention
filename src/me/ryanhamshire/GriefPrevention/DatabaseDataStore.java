@@ -256,7 +256,7 @@ public class DatabaseDataStore extends DataStore
 				}
 				catch(Exception e)
 				{
-				    if(e.getMessage().contains("World not found"))
+				    if(e.getMessage() != null && e.getMessage().contains("World not found"))
 				    {
 				        GriefPrevention.AddLogEntry("Failed to load a claim (ID:" + claimID.toString() + ") because its world isn't loaded (yet?).  Please delete the claim or contact the GriefPrevention developer with information about which plugin(s) you're using to load or create worlds.  " + lesserCornerString);
 				        continue;
