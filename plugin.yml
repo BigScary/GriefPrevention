@@ -99,7 +99,7 @@ commands:
       permission: griefprevention.claims
    claim:
       description: Creates a land claim centered at your current location.
-      usage: /Claim
+      usage: /Claim [optional radius]
       aliases: [createclaim, makeclaim, newclaim]
       permission: griefprevention.claims
    buyclaimblocks:

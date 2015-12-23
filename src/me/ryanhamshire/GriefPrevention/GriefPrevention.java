@@ -934,34 +934,61 @@ public class GriefPrevention extends JavaPlugin
                 return true;
             }
             
-            //if player already has a land claim, this requires the claim modification tool to be in hand
             PlayerData playerData = this.dataStore.getPlayerData(player.getUniqueId());
+            
+            //default is chest claim radius
             int radius = GriefPrevention.instance.config_claims_automaticClaimsForNewPlayersRadius;
-            if(radius < 0) radius = 0;
+            
+            //if player has any claims, respect claim minimum size setting
             if(playerData.getClaims().size() > 0)
             {
-                if(player.getGameMode() != GameMode.CREATIVE && player.getItemInHand().getType() != GriefPrevention.instance.config_claims_modificationTool)
+                //if player has exactly one land claim, this requires the claim modification tool to be in hand (or creative mode player)
+                if(playerData.getClaims().size() == 1 && player.getGameMode() != GameMode.CREATIVE && player.getItemInHand().getType() != GriefPrevention.instance.config_claims_modificationTool)
                 {
                     GriefPrevention.sendMessage(player, TextMode.Err, Messages.MustHoldModificationToolForThat);
                     return true;
                 }
+                
                 radius = (int)Math.ceil(Math.sqrt(GriefPrevention.instance.config_claims_minArea) / 2);
             }
+            
+            //allow for specifying the radius
+            if(args.length > 0)
+            {
+                int specifiedRadius;
+                try
+                {
+                    specifiedRadius = Integer.parseInt(args[0]);
+                }
+                catch(NumberFormatException e)
+                {
+                    return false;
+                }
+                
+                if(specifiedRadius < radius)
+                {
+                    GriefPrevention.sendMessage(player, TextMode.Err, Messages.MinimumRadius, String.valueOf(radius));
+                    return true;
+                }
+                else
+                {
+                    radius = specifiedRadius;
+                }
+            }
+            
+            if(radius < 0) radius = 0;
             
             Location lc = player.getLocation().add(-radius, 0, -radius);
             Location gc = player.getLocation().add(radius, 0, radius);
             
             //player must have sufficient unused claim blocks
-            if(playerData.getClaims().size() > 0)
+            int area = Math.abs((gc.getBlockX() - lc.getBlockX() + 1) * (gc.getBlockZ() - lc.getBlockZ() + 1));
+            int remaining = playerData.getRemainingClaimBlocks();
+            if(remaining < area)
             {
-                int area = Math.abs((gc.getBlockX() - lc.getBlockX() + 1) * (gc.getBlockZ() - lc.getBlockZ() + 1));
-                int remaining = playerData.getRemainingClaimBlocks();
-                if(remaining < area)
-                {
-                    GriefPrevention.sendMessage(player, TextMode.Err, Messages.CreateClaimInsufficientBlocks, String.valueOf(area - remaining));
-                    GriefPrevention.instance.dataStore.tryAdvertiseAdminAlternatives(player);
-                    return true;
-                }
+                GriefPrevention.sendMessage(player, TextMode.Err, Messages.CreateClaimInsufficientBlocks, String.valueOf(area - remaining));
+                GriefPrevention.instance.dataStore.tryAdvertiseAdminAlternatives(player);
+                return true;
             }
 
             CreateClaimResult result = this.dataStore.createClaim(lc.getWorld(), 
