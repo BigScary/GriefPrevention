@@ -253,6 +253,8 @@ public class BlockEventHandler implements Listener
 			//if the player doesn't have any claims yet, automatically create a claim centered at the chest
 			if(playerData.getClaims().size() == 0)
 			{
+GriefPrevention.AddLogEntry("atempting chest claim " + radius);
+			    
 				//radius == 0 means protect ONLY the chest
 				if(GriefPrevention.instance.config_claims_automaticClaimsForNewPlayersRadius == 0)
 				{					
@@ -263,34 +265,43 @@ public class BlockEventHandler implements Listener
 				//otherwise, create a claim in the area around the chest
 				else
 				{
-					//as long as the automatic claim overlaps another existing claim, shrink it
+				    //if failure due to insufficient claim blocks available
+                    if(playerData.getRemainingClaimBlocks() < 1)
+                    {
+                        GriefPrevention.sendMessage(player, TextMode.Warn, Messages.NoEnoughBlocksForChestClaim);
+                        return;
+                    }
+				    
+				    //as long as the automatic claim overlaps another existing claim, shrink it
 					//note that since the player had permission to place the chest, at the very least, the automatic claim will include the chest
-					while(radius >= 0 && playerData.getRemainingClaimBlocks() >= (radius + 1) * (radius + 1) && !this.dataStore.createClaim(block.getWorld(), 
-							block.getX() - radius, block.getX() + radius, 
-							block.getY() - GriefPrevention.instance.config_claims_claimsExtendIntoGroundDistance, block.getY(), 
-							block.getZ() - radius, block.getZ() + radius, 
-							player.getUniqueId(), 
-							null, null,
-							player).succeeded)
+					CreateClaimResult result = null;
+				    while(radius >= 0)
 					{
-						radius--;
+				        int area = (radius * 2 + 1) * (radius * 2 + 1);
+				        if(playerData.getRemainingClaimBlocks() >= area)
+				        {
+			                result = this.dataStore.createClaim(
+		                        block.getWorld(), 
+	                            block.getX() - radius, block.getX() + radius, 
+	                            block.getY() - GriefPrevention.instance.config_claims_claimsExtendIntoGroundDistance, block.getY(), 
+	                            block.getZ() - radius, block.getZ() + radius, 
+	                            player.getUniqueId(), 
+	                            null, null,
+	                            player);
+			                
+			                if(result.succeeded) break;
+				        }
+				        
+				        radius--;
 					}
 					
-					//if failure due to insufficient claim blocks available
-					if(radius < 0)
-					{
-					    GriefPrevention.sendMessage(player, TextMode.Warn, Messages.NoEnoughBlocksForChestClaim);
-					    return;
-					}
-					
-					else
+					if(result != null && result.succeeded)
 					{
     					//notify and explain to player
     					GriefPrevention.sendMessage(player, TextMode.Success, Messages.AutomaticClaimNotification);
     					
     					//show the player the protected area
-    					Claim newClaim = this.dataStore.getClaimAt(block.getLocation(), false, null);
-    					Visualization visualization = Visualization.FromClaim(newClaim, block.getY(), VisualizationType.Claim, player.getLocation());
+    					Visualization visualization = Visualization.FromClaim(result.claim, block.getY(), VisualizationType.Claim, player.getLocation());
     					Visualization.Apply(player, visualization);
 					}
 				}
