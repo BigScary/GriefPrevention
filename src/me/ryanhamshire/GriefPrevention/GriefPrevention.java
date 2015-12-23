@@ -955,6 +955,12 @@ public class GriefPrevention extends JavaPlugin
             //allow for specifying the radius
             if(args.length > 0)
             {
+                if(playerData.getClaims().size() < 2 && player.getGameMode() != GameMode.CREATIVE && player.getItemInHand().getType() != GriefPrevention.instance.config_claims_modificationTool)
+                {
+                    GriefPrevention.sendMessage(player, TextMode.Err, Messages.RadiusRequiresGoldenShovel);
+                    return true;
+                }
+                
                 int specifiedRadius;
                 try
                 {
