@@ -189,6 +189,7 @@ public class GriefPrevention extends JavaPlugin
     public boolean config_logs_suspiciousEnabled;
     public boolean config_logs_adminEnabled;
     public boolean config_logs_debugEnabled;
+    public boolean config_logs_mutedChatEnabled;
     
     //ban management plugin interop settings
     public boolean config_ban_useCommand;
@@ -727,6 +728,7 @@ public class GriefPrevention extends JavaPlugin
         this.config_logs_suspiciousEnabled = config.getBoolean("GriefPrevention.Abridged Logs.Included Entry Types.Suspicious Activity", true);
         this.config_logs_adminEnabled = config.getBoolean("GriefPrevention.Abridged Logs.Included Entry Types.Administrative Activity", false);
         this.config_logs_debugEnabled = config.getBoolean("GriefPrevention.Abridged Logs.Included Entry Types.Debug", false);
+        this.config_logs_mutedChatEnabled = config.getBoolean("GriefPrevention.Abridged Logs.Included Entry Types.Muted Chat Messages", false);
         
         //claims mode by world
         for(World world : this.config_claims_worldModes.keySet())
@@ -846,6 +848,7 @@ public class GriefPrevention extends JavaPlugin
         outConfig.set("GriefPrevention.Abridged Logs.Included Entry Types.Suspicious Activity", this.config_logs_suspiciousEnabled);
         outConfig.set("GriefPrevention.Abridged Logs.Included Entry Types.Administrative Activity", this.config_logs_adminEnabled);
         outConfig.set("GriefPrevention.Abridged Logs.Included Entry Types.Debug", this.config_logs_debugEnabled);
+        outConfig.set("GriefPrevention.Abridged Logs.Included Entry Types.Muted Chat Messages", this.config_logs_mutedChatEnabled);
         
         try
         {
@@ -1032,6 +1035,7 @@ public class GriefPrevention extends JavaPlugin
                 }
                 Visualization visualization = Visualization.FromClaim(result.claim, player.getEyeLocation().getBlockY(), VisualizationType.Claim, player.getLocation());
                 Visualization.Apply(player, visualization);
+                playerData.claimResizing = null;
                 playerData.lastShovelLocation = null;
                 
                 this.autoExtendClaim(result.claim);
@@ -1102,7 +1106,6 @@ public class GriefPrevention extends JavaPlugin
             
             //determine new corner coordinates
             org.bukkit.util.Vector direction = player.getLocation().getDirection();
-GriefPrevention.AddLogEntry(direction.toString());            
             if(direction.getY() > .75)
             {
                 GriefPrevention.sendMessage(player, TextMode.Info, Messages.ClaimsExtendToSky);

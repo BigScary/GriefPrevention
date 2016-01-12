@@ -85,6 +85,7 @@ class CustomLogger
         if(entryType == CustomLogEntryTypes.SuspiciousActivity && !GriefPrevention.instance.config_logs_suspiciousEnabled) return false;
         if(entryType == CustomLogEntryTypes.AdminActivity && !GriefPrevention.instance.config_logs_adminEnabled) return false;
         if(entryType == CustomLogEntryTypes.Debug && !GriefPrevention.instance.config_logs_debugEnabled) return false;
+        if(entryType == CustomLogEntryTypes.MutedChat && !GriefPrevention.instance.config_logs_mutedChatEnabled) return false;
         
         return true;
     }

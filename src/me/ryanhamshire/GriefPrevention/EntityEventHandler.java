@@ -49,11 +49,13 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.entity.Rabbit;
+import org.bukkit.entity.Rabbit.Type;
 import org.bukkit.entity.Tameable;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.entity.Villager;
 import org.bukkit.entity.WaterMob;
-
+import org.bukkit.entity.minecart.ExplosiveMinecart;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -99,7 +101,7 @@ public class EntityEventHandler implements Listener
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
 	public void onEntityChangeBLock(EntityChangeBlockEvent event)
 	{
-	    if(!GriefPrevention.instance.config_endermenMoveBlocks && event.getEntityType() == EntityType.ENDERMAN)
+		if(!GriefPrevention.instance.config_endermenMoveBlocks && event.getEntityType() == EntityType.ENDERMAN)
 		{
 			event.setCancelled(true);
 		}
@@ -561,6 +563,13 @@ public class EntityEventHandler implements Listener
 		//monsters are never protected
 		if(event.getEntity() instanceof Monster) return;
 		
+		//nor are killer bunnies
+		if(event.getEntity() instanceof Rabbit)
+		{
+			Rabbit rabbit = (Rabbit)event.getEntity();
+			if(rabbit.getRabbitType() == Rabbit.Type.THE_KILLER_BUNNY) return;
+		}
+		
 		//horse protections can be disabled
 		if(event.getEntity() instanceof Horse && !GriefPrevention.instance.config_claims_protectHorses) return;
 		
@@ -791,7 +800,7 @@ public class EntityEventHandler implements Listener
 				PlayerData playerData = null;
 				
 				//if not a player or an explosive, allow
-				if(attacker == null && damageSource != null && !(damageSource instanceof Projectile) && damageSource.getType() != EntityType.CREEPER && !(damageSource instanceof Explosive))
+				if(attacker == null && damageSource != null && !(damageSource instanceof Projectile) && damageSource.getType() != EntityType.CREEPER && !(damageSource instanceof Explosive) && !(damageSource instanceof ExplosiveMinecart))
 				{
 				    return;
 				}

@@ -144,7 +144,7 @@ class PlayerEventHandler implements Listener
 		    recipients.clear();
 		    recipients.addAll(recipientsToKeep);
 		    
-		    GriefPrevention.AddLogEntry(notificationMessage, CustomLogEntryTypes.AdminActivity, false);
+		    GriefPrevention.AddLogEntry(notificationMessage, CustomLogEntryTypes.MutedChat, false);
 		}
 		
 		//troll and excessive profanity filter
@@ -170,7 +170,7 @@ class PlayerEventHandler implements Listener
             //otherwise assume chat troll and mute all chat from this sender until an admin says otherwise
             else
             {
-                GriefPrevention.AddLogEntry("Auto-muted new player " + player.getName() + " for profanity shortly after join.  Use /SoftMute to undo.");
+                GriefPrevention.AddLogEntry("Auto-muted new player " + player.getName() + " for profanity shortly after join.  Use /SoftMute to undo.", CustomLogEntryTypes.AdminActivity);
                 GriefPrevention.instance.dataStore.toggleSoftMute(player.getUniqueId());
             }
         }
@@ -635,6 +635,7 @@ class PlayerEventHandler implements Listener
 	    //otherwise build a list of all the aliases of this command across all installed plugins
 	    HashSet<String> aliases = new HashSet<String>();
 	    aliases.add(commandName);
+	    aliases.add("minecraft:" + commandName);
 	    for(Plugin plugin : Bukkit.getServer().getPluginManager().getPlugins())
         {
             JavaPlugin javaPlugin = (JavaPlugin)plugin;
