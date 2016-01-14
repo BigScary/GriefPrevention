@@ -581,6 +581,11 @@ class PlayerEventHandler implements Listener
 		    {
 		        event.setCancelled(this.handlePlayerChat(event.getPlayer(), event.getMessage(), event));
 		    }
+	        
+	        if(!player.hasPermission("griefprevention.spam") && this.bannedWordFinder.hasMatch(message))
+	        {
+	            event.setCancelled(true);
+	        }
 		    
 		    //unless cancelled, log in abridged logs
 	        if(!event.isCancelled())
