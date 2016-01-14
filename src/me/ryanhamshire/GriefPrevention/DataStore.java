@@ -1603,7 +1603,10 @@ public abstract class DataStore
 			config.set("Messages." + messageID.name() + ".Text", this.messages[messageID.ordinal()]);
 			
 			//support color codes
-			this.messages[messageID.ordinal()] = this.messages[messageID.ordinal()].replace('$', (char)0x00A7);
+			if(messageID != Messages.HowToClaimRegex)
+			{
+			    this.messages[messageID.ordinal()] = this.messages[messageID.ordinal()].replace('$', (char)0x00A7);
+			}
 			
 			if(messageData.notes != null)
 			{
