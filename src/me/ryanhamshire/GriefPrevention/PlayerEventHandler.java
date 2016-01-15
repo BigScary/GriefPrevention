@@ -1021,7 +1021,7 @@ class PlayerEventHandler implements Listener
 	private boolean shouldSilenceNotification()
 	{
 		final long ONE_MINUTE = 60000;
-		final int MAX_ALLOWED = 20;
+		final int MAX_ALLOWED = 5;
 		Long now = Calendar.getInstance().getTimeInMillis();
 		
 		//eliminate any expired entries (longer than a minute ago)
