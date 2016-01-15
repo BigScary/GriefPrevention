@@ -730,6 +730,9 @@ public abstract class DataStore
 		CreateClaimResult result = new CreateClaimResult();
 		
 		int smallx, bigx, smally, bigy, smallz, bigz;
+		
+		if(y1 < GriefPrevention.instance.config_claims_maxDepth) y1 = GriefPrevention.instance.config_claims_maxDepth;
+		if(y2 < GriefPrevention.instance.config_claims_maxDepth) y2 = GriefPrevention.instance.config_claims_maxDepth;
 
 		//determine small versus big inputs
 		if(x1 < x2)
