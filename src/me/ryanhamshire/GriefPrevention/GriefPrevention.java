@@ -3215,7 +3215,7 @@ public class GriefPrevention extends JavaPlugin
 		//it's too expensive to do this for huge claims
 		if(claim.getArea() > 10000) return;
 		
-		ArrayList<Chunk> chunks = claim.getChunks();
+		List<Chunk> chunks = claim.getChunks();
         for(Chunk chunk : chunks)
         {
 			this.restoreChunk(chunk, this.getSeaLevel(chunk.getWorld()) - 15, false, delayInTicks, null);

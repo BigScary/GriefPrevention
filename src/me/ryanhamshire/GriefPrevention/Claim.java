@@ -586,7 +586,7 @@ public class Claim
 	
 	//gets ALL permissions
 	//useful for  making copies of permissions during a claim resize and listing all permissions in a claim
-	public void getPermissions(ArrayList<String> builders, ArrayList<String> containers, ArrayList<String> accessors, ArrayList<String> managers)
+	public void getPermissions(List<String> builders, List<String> containers, List<String> accessors, List<String> managers)
 	{
 		//loop through all the entries in the hash map
 		Iterator<Map.Entry<String, ClaimPermission>> mappingsIterator = this.playerIDToClaimPermissionMap.entrySet().iterator(); 
@@ -597,22 +597,26 @@ public class Claim
 			//build up a list for each permission level
 			if(entry.getValue() == ClaimPermission.Build)
 			{
-				builders.add(entry.getKey());
+			   if (builders != null)
+			      builders.add(entry.getKey());
 			}
 			else if(entry.getValue() == ClaimPermission.Inventory)
 			{
-				containers.add(entry.getKey());
+            if (containers != null)
+               containers.add(entry.getKey());
 			}
 			else
 			{
-				accessors.add(entry.getKey());
+			   if (accessors != null)
+			      accessors.add(entry.getKey());
 			}			
 		}
 		
 		//managers are handled a little differently
 		for(int i = 0; i < this.managers.size(); i++)
 		{
-			managers.add(this.managers.get(i));
+		   if (managers != null)
+		      managers.add(this.managers.get(i));
 		}
 	}
 	
@@ -755,7 +759,7 @@ public class Claim
 		
 		//count current entities (ignoring players)
 		int totalEntities = 0;
-		ArrayList<Chunk> chunks = this.getChunks();
+		List<Chunk> chunks = this.getChunks();
 		for(Chunk chunk : chunks)
 		{
 			Entity [] entities = chunk.getEntities();
@@ -849,7 +853,7 @@ public class Claim
 		return (long)score;
 	}
 
-    public ArrayList<Chunk> getChunks()
+    public List<Chunk> getChunks()
     {
         ArrayList<Chunk> chunks = new ArrayList<Chunk>();
         
@@ -868,7 +872,7 @@ public class Claim
         return chunks;
     }
 
-    public ArrayList<String> getChunkStrings()
+    public List<String> getChunkStrings()
     {
         ArrayList<String> chunkStrings = new ArrayList<String>();
         int smallX = this.getLesserBoundaryCorner().getBlockX() >> 4;
