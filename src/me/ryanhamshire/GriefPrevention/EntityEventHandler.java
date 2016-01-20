@@ -78,7 +78,6 @@ import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.hanging.HangingBreakEvent;
 import org.bukkit.event.hanging.HangingBreakEvent.RemoveCause;
 import org.bukkit.event.hanging.HangingPlaceEvent;
-import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.vehicle.VehicleDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -102,13 +101,9 @@ public class EntityEventHandler implements Listener
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
 	public void onProjectileFire(ProjectileLaunchEvent event)
 	{
-	    EntityType type = event.getEntityType();
-	    if(type == EntityType.SPLASH_POTION)
+	    if(GriefPrevention.instance.creativeRulesApply(event.getEntity().getLocation()))
 	    {
-    	    if(GriefPrevention.instance.creativeRulesApply(event.getEntity().getLocation()))
-    	    {
-    	        event.setCancelled(true);
-    	    }
+	        event.setCancelled(true);
 	    }
 	}
 	
