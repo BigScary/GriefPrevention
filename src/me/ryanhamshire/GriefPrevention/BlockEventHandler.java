@@ -253,8 +253,6 @@ public class BlockEventHandler implements Listener
 			//if the player doesn't have any claims yet, automatically create a claim centered at the chest
 			if(playerData.getClaims().size() == 0)
 			{
-GriefPrevention.AddLogEntry("atempting chest claim " + radius);
-			    
 				//radius == 0 means protect ONLY the chest
 				if(GriefPrevention.instance.config_claims_automaticClaimsForNewPlayersRadius == 0)
 				{					
@@ -377,6 +375,34 @@ GriefPrevention.AddLogEntry("atempting chest claim " + radius);
 		{
 		    GriefPrevention.sendMessage(player, TextMode.Warn, Messages.NoPistonsOutsideClaims);
 		}
+		
+		//limit active blocks in creative mode worlds
+		if(!player.hasPermission("griefprevention.adminclaims") && GriefPrevention.instance.creativeRulesApply(block.getLocation()) && isActiveBlock(block))
+		{
+    		String noPlaceReason = claim.allowMoreActiveBlocks();
+            if(noPlaceReason != null)
+            {
+                GriefPrevention.sendMessage(player, TextMode.Err, noPlaceReason);
+                placeEvent.setCancelled(true);
+                return;
+            }
+		}
+	}
+	
+	static boolean isActiveBlock(Block block)
+	{
+	    return isActiveBlock(block.getType());
+	}
+	
+	static boolean isActiveBlock(BlockState state)
+	{
+	    return isActiveBlock(state.getType());
+	}
+	
+	static boolean isActiveBlock(Material type)
+	{
+	    if(type == Material.HOPPER || type == Material.BEACON || type == Material.MOB_SPAWNER) return true;
+	    return false;
 	}
 	
 	//blocks "pushing" other players' blocks around (pistons)

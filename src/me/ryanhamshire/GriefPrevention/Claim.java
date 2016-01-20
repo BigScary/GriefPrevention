@@ -23,6 +23,7 @@ import java.util.*;
 import org.bukkit.*;
 import org.bukkit.World.Environment;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
@@ -774,6 +775,38 @@ public class Claim
 		
 		return null;
 	}
+	
+	public String allowMoreActiveBlocks()
+    {
+	    if(this.parent != null) return this.parent.allowMoreActiveBlocks();
+	    
+	    //determine maximum allowable entity count, based on claim size
+        int maxActives = this.getArea() / 100;      
+        if(maxActives == 0) return GriefPrevention.instance.dataStore.getMessage(Messages.ClaimTooSmallForActiveBlocks);
+        
+        //count current actives
+        int totalActives = 0;
+        ArrayList<Chunk> chunks = this.getChunks();
+        for(Chunk chunk : chunks)
+        {
+            BlockState [] actives = chunk.getTileEntities();
+            for(int i = 0; i < actives.length; i++)
+            {
+                BlockState active = actives[i];
+                if(BlockEventHandler.isActiveBlock(active))
+                {
+                    if(this.contains(active.getLocation(), false, false))
+                    {
+                        totalActives++;
+                    }
+                }
+            }
+        }
+
+        if(totalActives >= maxActives) return GriefPrevention.instance.dataStore.getMessage(Messages.TooManyActiveBlocksInClaim);
+        
+        return null;
+    }
 	
 	//implements a strict ordering of claims, used to keep the claims collection sorted for faster searching
 	boolean greaterThan(Claim otherClaim)
