@@ -19,9 +19,7 @@
 package me.ryanhamshire.GriefPrevention;
 import java.net.InetAddress;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
-import java.util.Set;
 import java.util.UUID;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
@@ -34,7 +32,6 @@ import me.ryanhamshire.GriefPrevention.Visualization;
 
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.entity.Player;
 
 //holds all of GriefPrevention's player-tied data
 public class PlayerData 

@@ -374,7 +374,8 @@ public class GriefPrevention extends JavaPlugin
 		namesThread.start();
 		
 		//load ignore lists for any already-online players
-		Collection<Player> players = (Collection<Player>)GriefPrevention.instance.getServer().getOnlinePlayers();
+		@SuppressWarnings("unchecked")
+        Collection<Player> players = (Collection<Player>)GriefPrevention.instance.getServer().getOnlinePlayers();
 		for(Player player : players)
 		{
 		    new IgnoreLoaderThread(player.getUniqueId(), this.dataStore.getPlayerData(player.getUniqueId()).ignoredPlayers).start();
@@ -926,7 +927,8 @@ public class GriefPrevention extends JavaPlugin
     }
 
     //handles slash commands
-	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args){
+	@SuppressWarnings("deprecation")
+    public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args){
 		
 		Player player = null;
 		if (sender instanceof Player) 
@@ -2878,7 +2880,8 @@ public class GriefPrevention extends JavaPlugin
         }
     }
 	
-	public OfflinePlayer resolvePlayerByName(String name) 
+	@SuppressWarnings("deprecation")
+    public OfflinePlayer resolvePlayerByName(String name) 
 	{
 		//try online players first
 		Player targetPlayer = this.getServer().getPlayerExact(name);
@@ -2951,7 +2954,8 @@ public class GriefPrevention extends JavaPlugin
 	public void onDisable()
 	{ 
 		//save data for any online players
-		Collection<Player> players = (Collection<Player>)this.getServer().getOnlinePlayers();
+		@SuppressWarnings("unchecked")
+        Collection<Player> players = (Collection<Player>)this.getServer().getOnlinePlayers();
 		for(Player player : players)
 		{
 			UUID playerID = player.getUniqueId();
@@ -3222,7 +3226,8 @@ public class GriefPrevention extends JavaPlugin
         }
 	}
 	
-	public void restoreChunk(Chunk chunk, int miny, boolean aggressiveMode, long delayInTicks, Player playerReceivingVisualization)
+	@SuppressWarnings("deprecation")
+    public void restoreChunk(Chunk chunk, int miny, boolean aggressiveMode, long delayInTicks, Player playerReceivingVisualization)
 	{
 		//build a snapshot of this chunk, including 1 block boundary outside of the chunk all the way around
 		int maxHeight = chunk.getWorld().getMaxHeight();

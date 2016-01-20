@@ -31,19 +31,14 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
 
-import org.bukkit.Achievement;
-import org.bukkit.BanList;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
-import org.bukkit.ChunkSnapshot;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.TravelAgent;
-import org.bukkit.BanList.Type;
-import org.bukkit.World;
 import org.bukkit.World.Environment;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -56,7 +51,6 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Hanging;
 import org.bukkit.entity.Horse;
 import org.bukkit.entity.Item;
-import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Tameable;
 import org.bukkit.entity.Vehicle;
@@ -497,6 +491,7 @@ class PlayerEventHandler implements Listener
 		if(category == CommandCategory.Whisper && args.length > 1)
 		{
 		    //determine target player, might be NULL
+            @SuppressWarnings("deprecation")
             Player targetPlayer = GriefPrevention.instance.getServer().getPlayer(args[1]);
 		    
             //softmute feature
@@ -522,7 +517,8 @@ class PlayerEventHandler implements Listener
         			
         			String logMessage = logMessageBuilder.toString();
         			
-        			Collection<Player> players = (Collection<Player>)GriefPrevention.instance.getServer().getOnlinePlayers();
+        			@SuppressWarnings("unchecked")
+                    Collection<Player> players = (Collection<Player>)GriefPrevention.instance.getServer().getOnlinePlayers();
         			for(Player onlinePlayer : players)
         			{
         				if(onlinePlayer.hasPermission("griefprevention.eavesdrop") && !onlinePlayer.equals(targetPlayer) && !onlinePlayer.equals(player))
@@ -758,7 +754,8 @@ class PlayerEventHandler implements Listener
 	}
 	
 	//when a player successfully joins the server...
-	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
+	@SuppressWarnings("deprecation")
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
 	void onPlayerJoin(PlayerJoinEvent event)
 	{
 		Player player = event.getPlayer();
@@ -840,7 +837,8 @@ class PlayerEventHandler implements Listener
 						GriefPrevention.AddLogEntry("Auto-banned new player " + player.getName() + " because that account is using an IP address very recently used by banned player " + info.bannedAccountName + " (" + info.address.toString() + ").", CustomLogEntryTypes.AdminActivity);
 						
 						//notify any online ops
-						Collection<Player> players = (Collection<Player>)GriefPrevention.instance.getServer().getOnlinePlayers();
+						@SuppressWarnings("unchecked")
+                        Collection<Player> players = (Collection<Player>)GriefPrevention.instance.getServer().getOnlinePlayers();
 						for(Player otherPlayer : players)
 						{
 							if(otherPlayer.isOp())
@@ -1563,7 +1561,8 @@ class PlayerEventHandler implements Listener
 	}
 	
 	//when a player interacts with the world
-	@EventHandler(priority = EventPriority.LOWEST)
+	@SuppressWarnings("deprecation")
+    @EventHandler(priority = EventPriority.LOWEST)
 	void onPlayerInteract(PlayerInteractEvent event)
 	{
 	    //not interested in left-click-on-air actions
@@ -2490,7 +2489,8 @@ class PlayerEventHandler implements Listener
 	private ConcurrentHashMap<Integer, Boolean> inventoryHolderCache = new ConcurrentHashMap<Integer, Boolean>();
 	private boolean isInventoryHolder(Block clickedBlock)
 	{
-	    Integer cacheKey = clickedBlock.getTypeId();
+	    @SuppressWarnings("deprecation")
+        Integer cacheKey = clickedBlock.getTypeId();
 	    Boolean cachedValue = this.inventoryHolderCache.get(cacheKey);
 	    if(cachedValue != null)
 	    {

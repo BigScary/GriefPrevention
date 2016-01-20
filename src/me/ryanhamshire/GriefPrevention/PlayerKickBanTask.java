@@ -18,9 +18,6 @@
  
 package me.ryanhamshire.GriefPrevention;
 
-import org.bukkit.BanList;
-import org.bukkit.Bukkit;
-import org.bukkit.BanList.Type;
 import org.bukkit.entity.Player;
 
 //kicks or bans a player

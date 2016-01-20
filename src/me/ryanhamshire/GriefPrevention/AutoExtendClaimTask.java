@@ -31,6 +31,7 @@ class AutoExtendClaimTask implements Runnable
         }
     }
 
+    @SuppressWarnings("deprecation")
     private int getLowestBuiltY()
     {
         int y = this.claim.getLesserBoundaryCorner().getBlockY();

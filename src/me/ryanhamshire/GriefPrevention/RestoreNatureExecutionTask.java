@@ -55,7 +55,8 @@ class RestoreNatureExecutionTask implements Runnable
 		this.player = player;
 	}
 	
-	@Override
+	@SuppressWarnings("deprecation")
+    @Override
 	public void run()
 	{
 		//apply changes to the world, but ONLY to unclaimed blocks

@@ -34,7 +34,8 @@ class VisualizationApplicationTask implements Runnable
 		this.player = player;
 	}
 	
-	@Override
+	@SuppressWarnings("deprecation")
+    @Override
 	public void run()
 	{
 		//for each element (=block) of the visualization

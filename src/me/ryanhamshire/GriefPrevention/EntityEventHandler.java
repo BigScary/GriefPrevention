@@ -50,7 +50,6 @@ import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Rabbit;
-import org.bukkit.entity.Rabbit.Type;
 import org.bukkit.entity.Tameable;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.entity.Villager;
@@ -166,6 +165,7 @@ public class EntityEventHandler implements Listener
 		             {
 		                 //when not allowed, drop as item instead of forming a block
 		                 event.setCancelled(true);
+		                 @SuppressWarnings("deprecation")
 		                 ItemStack itemStack = new ItemStack(entity.getMaterial(), 1, entity.getBlockData());
 		                 Item item = block.getWorld().dropItem(entity.getLocation(), itemStack);
 		                 item.setVelocity(new Vector());
@@ -218,6 +218,7 @@ public class EntityEventHandler implements Listener
         this.handleExplosion(explodeEvent.getBlock().getLocation(), null, explodeEvent.blockList());
     }
     
+    @SuppressWarnings("deprecation")
     void handleExplosion(Location location, Entity entity, List<Block> blocks)
     {
         //only applies to claims-enabled worlds

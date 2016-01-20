@@ -139,7 +139,8 @@ public class BlockEventHandler implements Listener
 			
 			if(!player.hasPermission("griefprevention.eavesdropsigns"))
 			{
-				Collection<Player> players = (Collection<Player>)GriefPrevention.instance.getServer().getOnlinePlayers();
+				@SuppressWarnings("unchecked")
+                Collection<Player> players = (Collection<Player>)GriefPrevention.instance.getServer().getOnlinePlayers();
 				for(Player otherPlayer : players)
 				{
 					if(otherPlayer.hasPermission("griefprevention.eavesdropsigns"))
@@ -174,7 +175,8 @@ public class BlockEventHandler implements Listener
 	}
 	
 	//when a player places a block...
-	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
+	@SuppressWarnings("null")
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
 	public void onBlockPlace(BlockPlaceEvent placeEvent)
 	{
 		Player player = placeEvent.getPlayer();
@@ -754,7 +756,7 @@ public class BlockEventHandler implements Listener
 	    
 	    //from where?
 		Block fromBlock = dispenseEvent.getBlock();
-		Dispenser dispenser = new Dispenser(fromBlock.getType(), fromBlock.getData());
+		Dispenser dispenser = (Dispenser)fromBlock.getState();
 		
 		//to where?
 		Block toBlock = fromBlock.getRelative(dispenser.getFacing());

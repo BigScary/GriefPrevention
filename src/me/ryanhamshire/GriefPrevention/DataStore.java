@@ -345,7 +345,9 @@ public abstract class DataStore
 	
 	class NoTransferException extends Exception
 	{
-	    NoTransferException(String message)
+        private static final long serialVersionUID = 1L;
+
+        NoTransferException(String message)
 	    {
 	        super(message);
 	    }
@@ -1005,7 +1007,8 @@ public abstract class DataStore
 		//if the claim should be opened to looting
 		if(grantAccess)
 		{
-			Player winner = GriefPrevention.instance.getServer().getPlayer(winnerName);
+			@SuppressWarnings("deprecation")
+            Player winner = GriefPrevention.instance.getServer().getPlayer(winnerName);
 			if(winner != null)
 			{
 				//notify the winner
@@ -1020,8 +1023,10 @@ public abstract class DataStore
 		//if the siege ended due to death, transfer inventory to winner
 		if(death)
 		{
-			Player winner = GriefPrevention.instance.getServer().getPlayer(winnerName);
-			Player loser = GriefPrevention.instance.getServer().getPlayer(loserName);
+			@SuppressWarnings("deprecation")
+            Player winner = GriefPrevention.instance.getServer().getPlayer(winnerName);
+			@SuppressWarnings("deprecation")
+            Player loser = GriefPrevention.instance.getServer().getPlayer(loserName);
 			if(winner != null && loser != null)
 			{
 				//get loser's inventory, then clear it

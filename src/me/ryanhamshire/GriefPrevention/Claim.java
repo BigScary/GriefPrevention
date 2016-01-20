@@ -825,7 +825,8 @@ public class Claim
 		return thisCorner.getWorld().getName().compareTo(otherCorner.getWorld().getName()) < 0;
 	}
 	
-	long getPlayerInvestmentScore()
+	@SuppressWarnings("deprecation")
+    long getPlayerInvestmentScore()
 	{
 		//decide which blocks will be considered player placed
 		Location lesserBoundaryCorner = this.getLesserBoundaryCorner();
