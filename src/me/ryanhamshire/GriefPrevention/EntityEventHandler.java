@@ -73,6 +73,7 @@ import org.bukkit.event.entity.EntityInteractEvent;
 import org.bukkit.event.entity.ExpBottleEvent;
 import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.hanging.HangingBreakEvent;
 import org.bukkit.event.hanging.HangingBreakEvent.RemoveCause;
@@ -95,6 +96,15 @@ public class EntityEventHandler implements Listener
 	public EntityEventHandler(DataStore dataStore)
 	{
 		this.dataStore = dataStore;
+	}
+	
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
+	public void onProjectileFire(ProjectileLaunchEvent event)
+	{
+	    if(GriefPrevention.instance.creativeRulesApply(event.getEntity().getLocation()))
+	    {
+	        event.setCancelled(true);
+	    }
 	}
 	
 	//don't allow endermen to change blocks
