@@ -704,17 +704,17 @@ public abstract class DataStore
 	    }
 	}
 	
-	//gets an almost-unique, persistent identifier string for a chunk
-    String getChunkString(int chunkx, int chunkz)
-    {
-        return String.valueOf(chunkx) + (chunkz);
-    }
+    	//gets an unique, persistent identifier string for a chunk
+    	String getChunkString(int chunkx, int chunkz)
+    	{
+        	return chunkx + "," + chunkz;
+    	}
 	
-	//gets an almost-unique, persistent identifier string for a chunk
-	String getChunkString(Location location)
-	{
-        return this.getChunkString(location.getBlockX() >> 4, location.getBlockZ() >> 4);
-    }
+    	//gets an unique, persistent identifier string for a chunk
+    	String getChunkString(Location location)
+    	{
+        	return this.getChunkString(location.getBlockX() >> 4, location.getBlockZ() >> 4);
+    	}
 	
     //creates a claim.
 	//if the new claim would overlap an existing claim, returns a failure along with a reference to the existing claim
