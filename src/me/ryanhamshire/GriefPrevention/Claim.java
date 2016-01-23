@@ -18,13 +18,16 @@
 
 package me.ryanhamshire.GriefPrevention;
 
-import java.util.*;
-
-import org.bukkit.*;
+import org.bukkit.Chunk;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.World.Environment;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+
+import java.util.*;
 
 //represents a player claim
 //creating an instance doesn't make an effective claim
@@ -868,9 +871,9 @@ public class Claim
         return chunks;
     }
 
-    public ArrayList<String> getChunkStrings()
+    public ArrayList<Long> getChunkIdentifiers()
     {
-        ArrayList<String> chunkStrings = new ArrayList<String>();
+        ArrayList<Long> chunkIdentifiers = new ArrayList<Long>();
         int smallX = this.getLesserBoundaryCorner().getBlockX() >> 4;
         int smallZ = this.getLesserBoundaryCorner().getBlockZ() >> 4;
 		int largeX = this.getGreaterBoundaryCorner().getBlockX() >> 4;
@@ -880,10 +883,10 @@ public class Claim
 		{
 		    for(int z = smallZ; z <= largeZ; z++)
 		    {
-		        chunkStrings.add(String.valueOf(x) + z);
+				chunkIdentifiers.add((long)x << 32 | z & 0xFFFFFFFFL);
 		    }
 		}
 		
-		return chunkStrings;
+		return chunkIdentifiers;
     }
 }
