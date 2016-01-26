@@ -18,14 +18,8 @@
 
 package me.ryanhamshire.GriefPrevention;
 
-import java.io.*;
-import java.nio.charset.Charset;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.regex.Pattern;
-
+import com.google.common.io.Files;
 import me.ryanhamshire.GriefPrevention.events.ClaimDeletedEvent;
-
 import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -34,7 +28,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Tameable;
 import org.bukkit.inventory.ItemStack;
 
-import com.google.common.io.Files;
+import java.io.*;
+import java.nio.charset.Charset;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
 
 //singleton class which manages all GriefPrevention data (except for config options)
 public abstract class DataStore 
@@ -47,7 +45,7 @@ public abstract class DataStore
 	
 	//in-memory cache for claim data
 	ArrayList<Claim> claims = new ArrayList<Claim>();
-	ConcurrentHashMap<String, ArrayList<Claim>> chunksToClaimsMap = new ConcurrentHashMap<String, ArrayList<Claim>>();
+	ConcurrentHashMap<Long, ArrayList<Claim>> chunksToClaimsMap = new ConcurrentHashMap<Long, ArrayList<Claim>>();
 	
 	//in-memory cache for messages
 	private String [] messages;
@@ -345,9 +343,7 @@ public abstract class DataStore
 	
 	class NoTransferException extends Exception
 	{
-        private static final long serialVersionUID = 1L;
-
-        NoTransferException(String message)
+	    NoTransferException(String message)
 	    {
 	        super(message);
 	    }
@@ -413,14 +409,14 @@ public abstract class DataStore
 		
 		//add it and mark it as added
 		this.claims.add(newClaim);
-		ArrayList<String> chunkStrings = newClaim.getChunkStrings();
-		for(String chunkString : chunkStrings)
+		ArrayList<Long> chunkIdentifiers = newClaim.getChunkIdentifiers();
+		for(long chunkIdentifier : chunkIdentifiers)
 		{
-		    ArrayList<Claim> claimsInChunk = this.chunksToClaimsMap.get(chunkString);
+		    ArrayList<Claim> claimsInChunk = this.chunksToClaimsMap.get(chunkIdentifier);
 		    if(claimsInChunk == null)
 		    {
 		        claimsInChunk = new ArrayList<Claim>();
-		        this.chunksToClaimsMap.put(chunkString, claimsInChunk);
+		        this.chunksToClaimsMap.put(chunkIdentifier, claimsInChunk);
 		    }
 		    
 		    claimsInChunk.add(newClaim);
@@ -578,10 +574,10 @@ public abstract class DataStore
 			}
 		}
 		
-		ArrayList<String> chunkStrings = claim.getChunkStrings();
-        for(String chunkString : chunkStrings)
+		ArrayList<Long> chunkIdentifiers = claim.getChunkIdentifiers();
+        for(long chunkIdentifier : chunkIdentifiers)
         {
-            ArrayList<Claim> claimsInChunk = this.chunksToClaimsMap.get(chunkString);
+            ArrayList<Claim> claimsInChunk = this.chunksToClaimsMap.get(chunkIdentifier);
             for(int j = 0; j < claimsInChunk.size(); j++)
             {
                 if(claimsInChunk.get(j).id.equals(claim.id))
@@ -648,7 +644,7 @@ public abstract class DataStore
 		if(cachedClaim != null && cachedClaim.inDataStore && cachedClaim.contains(location, ignoreHeight, true)) return cachedClaim;
 		
 		//find a top level claim
-		String chunkID = this.getChunkString(location);
+		long chunkID = this.getChunkIdentifier(location);
 		ArrayList<Claim> claimsInChunk = this.chunksToClaimsMap.get(chunkID);
 		if(claimsInChunk == null) return null;
 		
@@ -693,7 +689,7 @@ public abstract class DataStore
 	
 	public Collection<Claim> getClaims(int chunkx, int chunkz)
 	{
-	    ArrayList<Claim> chunkClaims = this.chunksToClaimsMap.get(this.getChunkString(chunkx, chunkz));
+	    ArrayList<Claim> chunkClaims = this.chunksToClaimsMap.get(this.getChunkIdentifier(chunkx, chunkz));
 	    if(chunkClaims != null)
 	    {
 	        return Collections.unmodifiableCollection(chunkClaims);
@@ -705,15 +701,15 @@ public abstract class DataStore
 	}
 	
 	//gets an almost-unique, persistent identifier string for a chunk
-    String getChunkString(int chunkx, int chunkz)
+    long getChunkIdentifier(int chunkx, int chunkz)
     {
-        return String.valueOf(chunkx) + (chunkz);
+        return (long)chunkx << 32 | chunkz & 0xFFFFFFFFL;
     }
 	
 	//gets an almost-unique, persistent identifier string for a chunk
-	String getChunkString(Location location)
+    long getChunkIdentifier(Location location)
 	{
-        return this.getChunkString(location.getBlockX() >> 4, location.getBlockZ() >> 4);
+        return this.getChunkIdentifier(location.getBlockX() >> 4, location.getBlockZ() >> 4);
     }
 	
     //creates a claim.
@@ -1007,8 +1003,7 @@ public abstract class DataStore
 		//if the claim should be opened to looting
 		if(grantAccess)
 		{
-			@SuppressWarnings("deprecation")
-            Player winner = GriefPrevention.instance.getServer().getPlayer(winnerName);
+			Player winner = GriefPrevention.instance.getServer().getPlayer(winnerName);
 			if(winner != null)
 			{
 				//notify the winner
@@ -1023,10 +1018,8 @@ public abstract class DataStore
 		//if the siege ended due to death, transfer inventory to winner
 		if(death)
 		{
-			@SuppressWarnings("deprecation")
-            Player winner = GriefPrevention.instance.getServer().getPlayer(winnerName);
-			@SuppressWarnings("deprecation")
-            Player loser = GriefPrevention.instance.getServer().getPlayer(loserName);
+			Player winner = GriefPrevention.instance.getServer().getPlayer(winnerName);
+			Player loser = GriefPrevention.instance.getServer().getPlayer(loserName);
 			if(winner != null && loser != null)
 			{
 				//get loser's inventory, then clear it
@@ -1578,8 +1571,6 @@ public abstract class DataStore
 		this.addDefault(defaults, Messages.ClaimsAutoExtendDownward, "Land claims auto-extend deeper into the ground when you place blocks under them.", null);
 		this.addDefault(defaults, Messages.MinimumRadius, "Minimum radius is {0}.", "0: minimum radius");
 		this.addDefault(defaults, Messages.RadiusRequiresGoldenShovel, "You must be holding a golden shovel when specifying a radius.", null);
-		this.addDefault(defaults, Messages.ClaimTooSmallForActiveBlocks, "This claim isn't big enough to support any active block types (hoppers, spawners, beacons...).  Make the claim bigger first.", null);
-		this.addDefault(defaults, Messages.TooManyActiveBlocksInClaim, "This claim is at its limit for active block types (hoppers, spawners, beacons...).  Either make it bigger, or remove other active blocks first.", null);
 		
 		this.addDefault(defaults, Messages.BookAuthor, "BigScary", null);
 		this.addDefault(defaults, Messages.BookTitle, "How to Claim Land", null);
@@ -1732,7 +1723,7 @@ public abstract class DataStore
             for(int chunk_z = lesserChunk.getZ(); chunk_z <= greaterChunk.getZ(); chunk_z++)
             {
                 Chunk chunk = location.getWorld().getChunkAt(chunk_x, chunk_z);
-                String chunkID = this.getChunkString(chunk.getBlock(0,  0,  0).getLocation());
+                long chunkID = this.getChunkIdentifier(chunk.getBlock(0,  0,  0).getLocation());
                 ArrayList<Claim> claimsInChunk = this.chunksToClaimsMap.get(chunkID);
                 if(claimsInChunk != null)
                 {

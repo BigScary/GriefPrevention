@@ -18,14 +18,16 @@
 
 package me.ryanhamshire.GriefPrevention;
 
-import java.util.*;
-
-import org.bukkit.*;
+import org.bukkit.Chunk;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.World.Environment;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+
+import java.util.*;
 
 //represents a player claim
 //creating an instance doesn't make an effective claim
@@ -776,38 +778,6 @@ public class Claim
 		return null;
 	}
 	
-	public String allowMoreActiveBlocks()
-    {
-	    if(this.parent != null) return this.parent.allowMoreActiveBlocks();
-	    
-	    //determine maximum allowable entity count, based on claim size
-        int maxActives = this.getArea() / 100;      
-        if(maxActives == 0) return GriefPrevention.instance.dataStore.getMessage(Messages.ClaimTooSmallForActiveBlocks);
-        
-        //count current actives
-        int totalActives = 0;
-        ArrayList<Chunk> chunks = this.getChunks();
-        for(Chunk chunk : chunks)
-        {
-            BlockState [] actives = chunk.getTileEntities();
-            for(int i = 0; i < actives.length; i++)
-            {
-                BlockState active = actives[i];
-                if(BlockEventHandler.isActiveBlock(active))
-                {
-                    if(this.contains(active.getLocation(), false, false))
-                    {
-                        totalActives++;
-                    }
-                }
-            }
-        }
-
-        if(totalActives >= maxActives) return GriefPrevention.instance.dataStore.getMessage(Messages.TooManyActiveBlocksInClaim);
-        
-        return null;
-    }
-	
 	//implements a strict ordering of claims, used to keep the claims collection sorted for faster searching
 	boolean greaterThan(Claim otherClaim)
 	{
@@ -825,8 +795,7 @@ public class Claim
 		return thisCorner.getWorld().getName().compareTo(otherCorner.getWorld().getName()) < 0;
 	}
 	
-	@SuppressWarnings("deprecation")
-    long getPlayerInvestmentScore()
+	long getPlayerInvestmentScore()
 	{
 		//decide which blocks will be considered player placed
 		Location lesserBoundaryCorner = this.getLesserBoundaryCorner();
@@ -902,9 +871,9 @@ public class Claim
         return chunks;
     }
 
-    public ArrayList<String> getChunkStrings()
+    public ArrayList<Long> getChunkIdentifiers()
     {
-        ArrayList<String> chunkStrings = new ArrayList<String>();
+        ArrayList<Long> chunkIdentifiers = new ArrayList<Long>();
         int smallX = this.getLesserBoundaryCorner().getBlockX() >> 4;
         int smallZ = this.getLesserBoundaryCorner().getBlockZ() >> 4;
 		int largeX = this.getGreaterBoundaryCorner().getBlockX() >> 4;
@@ -914,10 +883,10 @@ public class Claim
 		{
 		    for(int z = smallZ; z <= largeZ; z++)
 		    {
-		        chunkStrings.add(String.valueOf(x) + z);
+				chunkIdentifiers.add((long)x << 32 | z & 0xFFFFFFFFL);
 		    }
 		}
 		
-		return chunkStrings;
+		return chunkIdentifiers;
     }
 }
