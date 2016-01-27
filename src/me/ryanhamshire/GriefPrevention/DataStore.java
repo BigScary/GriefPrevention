@@ -47,7 +47,7 @@ public abstract class DataStore
 	
 	//in-memory cache for claim data
 	ArrayList<Claim> claims = new ArrayList<Claim>();
-	ConcurrentHashMap<String, ArrayList<Claim>> chunksToClaimsMap = new ConcurrentHashMap<String, ArrayList<Claim>>();
+	ConcurrentHashMap<ChunkLocationInfo, ArrayList<Claim>> chunksToClaimsMap = new ConcurrentHashMap<ChunkLocationInfo, ArrayList<Claim>>();
 	
 	//in-memory cache for messages
 	private String [] messages;
@@ -413,14 +413,14 @@ public abstract class DataStore
 		
 		//add it and mark it as added
 		this.claims.add(newClaim);
-		ArrayList<String> chunkStrings = newClaim.getChunkStrings();
-		for(String chunkString : chunkStrings)
+		ArrayList<ChunkLocationInfo> chunkIdentifiers = newClaim.getChunkIdentifiers();
+		for(ChunkLocationInfo chunkIdentifier : chunkIdentifiers)
 		{
-		    ArrayList<Claim> claimsInChunk = this.chunksToClaimsMap.get(chunkString);
+		    ArrayList<Claim> claimsInChunk = this.chunksToClaimsMap.get(chunkIdentifier);
 		    if(claimsInChunk == null)
 		    {
 		        claimsInChunk = new ArrayList<Claim>();
-		        this.chunksToClaimsMap.put(chunkString, claimsInChunk);
+		        this.chunksToClaimsMap.put(chunkIdentifier, claimsInChunk);
 		    }
 		    
 		    claimsInChunk.add(newClaim);
@@ -578,10 +578,10 @@ public abstract class DataStore
 			}
 		}
 		
-		ArrayList<String> chunkStrings = claim.getChunkStrings();
-        for(String chunkString : chunkStrings)
+		ArrayList<ChunkLocationInfo> chunkIdentifiers = claim.getChunkIdentifiers();
+        for(ChunkLocationInfo chunkIdentifier : chunkIdentifiers)
         {
-            ArrayList<Claim> claimsInChunk = this.chunksToClaimsMap.get(chunkString);
+            ArrayList<Claim> claimsInChunk = this.chunksToClaimsMap.get(chunkIdentifier);
             for(int j = 0; j < claimsInChunk.size(); j++)
             {
                 if(claimsInChunk.get(j).id.equals(claim.id))

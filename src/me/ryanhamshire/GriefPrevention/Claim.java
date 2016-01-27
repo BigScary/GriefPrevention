@@ -902,9 +902,9 @@ public class Claim
         return chunks;
     }
 
-    public ArrayList<String> getChunkStrings()
+    public ArrayList<ChunkLocationInfo> getChunkIdentifiers()
     {
-        ArrayList<String> chunkStrings = new ArrayList<String>();
+        ArrayList<ChunkLocationInfo> chunkIdentifiers = new ArrayList<ChunkLocationInfo>();
         int smallX = this.getLesserBoundaryCorner().getBlockX() >> 4;
         int smallZ = this.getLesserBoundaryCorner().getBlockZ() >> 4;
 		int largeX = this.getGreaterBoundaryCorner().getBlockX() >> 4;
@@ -914,10 +914,10 @@ public class Claim
 		{
 		    for(int z = smallZ; z <= largeZ; z++)
 		    {
-		        chunkStrings.add(String.valueOf(x) + z);
+				chunkIdentifiers.add(new ChunkLocationInfo(x, z, this.lesserBoundaryCorner.getWorld().getUID()));
 		    }
 		}
 		
-		return chunkStrings;
+		return chunkIdentifiers;
     }
 }
