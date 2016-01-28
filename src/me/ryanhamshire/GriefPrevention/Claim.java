@@ -902,9 +902,9 @@ public class Claim
         return chunks;
     }
 
-    public ArrayList<String> getChunkStrings()
+    ArrayList<Long> getChunkHashes()
     {
-        ArrayList<String> chunkStrings = new ArrayList<String>();
+        ArrayList<Long> hashes = new ArrayList<Long>();
         int smallX = this.getLesserBoundaryCorner().getBlockX() >> 4;
         int smallZ = this.getLesserBoundaryCorner().getBlockZ() >> 4;
 		int largeX = this.getGreaterBoundaryCorner().getBlockX() >> 4;
@@ -914,10 +914,10 @@ public class Claim
 		{
 		    for(int z = smallZ; z <= largeZ; z++)
 		    {
-		        chunkStrings.add(String.valueOf(x) + z);
+		        hashes.add(DataStore.getChunkHash(x, z));
 		    }
 		}
 		
-		return chunkStrings;
+		return hashes;
     }
 }

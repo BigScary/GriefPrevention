@@ -47,7 +47,7 @@ public abstract class DataStore
 	
 	//in-memory cache for claim data
 	ArrayList<Claim> claims = new ArrayList<Claim>();
-	ConcurrentHashMap<String, ArrayList<Claim>> chunksToClaimsMap = new ConcurrentHashMap<String, ArrayList<Claim>>();
+	ConcurrentHashMap<Long, ArrayList<Claim>> chunksToClaimsMap = new ConcurrentHashMap<Long, ArrayList<Claim>>();
 	
 	//in-memory cache for messages
 	private String [] messages;
@@ -413,14 +413,14 @@ public abstract class DataStore
 		
 		//add it and mark it as added
 		this.claims.add(newClaim);
-		ArrayList<String> chunkStrings = newClaim.getChunkStrings();
-		for(String chunkString : chunkStrings)
+		ArrayList<Long> chunkHashes = newClaim.getChunkHashes();
+		for(Long chunkHash : chunkHashes)
 		{
-		    ArrayList<Claim> claimsInChunk = this.chunksToClaimsMap.get(chunkString);
+		    ArrayList<Claim> claimsInChunk = this.chunksToClaimsMap.get(chunkHash);
 		    if(claimsInChunk == null)
 		    {
 		        claimsInChunk = new ArrayList<Claim>();
-		        this.chunksToClaimsMap.put(chunkString, claimsInChunk);
+		        this.chunksToClaimsMap.put(chunkHash, claimsInChunk);
 		    }
 		    
 		    claimsInChunk.add(newClaim);
@@ -578,10 +578,10 @@ public abstract class DataStore
 			}
 		}
 		
-		ArrayList<String> chunkStrings = claim.getChunkStrings();
-        for(String chunkString : chunkStrings)
+		ArrayList<Long> chunkHashes = claim.getChunkHashes();
+        for(Long chunkHash : chunkHashes)
         {
-            ArrayList<Claim> claimsInChunk = this.chunksToClaimsMap.get(chunkString);
+            ArrayList<Claim> claimsInChunk = this.chunksToClaimsMap.get(chunkHash);
             for(int j = 0; j < claimsInChunk.size(); j++)
             {
                 if(claimsInChunk.get(j).id.equals(claim.id))
@@ -648,7 +648,7 @@ public abstract class DataStore
 		if(cachedClaim != null && cachedClaim.inDataStore && cachedClaim.contains(location, ignoreHeight, true)) return cachedClaim;
 		
 		//find a top level claim
-		String chunkID = this.getChunkString(location);
+		Long chunkID = getChunkHash(location);
 		ArrayList<Claim> claimsInChunk = this.chunksToClaimsMap.get(chunkID);
 		if(claimsInChunk == null) return null;
 		
@@ -693,7 +693,7 @@ public abstract class DataStore
 	
 	public Collection<Claim> getClaims(int chunkx, int chunkz)
 	{
-	    ArrayList<Claim> chunkClaims = this.chunksToClaimsMap.get(this.getChunkString(chunkx, chunkz));
+	    ArrayList<Claim> chunkClaims = this.chunksToClaimsMap.get(getChunkHash(chunkx, chunkz));
 	    if(chunkClaims != null)
 	    {
 	        return Collections.unmodifiableCollection(chunkClaims);
@@ -704,16 +704,16 @@ public abstract class DataStore
 	    }
 	}
 	
-	//gets an almost-unique, persistent identifier string for a chunk
-    String getChunkString(int chunkx, int chunkz)
+	//gets an almost-unique, persistent identifier for a chunk
+    static Long getChunkHash(long chunkx, long chunkz)
     {
-        return String.valueOf(chunkx) + (chunkz);
+        return (chunkz ^ (chunkx << 32));
     }
 	
-	//gets an almost-unique, persistent identifier string for a chunk
-	String getChunkString(Location location)
+	//gets an almost-unique, persistent identifier for a chunk
+	static Long getChunkHash(Location location)
 	{
-        return this.getChunkString(location.getBlockX() >> 4, location.getBlockZ() >> 4);
+        return getChunkHash(location.getBlockX() >> 4, location.getBlockZ() >> 4);
     }
 	
     //creates a claim.
@@ -1732,7 +1732,7 @@ public abstract class DataStore
             for(int chunk_z = lesserChunk.getZ(); chunk_z <= greaterChunk.getZ(); chunk_z++)
             {
                 Chunk chunk = location.getWorld().getChunkAt(chunk_x, chunk_z);
-                String chunkID = this.getChunkString(chunk.getBlock(0,  0,  0).getLocation());
+                Long chunkID = getChunkHash(chunk.getBlock(0,  0,  0).getLocation());
                 ArrayList<Claim> claimsInChunk = this.chunksToClaimsMap.get(chunkID);
                 if(claimsInChunk != null)
                 {
