@@ -2356,6 +2356,13 @@ public class GriefPrevention extends JavaPlugin
             if(isMuted)
             {
                 GriefPrevention.sendMessage(player, TextMode.Success, Messages.SoftMuted, targetPlayer.getName());
+                String executorName = "console";
+                if(player != null)
+                {
+                    executorName = player.getName();
+                }
+                
+                GriefPrevention.AddLogEntry(executorName + " muted " + targetPlayer.getName() + ".", CustomLogEntryTypes.AdminActivity, true);
             }
             else
             {
