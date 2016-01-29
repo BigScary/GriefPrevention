@@ -756,7 +756,8 @@ public class BlockEventHandler implements Listener
 	    
 	    //from where?
 		Block fromBlock = dispenseEvent.getBlock();
-		Dispenser dispenser = (Dispenser)fromBlock.getState();
+		@SuppressWarnings("deprecation")
+        Dispenser dispenser = new Dispenser(Material.DISPENSER, fromBlock.getData());
 		
 		//to where?
 		Block toBlock = fromBlock.getRelative(dispenser.getFacing());
