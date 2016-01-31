@@ -33,6 +33,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import me.ryanhamshire.GriefPrevention.DataStore.NoTransferException;
+import me.ryanhamshire.GriefPrevention.events.SaveTrappedPlayerEvent;
 import net.milkbowl.vault.economy.Economy;
 
 import org.bukkit.Achievement;
@@ -2194,8 +2195,12 @@ public class GriefPrevention extends JavaPlugin
 				return true;
 			}
 			
+			//rescue destination may be set by GPFlags, ask to find out
+			SaveTrappedPlayerEvent event = new SaveTrappedPlayerEvent(claim);
+            Bukkit.getPluginManager().callEvent(event);
+			
 			//if the player is in an administrative claim, he should contact an admin
-			if(claim.isAdminClaim())
+			if(claim.isAdminClaim() && event.getDestination() != null)
 			{
 				GriefPrevention.sendMessage(player, TextMode.Err, Messages.TrappedWontWorkHere);
 				return true;
@@ -2205,7 +2210,7 @@ public class GriefPrevention extends JavaPlugin
 			GriefPrevention.sendMessage(player, TextMode.Instr, Messages.RescuePending);
 			
 			//create a task to rescue this player in a little while
-			PlayerRescueTask task = new PlayerRescueTask(player, player.getLocation());
+			PlayerRescueTask task = new PlayerRescueTask(player, player.getLocation(), event.getDestination());
 			this.getServer().getScheduler().scheduleSyncDelayedTask(this, task, 200L);  //20L ~ 1 second
 			
 			return true;

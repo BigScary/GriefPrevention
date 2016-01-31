@@ -29,13 +29,17 @@ class PlayerRescueTask implements Runnable
 	//original location where /trapped was used
 	private Location location;
 	
+	//rescue destination, may be decided at instantiation or at execution
+    private Location destination;
+	
 	//player data
 	private Player player;
 	
-	public PlayerRescueTask(Player player, Location location)
+	public PlayerRescueTask(Player player, Location location, Location destination)
 	{
 		this.player = player;
-		this.location = location;		
+		this.location = location;
+		this.destination = destination;
 	}
 	
 	@Override
@@ -56,9 +60,16 @@ class PlayerRescueTask implements Runnable
 		}
 		
 		//otherwise find a place to teleport him
-		Location destination = GriefPrevention.instance.ejectPlayer(this.player);
+		if(this.destination == null)
+		{
+		    this.destination = GriefPrevention.instance.ejectPlayer(this.player);
+		}
+		else
+		{
+		    player.teleport(this.destination);
+		}
 		
 		//log entry, in case admins want to investigate the "trap"
-		GriefPrevention.AddLogEntry("Rescued trapped player " + player.getName() + " from " + GriefPrevention.getfriendlyLocationString(this.location) + " to " + GriefPrevention.getfriendlyLocationString(destination) + ".");		
+		GriefPrevention.AddLogEntry("Rescued trapped player " + player.getName() + " from " + GriefPrevention.getfriendlyLocationString(this.location) + " to " + GriefPrevention.getfriendlyLocationString(this.destination) + ".");		
 	}
 }

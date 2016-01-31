@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.UUID;
 
 import me.ryanhamshire.GriefPrevention.events.PreventPvPEvent;
+import me.ryanhamshire.GriefPrevention.events.ProtectDeathDropsEvent;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -442,20 +443,26 @@ public class EntityEventHandler implements Listener
         if((isPvPWorld && GriefPrevention.instance.config_lockDeathDropsInPvpWorlds) || 
            (!isPvPWorld && GriefPrevention.instance.config_lockDeathDropsInNonPvpWorlds))
         {
-            //remember information about these drops so that they can be marked when they spawn as items
-            long expirationTime = System.currentTimeMillis() + 3000;  //now + 3 seconds
-            Location deathLocation = player.getLocation();
-            UUID playerID = player.getUniqueId();
-            List<ItemStack> drops = event.getDrops();
-            for(ItemStack stack : drops)
+            Claim claim = this.dataStore.getClaimAt(player.getLocation(), false, playerData.lastClaim);
+            ProtectDeathDropsEvent protectionEvent = new ProtectDeathDropsEvent(claim);
+            Bukkit.getPluginManager().callEvent(protectionEvent);
+            if(!protectionEvent.isCancelled())
             {
-                GriefPrevention.instance.pendingItemWatchList.add(
-                       new PendingItemProtection(deathLocation, playerID, expirationTime, stack));
+                //remember information about these drops so that they can be marked when they spawn as items
+                long expirationTime = System.currentTimeMillis() + 3000;  //now + 3 seconds
+                Location deathLocation = player.getLocation();
+                UUID playerID = player.getUniqueId();
+                List<ItemStack> drops = event.getDrops();
+                for(ItemStack stack : drops)
+                {
+                    GriefPrevention.instance.pendingItemWatchList.add(
+                           new PendingItemProtection(deathLocation, playerID, expirationTime, stack));
+                }
+                
+                //allow the player to receive a message about how to unlock any drops
+                playerData.dropsAreUnlocked = false;
+                playerData.receivedDropUnlockAdvertisement = false;
             }
-            
-            //allow the player to receive a message about how to unlock any drops
-            playerData.dropsAreUnlocked = false;
-            playerData.receivedDropUnlockAdvertisement = false;
         }
 	}
 	
