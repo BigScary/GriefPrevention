@@ -21,6 +21,10 @@
 import java.util.Calendar;
 import java.util.Vector;
 
+import org.bukkit.Bukkit;
+
+import me.ryanhamshire.GriefPrevention.events.ClaimExpirationEvent;
+
 class CleanupUnusedClaimTask implements Runnable 
 {	
     Claim claim;
@@ -35,7 +39,12 @@ class CleanupUnusedClaimTask implements Runnable
 	@Override
 	public void run()
 	{
-		//determine area of the default chest claim
+		//see if any other plugins don't want this claim deleted
+	    ClaimExpirationEvent event = new ClaimExpirationEvent(this.claim);
+	    Bukkit.getPluginManager().callEvent(event);
+	    if(event.isCancelled()) return;
+	    
+	    //determine area of the default chest claim
 		int areaOfDefaultClaim = 0;
 		if(GriefPrevention.instance.config_claims_automaticClaimsForNewPlayersRadius >= 0)
 		{
