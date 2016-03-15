@@ -64,6 +64,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.MetadataValue;
@@ -1569,6 +1570,9 @@ class PlayerEventHandler implements Listener
 	    Action action = event.getAction();
 	    if(action == Action.LEFT_CLICK_AIR) return;
 	    if(action == Action.PHYSICAL) return;
+	    
+	    //not interested in offhand clicks
+	    if(event.getHand() == EquipmentSlot.OFF_HAND) return;
 	    
 	    Player player = event.getPlayer();
 		Block clickedBlock = event.getClickedBlock(); //null returned here means interacting with air
