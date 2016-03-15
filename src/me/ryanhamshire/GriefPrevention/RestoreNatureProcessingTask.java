@@ -416,7 +416,7 @@ class RestoreNatureProcessingTask implements Runnable
 				
 				if(block.typeId == Material.STONE.getId() || block.typeId == Material.GRAVEL.getId() || block.typeId == Material.SOIL.getId() || block.typeId == Material.DIRT.getId() || block.typeId == Material.SANDSTONE.getId())
 				{
-					if(this.biome == Biome.DESERT || this.biome == Biome.DESERT_HILLS || this.biome == Biome.BEACH)
+					if(this.biome == Biome.DESERT || this.biome == Biome.DESERT_HILLS || this.biome == Biome.BEACHES)
 					{
 						this.snapshots[x][y][z].typeId = Material.SAND.getId();
 					}
@@ -785,7 +785,7 @@ class RestoreNatureProcessingTask implements Runnable
 		}
 		
 		//these are unnatural in sandy biomes, but not elsewhere
-		if(biome == Biome.DESERT || biome == Biome.DESERT_HILLS || biome == Biome.BEACH || environment != Environment.NORMAL)
+		if(biome == Biome.DESERT || biome == Biome.DESERT_HILLS || biome == Biome.BEACHES || environment != Environment.NORMAL)
 		{
 			playerBlocks.add(Material.LEAVES.getId());
 			playerBlocks.add(Material.LEAVES_2.getId());
