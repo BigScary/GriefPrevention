@@ -582,12 +582,15 @@ public abstract class DataStore
         for(Long chunkHash : chunkHashes)
         {
             ArrayList<Claim> claimsInChunk = this.chunksToClaimsMap.get(chunkHash);
-            for(int j = 0; j < claimsInChunk.size(); j++)
+            if(claimsInChunk != null)
             {
-                if(claimsInChunk.get(j).id.equals(claim.id))
+                for(int j = 0; j < claimsInChunk.size(); j++)
                 {
-                    claimsInChunk.remove(j);
-                    break;
+                    if(claimsInChunk.get(j).id.equals(claim.id))
+                    {
+                        claimsInChunk.remove(j);
+                        break;
+                    }
                 }
             }
         }
