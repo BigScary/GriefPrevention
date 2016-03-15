@@ -1989,6 +1989,8 @@ class PlayerEventHandler implements Listener
 			//if it's a golden shovel
 			else if(materialInHand != GriefPrevention.instance.config_claims_modificationTool) return;
 			
+			event.setCancelled(true);  //GriefPrevention exclusively reserves this tool  (e.g. no grass path creation for golden shovel)
+			
 			//disable golden shovel while under siege
 			if(playerData == null) playerData = this.dataStore.getPlayerData(player.getUniqueId());
 			if(playerData.siegeData != null)
