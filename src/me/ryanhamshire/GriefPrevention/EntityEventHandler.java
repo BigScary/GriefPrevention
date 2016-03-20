@@ -725,7 +725,8 @@ public class EntityEventHandler implements Listener
 	        //if the damaged entity is a claimed item frame or armor stand, the damager needs to be a player with container trust in the claim
 		    if(subEvent.getEntityType() == EntityType.ITEM_FRAME
 		       || subEvent.getEntityType() == EntityType.ARMOR_STAND
-		       || subEvent.getEntityType() == EntityType.VILLAGER)
+		       || subEvent.getEntityType() == EntityType.VILLAGER
+		       || subEvent.getEntityType() == EntityType.ENDER_CRYSTAL)
 		    {
 		        //allow for disabling villager protections in the config
 		        if(subEvent.getEntityType() == EntityType.VILLAGER && !GriefPrevention.instance.config_claims_protectCreatures) return;
