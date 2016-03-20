@@ -817,7 +817,13 @@ public class EntityEventHandler implements Listener
 				PlayerData playerData = null;
 				
 				//if not a player or an explosive, allow
-				if(attacker == null && damageSource != null && !(damageSource instanceof Projectile) && damageSource.getType() != EntityType.CREEPER && !(damageSource instanceof Explosive) && !(damageSource instanceof ExplosiveMinecart))
+				if(attacker == null
+				        && damageSource != null
+		                && damageSource.getType() != EntityType.CREEPER
+		                && damageSource.getType() != EntityType.ENDER_CRYSTAL
+		                && !(damageSource instanceof Projectile)
+				        && !(damageSource instanceof Explosive)
+				        && !(damageSource instanceof ExplosiveMinecart))
 				{
 				    return;
 				}
