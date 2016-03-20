@@ -55,6 +55,7 @@ import org.bukkit.command.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.PluginManager;
@@ -3401,5 +3402,11 @@ public class GriefPrevention extends JavaPlugin
                 player.kickPlayer(reason);
             }
         }
+    }
+
+    public ItemStack getItemInHand(Player player, EquipmentSlot hand)
+    {
+        if(hand == EquipmentSlot.OFF_HAND) return player.getInventory().getItemInOffHand();
+        return player.getInventory().getItemInMainHand();
     }
 }

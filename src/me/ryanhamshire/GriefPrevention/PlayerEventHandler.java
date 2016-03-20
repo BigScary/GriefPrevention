@@ -1344,7 +1344,7 @@ class PlayerEventHandler implements Listener
         }
 		
 		//if preventing theft, prevent leashing claimed creatures
-		if(GriefPrevention.instance.config_claims_preventTheft && entity instanceof Creature && player.getItemInHand().getType() == Material.LEASH)
+		if(GriefPrevention.instance.config_claims_preventTheft && entity instanceof Creature && GriefPrevention.instance.getItemInHand(player, event.getHand()).getType() == Material.LEASH)
 		{
 		    Claim claim = this.dataStore.getClaimAt(entity.getLocation(), false, playerData.lastClaim);
             if(claim != null)
@@ -1571,9 +1571,6 @@ class PlayerEventHandler implements Listener
 	    if(action == Action.LEFT_CLICK_AIR) return;
 	    if(action == Action.PHYSICAL) return;
 	    
-	    //not interested in offhand clicks
-	    if(event.getHand() == EquipmentSlot.OFF_HAND) return;
-	    
 	    Player player = event.getPlayer();
 		Block clickedBlock = event.getClickedBlock(); //null returned here means interacting with air
 		
@@ -1786,7 +1783,7 @@ class PlayerEventHandler implements Listener
 			if(action != Action.RIGHT_CLICK_BLOCK && action != Action.RIGHT_CLICK_AIR) return;
 			
 			//what's the player holding?
-			ItemStack itemInHand = player.getItemInHand();
+			ItemStack itemInHand = GriefPrevention.instance.getItemInHand(player, event.getHand());
 			Material materialInHand = itemInHand.getType();		
 			
 			//if it's bonemeal or armor stand or spawn egg, check for build permission (ink sac == bone meal, must be a Bukkit bug?)
