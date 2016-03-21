@@ -822,6 +822,7 @@ public class EntityEventHandler implements Listener
 				        && damageSource != null
 		                && damageSource.getType() != EntityType.CREEPER
 		                && damageSource.getType() != EntityType.ENDER_CRYSTAL
+		                && damageSource.getType() != EntityType.AREA_EFFECT_CLOUD
 		                && !(damageSource instanceof Projectile)
 				        && !(damageSource instanceof Explosive)
 				        && !(damageSource instanceof ExplosiveMinecart))
@@ -1049,6 +1050,7 @@ public class EntityEventHandler implements Listener
 	    for(PotionEffect effect : effects)
 	    {
 	        PotionEffectType effectType = effect.getType();
+
 	        //restrict some potions on claimed animals (griefers could use this to kill or steal animals over fences)
 	        if(effectType.getName().equals("JUMP") || effectType.getName().equals("POISON"))
 	        {
