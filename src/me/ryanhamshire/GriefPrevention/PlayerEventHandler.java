@@ -64,7 +64,6 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
-import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.MetadataValue;
@@ -1139,7 +1138,8 @@ class PlayerEventHandler implements Listener
 		PlayerData playerData = this.dataStore.getPlayerData(player.getUniqueId());
 		
 		//FEATURE: prevent players from using ender pearls to gain access to secured claims
-		if(event.getCause() == TeleportCause.ENDER_PEARL && GriefPrevention.instance.config_claims_enderPearlsRequireAccessTrust)
+		TeleportCause cause = event.getCause();
+		if(cause == TeleportCause.CHORUS_FRUIT || (cause == TeleportCause.ENDER_PEARL && GriefPrevention.instance.config_claims_enderPearlsRequireAccessTrust))
 		{
 			Claim toClaim = this.dataStore.getClaimAt(event.getTo(), false, playerData.lastClaim);
 			if(toClaim != null)
@@ -1150,7 +1150,10 @@ class PlayerEventHandler implements Listener
 				{
 					GriefPrevention.sendMessage(player, TextMode.Err, noAccessReason);
 					event.setCancelled(true);
-					player.getInventory().addItem(new ItemStack(Material.ENDER_PEARL));
+					if(cause == TeleportCause.ENDER_PEARL)
+					    player.getInventory().addItem(new ItemStack(Material.ENDER_PEARL));
+					else
+					    player.getInventory().addItem(new ItemStack(Material.CHORUS_FRUIT));
 				}
 			}
 		}
