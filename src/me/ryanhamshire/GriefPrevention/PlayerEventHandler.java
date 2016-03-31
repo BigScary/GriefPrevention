@@ -162,7 +162,7 @@ class PlayerEventHandler implements Listener
             }
             
             //otherwise assume chat troll and mute all chat from this sender until an admin says otherwise
-            else
+            else if(GriefPrevention.instance.config_trollFilterEnabled)
             {
                 GriefPrevention.AddLogEntry("Auto-muted new player " + player.getName() + " for profanity shortly after join.  Use /SoftMute to undo.", CustomLogEntryTypes.AdminActivity);
                 GriefPrevention.instance.dataStore.toggleSoftMute(player.getUniqueId());
