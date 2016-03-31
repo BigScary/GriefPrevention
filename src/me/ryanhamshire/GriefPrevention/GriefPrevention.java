@@ -177,6 +177,8 @@ public class GriefPrevention extends JavaPlugin
 	
 	public int config_ipLimit;                                      //how many players can share an IP address
 	
+	public boolean config_trollFilterEnabled;                       //whether to auto-mute new players who use banned words right after joining
+	
 	public MaterialCollection config_mods_accessTrustIds;			//list of block IDs which should require /accesstrust for player interaction
 	public MaterialCollection config_mods_containerTrustIds;		//list of block IDs which should require /containertrust for player interaction
 	public List<String> config_mods_ignoreClaimsAccounts;			//list of player names which ALWAYS ignore claims
@@ -580,6 +582,7 @@ public class GriefPrevention extends JavaPlugin
         whisperCommandsToMonitor = config.getString("GriefPrevention.Spam.WhisperSlashCommands", whisperCommandsToMonitor);
         
         this.config_smartBan = config.getBoolean("GriefPrevention.SmartBan", true);
+        this.config_trollFilterEnabled = config.getBoolean("GriefPrevention.Mute New Players Using Banned Words", true);
         this.config_ipLimit = config.getInt("GriefPrevention.MaxPlayersPerIpAddress", 3); 
         
         this.config_endermenMoveBlocks = config.getBoolean("GriefPrevention.EndermenMoveBlocks", false);
@@ -825,6 +828,7 @@ public class GriefPrevention extends JavaPlugin
         outConfig.set("GriefPrevention.AdminsGetSignNotifications", this.config_signNotifications);
         
         outConfig.set("GriefPrevention.SmartBan", this.config_smartBan);
+        outConfig.set("GriefPrevention.Mute New Players Using Banned Words", this.config_trollFilterEnabled);
         outConfig.set("GriefPrevention.MaxPlayersPerIpAddress", this.config_ipLimit);
         
         outConfig.set("GriefPrevention.Siege.Worlds", siegeEnabledWorldNames);
