@@ -958,8 +958,9 @@ public class GriefPrevention extends JavaPlugin
                 return true;
             }
             
-            //default is chest claim radius
+            //default is chest claim radius, unless -1
             int radius = GriefPrevention.instance.config_claims_automaticClaimsForNewPlayersRadius;
+            if(radius < 0) radius = (int)Math.ceil(Math.sqrt(GriefPrevention.instance.config_claims_minArea) / 2);
             
             //if player has any claims, respect claim minimum size setting
             if(playerData.getClaims().size() > 0)
