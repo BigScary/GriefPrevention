@@ -29,6 +29,7 @@ import me.ryanhamshire.GriefPrevention.events.ClaimDeletedEvent;
 import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.AnimalTamer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Tameable;
@@ -630,9 +631,20 @@ public abstract class DataStore
                     if(entity instanceof Tameable)
                     {
                         Tameable pet = (Tameable)entity;
-                        if(pet.isTamed() && pet.getOwner().getUniqueId().equals(claim.ownerID))
+                        if(pet.isTamed())
                         {
-                            pet.setTamed(false);
+                            AnimalTamer owner = pet.getOwner();
+                            if(owner != null)
+                            {
+                                UUID ownerID = owner.getUniqueId();
+                                if(ownerID != null)
+                                {
+                                    if(ownerID.equals(claim.ownerID))
+                                    {
+                                        pet.setTamed(false);
+                                    }
+                                }
+                            }
                         }
                     }
                 }
