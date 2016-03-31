@@ -949,6 +949,15 @@ public class GriefPrevention extends JavaPlugin
             
             PlayerData playerData = this.dataStore.getPlayerData(player.getUniqueId());
             
+            //if he's at the claim count per player limit already and doesn't have permission to bypass, display an error message
+            if(GriefPrevention.instance.config_claims_maxClaimsPerPlayer > 0 &&
+               !player.hasPermission("griefprevention.overrideclaimcountlimit") &&
+               playerData.getClaims().size() >= GriefPrevention.instance.config_claims_maxClaimsPerPlayer)
+            {
+                GriefPrevention.sendMessage(player, TextMode.Err, Messages.ClaimCreationFailedOverClaimCountLimit);
+                return true;
+            }
+            
             //default is chest claim radius
             int radius = GriefPrevention.instance.config_claims_automaticClaimsForNewPlayersRadius;
             
