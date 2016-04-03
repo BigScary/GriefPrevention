@@ -216,7 +216,7 @@ public abstract class DataStore
         }        
     }
 	
-	List<String> loadBannedWords()
+	public List<String> loadBannedWords()
     {
         try
         {
