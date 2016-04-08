@@ -60,6 +60,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockExplodeEvent;
+import org.bukkit.event.block.EntityBlockFormEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.entity.EntityBreakDoorEvent;
@@ -97,7 +98,21 @@ public class EntityEventHandler implements Listener
 		this.dataStore = dataStore;
 	}
 	
-	//don't allow endermen to change blocks
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
+	public void onEntityFormBlock(EntityBlockFormEvent event)
+	{
+	    Entity entity = event.getEntity();
+	    if(entity.getType() == EntityType.PLAYER)
+        {
+            Player player = (Player)event.getEntity();
+            String noBuildReason = GriefPrevention.instance.allowBuild(player, event.getBlock().getLocation(), event.getNewState().getType());
+            if(noBuildReason != null)
+            {
+                event.setCancelled(true);
+            }
+        }
+	}
+	
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
 	public void onEntityChangeBLock(EntityChangeBlockEvent event)
 	{
