@@ -64,6 +64,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.MetadataValue;
@@ -1405,7 +1406,7 @@ class PlayerEventHandler implements Listener
 		if(!GriefPrevention.instance.pvpRulesApply(player.getWorld())) return;
 		
 		//if we're preventing spawn camping and the player was previously empty handed...
-		if(GriefPrevention.instance.config_pvp_protectFreshSpawns && (player.getItemInHand().getType() == Material.AIR))
+		if(GriefPrevention.instance.config_pvp_protectFreshSpawns && (GriefPrevention.instance.getItemInHand(player, EquipmentSlot.HAND).getType() == Material.AIR))
 		{
 			//if that player is currently immune to pvp
 			PlayerData playerData = this.dataStore.getPlayerData(event.getPlayer().getUniqueId());
