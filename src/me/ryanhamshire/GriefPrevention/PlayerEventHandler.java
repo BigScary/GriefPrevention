@@ -1152,8 +1152,6 @@ class PlayerEventHandler implements Listener
 					event.setCancelled(true);
 					if(cause == TeleportCause.ENDER_PEARL)
 					    player.getInventory().addItem(new ItemStack(Material.ENDER_PEARL));
-					else
-					    player.getInventory().addItem(new ItemStack(Material.CHORUS_FRUIT));
 				}
 			}
 		}
