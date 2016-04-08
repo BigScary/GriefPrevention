@@ -241,5 +241,7 @@ public enum Messages
     MinimumRadius,
     RadiusRequiresGoldenShovel,
     ClaimTooSmallForActiveBlocks,
-    TooManyActiveBlocksInClaim	
+    TooManyActiveBlocksInClaim,
+    ConsoleOnlyCommand,
+    WorldNotFound	
 }

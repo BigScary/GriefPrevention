@@ -67,6 +67,10 @@ commands:
       description: Deletes all of another player's claims.
       usage: /DeleteAllClaims <player>
       permission: griefprevention.deleteclaims
+   deleteclaimsinworld:
+      description: Deletes all the claims in a world.  Only usable at the server console.
+      usage: /DeleteClaimsInWorld <world>
+      permission: griefprevention.deleteclaimsinworld
    adminclaims:
       description: Switches the shovel tool to administrative claims mode.
       usage: /AdminClaims
@@ -262,6 +266,9 @@ permissions:
     griefprevention.deleteclaims:
         description: Grants permission to delete other players' claims.
         default: op
+    griefprevention.deleteclaimsinworld:
+        description: Not used.  DeleteClaimsInWorld must be executed at the server console.
+        default: false
     griefprevention.adjustclaimblocks:
         description: Grants permission to add or remove bonus blocks from a player's account.
         default: op

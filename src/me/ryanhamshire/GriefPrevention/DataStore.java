@@ -1605,6 +1605,8 @@ public abstract class DataStore
 		this.addDefault(defaults, Messages.BookUsefulCommands, "Useful Commands:", null);
 		this.addDefault(defaults, Messages.NoProfanity, "Please moderate your language.", null);
 		this.addDefault(defaults, Messages.IsIgnoringYou, "That player is ignoring you.", null);
+		this.addDefault(defaults, Messages.ConsoleOnlyCommand, "That command may only be executed from the server console.", null);
+		this.addDefault(defaults, Messages.WorldNotFound, "World not found.", null);
 		
 		//load the config file
 		FileConfiguration config = YamlConfiguration.loadConfiguration(new File(messagesFilePath));
@@ -1763,5 +1765,19 @@ public abstract class DataStore
         }
         
         return claims;
+    }
+    
+	//deletes all the land claims in a specified world
+	void deleteClaimsInWorld(World world)
+	{
+	    for(int i = 0; i < claims.size(); i++)
+	    {
+	        Claim claim = claims.get(i);
+	        if(claim.getLesserBoundaryCorner().getWorld().equals(world))
+	        {
+	            this.deleteClaim(claim, false, false);
+	            i--;
+	        }
+	    }
     }
 }
