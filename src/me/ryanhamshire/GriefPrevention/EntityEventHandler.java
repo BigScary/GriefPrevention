@@ -650,6 +650,40 @@ public class EntityEventHandler implements Listener
     				attacker = (Player)arrow.getShooter();
     			}
     		}
+    		
+    		//protect players from lingering potion damage when protected from pvp
+            if(damageSource.getType() == EntityType.AREA_EFFECT_CLOUD && event.getEntityType() == EntityType.PLAYER && GriefPrevention.instance.pvpRulesApply(event.getEntity().getWorld()))
+            {
+                Player damaged = (Player)event.getEntity();
+                PlayerData damagedData = GriefPrevention.instance.dataStore.getPlayerData(damaged.getUniqueId());
+                
+                //case 1: recently spawned
+                if(GriefPrevention.instance.config_pvp_protectFreshSpawns && damagedData.pvpImmune)
+                {
+                    event.setCancelled(true);
+                    return;
+                }
+                
+                //case 2: in a pvp safe zone
+                else
+                {
+                    Claim damagedClaim = GriefPrevention.instance.dataStore.getClaimAt(damaged.getLocation(), false, damagedData.lastClaim);
+                    if(damagedClaim != null)
+                    {
+                        damagedData.lastClaim = damagedClaim;
+                        if(GriefPrevention.instance.claimIsPvPSafeZone(damagedClaim))
+                        {
+                            PreventPvPEvent pvpEvent = new PreventPvPEvent(damagedClaim);
+                            Bukkit.getPluginManager().callEvent(pvpEvent);
+                            if(!pvpEvent.isCancelled())
+                            {
+                                event.setCancelled(true);
+                                return;
+                            }
+                        }
+                    }
+                }
+            }
 		}
 		
 		//if the attacker is a player and defender is a player (pvp combat)
@@ -690,9 +724,7 @@ public class EntityEventHandler implements Listener
     				{
     				    if(	attackerClaim != null && //ignore claims mode allows for pvp inside land claims
     				        !attackerData.inPvpCombat() &&
-        					(attackerClaim.isAdminClaim() && attackerClaim.parent == null && GriefPrevention.instance.config_pvp_noCombatInAdminLandClaims ||
-        					 attackerClaim.isAdminClaim() && attackerClaim.parent != null && GriefPrevention.instance.config_pvp_noCombatInAdminSubdivisions ||
-        					!attackerClaim.isAdminClaim() && GriefPrevention.instance.config_pvp_noCombatInPlayerLandClaims))
+        					GriefPrevention.instance.claimIsPvPSafeZone(attackerClaim))
         				{
         					attackerData.lastClaim = attackerClaim;
         					PreventPvPEvent pvpEvent = new PreventPvPEvent(attackerClaim);
@@ -708,9 +740,7 @@ public class EntityEventHandler implements Listener
         				Claim defenderClaim = this.dataStore.getClaimAt(defender.getLocation(), false, defenderData.lastClaim);
         				if( defenderClaim != null &&
         				    !defenderData.inPvpCombat() &&
-        				    (defenderClaim.isAdminClaim() && defenderClaim.parent == null && GriefPrevention.instance.config_pvp_noCombatInAdminLandClaims ||
-        		             defenderClaim.isAdminClaim() && defenderClaim.parent != null && GriefPrevention.instance.config_pvp_noCombatInAdminSubdivisions ||
-        					!defenderClaim.isAdminClaim() && GriefPrevention.instance.config_pvp_noCombatInPlayerLandClaims))
+        				    GriefPrevention.instance.claimIsPvPSafeZone(defenderClaim))
         				{
         					defenderData.lastClaim = defenderClaim;
         					PreventPvPEvent pvpEvent = new PreventPvPEvent(defenderClaim);
@@ -1108,10 +1138,7 @@ public class EntityEventHandler implements Listener
 	                PlayerData defenderData = this.dataStore.getPlayerData(effectedPlayer.getUniqueId());
 	                PlayerData attackerData = this.dataStore.getPlayerData(thrower.getUniqueId());
 	                Claim attackerClaim = this.dataStore.getClaimAt(thrower.getLocation(), false, attackerData.lastClaim);
-	                if( attackerClaim != null && 
-	                    (attackerClaim.isAdminClaim() && attackerClaim.parent == null && GriefPrevention.instance.config_pvp_noCombatInAdminLandClaims ||
-	                     attackerClaim.isAdminClaim() && attackerClaim.parent != null && GriefPrevention.instance.config_pvp_noCombatInAdminSubdivisions ||
-	                    !attackerClaim.isAdminClaim() && GriefPrevention.instance.config_pvp_noCombatInPlayerLandClaims))
+	                if(attackerClaim != null && GriefPrevention.instance.claimIsPvPSafeZone(attackerClaim))
 	                {
 	                    attackerData.lastClaim = attackerClaim;
 	                    PreventPvPEvent pvpEvent = new PreventPvPEvent(attackerClaim);
@@ -1125,10 +1152,7 @@ public class EntityEventHandler implements Listener
 	                }
 	                
 	                Claim defenderClaim = this.dataStore.getClaimAt(effectedPlayer.getLocation(), false, defenderData.lastClaim);
-	                if( defenderClaim != null &&
-	                    (defenderClaim.isAdminClaim() && defenderClaim.parent == null && GriefPrevention.instance.config_pvp_noCombatInAdminLandClaims ||
-	                     defenderClaim.isAdminClaim() && defenderClaim.parent != null && GriefPrevention.instance.config_pvp_noCombatInAdminSubdivisions ||
-	                    !defenderClaim.isAdminClaim() && GriefPrevention.instance.config_pvp_noCombatInPlayerLandClaims))
+	                if(defenderClaim != null && GriefPrevention.instance.claimIsPvPSafeZone(defenderClaim))
 	                {
 	                    defenderData.lastClaim = defenderClaim;
 	                    PreventPvPEvent pvpEvent = new PreventPvPEvent(defenderClaim);
