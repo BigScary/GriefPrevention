@@ -233,6 +233,7 @@ permissions:
             griefprevention.notignorable: true
             griefprevention.seeinactivity: true
             griefprevention.eavesdropimmune: true
+            griefprevention.deleteclaimsinworld: true
     griefprevention.siegeimmune:
         description: Makes a player immune to /Siege.
         default: op
@@ -268,7 +269,7 @@ permissions:
         default: op
     griefprevention.deleteclaimsinworld:
         description: Not used.  DeleteClaimsInWorld must be executed at the server console.
-        default: false
+        default: op
     griefprevention.adjustclaimblocks:
         description: Grants permission to add or remove bonus blocks from a player's account.
         default: op
