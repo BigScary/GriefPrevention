@@ -55,6 +55,7 @@ import org.bukkit.entity.Tameable;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.entity.Villager;
 import org.bukkit.entity.WaterMob;
+import org.bukkit.entity.Zombie;
 import org.bukkit.entity.minecart.ExplosiveMinecart;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -794,7 +795,7 @@ public class EntityEventHandler implements Listener
                     if(attacker == null)
                     {
                         //exception case
-                        if(event.getEntity() instanceof Villager && damageSource != null && damageSource instanceof Monster)
+                        if(event.getEntity() instanceof Villager && damageSource != null && damageSource instanceof Zombie)
                         {
                             return;
                         }
@@ -891,7 +892,7 @@ public class EntityEventHandler implements Listener
 					if(attacker == null)
 					{
 						//exception case
-						if(event.getEntity() instanceof Villager && damageSource != null && damageSource instanceof Monster)
+						if(event.getEntity() instanceof Villager && damageSource != null && damageSource instanceof Zombie)
 						{
 							return;
 						}
