@@ -3181,7 +3181,9 @@ public class GriefPrevention extends JavaPlugin
 	
 	public String allowBuild(Player player, Location location, Material material)
 	{
-		PlayerData playerData = this.dataStore.getPlayerData(player.getUniqueId());
+	    if(!GriefPrevention.instance.claimsEnabledForWorld(location.getWorld())) return null;
+	    
+	    PlayerData playerData = this.dataStore.getPlayerData(player.getUniqueId());
 		Claim claim = this.dataStore.getClaimAt(location, false, playerData.lastClaim);
 		
 		//exception: administrators in ignore claims mode and special player accounts created by server mods
@@ -3226,7 +3228,9 @@ public class GriefPrevention extends JavaPlugin
 	
 	public String allowBreak(Player player, Block block, Location location)
 	{
-		PlayerData playerData = this.dataStore.getPlayerData(player.getUniqueId());
+		if(!GriefPrevention.instance.claimsEnabledForWorld(location.getWorld())) return null;
+	    
+	    PlayerData playerData = this.dataStore.getPlayerData(player.getUniqueId());
 		Claim claim = this.dataStore.getClaimAt(location, false, playerData.lastClaim);
 		
 		//exception: administrators in ignore claims mode, and special player accounts created by server mods
