@@ -1590,33 +1590,30 @@ class PlayerEventHandler implements Listener
         PlayerData playerData = null;
         if(action == Action.LEFT_CLICK_BLOCK && clickedBlock != null)
         {
+            Block adjacentBlock = clickedBlock.getRelative(event.getBlockFace());
+            byte lightLevel = adjacentBlock.getLightFromBlocks();
+            if(lightLevel == 15 && adjacentBlock.getType() == Material.FIRE)
+            {
+                if(playerData == null) playerData = this.dataStore.getPlayerData(player.getUniqueId());
+                Claim claim = this.dataStore.getClaimAt(clickedBlock.getLocation(), false, playerData.lastClaim);
+                if(claim != null)
+                {
+                    playerData.lastClaim = claim;
+                    
+                    String noBuildReason = claim.allowBuild(player, Material.AIR);
+                    if(noBuildReason != null)
+                    {
+                        event.setCancelled(true);
+                        GriefPrevention.sendMessage(player, TextMode.Err, noBuildReason);
+                        player.sendBlockChange(adjacentBlock.getLocation(), adjacentBlock.getTypeId(), adjacentBlock.getData());
+                        return;
+                    }
+                }
+            }
+            
             //exception for blocks on a specific watch list
             if(!this.onLeftClickWatchList(clickedBlockType) && !GriefPrevention.instance.config_mods_accessTrustIds.Contains(new MaterialInfo(clickedBlock.getTypeId(), clickedBlock.getData(), null)))
             {
-                //and an exception for putting our fires
-                if(GriefPrevention.instance.config_claims_protectFires && event.getClickedBlock() != null)
-                {
-                    Block adjacentBlock = event.getClickedBlock().getRelative(event.getBlockFace());
-                    if(adjacentBlock.getType() == Material.FIRE)
-                    {
-                        if(playerData == null) playerData = this.dataStore.getPlayerData(player.getUniqueId());
-                        Claim claim = this.dataStore.getClaimAt(clickedBlock.getLocation(), false, playerData.lastClaim);
-                        if(claim != null)
-                        {
-                            playerData.lastClaim = claim;
-                            
-                            String noBuildReason = claim.allowBuild(player, Material.AIR);
-                            if(noBuildReason != null)
-                            {
-                                event.setCancelled(true);
-                                GriefPrevention.sendMessage(player, TextMode.Err, noBuildReason);
-                                player.sendBlockChange(adjacentBlock.getLocation(), adjacentBlock.getTypeId(), adjacentBlock.getData());
-                                return;
-                            }
-                        }
-                    }
-                }
-                
                 return;
             }
         }
