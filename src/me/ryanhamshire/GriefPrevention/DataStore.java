@@ -33,6 +33,7 @@ import org.bukkit.entity.AnimalTamer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Tameable;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
 import com.google.common.io.Files;
@@ -642,6 +643,12 @@ public abstract class DataStore
                                     if(ownerID.equals(claim.ownerID))
                                     {
                                         pet.setTamed(false);
+                                        pet.setOwner(null);
+                                        if(pet instanceof InventoryHolder)
+                                        {
+                                            InventoryHolder holder = (InventoryHolder)pet;
+                                            holder.getInventory().clear();
+                                        }
                                     }
                                 }
                             }
