@@ -19,6 +19,7 @@
  package me.ryanhamshire.GriefPrevention;
 
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 
 //asynchronously loads player data without caching it in the datastore, then
 //passes those data to a claim cleanup task which might decide to delete a claim for inactivity
@@ -37,6 +38,7 @@ class CleanupUnusedClaimPreTask implements Runnable
 	{
 		//get the data
 	    PlayerData ownerData = GriefPrevention.instance.dataStore.getPlayerDataFromStorage(claim.ownerID);
+	    OfflinePlayer ownerInfo = Bukkit.getServer().getOfflinePlayer(claim.ownerID);
 	    
 	    GriefPrevention.AddLogEntry("Looking for expired claims.  Checking data for " + claim.ownerID.toString(), CustomLogEntryTypes.Debug, true);
 	    
@@ -49,6 +51,6 @@ class CleanupUnusedClaimPreTask implements Runnable
         }
 		
 	    //pass it back to the main server thread, where it's safe to delete a claim if needed
-	    Bukkit.getScheduler().scheduleSyncDelayedTask(GriefPrevention.instance, new CleanupUnusedClaimTask(claim, ownerData), 1L);
+	    Bukkit.getScheduler().scheduleSyncDelayedTask(GriefPrevention.instance, new CleanupUnusedClaimTask(claim, ownerData, ownerInfo), 1L);
 	}
 }
