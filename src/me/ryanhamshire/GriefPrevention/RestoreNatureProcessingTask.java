@@ -764,7 +764,12 @@ class RestoreNatureProcessingTask implements Runnable
         playerBlocks.add(Material.COAL_BLOCK.getId());
         playerBlocks.add(Material.REDSTONE_LAMP_OFF.getId());
         playerBlocks.add(Material.REDSTONE_LAMP_ON.getId());
-		
+        playerBlocks.add(Material.PURPUR_BLOCK.getId());
+        playerBlocks.add(Material.PURPUR_SLAB.getId());
+        playerBlocks.add(Material.PURPUR_DOUBLE_SLAB.getId());
+        playerBlocks.add(Material.PURPUR_PILLAR.getId());
+        playerBlocks.add(Material.PURPUR_STAIRS.getId());
+        
 		//these are unnatural in the standard world, but not in the nether
 		if(environment != Environment.NETHER)
 		{
@@ -782,6 +787,8 @@ class RestoreNatureProcessingTask implements Runnable
 			playerBlocks.add(Material.OBSIDIAN.getId());
 			playerBlocks.add(Material.ENDER_STONE.getId());
 			playerBlocks.add(Material.ENDER_PORTAL_FRAME.getId());
+			playerBlocks.add(Material.CHORUS_PLANT.getId());
+			playerBlocks.add(Material.CHORUS_FLOWER.getId());
 		}
 		
 		//these are unnatural in sandy biomes, but not elsewhere
