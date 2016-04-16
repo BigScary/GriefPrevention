@@ -1210,37 +1210,50 @@ class PlayerEventHandler implements Listener
         if(entity instanceof Tameable)
         {
             Tameable tameable = (Tameable)entity;
-            if(tameable.isTamed() && tameable.getOwner() != null)
+            if(tameable.isTamed())
             {
-               UUID ownerID = tameable.getOwner().getUniqueId();
-               
-               //if the player interacting is the owner or an admin in ignore claims mode, always allow
-               if(player.getUniqueId().equals(ownerID) || playerData.ignoreClaims)
-               {
-                   //if giving away pet, do that instead
-                   if(playerData.petGiveawayRecipient != null)
-                   {
-                       tameable.setOwner(playerData.petGiveawayRecipient);
-                       playerData.petGiveawayRecipient = null;
-                       GriefPrevention.sendMessage(player, TextMode.Success, Messages.PetGiveawayConfirmation);
-                       event.setCancelled(true);
-                   }
+                if(tameable.getOwner() != null)
+                {
+                   UUID ownerID = tameable.getOwner().getUniqueId();
                    
-                   return;
-               }
-               if(!GriefPrevention.instance.pvpRulesApply(entity.getLocation().getWorld()) || GriefPrevention.instance.config_pvp_protectPets)
-               {
-                   //otherwise disallow
-                   OfflinePlayer owner = GriefPrevention.instance.getServer().getOfflinePlayer(ownerID); 
-                   String ownerName = owner.getName();
-                   if(ownerName == null) ownerName = "someone";
-                   String message = GriefPrevention.instance.dataStore.getMessage(Messages.NotYourPet, ownerName);
-                   if(player.hasPermission("griefprevention.ignoreclaims"))
-                       message += "  " + GriefPrevention.instance.dataStore.getMessage(Messages.IgnoreClaimsAdvertisement);
-                   GriefPrevention.sendMessage(player, TextMode.Err, message);
-                   event.setCancelled(true);
-                   return;
-               }
+                   //if the player interacting is the owner or an admin in ignore claims mode, always allow
+                   if(player.getUniqueId().equals(ownerID) || playerData.ignoreClaims)
+                   {
+                       //if giving away pet, do that instead
+                       if(playerData.petGiveawayRecipient != null)
+                       {
+                           tameable.setOwner(playerData.petGiveawayRecipient);
+                           playerData.petGiveawayRecipient = null;
+                           GriefPrevention.sendMessage(player, TextMode.Success, Messages.PetGiveawayConfirmation);
+                           event.setCancelled(true);
+                       }
+                       
+                       return;
+                   }
+                   if(!GriefPrevention.instance.pvpRulesApply(entity.getLocation().getWorld()) || GriefPrevention.instance.config_pvp_protectPets)
+                   {
+                       //otherwise disallow
+                       OfflinePlayer owner = GriefPrevention.instance.getServer().getOfflinePlayer(ownerID); 
+                       String ownerName = owner.getName();
+                       if(ownerName == null) ownerName = "someone";
+                       String message = GriefPrevention.instance.dataStore.getMessage(Messages.NotYourPet, ownerName);
+                       if(player.hasPermission("griefprevention.ignoreclaims"))
+                           message += "  " + GriefPrevention.instance.dataStore.getMessage(Messages.IgnoreClaimsAdvertisement);
+                       GriefPrevention.sendMessage(player, TextMode.Err, message);
+                       event.setCancelled(true);
+                       return;
+                   }
+                }
+            }
+            else  //world repair code for a now-fixed GP bug
+            {
+                //ensure this entity can be tamed by players
+                tameable.setOwner(null);
+                if(tameable instanceof InventoryHolder)
+                {
+                    InventoryHolder holder = (InventoryHolder)tameable;
+                    holder.getInventory().clear();
+                }
             }
         }
         
