@@ -2538,7 +2538,8 @@ class PlayerEventHandler implements Listener
 	        if(type != Material.AIR && 
 	           (!passThroughWater || type != Material.STATIONARY_WATER) &&
 	           (!passThroughWater || type != Material.WATER) &&
-	           type != Material.LONG_GRASS) return result;
+	           type != Material.LONG_GRASS &&
+               type != Material.SNOW) return result;
 	    }
 	    
 	    return result;
