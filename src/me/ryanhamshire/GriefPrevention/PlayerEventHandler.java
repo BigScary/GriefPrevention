@@ -1324,18 +1324,6 @@ class PlayerEventHandler implements Listener
 						return;
 					}
 				}
-				
-				//for boats, apply access rules
-				else if(entity instanceof Boat)
-				{
-					String noAccessReason = claim.allowAccess(player);
-					if(noAccessReason != null)
-					{
-						player.sendMessage(noAccessReason);
-						event.setCancelled(true);
-						return;
-					}
-				}
 			}
 		}
 		
