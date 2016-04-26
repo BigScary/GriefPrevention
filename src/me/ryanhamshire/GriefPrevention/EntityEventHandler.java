@@ -592,19 +592,28 @@ public class EntityEventHandler implements Listener
 		}
 	}
 	
+	private boolean isMonster(Entity entity)
+    {
+        if(entity instanceof Monster) return true;
+        
+        EntityType type = entity.getType();
+        if(type == EntityType.GHAST || type == EntityType.MAGMA_CUBE || type == EntityType.SHULKER) return true;
+        
+        if(type == EntityType.RABBIT)
+        {
+            Rabbit rabbit = (Rabbit)entity;
+            if(rabbit.getRabbitType() == Rabbit.Type.THE_KILLER_BUNNY) return true;
+        }
+        
+        return false;
+    }
+	
 	//when an entity is damaged
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
 	public void onEntityDamage (EntityDamageEvent event)
 	{
 		//monsters are never protected
-		if(event.getEntity() instanceof Monster) return;
-		
-		//nor are killer bunnies
-		if(event.getEntity() instanceof Rabbit)
-		{
-			Rabbit rabbit = (Rabbit)event.getEntity();
-			if(rabbit.getRabbitType() == Rabbit.Type.THE_KILLER_BUNNY) return;
-		}
+		if(isMonster(event.getEntity())) return;
 		
 		//horse protections can be disabled
 		if(event.getEntity() instanceof Horse && !GriefPrevention.instance.config_claims_protectHorses) return;
