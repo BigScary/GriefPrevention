@@ -1798,7 +1798,13 @@ class PlayerEventHandler implements Listener
 				return;
 			}
 			
-			else if(clickedBlock != null && materialInHand == Material.BOAT)
+			else if(clickedBlock != null && (
+			        materialInHand == Material.BOAT || 
+			        materialInHand == Material.BOAT_ACACIA || 
+			        materialInHand == Material.BOAT_BIRCH || 
+			        materialInHand == Material.BOAT_DARK_OAK || 
+			        materialInHand == Material.BOAT_JUNGLE ||
+			        materialInHand == Material.BOAT_SPRUCE))
 			{
 			    if(playerData == null) playerData = this.dataStore.getPlayerData(player.getUniqueId());
 			    Claim claim = this.dataStore.getClaimAt(clickedBlock.getLocation(), false, playerData.lastClaim);
@@ -1836,7 +1842,7 @@ class PlayerEventHandler implements Listener
             }
 			
 			//if it's a spawn egg, minecart, or boat, and this is a creative world, apply special rules
-			else if(clickedBlock != null && (materialInHand == Material.MINECART || materialInHand == Material.POWERED_MINECART || materialInHand == Material.STORAGE_MINECART || materialInHand == Material.BOAT || materialInHand == Material.ARMOR_STAND || materialInHand == Material.ITEM_FRAME || materialInHand == Material.MONSTER_EGG || materialInHand == Material.MONSTER_EGGS || materialInHand == Material.EXPLOSIVE_MINECART || materialInHand == Material.HOPPER_MINECART) && GriefPrevention.instance.creativeRulesApply(clickedBlock.getLocation()))
+			else if(clickedBlock != null && (materialInHand == Material.MINECART || materialInHand == Material.POWERED_MINECART || materialInHand == Material.STORAGE_MINECART || materialInHand == Material.ARMOR_STAND || materialInHand == Material.ITEM_FRAME || materialInHand == Material.MONSTER_EGG || materialInHand == Material.MONSTER_EGGS || materialInHand == Material.EXPLOSIVE_MINECART || materialInHand == Material.HOPPER_MINECART) && GriefPrevention.instance.creativeRulesApply(clickedBlock.getLocation()))
 			{
 				//player needs build permission at this location
 				String noBuildReason = GriefPrevention.instance.allowBuild(player, clickedBlock.getLocation(), Material.MINECART);
