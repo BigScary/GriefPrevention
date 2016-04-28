@@ -1591,7 +1591,12 @@ class PlayerEventHandler implements Listener
         if(action == Action.LEFT_CLICK_BLOCK && clickedBlock != null)
         {
             Block adjacentBlock = clickedBlock.getRelative(event.getBlockFace());
-            byte lightLevel = adjacentBlock.getLightFromBlocks();
+            byte lightLevel = 15;
+            try
+            {
+                lightLevel = adjacentBlock.getLightFromBlocks();
+            }
+            catch(ArrayIndexOutOfBoundsException e){ }  //assume default value of 15 to work around a craftbukkit bug
             if(lightLevel == 15 && adjacentBlock.getType() == Material.FIRE)
             {
                 if(playerData == null) playerData = this.dataStore.getPlayerData(player.getUniqueId());
