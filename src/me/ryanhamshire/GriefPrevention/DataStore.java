@@ -957,7 +957,7 @@ public abstract class DataStore
 	
 	//ends a siege
 	//either winnerName or loserName can be null, but not both
-	synchronized public void endSiege(SiegeData siegeData, String winnerName, String loserName, boolean death)
+	synchronized public void endSiege(SiegeData siegeData, String winnerName, String loserName, List<ItemStack> drops)
 	{
 		boolean grantAccess = false;
 		
@@ -1043,7 +1043,7 @@ public abstract class DataStore
 		}
 		
 		//if the siege ended due to death, transfer inventory to winner
-		if(death)
+		if(drops != null)
 		{
 			@SuppressWarnings("deprecation")
             Player winner = GriefPrevention.instance.getServer().getPlayer(winnerName);
@@ -1051,16 +1051,12 @@ public abstract class DataStore
             Player loser = GriefPrevention.instance.getServer().getPlayer(loserName);
 			if(winner != null && loser != null)
 			{
-				//get loser's inventory, then clear it
-				ItemStack [] loserItems = loser.getInventory().getContents();
-				loser.getInventory().clear();
-				
-				//try to add it to the winner's inventory
-				for(int j = 0; j < loserItems.length; j++)
+				//try to add any drops to the winner's inventory
+				for(ItemStack stack : drops)
 				{
-					if(loserItems[j] == null || loserItems[j].getType() == Material.AIR || loserItems[j].getAmount() == 0) continue;
+					if(stack == null || stack.getType() == Material.AIR || stack.getAmount() == 0) continue;
 					
-					HashMap<Integer, ItemStack> wontFitItems = winner.getInventory().addItem(loserItems[j]);
+					HashMap<Integer, ItemStack> wontFitItems = winner.getInventory().addItem(stack);
 					
 					//drop any remainder on the ground at his feet
 					Object [] keys = wontFitItems.keySet().toArray();
