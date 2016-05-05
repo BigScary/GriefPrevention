@@ -1590,28 +1590,26 @@ class PlayerEventHandler implements Listener
         PlayerData playerData = null;
         if(action == Action.LEFT_CLICK_BLOCK && clickedBlock != null)
         {
-            Block adjacentBlock = clickedBlock.getRelative(event.getBlockFace());
-            byte lightLevel = 15;
-            try
+            if(clickedBlock.getY() < clickedBlock.getWorld().getMaxHeight() - 1 || event.getBlockFace() != BlockFace.UP)
             {
-                lightLevel = adjacentBlock.getLightFromBlocks();
-            }
-            catch(ArrayIndexOutOfBoundsException e){ }  //assume default value of 15 to work around a craftbukkit bug
-            if(lightLevel == 15 && adjacentBlock.getType() == Material.FIRE)
-            {
-                if(playerData == null) playerData = this.dataStore.getPlayerData(player.getUniqueId());
-                Claim claim = this.dataStore.getClaimAt(clickedBlock.getLocation(), false, playerData.lastClaim);
-                if(claim != null)
+                Block adjacentBlock = clickedBlock.getRelative(event.getBlockFace());
+                byte lightLevel = adjacentBlock.getLightFromBlocks();
+                if(lightLevel == 15 && adjacentBlock.getType() == Material.FIRE)
                 {
-                    playerData.lastClaim = claim;
-                    
-                    String noBuildReason = claim.allowBuild(player, Material.AIR);
-                    if(noBuildReason != null)
+                    if(playerData == null) playerData = this.dataStore.getPlayerData(player.getUniqueId());
+                    Claim claim = this.dataStore.getClaimAt(clickedBlock.getLocation(), false, playerData.lastClaim);
+                    if(claim != null)
                     {
-                        event.setCancelled(true);
-                        GriefPrevention.sendMessage(player, TextMode.Err, noBuildReason);
-                        player.sendBlockChange(adjacentBlock.getLocation(), adjacentBlock.getTypeId(), adjacentBlock.getData());
-                        return;
+                        playerData.lastClaim = claim;
+                        
+                        String noBuildReason = claim.allowBuild(player, Material.AIR);
+                        if(noBuildReason != null)
+                        {
+                            event.setCancelled(true);
+                            GriefPrevention.sendMessage(player, TextMode.Err, noBuildReason);
+                            player.sendBlockChange(adjacentBlock.getLocation(), adjacentBlock.getTypeId(), adjacentBlock.getData());
+                            return;
+                        }
                     }
                 }
             }
