@@ -1785,7 +1785,8 @@ class PlayerEventHandler implements Listener
 			if(action != Action.RIGHT_CLICK_BLOCK && action != Action.RIGHT_CLICK_AIR) return;
 			
 			//what's the player holding?
-			ItemStack itemInHand = GriefPrevention.instance.getItemInHand(player, event.getHand());
+			EquipmentSlot hand = event.getHand();
+			ItemStack itemInHand = GriefPrevention.instance.getItemInHand(player, hand);
 			Material materialInHand = itemInHand.getType();		
 			
 			//if it's bonemeal or armor stand or spawn egg, check for build permission (ink sac == bone meal, must be a Bukkit bug?)
@@ -1873,7 +1874,7 @@ class PlayerEventHandler implements Listener
 			}
 			
 			//if he's investigating a claim
-			else if(materialInHand == GriefPrevention.instance.config_claims_investigationTool)
+			else if(materialInHand == GriefPrevention.instance.config_claims_investigationTool &&  hand == EquipmentSlot.HAND)
 			{
 		        //if claims are disabled in this world, do nothing
 			    if(!GriefPrevention.instance.claimsEnabledForWorld(player.getWorld())) return;
@@ -1992,7 +1993,7 @@ class PlayerEventHandler implements Listener
             }
 			
 			//if it's a golden shovel
-			else if(materialInHand != GriefPrevention.instance.config_claims_modificationTool) return;
+			else if(materialInHand != GriefPrevention.instance.config_claims_modificationTool || hand != EquipmentSlot.HAND) return;
 			
 			event.setCancelled(true);  //GriefPrevention exclusively reserves this tool  (e.g. no grass path creation for golden shovel)
 			
