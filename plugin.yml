@@ -72,6 +72,11 @@ commands:
       usage: /DeleteClaimsInWorld <world>
       aliases: [deleteallclaimsinworld, clearclaimsinworld, clearallclaimsinworld]
       permission: griefprevention.deleteclaimsinworld
+   deleteuserclaimsinworld:
+      description: Deletes all the non-admin claims in a world.  Only usable at the server console.
+      usage: /DeleteUserClaimsInWorld <world>
+      aliases: [deletealluserclaimsinworld, clearuserclaimsinworld, clearalluserclaimsinworld]
+      permission: griefprevention.deleteclaimsinworld
    adminclaims:
       description: Switches the shovel tool to administrative claims mode.
       usage: /AdminClaims

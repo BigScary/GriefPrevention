@@ -1771,13 +1771,14 @@ public abstract class DataStore
     }
     
 	//deletes all the land claims in a specified world
-	void deleteClaimsInWorld(World world)
+	void deleteClaimsInWorld(World world, boolean deleteAdminClaims)
 	{
 	    for(int i = 0; i < claims.size(); i++)
 	    {
 	        Claim claim = claims.get(i);
 	        if(claim.getLesserBoundaryCorner().getWorld().equals(world))
 	        {
+	            if(!deleteAdminClaims && claim.isAdminClaim()) continue;
 	            this.deleteClaim(claim, false, false);
 	            i--;
 	        }
