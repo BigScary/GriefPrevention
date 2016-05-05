@@ -893,6 +893,17 @@ class PlayerEventHandler implements Listener
         
         //create a thread to load ignore information
         new IgnoreLoaderThread(playerID, playerData.ignoredPlayers).start();
+        
+        //is he possibly stuck in a portal frame?
+        Location returnLocation = PlayerEventHandler.portalReturnMap.get(player.getUniqueId());
+        if(returnLocation != null)
+        {
+            PlayerEventHandler.portalReturnMap.remove(player.getUniqueId());
+            if(player.getLocation().getBlock().getType() == Material.PORTAL)
+            {
+                player.teleport(returnLocation);
+            }
+        }
 	}
 	
 	//when a player spawns, conditionally apply temporary pvp protection 
@@ -1075,6 +1086,9 @@ class PlayerEventHandler implements Listener
 		}
 	}
 	
+	//remember where players teleport from (via portals) in case they're trapped at the destination
+	static ConcurrentHashMap<UUID, Location> portalReturnMap = new ConcurrentHashMap<UUID, Location>();
+	
 	//when a player teleports via a portal
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
 	void onPlayerPortal(PlayerPortalEvent event) 
@@ -1092,6 +1106,7 @@ class PlayerEventHandler implements Listener
             //FEATURE: when players get trapped in a nether portal, send them back through to the other side
             CheckForPortalTrapTask task = new CheckForPortalTrapTask(player, event.getFrom());
             GriefPrevention.instance.getServer().getScheduler().scheduleSyncDelayedTask(GriefPrevention.instance, task, 200L);
+            portalReturnMap.put(player.getUniqueId(), event.getFrom());
         
             //FEATURE: if the player teleporting doesn't have permission to build a nether portal and none already exists at the destination, cancel the teleportation
             if(GriefPrevention.instance.config_claims_portalsRequirePermission)
@@ -1102,6 +1117,7 @@ class PlayerEventHandler implements Listener
                     if(event.getPortalTravelAgent().getCanCreatePortal())
                     {
                         //hypothetically find where the portal would be created if it were
+                        //this is VERY expensive for the cpu, so this feature is off by default
                         TravelAgent agent = event.getPortalTravelAgent();
                         agent.setCanCreatePortal(false);
                         destination = agent.findOrCreate(destination);
