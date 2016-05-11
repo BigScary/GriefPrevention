@@ -284,13 +284,25 @@ public class Visualization
 	private static boolean isTransparent(Block block, boolean waterIsTransparent)
 	{
 		return (	block.getType() != Material.SNOW && (
-		            block.getType() == Material.AIR ||
-					block.getType() == Material.FENCE ||
-					block.getType() == Material.SIGN ||
-					block.getType() == Material.SIGN_POST ||
-					block.getType() == Material.WALL_SIGN ||
-					(waterIsTransparent && block.getType() == Material.STATIONARY_WATER) || 
-					block.getType().isTransparent()));
+				block.getType() == Material.AIR ||
+				block.getType() == Material.FENCE ||
+				block.getType() == Material.ACACIA_FENCE ||
+				block.getType() == Material.BIRCH_FENCE ||
+				block.getType() == Material.DARK_OAK_FENCE ||
+				block.getType() == Material.JUNGLE_FENCE ||
+				block.getType() == Material.NETHER_FENCE ||
+				block.getType() == Material.SPRUCE_FENCE ||
+				block.getType() == Material.FENCE_GATE ||
+				block.getType() == Material.ACACIA_FENCE_GATE ||
+				block.getType() == Material.BIRCH_FENCE_GATE ||
+				block.getType() == Material.DARK_OAK_FENCE_GATE ||
+				block.getType() == Material.SPRUCE_FENCE_GATE ||
+				block.getType() == Material.JUNGLE_FENCE_GATE ||
+				block.getType() == Material.SIGN ||
+				block.getType() == Material.SIGN_POST ||
+				block.getType() == Material.WALL_SIGN ||
+				(waterIsTransparent && block.getType() == Material.STATIONARY_WATER) || 
+				block.getType().isTransparent()));
 	}
 
     public static Visualization fromClaims(Iterable<Claim> claims, int height, VisualizationType type, Location locality)
