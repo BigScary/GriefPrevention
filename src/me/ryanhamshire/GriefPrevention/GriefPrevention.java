@@ -2662,7 +2662,7 @@ public class GriefPrevention extends JavaPlugin
         }
 	}
 	
-	enum IgnoreMode	{None, StandardIgnore, AdminIgnore}
+	public enum IgnoreMode	{None, StandardIgnore, AdminIgnore}
 	
 	private String trustEntryToPlayerName(String entry)
 	{
