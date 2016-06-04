@@ -1380,6 +1380,33 @@ class PlayerEventHandler implements Listener
 		}
 	}
 	
+	//when a player reels in his fishing rod
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
+	public void onPlayerFish(PlayerFishEvent event)
+	{
+	    Entity entity = event.getCaught();
+	    if(entity == null) return;  //if nothing pulled, uninteresting event
+	    
+	    //if should be protected from pulling in land claims without permission
+	    if(entity.getType() == EntityType.ARMOR_STAND || entity instanceof Animals)
+	    {
+	        Player player = event.getPlayer();
+	        PlayerData playerData = GriefPrevention.instance.dataStore.getPlayerData(player.getUniqueId());
+	        Claim claim = GriefPrevention.instance.dataStore.getClaimAt(entity.getLocation(), false, playerData.lastClaim);
+	        if(claim != null)
+	        {
+	            //if no permission, cancel
+	            String errorMessage = claim.allowContainers(player);
+	            if(errorMessage != null)
+	            {
+	                event.setCancelled(true);
+	                GriefPrevention.sendMessage(player, TextMode.Err, Messages.NoDamageClaimedEntity, claim.getOwnerName());
+	                return;
+	            }
+	        }
+	    }
+	}
+	
 	//when a player picks up an item...
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
 	public void onPlayerPickupItem(PlayerPickupItemEvent event)
