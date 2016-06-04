@@ -83,7 +83,8 @@ public class GriefPrevention extends JavaPlugin
 	//configuration variables, loaded/saved from a config.yml
 	
 	//claim mode for each world
-	public ConcurrentHashMap<World, ClaimsMode> config_claims_worldModes;     
+	public ConcurrentHashMap<World, ClaimsMode> config_claims_worldModes;   
+	private boolean config_creativeWorldsExist;                     //note on whether there are any creative mode worlds, to save cpu cycles on a common hash lookup
 	
 	public boolean config_claims_preventTheft;						//whether containers and crafting blocks are protectable
 	public boolean config_claims_protectCreatures;					//whether claimed animals may be injured by players without permission
@@ -427,6 +428,7 @@ public class GriefPrevention extends JavaPlugin
         
         //decide claim mode for each world
         this.config_claims_worldModes = new ConcurrentHashMap<World, ClaimsMode>();
+        this.config_creativeWorldsExist = false;
         for(World world : worlds)
         {
             //is it specified in the config file?
@@ -437,12 +439,14 @@ public class GriefPrevention extends JavaPlugin
                 if(claimsMode != null)
                 {
                     this.config_claims_worldModes.put(world, claimsMode);
+                    if(claimsMode == ClaimsMode.Creative) this.config_creativeWorldsExist = true;
                     continue;
                 }
                 else
                 {
                     GriefPrevention.AddLogEntry("Error: Invalid claim mode \"" + configSetting + "\".  Options are Survival, Creative, and Disabled.");
                     this.config_claims_worldModes.put(world, ClaimsMode.Creative);
+                    this.config_creativeWorldsExist = true;
                 }
             }
             
@@ -450,6 +454,7 @@ public class GriefPrevention extends JavaPlugin
             if(deprecated_creativeClaimsEnabledWorldNames.contains(world.getName()))
             {
                 this.config_claims_worldModes.put(world, ClaimsMode.Creative);
+                this.config_creativeWorldsExist = true;
             }
             
             else if(deprecated_claimsEnabledWorldNames.contains(world.getName()))
@@ -466,12 +471,14 @@ public class GriefPrevention extends JavaPlugin
             else if(world.getName().toLowerCase().contains("creative"))
             {
                 this.config_claims_worldModes.put(world, ClaimsMode.Creative);
+                this.config_creativeWorldsExist = true;
             }
             
             //decide a default based on server type and world type
             else if(this.getServer().getDefaultGameMode() == GameMode.CREATIVE)
             {
                 this.config_claims_worldModes.put(world, ClaimsMode.Creative);
+                this.config_creativeWorldsExist = true;
             }
             
             else if(world.getEnvironment() == Environment.NORMAL)
@@ -3194,7 +3201,9 @@ public class GriefPrevention extends JavaPlugin
     //determines whether creative anti-grief rules apply at a location
 	boolean creativeRulesApply(Location location)
 	{
-		return this.config_claims_worldModes.get((location.getWorld())) == ClaimsMode.Creative;
+		if(!this.config_creativeWorldsExist) return false;
+
+	    return this.config_claims_worldModes.get((location.getWorld())) == ClaimsMode.Creative;
 	}
 	
 	public String allowBuild(Player player, Location location)
