@@ -1426,6 +1426,7 @@ public abstract class DataStore
 		this.addDefault(defaults, Messages.NoDeletePermission, "You don't have permission to delete claims.", null);
 		this.addDefault(defaults, Messages.AllAdminDeleted, "Deleted all administrative claims.", null);
 		this.addDefault(defaults, Messages.AdjustBlocksSuccess, "Adjusted {0}'s bonus claim blocks by {1}.  New total bonus blocks: {2}.", "0: player; 1: adjustment; 2: new total");
+		this.addDefault(defaults, Messages.AdjustBlocksAllSuccess, "Adjusted all online players' bonus claim blocks by {0}.", "0: adjustment amount");
 		this.addDefault(defaults, Messages.NotTrappedHere, "You can build here.  Save yourself.", null);
 		this.addDefault(defaults, Messages.RescuePending, "If you stay put for 10 seconds, you'll be teleported out.  Please wait.", null);
 		this.addDefault(defaults, Messages.NonSiegeWorld, "Siege is disabled here.", null);

@@ -2202,6 +2202,40 @@ public class GriefPrevention extends JavaPlugin
 			return true;			
 		}
 		
+		//adjustbonusclaimblocksall <amount>
+        else if(cmd.getName().equalsIgnoreCase("adjustbonusclaimblocksall"))
+        {
+            //requires exactly one parameter, the amount of adjustment
+            if(args.length != 1) return false;
+            
+            //parse the adjustment amount
+            int adjustment;         
+            try
+            {
+                adjustment = Integer.parseInt(args[0]);
+            }
+            catch(NumberFormatException numberFormatException)
+            {
+                return false;  //causes usage to be displayed
+            }
+            
+            //for each online player
+            @SuppressWarnings("unchecked")
+            Collection<Player> players = (Collection<Player>)this.getServer().getOnlinePlayers();
+            for(Player onlinePlayer : players)
+            {
+                UUID playerID = onlinePlayer.getUniqueId();
+                PlayerData playerData = this.dataStore.getPlayerData(playerID);
+                playerData.setBonusClaimBlocks(playerData.getBonusClaimBlocks() + adjustment);
+                this.dataStore.savePlayerData(playerID, playerData);
+            }
+            
+            GriefPrevention.sendMessage(player, TextMode.Success, Messages.AdjustBlocksAllSuccess, String.valueOf(adjustment));
+            if(player != null) GriefPrevention.AddLogEntry(player.getName() + " adjusted all players' bonus claim blocks by " + adjustment + ".", CustomLogEntryTypes.AdminActivity);
+            
+            return true;
+        }
+		
 		//setaccruedclaimblocks <player> <amount>
         else if(cmd.getName().equalsIgnoreCase("setaccruedclaimblocks"))
         {

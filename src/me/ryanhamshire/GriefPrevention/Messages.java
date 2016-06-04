@@ -243,5 +243,6 @@ public enum Messages
     ClaimTooSmallForActiveBlocks,
     TooManyActiveBlocksInClaim,
     ConsoleOnlyCommand,
-    WorldNotFound	
+    WorldNotFound,
+    AdjustBlocksAllSuccess	
 }

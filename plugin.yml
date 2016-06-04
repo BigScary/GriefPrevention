@@ -53,6 +53,11 @@ commands:
       usage: /AdjustBonusClaimBlocks <player> <amount>
       permission: griefprevention.adjustclaimblocks
       aliases: acb
+   adjustbonusclaimblocksall:
+      description: Adds or subtracts bonus claim blocks for all online players.
+      usage: /AdjustBonusClaimBlocksAll <player> <amount>
+      permission: griefprevention.adjustclaimblocks
+      aliases: acball
    setaccruedclaimblocks:
       description: Updates a player's accrued claim block total.
       usage: /SetAccruedClaimBlocks <player> <amount>
