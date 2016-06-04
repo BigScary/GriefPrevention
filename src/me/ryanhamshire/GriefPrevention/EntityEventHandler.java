@@ -864,7 +864,12 @@ public class EntityEventHandler implements Listener
         		                if(attacker.hasPermission("griefprevention.ignoreclaims"))
         		                    message += "  " + GriefPrevention.instance.dataStore.getMessage(Messages.IgnoreClaimsAdvertisement);
         		                GriefPrevention.sendMessage(attacker, TextMode.Err, message);
-        		                event.setCancelled(true);
+        		                PreventPvPEvent pvpEvent = new PreventPvPEvent(new Claim(subEvent.getEntity().getLocation(), subEvent.getEntity().getLocation(), null, new ArrayList<String>(), new ArrayList<String>(), new ArrayList<String>(), new ArrayList<String>(), null));
+                                Bukkit.getPluginManager().callEvent(pvpEvent);
+                                if(!pvpEvent.isCancelled())
+                                {
+                                    event.setCancelled(true);
+                                }
         		                return;
                             }
     		                //and disallow if attacker is pvp immune
