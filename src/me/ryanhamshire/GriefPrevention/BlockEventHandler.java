@@ -489,9 +489,9 @@ public class BlockEventHandler implements Listener
     			    if(!claim.getOwnerName().equals(pistonClaimOwnerName))
     			    {
         				event.setCancelled(true);
-        				event.getBlock().getWorld().createExplosion(event.getBlock().getLocation(), 0);
-        				event.getBlock().getWorld().dropItem(event.getBlock().getLocation(), new ItemStack(event.getBlock().getType()));
-        				event.getBlock().setType(Material.AIR);
+        				pistonBlock.getWorld().createExplosion(pistonBlock.getLocation(), 0);
+        				pistonBlock.getWorld().dropItem(pistonBlock.getLocation(), new ItemStack(pistonBlock.getType()));
+        				pistonBlock.setType(Material.AIR);
         				return;
     			    }
     			}
@@ -520,9 +520,9 @@ public class BlockEventHandler implements Listener
 				if(!newOwnerName.equals(originalOwnerName) && !newOwnerName.isEmpty())
 				{
 					event.setCancelled(true);
-					event.getBlock().getWorld().createExplosion(event.getBlock().getLocation(), 0);
-					event.getBlock().getWorld().dropItem(event.getBlock().getLocation(), new ItemStack(event.getBlock().getType()));
-					event.getBlock().setType(Material.AIR);
+					pistonBlock.getWorld().createExplosion(pistonBlock.getLocation(), 0);
+					pistonBlock.getWorld().dropItem(pistonBlock.getLocation(), new ItemStack(pistonBlock.getType()));
+					pistonBlock.setType(Material.AIR);
 					return;
 				}
 			}
@@ -546,7 +546,7 @@ public class BlockEventHandler implements Listener
     		{
     		    //if piston not in a land claim, cancel event
     		    Claim pistonClaim = this.dataStore.getClaimAt(event.getBlock().getLocation(), false, null);
-    		    if(pistonClaim == null)
+    		    if(pistonClaim == null && !event.getBlocks().isEmpty())
     		    {
     		        event.setCancelled(true);
     		        return;
@@ -568,7 +568,8 @@ public class BlockEventHandler implements Listener
     		{
     		    //who owns the piston, if anyone?
                 String pistonOwnerName = "_";
-                Location pistonLocation = event.getBlock().getLocation();       
+                Block block = event.getBlock();
+                Location pistonLocation = block.getLocation();       
                 Claim pistonClaim = this.dataStore.getClaimAt(pistonLocation, false, null);
                 if(pistonClaim != null) pistonOwnerName = pistonClaim.getOwnerName();
     		    
@@ -584,6 +585,10 @@ public class BlockEventHandler implements Listener
             		if(!pistonOwnerName.equals(movingBlockOwnerName))
             		{
             			event.setCancelled(true);
+            			block.getWorld().createExplosion(block.getLocation(), 0);
+            			block.getWorld().dropItem(block.getLocation(), new ItemStack(Material.PISTON_STICKY_BASE));
+            			block.setType(Material.AIR);
+                        return;
             		}
         		}
     		}
