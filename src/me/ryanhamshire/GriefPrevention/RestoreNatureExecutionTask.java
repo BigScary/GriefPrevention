@@ -80,8 +80,14 @@ class RestoreNatureExecutionTask implements Runnable
 							break;
 						}
 						
-						currentBlock.setTypeId(blockUpdate.typeId);
-						currentBlock.setData(blockUpdate.data);
+						try
+						{
+						    currentBlock.setTypeIdAndData(blockUpdate.typeId, blockUpdate.data, false);
+						}
+						catch(IllegalArgumentException e)
+						{
+						    //just don't update this block and continue trying to update other blocks
+						}
 					}
 				}
 			}

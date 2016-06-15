@@ -608,6 +608,7 @@ class RestoreNatureProcessingTask implements Runnable
 			if(block.typeId != Material.AIR.getId() &&
 			!(ignoreLeaves && block.typeId == Material.SNOW.getId()) &&
 			!(ignoreLeaves && block.typeId == Material.LEAVES.getId()) &&
+			!(ignoreLeaves && block.typeId == Material.LEAVES_2.getId()) &&
 			!(block.typeId == Material.STATIONARY_WATER.getId()) &&
 			!(block.typeId == Material.WATER.getId()) &&
 			!(block.typeId == Material.LAVA.getId()) &&
