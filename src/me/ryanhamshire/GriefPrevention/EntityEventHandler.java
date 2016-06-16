@@ -795,6 +795,9 @@ public class EntityEventHandler implements Listener
 		        //allow for disabling villager protections in the config
 		        if(subEvent.getEntityType() == EntityType.VILLAGER && !GriefPrevention.instance.config_claims_protectCreatures) return;
 		        
+		        //don't protect polar bears, they may be aggressive
+		        if(subEvent.getEntityType() == EntityType.POLAR_BEAR) return;
+		        
 		        //decide whether it's claimed
 		        Claim cachedClaim = null;
                 PlayerData playerData = null;

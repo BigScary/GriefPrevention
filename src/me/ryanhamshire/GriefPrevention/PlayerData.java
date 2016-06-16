@@ -30,8 +30,10 @@ import me.ryanhamshire.GriefPrevention.ShovelMode;
 import me.ryanhamshire.GriefPrevention.SiegeData;
 import me.ryanhamshire.GriefPrevention.Visualization;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
 
 //holds all of GriefPrevention's player-tied data
 public class PlayerData 
@@ -186,23 +188,25 @@ public class PlayerData
 	{
 	    if(this.accruedClaimBlocks == null) this.loadDataFromSecondaryStorage();
         
-	    //if player is over accrued limit, accrued limit was probably reduced in config file AFTER he accrued
-        //in that case, leave his blocks where they are
-        int currentTotal = this.accruedClaimBlocks;
-        if(currentTotal >= GriefPrevention.instance.config_claims_maxAccruedBlocks)
-        {
-            this.newlyAccruedClaimBlocks = 0;
-            return currentTotal;
-        }
+	    //update claim blocks with any he has accrued during his current play session
+	    if(this.newlyAccruedClaimBlocks > 0)
+	    {
+	        int accruedLimit = this.getAccruedClaimBlocksLimit();
+	        
+	        //if over the limit before adding blocks, leave it as-is, because the limit may have changed AFTER he accrued the blocks
+	        if(this.accruedClaimBlocks < accruedLimit)
+	        {
+	            //move any in the holding area
+	            int newTotal = this.accruedClaimBlocks + this.newlyAccruedClaimBlocks;
+	            
+	            //respect limits
+	            this.accruedClaimBlocks = Math.min(newTotal, accruedLimit);
+	        }
+	        
+	        this.newlyAccruedClaimBlocks = 0;
+	        return this.accruedClaimBlocks;
+	    }
 	    
-	    //move any in the holding area
-	    int newTotal = this.accruedClaimBlocks + this.newlyAccruedClaimBlocks;
-	    this.newlyAccruedClaimBlocks = 0;
-        
-        //respect limits
-        if(newTotal > GriefPrevention.instance.config_claims_maxAccruedBlocks) newTotal = GriefPrevention.instance.config_claims_maxAccruedBlocks;
-	    this.accruedClaimBlocks = newTotal;
-        
 	    return accruedClaimBlocks;
     }
 
@@ -335,11 +339,8 @@ public class PlayerData
                 
                 //try to fix it by adding to accrued blocks
                 this.accruedClaimBlocks = totalClaimsArea;
-                if(this.accruedClaimBlocks > GriefPrevention.instance.config_claims_maxAccruedBlocks)
-                {
-                    //remember to respect the maximum on accrued blocks
-                    this.accruedClaimBlocks = GriefPrevention.instance.config_claims_maxAccruedBlocks;
-                }
+                int accruedLimit = this.getAccruedClaimBlocksLimit();
+                this.accruedClaimBlocks = Math.min(accruedLimit, this.accruedClaimBlocks);
                 
                 //if that didn't fix it, then make up the difference with bonus blocks
                 totalBlocks = this.accruedClaimBlocks + this.getBonusClaimBlocks() + GriefPrevention.instance.dataStore.getGroupBonusBlocks(this.playerID);
@@ -361,6 +362,19 @@ public class PlayerData
         return claims;
     }
     
+    //determine limits based on permissions
+    private int getAccruedClaimBlocksLimit()
+    {
+        Player player = Bukkit.getServer().getPlayer(this.playerID);
+        
+        //if the player isn't online, give him the benefit of any doubt
+        if(player == null) return Integer.MAX_VALUE;
+        
+        if(player.hasPermission("griefprevention.mostaccrued")) return GriefPrevention.instance.config_claims_maxAccruedBlocks_most;
+        if(player.hasPermission("griefprevention.moreaccrued")) return GriefPrevention.instance.config_claims_maxAccruedBlocks_more;
+        return GriefPrevention.instance.config_claims_maxAccruedBlocks_default;
+    }
+
     public void accrueBlocks(int howMany)
     {
         this.newlyAccruedClaimBlocks += howMany;

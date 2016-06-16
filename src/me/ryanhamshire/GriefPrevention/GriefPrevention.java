@@ -101,8 +101,12 @@ public class GriefPrevention extends JavaPlugin
 	
 	public int config_claims_initialBlocks;							//the number of claim blocks a new player starts with
 	public double config_claims_abandonReturnRatio;                 //the portion of claim blocks returned to a player when a claim is abandoned
-	public int config_claims_blocksAccruedPerHour;					//how many additional blocks players get each hour of play (can be zero)
-	public int config_claims_maxAccruedBlocks;						//the limit on accrued blocks (over time).  doesn't limit purchased or admin-gifted blocks 
+	public int config_claims_blocksAccruedPerHour_default;			//how many additional blocks players get each hour of play (can be zero) without any special permissions
+	public int config_claims_blocksAccruedPerHour_faster;           //how many additional blocks players get each hour of play when they have the griefprevention.fasteraccrual permission
+	public int config_claims_blocksAccruedPerHour_fastest;          //how many additional blocks players get each hour of play when they have the griefprevention.fastestaccrual permission
+	public int config_claims_maxAccruedBlocks_default;				//the limit on accrued blocks (over time) for players without any special permissions.  doesn't limit purchased or admin-gifted blocks 
+	public int config_claims_maxAccruedBlocks_more;                 //the limit on accrued blocks (over time) for players who have the griefprevention.moreaccrued permission
+	public int config_claims_maxAccruedBlocks_most;                 //the limit on accrued blocks (over time) for players who have the griefprevention.mostaccrued permission
 	public int config_claims_maxDepth;								//limit on how deep claims can go
 	public int config_claims_expirationDays;						//how many days of inactivity before a player loses his claims
 	public int config_claims_expirationExemptionTotalBlocks;        //total claim blocks amount which will exempt a player from claim expiration
@@ -306,7 +310,7 @@ public class GriefPrevention extends JavaPlugin
 		
 		//unless claim block accrual is disabled, start the recurring per 10 minute event to give claim blocks to online players
 		//20L ~ 1 second
-		if(this.config_claims_blocksAccruedPerHour > 0)
+		if(this.config_claims_blocksAccruedPerHour_default > 0 || this.config_claims_blocksAccruedPerHour_faster > 0 || this.config_claims_blocksAccruedPerHour_fastest > 0)
 		{
 			DeliverClaimBlocksTask task = new DeliverClaimBlocksTask(null);
 			this.getServer().getScheduler().scheduleSyncRepeatingTask(this, task, 20L * 60 * 10, 20L * 60 * 10);
@@ -527,8 +531,14 @@ public class GriefPrevention extends JavaPlugin
         this.config_claims_lockFenceGates = config.getBoolean("GriefPrevention.Claims.LockFenceGates", true);
         this.config_claims_enderPearlsRequireAccessTrust = config.getBoolean("GriefPrevention.Claims.EnderPearlsRequireAccessTrust", true);
         this.config_claims_initialBlocks = config.getInt("GriefPrevention.Claims.InitialBlocks", 100);
-        this.config_claims_blocksAccruedPerHour = config.getInt("GriefPrevention.Claims.BlocksAccruedPerHour", 100);
-        this.config_claims_maxAccruedBlocks = config.getInt("GriefPrevention.Claims.MaxAccruedBlocks", 80000);
+        this.config_claims_blocksAccruedPerHour_default = config.getInt("GriefPrevention.Claims.BlocksAccruedPerHour", 100);
+        this.config_claims_blocksAccruedPerHour_default = config.getInt("GriefPrevention.Claims.Claim Blocks Accrued Per Hour.Default", config_claims_blocksAccruedPerHour_default);
+        this.config_claims_blocksAccruedPerHour_faster = config.getInt("GriefPrevention.Claims.Claim Blocks Accrued Per Hour.With 'fasteraccrual' Permission", 110);
+        this.config_claims_blocksAccruedPerHour_fastest = config.getInt("GriefPrevention.Claims.Claim Blocks Accrued Per Hour.With 'fastestaccrual' Permission", 125);
+        this.config_claims_maxAccruedBlocks_default = config.getInt("GriefPrevention.Claims.MaxAccruedBlocks", 2000);
+        this.config_claims_maxAccruedBlocks_default = config.getInt("GriefPrevention.Claims.Max Accrued Claim Blocks.Default", this.config_claims_maxAccruedBlocks_default);
+        this.config_claims_maxAccruedBlocks_more= config.getInt("GriefPrevention.Claims.Max Accrued Claim Blocks.With 'moreaccrued' Permission", 5000);
+        this.config_claims_maxAccruedBlocks_most = config.getInt("GriefPrevention.Claims.Max Accrued Claim Blocks.With 'mostaccrued' Permission", 10000);
         this.config_claims_abandonReturnRatio = config.getDouble("GriefPrevention.Claims.AbandonReturnRatio", 1);
         this.config_claims_automaticClaimsForNewPlayersRadius = config.getInt("GriefPrevention.Claims.AutomaticNewPlayerClaimsRadius", 4);
         this.config_claims_claimsExtendIntoGroundDistance = Math.abs(config.getInt("GriefPrevention.Claims.ExtendIntoGroundDistance", 5));
@@ -762,8 +772,12 @@ public class GriefPrevention extends JavaPlugin
         outConfig.set("GriefPrevention.Claims.EnderPearlsRequireAccessTrust", this.config_claims_enderPearlsRequireAccessTrust);
         outConfig.set("GriefPrevention.Claims.ProtectHorses", this.config_claims_protectHorses);
         outConfig.set("GriefPrevention.Claims.InitialBlocks", this.config_claims_initialBlocks);
-        outConfig.set("GriefPrevention.Claims.BlocksAccruedPerHour", this.config_claims_blocksAccruedPerHour);
-        outConfig.set("GriefPrevention.Claims.MaxAccruedBlocks", this.config_claims_maxAccruedBlocks);
+        outConfig.set("GriefPrevention.Claims.Claim Blocks Accrued Per Hour.Default", this.config_claims_blocksAccruedPerHour_default);
+        outConfig.set("GriefPrevention.Claims.Claim Blocks Accrued Per Hour.With 'fasteraccrual' Permission", this.config_claims_blocksAccruedPerHour_faster);
+        outConfig.set("GriefPrevention.Claims.Claim Blocks Accrued Per Hour.With 'fastestaccrual' Permission", this.config_claims_blocksAccruedPerHour_fastest);
+        outConfig.set("GriefPrevention.Claims.Max Accrued Claim Blocks.Default", this.config_claims_maxAccruedBlocks_default);
+        outConfig.set("GriefPrevention.Claims.Max Accrued Claim Blocks.With 'moreaccrued' Permission", this.config_claims_maxAccruedBlocks_more);
+        outConfig.set("GriefPrevention.Claims.Max Accrued Claim Blocks.With 'mostaccrued' Permission", this.config_claims_maxAccruedBlocks_most);
         outConfig.set("GriefPrevention.Claims.AbandonReturnRatio", this.config_claims_abandonReturnRatio);
         outConfig.set("GriefPrevention.Claims.AutomaticNewPlayerClaimsRadius", this.config_claims_automaticClaimsForNewPlayersRadius);
         outConfig.set("GriefPrevention.Claims.ExtendIntoGroundDistance", this.config_claims_claimsExtendIntoGroundDistance);

@@ -38,8 +38,6 @@ class DeliverClaimBlocksTask implements Runnable
 	@Override
 	public void run()
 	{
-	    if(GriefPrevention.instance.config_claims_blocksAccruedPerHour <= 0) return;
-	    
 	    //if no player specified, this task will create a player-specific task for each online player, scheduled one tick apart
 	    if(this.player == null)
 		{
@@ -57,6 +55,8 @@ class DeliverClaimBlocksTask implements Runnable
 	    //otherwise, deliver claim blocks to the specified player
 	    else
 	    {
+	        if(!this.player.isOnline()) return;
+	        
 	        DataStore dataStore = GriefPrevention.instance.dataStore;
             PlayerData playerData = dataStore.getPlayerData(player.getUniqueId());
             
@@ -69,21 +69,24 @@ class DeliverClaimBlocksTask implements Runnable
                    (lastLocation == null || lastLocation.distanceSquared(player.getLocation()) >= 0) &&
                    !player.getLocation().getBlock().isLiquid())
                 {                   
-                    //add blocks
-                    int accruedBlocks = GriefPrevention.instance.config_claims_blocksAccruedPerHour / 6;
-                    if(accruedBlocks < 0) accruedBlocks = 1;
+                    //determine how fast blocks accrue for this player
+                    int accrualRate = GriefPrevention.instance.config_claims_blocksAccruedPerHour_default;
+                    if(player.hasPermission("griefprevention.fastestaccrual")) accrualRate = GriefPrevention.instance.config_claims_blocksAccruedPerHour_fastest;
+                    else if(player.hasPermission("griefprevention.fasteraccrual")) accrualRate = GriefPrevention.instance.config_claims_blocksAccruedPerHour_faster;
                     
+                    //add blocks
+                    int accruedBlocks = accrualRate / 6;
+                    if(accruedBlocks < 0) accruedBlocks = 1;
+                    playerData.accrueBlocks(accruedBlocks);
                     GriefPrevention.AddLogEntry("Delivering " + accruedBlocks + " blocks to " + player.getName(), CustomLogEntryTypes.Debug, true);
                     
-                    playerData.accrueBlocks(accruedBlocks); 
-                    
                     //intentionally NOT saving data here to reduce overall secondary storage access frequency
-                    //many other operations will cause this players data to save, including his eventual logout
+                    //many other operations will cause this player's data to save, including his eventual logout
                     //dataStore.savePlayerData(player.getUniqueIdentifier(), playerData);
                 }
                 else
                 {
-                    GriefPrevention.AddLogEntry(player.getName() + " isn't active enough.", CustomLogEntryTypes.Debug, true);
+                    GriefPrevention.AddLogEntry(player.getName() + " wasn't active enough to accrue claim blocks this round.", CustomLogEntryTypes.Debug, true);
                 }
             }
             catch(IllegalArgumentException e)  //can't measure distance when to/from are different worlds
