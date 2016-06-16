@@ -184,17 +184,20 @@ class PlayerEventHandler implements Listener
     		    PlayerData playerData = this.dataStore.getPlayerData(player.getUniqueId());
     		    for(Player recipient : recipients)
     		    {
-    		        if(playerData.ignoredPlayers.containsKey(recipient.getUniqueId()))
+    		        if(!recipient.hasPermission("griefprevention.notignorable"))
     		        {
-    		            recipientsToRemove.add(recipient);
-    		        }
-    		        else
-    		        {
-    		            PlayerData targetPlayerData = this.dataStore.getPlayerData(recipient.getUniqueId());
-    		            if(targetPlayerData.ignoredPlayers.containsKey(player.getUniqueId()))
-    		            {
-    		                recipientsToRemove.add(recipient);
-    		            }
+        		        if(playerData.ignoredPlayers.containsKey(recipient.getUniqueId()))
+        		        {
+        		            recipientsToRemove.add(recipient);
+        		        }
+        		        else
+        		        {
+        		            PlayerData targetPlayerData = this.dataStore.getPlayerData(recipient.getUniqueId());
+        		            if(targetPlayerData.ignoredPlayers.containsKey(player.getUniqueId()))
+        		            {
+        		                recipientsToRemove.add(recipient);
+        		            }
+        		        }
     		        }
     		    }
     		    
