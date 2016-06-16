@@ -2307,19 +2307,19 @@ public class GriefPrevention extends JavaPlugin
 				return true;
 			}
 			
+			//rescue destination may be set by GPFlags or other plugin, ask to find out
+            SaveTrappedPlayerEvent event = new SaveTrappedPlayerEvent(claim);
+            Bukkit.getPluginManager().callEvent(event);
+            
 			//if the player is in the nether or end, he's screwed (there's no way to programmatically find a safe place for him)
-			if(player.getWorld().getEnvironment() != Environment.NORMAL)
+			if(player.getWorld().getEnvironment() != Environment.NORMAL && event.getDestination() == null)
 			{
 				GriefPrevention.sendMessage(player, TextMode.Err, Messages.TrappedWontWorkHere);				
 				return true;
 			}
 			
-			//rescue destination may be set by GPFlags, ask to find out
-			SaveTrappedPlayerEvent event = new SaveTrappedPlayerEvent(claim);
-            Bukkit.getPluginManager().callEvent(event);
-			
 			//if the player is in an administrative claim, he should contact an admin
-			if(claim.isAdminClaim() && event.getDestination() != null)
+			if(claim.isAdminClaim() && event.getDestination() == null)
 			{
 				GriefPrevention.sendMessage(player, TextMode.Err, Messages.TrappedWontWorkHere);
 				return true;
