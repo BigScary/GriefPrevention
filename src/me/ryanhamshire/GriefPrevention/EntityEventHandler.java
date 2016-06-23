@@ -824,23 +824,23 @@ public class EntityEventHandler implements Listener
 		//so unless precautions are taken by the owner, a resourceful thief might find ways to steal anyway
 		
 		//if theft protection is enabled
-		if(event instanceof EntityDamageByEntityEvent)
+		if((event instanceof EntityDamageByEntityEvent)
+                    || (event instanceof EntityCombustByEntityEvent))
 		{
-                    EntityDamageByEntityEvent subEvent = (EntityDamageByEntityEvent)event;
 		    //don't track in worlds where claims are not enabled
 	        if(!GriefPrevention.instance.claimsEnabledForWorld(event.getEntity().getWorld())) return;
 	        
 	        //if the damaged entity is a claimed item frame or armor stand, the damager needs to be a player with container trust in the claim
-		    if(subEvent.getEntityType() == EntityType.ITEM_FRAME
-		       || subEvent.getEntityType() == EntityType.ARMOR_STAND
-		       || subEvent.getEntityType() == EntityType.VILLAGER
-		       || subEvent.getEntityType() == EntityType.ENDER_CRYSTAL)
+		    if(event.getEntity().getType() == EntityType.ITEM_FRAME
+		       || event.getEntity().getType() == EntityType.ARMOR_STAND
+		       || event.getEntity().getType() == EntityType.VILLAGER
+		       || event.getEntity().getType() == EntityType.ENDER_CRYSTAL)
 		    {
 		        //allow for disabling villager protections in the config
-		        if(subEvent.getEntityType() == EntityType.VILLAGER && !GriefPrevention.instance.config_claims_protectCreatures) return;
+		        if(event.getEntity().getType() == EntityType.VILLAGER && !GriefPrevention.instance.config_claims_protectCreatures) return;
 		        
 		        //don't protect polar bears, they may be aggressive
-		        if(subEvent.getEntityType() == EntityType.POLAR_BEAR) return;
+		        if(event.getEntity().getType() == EntityType.POLAR_BEAR) return;
 		        
 		        //decide whether it's claimed
 		        Claim cachedClaim = null;
@@ -881,12 +881,12 @@ public class EntityEventHandler implements Listener
 		    }
 		    
 		    //if the entity is an non-monster creature (remember monsters disqualified above), or a vehicle
-			if (((subEvent.getEntity() instanceof Creature || subEvent.getEntity() instanceof WaterMob) && GriefPrevention.instance.config_claims_protectCreatures))
+			if (((event.getEntity() instanceof Creature || event.getEntity() instanceof WaterMob) && GriefPrevention.instance.config_claims_protectCreatures))
 			{
 			    //if entity is tameable and has an owner, apply special rules
-		        if(subEvent.getEntity() instanceof Tameable)
+		        if(event.getEntity() instanceof Tameable)
 		        {
-		            Tameable tameable = (Tameable)subEvent.getEntity();
+		            Tameable tameable = (Tameable)event.getEntity();
 		            if(tameable.isTamed() && tameable.getOwner() != null)
 		            {
 		                //limit attacks by players to owners and admins in ignore claims mode
@@ -902,7 +902,7 @@ public class EntityEventHandler implements Listener
     		                if(attackerData.ignoreClaims) return;
     		               
     		                //otherwise disallow in non-pvp worlds (and also pvp worlds if configured to do so)
-    		                if(!GriefPrevention.instance.pvpRulesApply(subEvent.getEntity().getLocation().getWorld()) || (GriefPrevention.instance.config_pvp_protectPets && subEvent.getEntityType() != EntityType.WOLF))
+    		                if(!GriefPrevention.instance.pvpRulesApply(event.getEntity().getLocation().getWorld()) || (GriefPrevention.instance.config_pvp_protectPets && event.getEntityType() != EntityType.WOLF))
                             {
     		                    OfflinePlayer owner = GriefPrevention.instance.getServer().getOfflinePlayer(ownerID); 
                                 String ownerName = owner.getName();
@@ -911,13 +911,10 @@ public class EntityEventHandler implements Listener
         		                if(attacker.hasPermission("griefprevention.ignoreclaims"))
         		                    message += "  " + GriefPrevention.instance.dataStore.getMessage(Messages.IgnoreClaimsAdvertisement);
         		                GriefPrevention.sendMessage(attacker, TextMode.Err, message);
-        		                PreventPvPEvent pvpEvent = new PreventPvPEvent(new Claim(subEvent.getEntity().getLocation(), subEvent.getEntity().getLocation(), null, new ArrayList<String>(), new ArrayList<String>(), new ArrayList<String>(), new ArrayList<String>(), null));
+        		                PreventPvPEvent pvpEvent = new PreventPvPEvent(new Claim(event.getEntity().getLocation(), event.getEntity().getLocation(), null, new ArrayList<String>(), new ArrayList<String>(), new ArrayList<String>(), new ArrayList<String>(), null));
                                 Bukkit.getPluginManager().callEvent(pvpEvent);
-                                if(!pvpEvent.isCancelled())
-                                {
-                                    cancelEvent(event);
-                                }
-        		                return;
+                                cancelEvent(event);
+                                return;
                             }
     		                //and disallow if attacker is pvp immune
     		                else if(attackerData.pvpImmune)
