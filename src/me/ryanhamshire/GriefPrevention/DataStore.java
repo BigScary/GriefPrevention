@@ -1175,6 +1175,15 @@ public abstract class DataStore
 	//see CreateClaim() for details on return value
 	synchronized public CreateClaimResult resizeClaim(Claim claim, int newx1, int newx2, int newy1, int newy2, int newz1, int newz2, Player resizingPlayer)
 	{
+                // Before checking overlaps etc, check the player is in fact
+                // able to resize this claim
+                String cantResizeMessage = claim.allowEdit(resizingPlayer);
+                if (cantResizeMessage != null) {
+                    GriefPrevention.sendMessage(resizingPlayer, TextMode.Err, cantResizeMessage);
+                    CreateClaimResult fail = null;
+                    return fail;
+                }
+
 		//try to create this new claim, ignoring the original when checking for overlap
 		CreateClaimResult result = this.createClaim(claim.getLesserBoundaryCorner().getWorld(), newx1, newx2, newy1, newy2, newz1, newz2, claim.ownerID, claim.parent, claim.id, resizingPlayer);
 		
@@ -1221,12 +1230,6 @@ public abstract class DataStore
 	
 	void resizeClaimWithChecks(Player player, PlayerData playerData, int newx1, int newx2, int newy1, int newy2, int newz1, int newz2)
     {
-        // First, make sure the player is allowed to resize the claim:
-        String cantResizeMessage = playerData.claimResizing.allowEdit(player);
-        if (cantResizeMessage != null) {
-            GriefPrevention.sendMessage(player, TextMode.Err, cantResizeMessage);
-            return;
-        }
 	//for top level claims, apply size rules and claim blocks requirement
         if(playerData.claimResizing.parent == null)
         {               
