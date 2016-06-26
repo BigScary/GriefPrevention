@@ -1221,7 +1221,13 @@ public abstract class DataStore
 	
 	void resizeClaimWithChecks(Player player, PlayerData playerData, int newx1, int newx2, int newy1, int newy2, int newz1, int newz2)
     {
-	    //for top level claims, apply size rules and claim blocks requirement
+        // First, make sure the player is allowed to resize the claim:
+        String cantResizeMessage = playerData.claimResizing.allowEdit(player);
+        if (cantResizeMessage != null) {
+            GriefPrevention.sendMessage(player, TextMode.Err, cantResizeMessage);
+            return;
+        }
+	//for top level claims, apply size rules and claim blocks requirement
         if(playerData.claimResizing.parent == null)
         {               
             //measure new claim, apply size rules
