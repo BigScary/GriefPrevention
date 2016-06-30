@@ -2638,7 +2638,7 @@ public class GriefPrevention extends JavaPlugin
         }
 		
 		//separateplayers
-        else if(cmd.getName().equalsIgnoreCase("separate") && player != null)
+        else if(cmd.getName().equalsIgnoreCase("separate"))
         {
             //requires two player names
             if(args.length < 2) return false;
@@ -2666,7 +2666,7 @@ public class GriefPrevention extends JavaPlugin
         }
 		
 		//unseparateplayers
-        else if(cmd.getName().equalsIgnoreCase("unseparate") && player != null)
+        else if(cmd.getName().equalsIgnoreCase("unseparate"))
         {
             //requires two player names
             if(args.length < 2) return false;
