@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -931,20 +932,24 @@ class PlayerEventHandler implements Listener
     }
 	
 	//when a player dies...
-	@EventHandler(priority = EventPriority.HIGHEST)
+	private HashMap<UUID, Long> deathTimestamps = new HashMap<UUID, Long>();
+    @EventHandler(priority = EventPriority.HIGHEST)
 	void onPlayerDeath(PlayerDeathEvent event)
 	{
 		//FEATURE: prevent death message spam by implementing a "cooldown period" for death messages
-		PlayerData playerData = this.dataStore.getPlayerData(event.getEntity().getUniqueId());
+		Player player = event.getEntity();
+        Long lastDeathTime = this.deathTimestamps.get(player.getUniqueId());
 		long now = Calendar.getInstance().getTimeInMillis(); 
-		if(now - playerData.lastDeathTimeStamp < GriefPrevention.instance.config_spam_deathMessageCooldownSeconds * 1000)
+		if(lastDeathTime != null && now - lastDeathTime < GriefPrevention.instance.config_spam_deathMessageCooldownSeconds * 1000)
 		{
-			event.setDeathMessage("");
+			player.sendMessage(event.getDeathMessage());  //let the player assume his death message was broadcasted to everyone
+		    event.setDeathMessage("");
 		}
 		
-		playerData.lastDeathTimeStamp = now;
+		this.deathTimestamps.put(player.getUniqueId(), now);
 		
 		//these are related to locking dropped items on death to prevent theft
+		PlayerData playerData = GriefPrevention.instance.dataStore.getPlayerData(player.getUniqueId());
 		playerData.dropsAreUnlocked = false;
 		playerData.receivedDropUnlockAdvertisement = false;
 	}

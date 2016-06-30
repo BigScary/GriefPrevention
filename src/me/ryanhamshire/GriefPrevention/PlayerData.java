@@ -78,9 +78,6 @@ public class PlayerData
 	//whether this player was recently warned about building outside land claims
 	boolean warnedAboutBuildingOutsideClaims = false;
 	
-	//timestamp of last death, for use in preventing death message spam
-	long lastDeathTimeStamp = 0;
-	
 	//timestamp when last siege ended (where this player was the defender)
 	long lastSiegeEndTimeStamp = 0;
 	
