@@ -910,6 +910,22 @@ class PlayerEventHandler implements Listener
                 player.teleport(returnLocation);
             }
         }
+        
+        //if we're holding a logout message for this player, don't send that or this event's join message
+        if(GriefPrevention.instance.config_spam_logoutMessageDelaySeconds > 0)
+        {
+            String joinMessage = event.getJoinMessage();
+            if(joinMessage != null && !joinMessage.isEmpty())
+            {
+                Integer taskID = this.heldLogoutMessages.get(player.getUniqueId());
+                if(taskID != null && Bukkit.getScheduler().isQueued(taskID))
+                {
+                    Bukkit.getScheduler().cancelTask(taskID);
+                    player.sendMessage(event.getJoinMessage());
+                    event.setJoinMessage("");
+                }
+            }
+        }
 	}
 	
 	//when a player spawns, conditionally apply temporary pvp protection 
@@ -964,6 +980,7 @@ class PlayerEventHandler implements Listener
     }
 	
 	//when a player quits...
+	private HashMap<UUID, Integer> heldLogoutMessages = new HashMap<UUID, Integer>();
 	@EventHandler(priority = EventPriority.HIGHEST)
 	void onPlayerQuit(PlayerQuitEvent event)
 	{
@@ -1034,6 +1051,19 @@ class PlayerEventHandler implements Listener
         
         //drop data about this player
         this.dataStore.clearCachedPlayerData(playerID);
+        
+        //send quit message later, but only if the player stays offline
+        if(GriefPrevention.instance.config_spam_logoutMessageDelaySeconds > 0)
+        {
+            String quitMessage = event.getQuitMessage();
+            if(quitMessage != null && !quitMessage.isEmpty())
+            {
+                BroadcastMessageTask task = new BroadcastMessageTask(quitMessage);
+                int taskID = Bukkit.getScheduler().scheduleSyncDelayedTask(GriefPrevention.instance, task, 20L * GriefPrevention.instance.config_spam_logoutMessageDelaySeconds);
+                this.heldLogoutMessages.put(playerID, taskID);
+                event.setQuitMessage("");
+            }
+        }
 	}
 	
 	//determines whether or not a login or logout notification should be silenced, depending on how many there have been in the last minute

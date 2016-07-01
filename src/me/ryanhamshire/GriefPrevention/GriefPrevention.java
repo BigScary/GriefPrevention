@@ -139,6 +139,7 @@ public class GriefPrevention extends JavaPlugin
 	public String config_spam_warningMessage;						//message to show a player who is close to spam level
 	public String config_spam_allowedIpAddresses;					//IP addresses which will not be censored
 	public int config_spam_deathMessageCooldownSeconds;				//cooldown period for death messages (per player) in seconds
+	public int config_spam_logoutMessageDelaySeconds;               //delay before a logout message will be shown (only if the player stays offline that long)
 	
 	HashMap<World, Boolean> config_pvp_specifiedWorlds;				//list of worlds where pvp anti-grief rules apply, according to the config file
 	public boolean config_pvp_protectFreshSpawns;					//whether to make newly spawned players immune until they pick up an item
@@ -567,7 +568,8 @@ public class GriefPrevention extends JavaPlugin
         this.config_spam_banMessage = config.getString("GriefPrevention.Spam.BanMessage", "Banned for spam.");
         String slashCommandsToMonitor = config.getString("GriefPrevention.Spam.MonitorSlashCommands", "/me;/global;/local");
         slashCommandsToMonitor = config.getString("GriefPrevention.Spam.ChatSlashCommands", slashCommandsToMonitor);
-        this.config_spam_deathMessageCooldownSeconds = config.getInt("GriefPrevention.Spam.DeathMessageCooldownSeconds", 120);       
+        this.config_spam_deathMessageCooldownSeconds = config.getInt("GriefPrevention.Spam.DeathMessageCooldownSeconds", 120);
+        this.config_spam_logoutMessageDelaySeconds = config.getInt("GriefPrevention.Spam.Logout Message Delay In Seconds", 10);
         
         this.config_pvp_protectFreshSpawns = config.getBoolean("GriefPrevention.PvP.ProtectFreshSpawns", true);
         this.config_pvp_punishLogout = config.getBoolean("GriefPrevention.PvP.PunishLogout", true);
@@ -809,6 +811,7 @@ public class GriefPrevention extends JavaPlugin
         outConfig.set("GriefPrevention.Spam.BanMessage", this.config_spam_banMessage);
         outConfig.set("GriefPrevention.Spam.AllowedIpAddresses", this.config_spam_allowedIpAddresses);
         outConfig.set("GriefPrevention.Spam.DeathMessageCooldownSeconds", this.config_spam_deathMessageCooldownSeconds);
+        outConfig.set("GriefPrevention.Spam.Logout Message Delay In Seconds", this.config_spam_logoutMessageDelaySeconds);
         
         for(World world : worlds)
         {
