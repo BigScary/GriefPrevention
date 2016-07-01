@@ -2239,16 +2239,18 @@ public class GriefPrevention extends JavaPlugin
             //for each online player
             @SuppressWarnings("unchecked")
             Collection<Player> players = (Collection<Player>)this.getServer().getOnlinePlayers();
+            StringBuilder builder = new StringBuilder();
             for(Player onlinePlayer : players)
             {
                 UUID playerID = onlinePlayer.getUniqueId();
                 PlayerData playerData = this.dataStore.getPlayerData(playerID);
                 playerData.setBonusClaimBlocks(playerData.getBonusClaimBlocks() + adjustment);
                 this.dataStore.savePlayerData(playerID, playerData);
+                builder.append(onlinePlayer.getName() + " ");
             }
             
             GriefPrevention.sendMessage(player, TextMode.Success, Messages.AdjustBlocksAllSuccess, String.valueOf(adjustment));
-            if(player != null) GriefPrevention.AddLogEntry(player.getName() + " adjusted all players' bonus claim blocks by " + adjustment + ".", CustomLogEntryTypes.AdminActivity);
+            GriefPrevention.AddLogEntry("Adjusted all " + players.size() + "players' bonus claim blocks by " + adjustment + ".  " + builder.toString(), CustomLogEntryTypes.AdminActivity);
             
             return true;
         }
