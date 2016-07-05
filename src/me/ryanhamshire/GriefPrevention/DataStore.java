@@ -1067,6 +1067,8 @@ public abstract class DataStore
 						winnerLocation.getWorld().dropItemNaturally(winnerLocation, wontFitItems.get(key));
 					}
 				}
+				
+				drops.clear();
 			}
 		}
 	}
