@@ -2398,6 +2398,13 @@ public class GriefPrevention extends JavaPlugin
 			{
 				return false;
 			}
+
+                        // First off, you cannot siege yourself, that's just
+                        // silly:
+                        if (attacker.getName().equals( defender.getName() )) {
+                            GriefPrevention.sendMessage(player, TextMode.Err, Messages,NoSiegeYourself);
+                            return true;
+                        }
 			
 			//victim must not have the permission which makes him immune to siege
 			if(defender.hasPermission("griefprevention.siegeimmune"))
