@@ -804,7 +804,7 @@ public class EntityEventHandler implements Listener
             //don't track in worlds where claims are not enabled
             if(!GriefPrevention.instance.claimsEnabledForWorld(event.getEntity().getWorld())) return;
             
-            //if the damaged entity is a claimed item frame or armor stand, the damager needs to be a player with container trust in the claim
+            //if the damaged entity is a claimed item frame or armor stand, the damager needs to be a player with build trust in the claim
             if(subEvent.getEntityType() == EntityType.ITEM_FRAME
                || subEvent.getEntityType() == EntityType.ARMOR_STAND
                || subEvent.getEntityType() == EntityType.VILLAGER
@@ -911,6 +911,7 @@ public class EntityEventHandler implements Listener
                 if(attacker == null
                         && damageSource != null
                         && damageSource.getType() != EntityType.CREEPER
+                        && damageSource.getType() != EntityType.WITHER
                         && damageSource.getType() != EntityType.ENDER_CRYSTAL
                         && damageSource.getType() != EntityType.AREA_EFFECT_CLOUD
                         && !(damageSource instanceof Projectile)
@@ -1078,7 +1079,7 @@ public class EntityEventHandler implements Listener
 		}
 		
 		//if not a player and not an explosion, always allow
-        if(attacker == null && damageSourceType != EntityType.CREEPER && damageSourceType != EntityType.PRIMED_TNT)
+        if(attacker == null && damageSourceType != EntityType.CREEPER && damageSourceType != EntityType.WITHER && damageSourceType != EntityType.PRIMED_TNT)
         {
             return;
         }
