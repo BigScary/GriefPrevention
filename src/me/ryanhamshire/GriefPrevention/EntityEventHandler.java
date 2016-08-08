@@ -794,15 +794,49 @@ public class EntityEventHandler implements Listener
             }
         }
         
-        //FEATURE: protect claimed animals, boats, minecarts, and items inside item frames
-        //NOTE: animals can be lead with wheat, vehicles can be pushed around.
-        //so unless precautions are taken by the owner, a resourceful thief might find ways to steal anyway
-        
-        //if theft protection is enabled
         if(event instanceof EntityDamageByEntityEvent)
         {
             //don't track in worlds where claims are not enabled
             if(!GriefPrevention.instance.claimsEnabledForWorld(event.getEntity().getWorld())) return;
+            
+            //protect players from being attacked by other players' pets when protected from pvp
+            if(event.getEntityType() == EntityType.PLAYER)
+            {
+                Player defender = (Player)event.getEntity();
+                
+                //if attacker is a pet
+                Entity damager = subEvent.getDamager();
+                if(damager != null && damager instanceof Tameable)
+                {
+                    Tameable pet = (Tameable) damager;
+                    if(pet.isTamed() && pet.getOwner() != null)
+                    {
+                        //if defender is NOT in pvp combat and not immune to pvp right now due to recent respawn
+                        PlayerData defenderData = GriefPrevention.instance.dataStore.getPlayerData(event.getEntity().getUniqueId());
+                        if(!defenderData.pvpImmune && !defenderData.inPvpCombat())
+                        {
+                            //if defender is not in a protected area
+                            Claim defenderClaim = this.dataStore.getClaimAt(defender.getLocation(), false, defenderData.lastClaim);
+                            if( defenderClaim != null &&
+                                !defenderData.inPvpCombat() &&
+                                GriefPrevention.instance.claimIsPvPSafeZone(defenderClaim))
+                            {
+                                defenderData.lastClaim = defenderClaim;
+                                PreventPvPEvent pvpEvent = new PreventPvPEvent(defenderClaim);
+                                Bukkit.getPluginManager().callEvent(pvpEvent);
+                                
+                                //if other plugins aren't making an exception to the rule 
+                                if(!pvpEvent.isCancelled())
+                                {
+                                    event.setCancelled(true);
+                                    if(damager instanceof Creature) ((Creature) damager).setTarget(null);
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
             
             //if the damaged entity is a claimed item frame or armor stand, the damager needs to be a player with build trust in the claim
             if(subEvent.getEntityType() == EntityType.ITEM_FRAME
