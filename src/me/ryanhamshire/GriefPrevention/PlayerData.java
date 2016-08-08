@@ -86,11 +86,7 @@ public class PlayerData
 	
 	//spam
 	private Date lastLogin = null;					//when the player last logged into the server
-    public String lastMessage = "";					//the player's last chat message, or slash command complete with parameters 
-	public Date lastMessageTimestamp = new Date();  //last time the player sent a chat message or used a monitored slash command
-	public int spamCount = 0;						//number of consecutive "spams"
-	public boolean spamWarned = false;				//whether the player recently received a warning
-	
+    
 	//visualization
 	public Visualization currentVisualization = null;
 	
@@ -134,6 +130,9 @@ public class PlayerData
 	//spot where a player can't talk, used to mute new players until they've moved a little
 	//this is an anti-bot strategy.
 	Location noChatLocation = null;
+	
+	//last sign message, to prevent sign spam
+	String lastSignMessage = null;
 	
 	//ignore list
 	//true means invisible (admin-forced ignore), false means player-created ignore

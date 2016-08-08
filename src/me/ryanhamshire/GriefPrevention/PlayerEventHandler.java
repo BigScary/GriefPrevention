@@ -91,6 +91,9 @@ class PlayerEventHandler implements Listener
 	//matcher for banned words
 	private WordFinder bannedWordFinder = new WordFinder(GriefPrevention.instance.dataStore.loadBannedWords());
 	
+	//spam tracker
+	SpamDetector spamDetector = new SpamDetector();
+	
 	//typical constructor, yawn
 	PlayerEventHandler(DataStore dataStore, GriefPrevention plugin)
 	{
@@ -207,14 +210,7 @@ class PlayerEventHandler implements Listener
 		}
 	}
 	
-	//last chat message shown, regardless of who sent it
-	private String lastChatMessage = "";
-	private long lastChatMessageTimestamp = 0;
-	
-	//number of identical messages in a row
-	private int duplicateMessageCount = 0;
-	
-	//returns true if the message should be sent, false if it should be muted 
+	//returns true if the message should be muted, true if it should be sent 
 	private boolean handlePlayerChat(Player player, String message, PlayerEvent event)
 	{
 		//FEATURE: automatically educate players about claiming land
@@ -250,235 +246,84 @@ class PlayerEventHandler implements Listener
 		//if the player has permission to spam, don't bother even examining the message
 		if(player.hasPermission("griefprevention.spam")) return false;
 		
-		boolean spam = false;
-		String mutedReason = null;
+		//examine recent messages to detect spam
+		SpamAnalysisResult result = this.spamDetector.AnalyzeMessage(player.getUniqueId(), message, System.currentTimeMillis());
 		
-		//prevent bots from chatting - require movement before talking for any newish players
-        PlayerData playerData = this.dataStore.getPlayerData(player.getUniqueId());
-		if(playerData.noChatLocation != null)
+		//apply any needed changes to message (like lowercasing all-caps)
+		if(event instanceof AsyncPlayerChatEvent)
         {
-		    Location currentLocation = player.getLocation();
+            ((AsyncPlayerChatEvent)event).setMessage(result.finalMessage);
+        }
+		
+		//don't allow new players to chat after logging in until they move
+		PlayerData playerData = this.dataStore.getPlayerData(player.getUniqueId());
+        if(playerData.noChatLocation != null)
+        {
+            Location currentLocation = player.getLocation();
             if(currentLocation.getBlockX() == playerData.noChatLocation.getBlockX() &&
                currentLocation.getBlockZ() == playerData.noChatLocation.getBlockZ())
             {
                 GriefPrevention.sendMessage(player, TextMode.Err, Messages.NoChatUntilMove, 10L);
-                spam = true;
-                mutedReason = "pre-movement chat";
+                result.muteReason = "pre-movement chat";
             }
             else
             {
                 playerData.noChatLocation = null;
             }
         }
-		
-		//remedy any CAPS SPAM, exception for very short messages which could be emoticons like =D or XD
-		if(message.length() > 4 && this.stringsAreSimilar(message.toUpperCase(), message))
-		{
-			//exception for strings containing forward slash to avoid changing a case-sensitive URL
-			if(event instanceof AsyncPlayerChatEvent)
-			{
-				((AsyncPlayerChatEvent)event).setMessage(message.toLowerCase());
-			}
-		}
-		
-		//always mute an exact match to the last chat message
-		long now = new Date().getTime();
-		if(mutedReason != null && message.equals(this.lastChatMessage) && now - this.lastChatMessageTimestamp < 750)
-		{
-		    playerData.spamCount += ++this.duplicateMessageCount;
-		    spam = true;
-		    mutedReason = "repeat message";
-		}
-		else
-		{
-		    this.lastChatMessage = message;
-		    this.lastChatMessageTimestamp = now;
-		    this.duplicateMessageCount = 0;
-		}
-		
-		//where other types of spam are concerned, casing isn't significant
-		message = message.toLowerCase();
-		
-		//check message content and timing		
-		long millisecondsSinceLastMessage = now - playerData.lastMessageTimestamp.getTime();
-		
-		//if the message came too close to the last one
-		if(millisecondsSinceLastMessage < 1500)
-		{
-			//increment the spam counter
-			playerData.spamCount++;
-			spam = true;
-		}
-		
-		//if it's very similar to the last message from the same player and within 10 seconds of that message
-		if(mutedReason == null && this.stringsAreSimilar(message, playerData.lastMessage) && now - playerData.lastMessageTimestamp.getTime() < 10000)
-		{
-			playerData.spamCount++;
-			spam = true;
-			mutedReason = "similar message";
-		}
-		
-		//filter IP addresses
-		if(mutedReason == null)
-		{
-			if(GriefPrevention.instance.containsBlockedIP(message))
-			{
-				//spam notation
-				playerData.spamCount+=1;
-				spam = true;
-				
-				//block message
-				mutedReason = "IP address";
-			}
-		}
-		
-		//if the message was mostly non-alpha-numerics or doesn't include much whitespace, consider it a spam (probably ansi art or random text gibberish) 
-		if(mutedReason == null && message.length() > 5)
-		{
-			int symbolsCount = 0;
-			int whitespaceCount = 0;
-			for(int i = 0; i < message.length(); i++)
-			{
-				char character = message.charAt(i);
-				if(!(Character.isLetterOrDigit(character)))
-				{
-					symbolsCount++;
-				}
-				
-				if(Character.isWhitespace(character))
-				{
-					whitespaceCount++;
-				}
-			}
-			
-			if(symbolsCount > message.length() / 2 || (message.length() > 15 && whitespaceCount < message.length() / 10))
-			{
-				spam = true;
-				if(playerData.spamCount > 0) mutedReason = "gibberish";
-				playerData.spamCount++;
-			}
-		}
-		
-		//very short messages close together are spam
-		if(mutedReason == null && message.length() < 5 && millisecondsSinceLastMessage < 3000)
-		{
-			spam = true;
-			playerData.spamCount++;
-		}
-		
-		//in any case, record the timestamp of this message and also its content for next time
-        playerData.lastMessageTimestamp = new Date();
-        playerData.lastMessage = message;
-		
-		//if the message was determined to be a spam, consider taking action		
-		if(spam)
-		{		
-			//anything above level 8 for a player which has received a warning...  kick or if enabled, ban 
-			if(playerData.spamCount > 8 && playerData.spamWarned)
-			{
-				if(GriefPrevention.instance.config_spam_banOffenders)
-				{
-					//log entry
-					GriefPrevention.AddLogEntry("Banning " + player.getName() + " for spam.", CustomLogEntryTypes.AdminActivity);
-					
-					//kick and ban
-					PlayerKickBanTask task = new PlayerKickBanTask(player, GriefPrevention.instance.config_spam_banMessage, "GriefPrevention Anti-Spam",true);
-					GriefPrevention.instance.getServer().getScheduler().scheduleSyncDelayedTask(GriefPrevention.instance, task, 1L);
-				}
-				else
-				{
-					//log entry
-					GriefPrevention.AddLogEntry("Kicking " + player.getName() + " for spam.", CustomLogEntryTypes.AdminActivity);
-					
-					//just kick
-					PlayerKickBanTask task = new PlayerKickBanTask(player, "", "GriefPrevention Anti-Spam", false);
-					GriefPrevention.instance.getServer().getScheduler().scheduleSyncDelayedTask(GriefPrevention.instance, task, 1L);					
-				}
-				
-				return true;
-			}
-			
-			//cancel any messages while at or above the third spam level and issue warnings
-			//anything above level 2, mute and warn
-			if(playerData.spamCount >= 4)
-			{
-				if(mutedReason == null)
-				{
-				    mutedReason = "too-frequent text";
-				}
-				if(!playerData.spamWarned)
-				{
-					GriefPrevention.sendMessage(player, TextMode.Warn, GriefPrevention.instance.config_spam_warningMessage, 10L);
-					GriefPrevention.AddLogEntry("Warned " + player.getName() + " about spam penalties.", CustomLogEntryTypes.Debug, true);
-					playerData.spamWarned = true;
-				}
-			}
-			
-			if(mutedReason != null)
-			{
-				//make a log entry
-				GriefPrevention.AddLogEntry("Muted " + mutedReason + ".");
-				GriefPrevention.AddLogEntry("Muted " + player.getName() + " " + mutedReason + ":" + message, CustomLogEntryTypes.Debug, true);
-				
-				//cancelling the event guarantees other players don't receive the message
-				return true;
-			}		
-		}
-		
-		//otherwise if not a spam, reset the spam counter for this player
-		else
-		{
-			playerData.spamCount = 0;
-			playerData.spamWarned = false;
-		}
-		
-		return false;
+        
+        //filter IP addresses
+        if(result.muteReason == null)
+        {
+            if(GriefPrevention.instance.containsBlockedIP(message))
+            {
+                //block message
+                result.muteReason = "IP address";
+            }
+        }
+        
+        //take action based on spam detector results
+        if(result.shouldBanChatter)
+        {
+            if(GriefPrevention.instance.config_spam_banOffenders)
+            {
+                //log entry
+                GriefPrevention.AddLogEntry("Banning " + player.getName() + " for spam.", CustomLogEntryTypes.AdminActivity);
+                
+                //kick and ban
+                PlayerKickBanTask task = new PlayerKickBanTask(player, GriefPrevention.instance.config_spam_banMessage, "GriefPrevention Anti-Spam",true);
+                GriefPrevention.instance.getServer().getScheduler().scheduleSyncDelayedTask(GriefPrevention.instance, task, 1L);
+            }
+            else
+            {
+                //log entry
+                GriefPrevention.AddLogEntry("Kicking " + player.getName() + " for spam.", CustomLogEntryTypes.AdminActivity);
+                
+                //just kick
+                PlayerKickBanTask task = new PlayerKickBanTask(player, "", "GriefPrevention Anti-Spam", false);
+                GriefPrevention.instance.getServer().getScheduler().scheduleSyncDelayedTask(GriefPrevention.instance, task, 1L);                    
+            }
+        }
+        
+        else if(result.shouldWarnChatter)
+        {
+            //warn and log
+            GriefPrevention.sendMessage(player, TextMode.Warn, GriefPrevention.instance.config_spam_warningMessage, 10L);
+            GriefPrevention.AddLogEntry("Warned " + player.getName() + " about spam penalties.", CustomLogEntryTypes.Debug, true);
+        }
+        
+        if(result.muteReason != null)
+        {
+            //mute and log
+            GriefPrevention.AddLogEntry("Muted " + result.muteReason + ".");
+            GriefPrevention.AddLogEntry("Muted " + player.getName() + " " + result.muteReason + ":" + message, CustomLogEntryTypes.Debug, true);
+
+            return true;
+        }
+        
+        return false;
 	}
 	
-	//if two strings are 75% identical, they're too close to follow each other in the chat
-	private boolean stringsAreSimilar(String message, String lastMessage)
-	{
-	    //determine which is shorter
-		String shorterString, longerString;
-		if(lastMessage.length() < message.length())
-		{
-			shorterString = lastMessage;
-			longerString = message;
-		}
-		else
-		{
-			shorterString = message;
-			longerString = lastMessage;
-		}
-		
-		if(shorterString.length() <= 5) return shorterString.equals(longerString);
-		
-		//set similarity tolerance
-		int maxIdenticalCharacters = longerString.length() - longerString.length() / 4;
-		
-		//trivial check on length
-		if(shorterString.length() < maxIdenticalCharacters) return false;
-		
-		//compare forward
-		int identicalCount = 0;
-		int i;
-		for(i = 0; i < shorterString.length(); i++)
-		{
-			if(shorterString.charAt(i) == longerString.charAt(i)) identicalCount++;
-			if(identicalCount > maxIdenticalCharacters) return true;
-		}
-		
-		//compare backward
-		int j;
-		for(j = 0; j < shorterString.length() - i; j++)
-		{
-			if(shorterString.charAt(shorterString.length() - j - 1) == longerString.charAt(longerString.length() - j - 1)) identicalCount++;
-			if(identicalCount > maxIdenticalCharacters) return true;
-		}
-		
-		return false;
-	}
-
 	//when a player uses a slash command...
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
 	synchronized void onPlayerCommandPreprocess (PlayerCommandPreprocessEvent event)

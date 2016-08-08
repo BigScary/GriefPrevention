@@ -131,11 +131,11 @@ public class BlockEventHandler implements Listener
 		
 		//if not empty and wasn't the same as the last sign, log it and remember it for later
 		PlayerData playerData = this.dataStore.getPlayerData(player.getUniqueId());
-		if(notEmpty && playerData.lastMessage != null && !playerData.lastMessage.equals(signMessage))
+		if(notEmpty && playerData.lastSignMessage != null && !playerData.lastSignMessage.equals(signMessage))
 		{		
 			GriefPrevention.AddLogEntry(player.getName() + lines.toString().replace("\n  ", ";"), null);
 			PlayerEventHandler.makeSocialLogEntry(player.getName(), signMessage);
-			playerData.lastMessage = signMessage;
+			playerData.lastSignMessage = signMessage;
 			
 			if(!player.hasPermission("griefprevention.eavesdropsigns"))
 			{
