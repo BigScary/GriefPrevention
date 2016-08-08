@@ -66,6 +66,7 @@ public enum Messages
     AlreadySieging,
     NotSiegableThere,
     SiegeTooFarAway,
+    NoSiegeYourself,
     NoSiegeDefenseless,
     AlreadyUnderSiegePlayer,
     AlreadyUnderSiegeArea,

@@ -1436,6 +1436,7 @@ public abstract class DataStore
 		this.addDefault(defaults, Messages.AlreadyUnderSiegePlayer, "{0} is already under siege.  Join the party!", "0: defending player");
 		this.addDefault(defaults, Messages.NotSiegableThere, "{0} isn't protected there.", "0: defending player");
 		this.addDefault(defaults, Messages.SiegeTooFarAway, "You're too far away to siege.", null);
+		this.addDefault(defaults, Messages.NoSiegeYourself, "You cannot siege yourself, don't be silly", null);
 		this.addDefault(defaults, Messages.NoSiegeDefenseless, "That player is defenseless.  Go pick on somebody else.", null);
 		this.addDefault(defaults, Messages.AlreadyUnderSiegeArea, "That area is already under siege.  Join the party!", null);
 		this.addDefault(defaults, Messages.NoSiegeAdminClaim, "Siege is disabled in this area.", null);

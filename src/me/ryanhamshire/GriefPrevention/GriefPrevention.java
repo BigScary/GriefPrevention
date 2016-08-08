@@ -1695,7 +1695,7 @@ public class GriefPrevention extends JavaPlugin
 			//if no parameter, just tell player cost per block and balance
 			if(args.length != 1)
 			{
-				GriefPrevention.sendMessage(player, TextMode.Info, Messages.BlockPurchaseCost, String.valueOf(GriefPrevention.instance.config_economy_claimBlocksPurchaseCost), String.valueOf(GriefPrevention.economy.getBalance(player)));
+				GriefPrevention.sendMessage(player, TextMode.Info, Messages.BlockPurchaseCost, String.valueOf(GriefPrevention.instance.config_economy_claimBlocksPurchaseCost), String.valueOf(GriefPrevention.economy.getBalance(player.getName())));
 				return false;
 			}
 			
@@ -1720,7 +1720,7 @@ public class GriefPrevention extends JavaPlugin
 				}
 				
 				//if the player can't afford his purchase, send error message
-				double balance = economy.getBalance(player);				
+				double balance = economy.getBalance(player.getName());				
 				double totalCost = blockCount * GriefPrevention.instance.config_economy_claimBlocksPurchaseCost;				
 				if(totalCost > balance)
 				{
@@ -1731,7 +1731,7 @@ public class GriefPrevention extends JavaPlugin
 				else
 				{
 					//withdraw cost
-					economy.withdrawPlayer(player, totalCost);
+					economy.withdrawPlayer(player.getName(), totalCost);
 					
 					//add blocks
 					playerData.setBonusClaimBlocks(playerData.getBonusClaimBlocks() + blockCount);
@@ -1806,7 +1806,7 @@ public class GriefPrevention extends JavaPlugin
 			{					
 				//compute value and deposit it
 				double totalValue = blockCount * GriefPrevention.instance.config_economy_claimBlocksSellValue;					
-				economy.depositPlayer(player, totalValue);
+				economy.depositPlayer(player.getName(), totalValue);
 				
 				//subtract blocks
 				playerData.setBonusClaimBlocks(playerData.getBonusClaimBlocks() - blockCount);
@@ -2398,6 +2398,13 @@ public class GriefPrevention extends JavaPlugin
 			{
 				return false;
 			}
+
+                        // First off, you cannot siege yourself, that's just
+                        // silly:
+                        if (attacker.getName().equals( defender.getName() )) {
+                            GriefPrevention.sendMessage(player, TextMode.Err, Messages.NoSiegeYourself);
+                            return true;
+                        }
 			
 			//victim must not have the permission which makes him immune to siege
 			if(defender.hasPermission("griefprevention.siegeimmune"))
