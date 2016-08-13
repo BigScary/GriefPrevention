@@ -245,6 +245,7 @@ permissions:
             griefprevention.seeinactivity: true
             griefprevention.eavesdropimmune: true
             griefprevention.deleteclaimsinworld: true
+            griefprevention.siegeteleport: true
     griefprevention.siegeimmune:
         description: Makes a player immune to /Siege.
         default: op
@@ -353,3 +354,6 @@ permissions:
     griefprevention.mostaccrued:
         description: Players with this permission can accrue more claim blocks (limit specified in the config file).
         default: false
+    griefprevention.siegeteleport:
+        description: Players with this permission can teleport into and out of besieged areas.
+        default: op

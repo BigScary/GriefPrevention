@@ -1071,6 +1071,9 @@ class PlayerEventHandler implements Listener
 		//these rules only apply to siege worlds only
 		if(!GriefPrevention.instance.config_siege_enabledWorlds.contains(player.getWorld())) return;
 		
+		//these rules do not apply to admins
+		if(player.hasPermission("griefprevention.siegeteleport")) return;
+		
 		Location source = event.getFrom();
 		Claim sourceClaim = this.dataStore.getClaimAt(source, false, playerData.lastClaim);
 		if(sourceClaim != null && sourceClaim.siegeData != null)
