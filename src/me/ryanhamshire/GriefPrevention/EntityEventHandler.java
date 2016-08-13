@@ -595,7 +595,7 @@ public class EntityEventHandler implements Listener
         if(entity instanceof Monster) return true;
         
         EntityType type = entity.getType();
-        if(type == EntityType.GHAST || type == EntityType.MAGMA_CUBE || type == EntityType.SHULKER) return true;
+        if(type == EntityType.GHAST || type == EntityType.MAGMA_CUBE || type == EntityType.SHULKER || type == EntityType.POLAR_BEAR) return true;
         
         if(type == EntityType.RABBIT)
         {
