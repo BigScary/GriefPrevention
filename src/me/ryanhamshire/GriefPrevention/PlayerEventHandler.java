@@ -148,6 +148,16 @@ class PlayerEventHandler implements Listener
 		//troll and excessive profanity filter
 		else if(!player.hasPermission("griefprevention.spam") && this.bannedWordFinder.hasMatch(message))
         {
+		    //allow admins to see the soft-muted text
+		    String notificationMessage = "(Muted " + player.getName() + "): " + message;
+		    for(Player recipient : recipients)
+            {
+                if(recipient.hasPermission("griefprevention.eavesdrop"))
+                {
+                    recipient.sendMessage(ChatColor.GRAY + notificationMessage);
+                }
+            }
+		    
 		    //limit recipients to sender
 		    recipients.clear();
             recipients.add(player);
@@ -168,8 +178,7 @@ class PlayerEventHandler implements Listener
             //otherwise assume chat troll and mute all chat from this sender until an admin says otherwise
             else if(GriefPrevention.instance.config_trollFilterEnabled)
             {
-            	String notificationMessage = "(Auto-Muted " + player.getName() + "): " + message;
-                GriefPrevention.AddLogEntry("Auto-muted new player " + player.getName() + " for profanity shortly after join.  Use /SoftMute to undo.", CustomLogEntryTypes.AdminActivity);
+            	GriefPrevention.AddLogEntry("Auto-muted new player " + player.getName() + " for profanity shortly after join.  Use /SoftMute to undo.", CustomLogEntryTypes.AdminActivity);
                 GriefPrevention.AddLogEntry(notificationMessage, CustomLogEntryTypes.MutedChat, false);
                 GriefPrevention.instance.dataStore.toggleSoftMute(player.getUniqueId());
             }
