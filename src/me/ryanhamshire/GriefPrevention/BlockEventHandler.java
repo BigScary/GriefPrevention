@@ -89,7 +89,7 @@ public class BlockEventHandler implements Listener
 		Block block = breakEvent.getBlock();
 		
 		//make sure the player is allowed to break at the location
-		String noBuildReason = GriefPrevention.instance.allowBreak(player, block, block.getLocation());
+		String noBuildReason = GriefPrevention.instance.allowBreak(player, block, block.getLocation(), breakEvent);
 		if(noBuildReason != null)
 		{
 			GriefPrevention.sendMessage(player, TextMode.Err, noBuildReason);

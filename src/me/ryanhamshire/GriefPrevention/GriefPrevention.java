@@ -33,6 +33,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import me.ryanhamshire.GriefPrevention.DataStore.NoTransferException;
+import me.ryanhamshire.GriefPrevention.events.PreventBlockBreakEvent;
 import me.ryanhamshire.GriefPrevention.events.SaveTrappedPlayerEvent;
 import net.milkbowl.vault.economy.Economy;
 
@@ -55,6 +56,7 @@ import org.bukkit.command.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -3320,42 +3322,58 @@ public class GriefPrevention extends JavaPlugin
 	
 	public String allowBreak(Player player, Block block, Location location)
 	{
-		if(!GriefPrevention.instance.claimsEnabledForWorld(location.getWorld())) return null;
-	    
-	    PlayerData playerData = this.dataStore.getPlayerData(player.getUniqueId());
-		Claim claim = this.dataStore.getClaimAt(location, false, playerData.lastClaim);
-		
-		//exception: administrators in ignore claims mode, and special player accounts created by server mods
-		if(playerData.ignoreClaims || GriefPrevention.instance.config_mods_ignoreClaimsAccounts.contains(player.getName())) return null;
-		
-		//wilderness rules
-		if(claim == null)
-		{
-			//no building in the wilderness in creative mode
-			if(this.creativeRulesApply(location) || this.config_claims_worldModes.get(location.getWorld()) == ClaimsMode.SurvivalRequiringClaims)
-			{
-				String reason = this.dataStore.getMessage(Messages.NoBuildOutsideClaims);
-				if(player.hasPermission("griefprevention.ignoreclaims"))
-					reason += "  " + this.dataStore.getMessage(Messages.IgnoreClaimsAdvertisement);
-				reason += "  " + this.dataStore.getMessage(Messages.CreativeBasicsVideo2, DataStore.CREATIVE_VIDEO_URL);
-				return reason;
-			}
-			
-			//but it's fine in survival mode
-			else
-			{
-				return null;
-			}
-		}
-		else
-		{
-			//cache the claim for later reference
-			playerData.lastClaim = claim;
-		
-			//if not in the wilderness, then apply claim rules (permissions, etc)
-			return claim.allowBreak(player, block.getType());
-		}
+		return this.allowBreak(player, block, location, null);
 	}
+	
+	public String allowBreak(Player player, Block block, Location location, BlockBreakEvent breakEvent)
+    {
+        if(!GriefPrevention.instance.claimsEnabledForWorld(location.getWorld())) return null;
+        
+        PlayerData playerData = this.dataStore.getPlayerData(player.getUniqueId());
+        Claim claim = this.dataStore.getClaimAt(location, false, playerData.lastClaim);
+        
+        //exception: administrators in ignore claims mode, and special player accounts created by server mods
+        if(playerData.ignoreClaims || GriefPrevention.instance.config_mods_ignoreClaimsAccounts.contains(player.getName())) return null;
+        
+        //wilderness rules
+        if(claim == null)
+        {
+            //no building in the wilderness in creative mode
+            if(this.creativeRulesApply(location) || this.config_claims_worldModes.get(location.getWorld()) == ClaimsMode.SurvivalRequiringClaims)
+            {
+                String reason = this.dataStore.getMessage(Messages.NoBuildOutsideClaims);
+                if(player.hasPermission("griefprevention.ignoreclaims"))
+                    reason += "  " + this.dataStore.getMessage(Messages.IgnoreClaimsAdvertisement);
+                reason += "  " + this.dataStore.getMessage(Messages.CreativeBasicsVideo2, DataStore.CREATIVE_VIDEO_URL);
+                return reason;
+            }
+            
+            //but it's fine in survival mode
+            else
+            {
+                return null;
+            }
+        }
+        else
+        {
+            //cache the claim for later reference
+            playerData.lastClaim = claim;
+        
+            //if not in the wilderness, then apply claim rules (permissions, etc)
+            String cancel = claim.allowBreak(player, block.getType());
+            if(cancel != null && breakEvent != null)
+            {
+                PreventBlockBreakEvent preventionEvent = new PreventBlockBreakEvent(breakEvent);
+                Bukkit.getPluginManager().callEvent(preventionEvent);
+                if(preventionEvent.isCancelled())
+                {
+                    cancel = null;
+                }
+            }
+            
+            return cancel;
+        }
+    }
 
 	//restores nature in multiple chunks, as described by a claim instance
 	//this restores all chunks which have ANY number of claim blocks from this claim in them
