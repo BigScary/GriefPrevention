@@ -73,6 +73,7 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityInteractEvent;
+import org.bukkit.event.entity.EntityPortalEnterEvent;
 import org.bukkit.event.entity.ExpBottleEvent;
 import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
@@ -172,7 +173,8 @@ public class EntityEventHandler implements Listener
 		    else
 		    {
 		         List<MetadataValue> values = entity.getMetadata("GP_FALLINGBLOCK");
-		         
+				 //If entity fell through an end portal, allow it to form, as the event is erroneously fired twice in this scenario.
+				 if (entity.hasMetadata("GP_FELLTHROUGHPORTAL")) return;
 		         //if we're not sure where this entity came from (maybe another plugin didn't follow the standard?), allow the block to form
 		         if(values.size() < 1) return;
 		         
@@ -203,6 +205,15 @@ public class EntityEventHandler implements Listener
 		         }
 		    }
 		}
+	}
+
+	//Used by "sand cannon" fix to ignore fallingblocks that fell through End Portals
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
+	public void onFallingBlockEnterPortal(EntityPortalEnterEvent event)
+	{
+		if (event.getEntityType() != EntityType.FALLING_BLOCK)
+			return;
+		event.getEntity().setMetadata("GP_FELLTHROUGHPORTAL", new FixedMetadataValue(GriefPrevention.instance, true));
 	}
 	
 	//don't allow zombies to break down doors
