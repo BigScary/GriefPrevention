@@ -1614,6 +1614,7 @@ public abstract class DataStore
 		this.addDefault(defaults, Messages.IsIgnoringYou, "That player is ignoring you.", null);
 		this.addDefault(defaults, Messages.ConsoleOnlyCommand, "That command may only be executed from the server console.", null);
 		this.addDefault(defaults, Messages.WorldNotFound, "World not found.", null);
+		this.addDefault(defaults, Messages.TooMuchIpOverlap, "Sorry, there are too many players logged in with your IP address.", null);
 		
 		//load the config file
 		FileConfiguration config = YamlConfiguration.loadConfiguration(new File(messagesFilePath));

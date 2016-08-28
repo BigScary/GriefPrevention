@@ -245,5 +245,6 @@ public enum Messages
     TooManyActiveBlocksInClaim,
     ConsoleOnlyCommand,
     WorldNotFound,
-    AdjustBlocksAllSuccess	
+    AdjustBlocksAllSuccess,
+    TooMuchIpOverlap	
 }

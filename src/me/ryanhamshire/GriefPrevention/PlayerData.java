@@ -142,9 +142,6 @@ public class PlayerData
     //profanity warning, once per play session
 	boolean profanityWarned = false;
 
-    //true when the player's IP address was counted against the re-use limit when he joined
-	boolean ipLimited = false;
-
 	//whether or not this player is "in" pvp combat
 	public boolean inPvpCombat()
 	{

@@ -563,9 +563,6 @@ class PlayerEventHandler implements Listener
 
     private ConcurrentHashMap<UUID, Date> lastLoginThisServerSessionMap = new ConcurrentHashMap<UUID, Date>();
 
-    //counts how many players are using each IP address connected to the server right now
-    private ConcurrentHashMap<String, Integer> ipCountHash = new ConcurrentHashMap<String, Integer>();
-	
 	//when a player attempts to join the server...
 	@EventHandler(priority = EventPriority.HIGHEST)
 	void onPlayerLogin (PlayerLoginEvent event)
@@ -588,7 +585,7 @@ class PlayerEventHandler implements Listener
     			    long millisecondsSinceLastLogin = now - lastLoginThisSession.getTime();
     				long secondsSinceLastLogin = millisecondsSinceLastLogin / 1000;
     				long cooldownRemaining = GriefPrevention.instance.config_spam_loginCooldownSeconds - secondsSinceLastLogin;
-    				
+
     				//if cooldown remaining
     				if(cooldownRemaining > 0)
     				{
@@ -727,26 +724,33 @@ class PlayerEventHandler implements Listener
         InetAddress ipAddress = playerData.ipAddress;
         if(ipAddress != null)
         {
-            String ipAddressString = ipAddress.toString();
             int ipLimit = GriefPrevention.instance.config_ipLimit;
             if(ipLimit > 0 && GriefPrevention.isNewToServer(player))
             {
-                Integer ipCount = this.ipCountHash.get(ipAddressString);
-                if(ipCount == null) ipCount = 0;
+                int ipCount = 0;
+                
+                @SuppressWarnings("unchecked")
+                Collection<Player> players = (Collection<Player>)GriefPrevention.instance.getServer().getOnlinePlayers();
+                for(Player onlinePlayer : players)
+                {
+                    if(onlinePlayer.getUniqueId().equals(player.getUniqueId())) continue;
+                    
+                    PlayerData otherData = GriefPrevention.instance.dataStore.getPlayerData(onlinePlayer.getUniqueId());
+                    if(ipAddress.equals(otherData.ipAddress) && GriefPrevention.isNewToServer(onlinePlayer))
+                    {
+                        ipCount++;
+                    }
+                }
+                
                 if(ipCount >= ipLimit)
                 {
                     //kick player
-                    PlayerKickBanTask task = new PlayerKickBanTask(player, "Sorry, there are too many players logged in with your IP address.", "GriefPrevention IP-sharing limit.", false);
-                    GriefPrevention.instance.getServer().getScheduler().scheduleSyncDelayedTask(GriefPrevention.instance, task, 10L);
+                    PlayerKickBanTask task = new PlayerKickBanTask(player, GriefPrevention.instance.dataStore.getMessage(Messages.TooMuchIpOverlap), "GriefPrevention IP-sharing limit.", false);
+                    GriefPrevention.instance.getServer().getScheduler().scheduleSyncDelayedTask(GriefPrevention.instance, task, 100L);
                     
                     //silence join message
                     event.setJoinMessage(null);
                     return;
-                }
-                else
-                {
-                    this.ipCountHash.put(ipAddressString, ipCount + 1);
-                    playerData.ipLimited = true;
                 }
             }
         }
@@ -910,19 +914,6 @@ class PlayerEventHandler implements Listener
         if(playerData.siegeData != null)
         {
             if(player.getHealth() > 0) player.setHealth(0);  //might already be zero from above, this avoids a double death message
-        }
-        
-        //reduce count of players with that player's IP address
-        if(GriefPrevention.instance.config_ipLimit > 0 && playerData.ipLimited)
-        {
-            InetAddress ipAddress = playerData.ipAddress;
-            if(ipAddress != null)
-            {
-                String ipAddressString = ipAddress.toString();
-                Integer count = this.ipCountHash.get(ipAddressString);
-                if(count == null) count = 1;
-                this.ipCountHash.put(ipAddressString, count - 1);
-            }
         }
         
         //drop data about this player
