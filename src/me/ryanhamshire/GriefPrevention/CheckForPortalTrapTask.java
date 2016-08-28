@@ -20,6 +20,8 @@ package me.ryanhamshire.GriefPrevention;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 
 //players can be "trapped" in a portal frame if they don't have permission to break
@@ -44,12 +46,13 @@ class CheckForPortalTrapTask implements Runnable
 	{
 	    //if player has logged out, do nothing
 	    if(!player.isOnline()) return;
-	    
-	    //if still standing in a portal frame, teleport him back through
-	    if(this.player.getLocation().getBlock().getType() == Material.PORTAL)
-	    {
-	        this.player.teleport(this.returnLocation);
-	    }
+
+		Block playerBlock = this.player.getLocation().getBlock();
+		//if still standing in a portal frame, teleport him back through
+		if(playerBlock.getType() == Material.PORTAL || isInNonOccludingBlock(playerBlock))
+		{
+			this.player.teleport(this.returnLocation);
+		}
 	    
 	    //otherwise, note that he 'escaped' the portal frame
 	    else
@@ -57,4 +60,28 @@ class CheckForPortalTrapTask implements Runnable
 	        PlayerEventHandler.portalReturnMap.remove(player.getUniqueId());
 	    }
 	}
+
+	boolean isInNonOccludingBlock(Block block)
+	{
+		Material playerBlock = block.getType();
+		//Most blocks you can "stand" inside but cannot pass through (isSolid) usually can be seen through (!isOccluding)
+		//This can cause players to technically be considered not in a portal block, yet in reality is still stuck in the portal animation.
+		if ((!playerBlock.isSolid() || playerBlock.isOccluding())) //If it is _not_ such a block,
+		{
+			//Check the block above
+			playerBlock = block.getRelative(BlockFace.UP).getType();
+			if ((!playerBlock.isSolid() || playerBlock.isOccluding()))
+				return false; //player is not stuck
+		}
+		//Check if this block is also adjacent to a portal
+		if (block.getRelative(BlockFace.EAST).getType() == Material.PORTAL
+				|| block.getRelative(BlockFace.WEST).getType() == Material.PORTAL
+				|| block.getRelative(BlockFace.NORTH).getType() == Material.PORTAL
+				|| block.getRelative(BlockFace.SOUTH).getType() == Material.PORTAL)
+			return true;
+		return false;
+	}
+
+
+
 }
