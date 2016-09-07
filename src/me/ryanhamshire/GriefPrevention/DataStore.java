@@ -1146,14 +1146,14 @@ public abstract class DataStore
 	}		
 	
 	//deletes all claims owned by a player
-	synchronized public void deleteClaimsForPlayer(UUID playerID, boolean deleteCreativeClaims)
+	synchronized public void deleteClaimsForPlayer(UUID playerID, boolean releasePets)
 	{
 		//make a list of the player's claims
 		ArrayList<Claim> claimsToDelete = new ArrayList<Claim>();
 		for(int i = 0; i < this.claims.size(); i++)
 		{
 			Claim claim = this.claims.get(i);
-			if((playerID == claim.ownerID || (playerID != null && playerID.equals(claim.ownerID))) && (deleteCreativeClaims || !GriefPrevention.instance.creativeRulesApply(claim.getLesserBoundaryCorner())))
+			if((playerID == claim.ownerID || (playerID != null && playerID.equals(claim.ownerID))))
 				claimsToDelete.add(claim);
 		}
 		
@@ -1163,7 +1163,7 @@ public abstract class DataStore
 			Claim claim = claimsToDelete.get(i); 
 			claim.removeSurfaceFluids(null);
 			
-			this.deleteClaim(claim, true);
+			this.deleteClaim(claim, releasePets);
 			
 			//if in a creative mode world, delete the claim
 			if(GriefPrevention.instance.creativeRulesApply(claim.getLesserBoundaryCorner()))
