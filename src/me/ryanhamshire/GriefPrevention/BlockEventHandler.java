@@ -129,13 +129,15 @@ public class BlockEventHandler implements Listener
             return;
         }
 		
-		//if not empty and wasn't the same as the last sign, log it and remember it for later
 		PlayerData playerData = this.dataStore.getPlayerData(player.getUniqueId());
-		if(notEmpty && (playerData.lastSignMessage == null || !playerData.lastSignMessage.equals(signMessage)))
+		//if not empty and wasn't the same as the last sign, log it and remember it for later
+		//This has been temporarily removed since `signMessage` includes location, not just the message. Waste of memory IMO
+		//if(notEmpty && (playerData.lastSignMessage == null || !playerData.lastSignMessage.equals(signMessage)))
+		if (notEmpty)
 		{		
 			GriefPrevention.AddLogEntry(player.getName() + lines.toString().replace("\n  ", ";"), null);
 			PlayerEventHandler.makeSocialLogEntry(player.getName(), signMessage);
-			playerData.lastSignMessage = signMessage;
+			//playerData.lastSignMessage = signMessage;
 			
 			if(!player.hasPermission("griefprevention.eavesdropsigns"))
 			{
