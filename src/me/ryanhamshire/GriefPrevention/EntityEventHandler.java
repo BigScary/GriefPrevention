@@ -1043,6 +1043,9 @@ public class EntityEventHandler implements Listener
         
         //only interested in entities damaging entities (ignoring environmental damage)
         if(!(event instanceof EntityDamageByEntityEvent)) return;
+
+		//Ignore "damage" from snowballs, eggs, etc. from triggering the PvP timer
+		if (event.getDamage() == 0) return;
         
         EntityDamageByEntityEvent subEvent = (EntityDamageByEntityEvent) event;
         
