@@ -310,7 +310,7 @@ public abstract class DataStore
 	//gets the number of bonus blocks a player has from his permissions
 	//Bukkit doesn't allow for checking permissions of an offline player.
 	//this will return 0 when he's offline, and the correct number when online.
-	synchronized int getGroupBonusBlocks(UUID playerID)
+	synchronized public int getGroupBonusBlocks(UUID playerID)
 	{
 		int bonusBlocks = 0;
 		Set<String> keys = permissionToBonusBlocksMap.keySet();
