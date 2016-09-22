@@ -2131,9 +2131,27 @@ public class GriefPrevention extends JavaPlugin
 		//unlockItems
 		else if(cmd.getName().equalsIgnoreCase("unlockdrops") && player != null)
 		{
-			PlayerData playerData = this.dataStore.getPlayerData(player.getUniqueId());
+			PlayerData playerData;
+
+			if (player.hasPermission("griefprevention.unlockothersdrops") && args.length == 1)
+			{
+				Player otherPlayer = Bukkit.getPlayer(args[0]);
+				if (otherPlayer == null)
+				{
+					GriefPrevention.sendMessage(player, TextMode.Err, Messages.PlayerNotFound2);
+					return true;
+				}
+
+				playerData = this.dataStore.getPlayerData(otherPlayer.getUniqueId());
+				GriefPrevention.sendMessage(player, TextMode.Success, Messages.DropUnlockOthersConfirmation, otherPlayer.getName());
+			}
+			else
+			{
+				playerData = this.dataStore.getPlayerData(player.getUniqueId());
+				GriefPrevention.sendMessage(player, TextMode.Success, Messages.DropUnlockConfirmation);
+			}
+
 		    playerData.dropsAreUnlocked = true;
-		    GriefPrevention.sendMessage(player, TextMode.Success, Messages.DropUnlockConfirmation);
 			
 			return true;
 		}
