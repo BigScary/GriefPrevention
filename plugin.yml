@@ -246,6 +246,7 @@ permissions:
             griefprevention.eavesdropimmune: true
             griefprevention.deleteclaimsinworld: true
             griefprevention.siegeteleport: true
+            griefprevention.unlockothersdrops: true
     griefprevention.siegeimmune:
         description: Makes a player immune to /Siege.
         default: op
@@ -258,6 +259,9 @@ permissions:
     griefprevention.unlockdrops:
         description: Grants permission to use /UnlockDrops.
         default: true
+    griefprevention.unlockothersdrops:
+        description: Grants permission to use /UnlockDrops for other players.
+        default: op
     griefprevention.trapped:
         description: Grants permission to use /Trapped.
         default: true
