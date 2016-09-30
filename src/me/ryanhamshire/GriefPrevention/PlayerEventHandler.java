@@ -77,6 +77,7 @@ import org.bukkit.util.BlockIterator;
 class PlayerEventHandler implements Listener 
 {
 	private DataStore dataStore;
+	private GriefPrevention instance;
 	
 	//list of temporarily banned ip's
 	private ArrayList<IpBanInfo> tempBannedIps = new ArrayList<IpBanInfo>();
@@ -100,6 +101,7 @@ class PlayerEventHandler implements Listener
 	PlayerEventHandler(DataStore dataStore, GriefPrevention plugin)
 	{
 		this.dataStore = dataStore;
+		this.instance = plugin;
 	}
 	
 	//when a player chats, monitor for spam
@@ -761,16 +763,7 @@ class PlayerEventHandler implements Listener
         new IgnoreLoaderThread(playerID, playerData.ignoredPlayers).start();
         
         //is he possibly stuck in a portal frame?
-        Location returnLocation = PlayerEventHandler.portalReturnMap.get(player.getUniqueId());
-        if(returnLocation != null)
-        {
-            PlayerEventHandler.portalReturnMap.remove(player.getUniqueId());
-			Block playerBlock = player.getLocation().getBlock();
-			if(GriefPrevention.instance.isPlayerTrappedInPortal(playerBlock))
-            {
-                GriefPrevention.instance.rescuePlayerTrappedInPortal(player, returnLocation);
-            }
-        }
+		instance.rescuePlayerTrappedInPortal(player);
         
         //if we're holding a logout message for this player, don't send that or this event's join message
         if(GriefPrevention.instance.config_spam_logoutMessageDelaySeconds > 0)
@@ -974,10 +967,6 @@ class PlayerEventHandler implements Listener
 		}
 	}
 	
-	//remember where players teleport from (via portals) in case they're trapped at the destination
-	static ConcurrentHashMap<UUID, Location> portalReturnMap = new ConcurrentHashMap<UUID, Location>();
-	static ConcurrentHashMap<UUID, BukkitTask> portalReturnTaskMap = new ConcurrentHashMap<UUID, BukkitTask>();
-	
 	//when a player teleports via a portal
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
 	void onPlayerPortal(PlayerPortalEvent event) 
@@ -993,13 +982,7 @@ class PlayerEventHandler implements Listener
         if(event.getCause() == TeleportCause.NETHER_PORTAL)
         {
             //FEATURE: when players get trapped in a nether portal, send them back through to the other side
-			BukkitTask task = new CheckForPortalTrapTask(player, event.getFrom()).runTaskLater(GriefPrevention.instance, 600L);
-            portalReturnMap.put(player.getUniqueId(), event.getFrom());
-
-			//Cancel existing rescue task
-			if (portalReturnTaskMap.containsKey(player.getUniqueId()))
-				portalReturnTaskMap.get(player.getUniqueId()).cancel();
-			portalReturnTaskMap.put(player.getUniqueId(), task);
+			instance.startRescueTask(player, event.getFrom());
         
             //FEATURE: if the player teleporting doesn't have permission to build a nether portal and none already exists at the destination, cancel the teleportation
             if(GriefPrevention.instance.config_claims_portalsRequirePermission)

@@ -131,8 +131,8 @@ public class PlayerData
 	//this is an anti-bot strategy.
 	Location noChatLocation = null;
 	
-	//last sign message, to prevent sign spam
-	String lastSignMessage = null;
+	//last rescue location, if player was recently rescued (to undo if rescue was unnecessary)
+	Location portalTrappedLocation = null;
 	
 	//ignore list
 	//true means invisible (admin-forced ignore), false means player-created ignore

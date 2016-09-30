@@ -63,6 +63,8 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.BlockIterator;
 
 public class GriefPrevention extends JavaPlugin
@@ -2728,6 +2730,21 @@ public class GriefPrevention extends JavaPlugin
             
             return true;
         }
+
+        else if(cmd.getName().equalsIgnoreCase("undorescue"))
+		{
+			Location location = dataStore.getPlayerData(player.getUniqueId()).portalTrappedLocation;
+			if (location == null)
+			{
+				//TODO: tell player they were not initially rescued (if necessary?)
+				return true;
+			}
+			//Start a new rescue task in case the player was indeed trapped, but dumbly sent the command anyway
+			startRescueTask(player, player.getLocation());
+			player.teleport(location);
+			dataStore.getPlayerData(player.getUniqueId()).portalTrappedLocation = null;
+			return true;
+		}
 		
 		return false; 
 	}
@@ -3613,11 +3630,50 @@ public class GriefPrevention extends JavaPlugin
 				|| block.getRelative(BlockFace.SOUTH).getType() == Material.PORTAL;
 	}
 
-	public Location rescuePlayerTrappedInPortal(Player player, Location returnLocation)
+	public void rescuePlayerTrappedInPortal(final Player player)
 	{
-		Location oldLocation = player.getLocation();
-		player.teleport(returnLocation);
+		final Location oldLocation = player.getLocation();
+		if (!isPlayerTrappedInPortal(oldLocation.getBlock()))
+		{
+			//Note that he 'escaped' the portal frame
+			instance.portalReturnMap.remove(player.getUniqueId());
+			instance.portalReturnTaskMap.remove(player.getUniqueId());
+			return;
+		}
+
+		Location rescueLocation = portalReturnMap.get(player.getUniqueId());
+
+		if (rescueLocation == null)
+			return;
+
+		//Temporarily store the old location, in case the player wishes to undo the rescue
+		dataStore.getPlayerData(player.getUniqueId()).portalTrappedLocation = oldLocation;
+
+		player.teleport(rescueLocation);
 		sendMessage(player, TextMode.Info, Messages.RescuedFromPortalTrap);
-		return oldLocation;
+		portalReturnMap.remove(player.getUniqueId());
+
+		new BukkitRunnable()
+		{
+			public void run()
+			{
+				if (oldLocation == dataStore.getPlayerData(player.getUniqueId()).portalTrappedLocation)
+					dataStore.getPlayerData(player.getUniqueId()).portalTrappedLocation = null;
+			}
+		}.runTaskLater(this, 600L);
+	}
+
+	//remember where players teleport from (via portals) in case they're trapped at the destination
+	ConcurrentHashMap<UUID, Location> portalReturnMap = new ConcurrentHashMap<UUID, Location>();
+	ConcurrentHashMap<UUID, BukkitTask> portalReturnTaskMap = new ConcurrentHashMap<UUID, BukkitTask>();
+	public void startRescueTask(Player player, Location rescueLocation)
+	{
+		BukkitTask task = new CheckForPortalTrapTask(player, this).runTaskLater(GriefPrevention.instance, 600L);
+		portalReturnMap.put(player.getUniqueId(), rescueLocation);
+
+		//Cancel existing rescue task
+		if (portalReturnTaskMap.containsKey(player.getUniqueId()))
+			portalReturnTaskMap.get(player.getUniqueId()).cancel();
+		portalReturnTaskMap.put(player.getUniqueId(), task);
 	}
 }

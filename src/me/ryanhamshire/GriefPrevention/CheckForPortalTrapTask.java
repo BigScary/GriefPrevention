@@ -30,36 +30,28 @@ import org.bukkit.scheduler.BukkitRunnable;
 //if that happens, we detect the problem and send them back through the portal.
 class CheckForPortalTrapTask extends BukkitRunnable
 {
+	GriefPrevention instance;
 	//player who recently teleported via nether portal 
 	private Player player;
 	
 	//where to send the player back to if he hasn't left the portal frame
-	private Location returnLocation;
+	//private Location returnLocation;
 	
-	public CheckForPortalTrapTask(Player player, Location location)
+	public CheckForPortalTrapTask(Player player, GriefPrevention plugin)
 	{
 		this.player = player;
-		this.returnLocation = location;
+		this.instance = plugin;
 	}
 	
 	@Override
 	public void run()
 	{
 	    //if player has logged out, do nothing
-	    if(!player.isOnline()) return;
-
-		Block playerBlock = this.player.getLocation().getBlock();
-		//if still standing in a portal frame, teleport him back through
-		if(GriefPrevention.instance.isPlayerTrappedInPortal(playerBlock))
+	    if(!player.isOnline())
 		{
-			GriefPrevention.instance.rescuePlayerTrappedInPortal(player, returnLocation);
+			instance.portalReturnTaskMap.remove(player.getUniqueId());
+			return;
 		}
-	    
-	    //otherwise, note that he 'escaped' the portal frame
-	    else
-	    {
-	        PlayerEventHandler.portalReturnMap.remove(player.getUniqueId());
-			PlayerEventHandler.portalReturnTaskMap.remove(player.getUniqueId());
-	    }
+		instance.rescuePlayerTrappedInPortal(player);
 	}
 }
