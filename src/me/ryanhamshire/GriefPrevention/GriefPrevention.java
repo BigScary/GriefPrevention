@@ -3617,7 +3617,7 @@ public class GriefPrevention extends JavaPlugin
 	{
 		Location oldLocation = player.getLocation();
 		player.teleport(returnLocation);
-		sendMessage(player, TextMode.Info, Messages.);
+		sendMessage(player, TextMode.Info, Messages.RescuedFromPortalTrap);
 		return oldLocation;
 	}
 }

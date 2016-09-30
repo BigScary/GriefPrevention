@@ -23,11 +23,12 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 
 //players can be "trapped" in a portal frame if they don't have permission to break
 //solid blocks blocking them from exiting the frame
 //if that happens, we detect the problem and send them back through the portal.
-class CheckForPortalTrapTask implements Runnable 
+class CheckForPortalTrapTask extends BukkitRunnable
 {
 	//player who recently teleported via nether portal 
 	private Player player;
@@ -51,13 +52,14 @@ class CheckForPortalTrapTask implements Runnable
 		//if still standing in a portal frame, teleport him back through
 		if(GriefPrevention.instance.isPlayerTrappedInPortal(playerBlock))
 		{
-			this.player.teleport(this.returnLocation);
+			GriefPrevention.instance.rescuePlayerTrappedInPortal(player, returnLocation);
 		}
 	    
 	    //otherwise, note that he 'escaped' the portal frame
 	    else
 	    {
 	        PlayerEventHandler.portalReturnMap.remove(player.getUniqueId());
+			PlayerEventHandler.portalReturnTaskMap.remove(player.getUniqueId());
 	    }
 	}
 }

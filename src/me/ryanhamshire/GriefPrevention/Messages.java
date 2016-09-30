@@ -247,5 +247,6 @@ public enum Messages
     ConsoleOnlyCommand,
     WorldNotFound,
     AdjustBlocksAllSuccess,
-    TooMuchIpOverlap	
+    TooMuchIpOverlap,
+    RescuedFromPortalTrap
 }

@@ -70,6 +70,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.BlockIterator;
 
 class PlayerEventHandler implements Listener 
@@ -766,7 +768,7 @@ class PlayerEventHandler implements Listener
 			Block playerBlock = player.getLocation().getBlock();
 			if(GriefPrevention.instance.isPlayerTrappedInPortal(playerBlock))
             {
-                player.teleport(returnLocation);
+                GriefPrevention.instance.rescuePlayerTrappedInPortal(player, returnLocation);
             }
         }
         
@@ -974,6 +976,7 @@ class PlayerEventHandler implements Listener
 	
 	//remember where players teleport from (via portals) in case they're trapped at the destination
 	static ConcurrentHashMap<UUID, Location> portalReturnMap = new ConcurrentHashMap<UUID, Location>();
+	static ConcurrentHashMap<UUID, BukkitTask> portalReturnTaskMap = new ConcurrentHashMap<UUID, BukkitTask>();
 	
 	//when a player teleports via a portal
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
@@ -990,9 +993,13 @@ class PlayerEventHandler implements Listener
         if(event.getCause() == TeleportCause.NETHER_PORTAL)
         {
             //FEATURE: when players get trapped in a nether portal, send them back through to the other side
-            CheckForPortalTrapTask task = new CheckForPortalTrapTask(player, event.getFrom());
-            GriefPrevention.instance.getServer().getScheduler().scheduleSyncDelayedTask(GriefPrevention.instance, task, 600L);  //after 30 seconds
+			BukkitTask task = new CheckForPortalTrapTask(player, event.getFrom()).runTaskLater(GriefPrevention.instance, 600L);
             portalReturnMap.put(player.getUniqueId(), event.getFrom());
+
+			//Cancel existing rescue task
+			if (portalReturnTaskMap.containsKey(player.getUniqueId()))
+				portalReturnTaskMap.get(player.getUniqueId()).cancel();
+			portalReturnTaskMap.put(player.getUniqueId(), task);
         
             //FEATURE: if the player teleporting doesn't have permission to build a nether portal and none already exists at the destination, cancel the teleportation
             if(GriefPrevention.instance.config_claims_portalsRequirePermission)
