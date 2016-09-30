@@ -5,215 +5,219 @@ dev-url: http://dev.bukkit.org/server-mods/grief-prevention
 loadbefore: [TheUnderground]
 version: ${project.version}
 commands:
-   abandonclaim:
+    abandonclaim:
       description: Deletes a claim.
       usage: /AbandonClaim
       aliases: [unclaim, declaim, removeclaim, disclaim]
       permission: griefprevention.claims
-   abandontoplevelclaim:
+    abandontoplevelclaim:
       description: Deletes a claim and all its subdivisions.
       usage: /AbandonTopLevelClaim
       permission: griefprevention.claims
-   abandonallclaims:
+    abandonallclaims:
       description: Deletes ALL your claims.
       usage: /AbandonAllClaims
       permission: griefprevention.claims
-   trust:
+    trust:
       description: Grants a player full access to your claim(s).
       usage: /Trust <player>  Grants a player permission to build.  See also /UnTrust, /ContainerTrust, /AccessTrust, and /PermissionTrust.
       aliases: tr
       permission: griefprevention.claims
-   untrust:
+    untrust:
       description: Revokes a player's access to your claim(s).
       usage: /UnTrust <player>
       aliases: ut
       permission: griefprevention.claims
-   containertrust:
+    containertrust:
       description: Grants a player access to your claim's containers, crops, animals, bed, buttons, and levers.
       usage: /ContainerTrust <player>.  Grants a player access to your inventory, crops, animals, bed, and buttons/levers.
       aliases: ct
       permission: griefprevention.claims
-   accesstrust:
+    accesstrust:
       description: Grants a player entry to your claim(s) and use of your bed.
       usage: /AccessTrust <player>.  Grants a player access to your bed, buttons, and levers.
       aliases: at
       permission: griefprevention.claims
-   permissiontrust:
+    permissiontrust:
       description: Grants a player permission to grant his level of permission to others.
       usage: /PermissionTrust <player>.  Permits a player to share his permission level with others.
       aliases: pt
       permission: griefprevention.claims
-   subdivideclaims:
+    subdivideclaims:
       description: Switches the shovel tool to subdivision mode, used to subdivide your claims.
       usage: /SubdivideClaims
       aliases: [sc, subdivideclaim]
       permission: griefprevention.claims
-   adjustbonusclaimblocks:
+    adjustbonusclaimblocks:
       description: Adds or subtracts bonus claim blocks for a player.
       usage: /AdjustBonusClaimBlocks <player> <amount>
       permission: griefprevention.adjustclaimblocks
       aliases: acb
-   adjustbonusclaimblocksall:
+    adjustbonusclaimblocksall:
       description: Adds or subtracts bonus claim blocks for all online players.
       usage: /AdjustBonusClaimBlocksAll <player> <amount>
       permission: griefprevention.adjustclaimblocks
       aliases: acball
-   setaccruedclaimblocks:
+    setaccruedclaimblocks:
       description: Updates a player's accrued claim block total.
       usage: /SetAccruedClaimBlocks <player> <amount>
       permission: griefprevention.adjustclaimblocks
       aliases: scb
-   deleteclaim:
+    deleteclaim:
       description: Deletes the claim you're standing in, even if it's not your claim.
       usage: /DeleteClaim
       permission: griefprevention.deleteclaims
-      aliases: dc   
-   deleteallclaims:
+      aliases: dc
+    deleteallclaims:
       description: Deletes all of another player's claims.
       usage: /DeleteAllClaims <player>
       permission: griefprevention.deleteclaims
-   deleteclaimsinworld:
+    deleteclaimsinworld:
       description: Deletes all the claims in a world.  Only usable at the server console.
       usage: /DeleteClaimsInWorld <world>
       aliases: [deleteallclaimsinworld, clearclaimsinworld, clearallclaimsinworld]
       permission: griefprevention.deleteclaimsinworld
-   deleteuserclaimsinworld:
+    deleteuserclaimsinworld:
       description: Deletes all the non-admin claims in a world.  Only usable at the server console.
       usage: /DeleteUserClaimsInWorld <world>
       aliases: [deletealluserclaimsinworld, clearuserclaimsinworld, clearalluserclaimsinworld]
       permission: griefprevention.deleteclaimsinworld
-   adminclaims:
+    adminclaims:
       description: Switches the shovel tool to administrative claims mode.
       usage: /AdminClaims
       permission: griefprevention.adminclaims
       aliases: ac
-   restorenature:
+    restorenature:
       description: Switches the shovel tool to restoration mode.
-      usage: /RestoreNature 
+      usage: /RestoreNature
       permission: griefprevention.restorenature
       aliases: rn
-   restorenatureaggressive:
+    restorenatureaggressive:
       description: Switches the shovel tool to aggressive restoration mode.
-      usage: /RestoreNatureAggressive 
+      usage: /RestoreNatureAggressive
       permission: griefprevention.restorenatureaggressive
       aliases: rna
-   restorenaturefill:
+    restorenaturefill:
       description: Switches the shovel tool to fill mode.
-      usage: /RestoreNatureFill <radius> 
+      usage: /RestoreNatureFill <radius>
       permission: griefprevention.restorenatureaggressive
       aliases: rnf
-   basicclaims:
+    basicclaims:
       description: Switches the shovel tool back to basic claims mode.
       usage: /BasicClaims
       aliases: bc
       permission: griefprevention.claims
-   extendclaim:
+    extendclaim:
       description: Resizes the land claim you're standing in by pushing or pulling its boundary in the direction you're facing.
       usage: /ExtendClaim <numberOfBlocks>
       aliases: [expandclaim, resizeclaim]
       permission: griefprevention.claims
-   claim:
+    claim:
       description: Creates a land claim centered at your current location.
       usage: /Claim [optional radius]
       aliases: [createclaim, makeclaim, newclaim]
       permission: griefprevention.claims
-   buyclaimblocks:
+    buyclaimblocks:
       description: Purchases additional claim blocks with server money.  Doesn't work on servers without a Vault-compatible economy plugin.
       usage: /BuyClaimBlocks <numberOfBlocks>
-      aliases: buyclaim   
+      aliases: buyclaim
       permission: griefprevention.buysellclaimblocks
-   sellclaimblocks:
+    sellclaimblocks:
       description: Sells your claim blocks for server money.  Doesn't work on servers without a Vault-compatible economy plugin.
       usage: /SellClaimBlocks <numberOfBlocks>
       aliases: sellclaim
       permission: griefprevention.buysellclaimblocks
-   trapped:
+    trapped:
       description: Ejects you to nearby unclaimed land.  Has a substantial cooldown period.
       usage: /Trapped
       permission: griefprevention.trapped
-   trustlist:
+    trustlist:
       description: Lists permissions for the claim you're standing in.
       usage: /TrustList
       permission: griefprevention.claims
-   siege:
+    siege:
       description: Initiates a siege versus another player.
       usage: /Siege <playerName>
       permission: griefprevention.siege
-   ignoreclaims:
+    ignoreclaims:
       description: Toggles ignore claims mode.
       usage: /IgnoreClaims
       permission: griefprevention.ignoreclaims
       aliases: ic
-   deletealladminclaims:
+    deletealladminclaims:
       description: Deletes all administrative claims.
       usage: /DeleteAllAdminClaims
       permission: griefprevention.adminclaims
-   adminclaimslist:
+    adminclaimslist:
       description: Lists all administrative claims.
       usage: /AdminClaimsList
       permission: griefprevention.adminclaims
-   transferclaim:
+    transferclaim:
       description: Converts an administrative claim to a private claim.
       usage: /TransferClaim <player>
       aliases: giveclaim
       permission: griefprevention.transferclaim
-   unlockdrops:
+    unlockdrops:
       description: Allows other players to pick up the items you dropped when you died.
       usage: /UnlockDrops
       permission: griefprevention.unlockdrops
-   claimslist:
+    claimslist:
       description: Lists information about a player's claim blocks and claims.
       usage: /ClaimsList or /ClaimsList <player>
       aliases: [claimlist, listclaims]
       permission: griefprevention.claims
-   claimexplosions:
+    claimexplosions:
       description: Toggles whether explosives may be used in a specific land claim.
       usage: /ClaimExplosions
       permission: griefprevention.claims
       aliases: claimexplosion
-   softmute:
+    softmute:
       description: Toggles whether a player's messages will only reach other soft-muted players.
       usage: /SoftMute <player>
       permission: griefprevention.softmute
-   gpreload:
+    gpreload:
       description: Reloads Grief Prevention's configuration settings.  Does NOT totally reload the entire plugin.
       usage: /gpreload
       permission: griefprevention.reload
-   givepet:
+    givepet:
       description: Allows a player to give away a pet he or she tamed.
       usage: /GivePet <player>
       permission: griefprevention.givepet
-   gpblockinfo:
+    gpblockinfo:
       description: Allows an administrator to get technical information about blocks in the world and items in hand.
       usage: /GPBlockInfo
       permission: griefprevention.gpblockinfo
-   ignoreplayer:
+    ignoreplayer:
       description: Ignores another player's chat messages.
       usage: /IgnorePlayer <player name>
       aliases: [ignore]
       permission: griefprevention.ignore
-   unignoreplayer:
+    unignoreplayer:
       description: Unignores another player's chat messages.
       usage: /UnIgnorePlayer <player name>
       aliases: [unignore]
       permission: griefprevention.ignore
-   ignoredplayerlist:
+    ignoredplayerlist:
       description: Lists the players you're ignoring in chat.
       usage: /IgnoredPlayerList
       aliases: [ignores, ignored, ignorelist, ignoredlist, listignores, listignored, ignoring]
       permission: griefprevention.ignore
-   separate:
+    separate:
       description: Forces two players to ignore each other in chat.
       usage: /Separate <player1> <player2>
       permission: griefprevention.separate
-   unseparate:
+    unseparate:
       description: Reverses /separate.
       usage: /UnSeparate <player1> <player2>
       permission: griefprevention.separate
-   claimbook:
+    claimbook:
       description: Gives a player a manual about claiming land.
       usage: /ClaimBook <player>
       permission: griefprevention.claimbook
+    undorescue:
+      description: Allows a player to undo a portal trap rescue operation
+      usage: /UnodRescue
+      permission: griefprevention.undorescue
 permissions:
     griefprevention.createclaims:
         description: Grants permission to create claims.
@@ -264,6 +268,9 @@ permissions:
         default: op
     griefprevention.trapped:
         description: Grants permission to use /Trapped.
+        default: true
+    griefprevention.undorescue:
+        description: Grants permission to use /UndoRescue
         default: true
     griefprevention.claimslistother:
         description: Grants permission to use /ClaimsList to get another player's information.
