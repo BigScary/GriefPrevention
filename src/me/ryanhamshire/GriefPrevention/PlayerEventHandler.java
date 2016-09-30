@@ -764,7 +764,7 @@ class PlayerEventHandler implements Listener
         {
             PlayerEventHandler.portalReturnMap.remove(player.getUniqueId());
 			Block playerBlock = player.getLocation().getBlock();
-			if(playerBlock.getType() == Material.PORTAL || isInNonOccludingBlock(playerBlock))
+			if(GriefPrevention.instance.isPlayerTrappedInPortal(playerBlock))
             {
                 player.teleport(returnLocation);
             }
@@ -785,27 +785,6 @@ class PlayerEventHandler implements Listener
                 }
             }
         }
-	}
-
-	boolean isInNonOccludingBlock(Block block)
-	{
-		Material playerBlock = block.getType();
-		//Most blocks you can "stand" inside but cannot pass through (isSolid) usually can be seen through (!isOccluding)
-		//This can cause players to technically be considered not in a portal block, yet in reality is still stuck in the portal animation.
-		if ((!playerBlock.isSolid() || playerBlock.isOccluding())) //If it is _not_ such a block,
-		{
-			//Check the block above
-			playerBlock = block.getRelative(BlockFace.UP).getType();
-			if ((!playerBlock.isSolid() || playerBlock.isOccluding()))
-				return false; //player is not stuck
-		}
-		//Check if this block is also adjacent to a portal
-		if (block.getRelative(BlockFace.EAST).getType() == Material.PORTAL
-				|| block.getRelative(BlockFace.WEST).getType() == Material.PORTAL
-				|| block.getRelative(BlockFace.NORTH).getType() == Material.PORTAL
-				|| block.getRelative(BlockFace.SOUTH).getType() == Material.PORTAL)
-			return true;
-		return false;
 	}
 
 	//when a player spawns, conditionally apply temporary pvp protection 
