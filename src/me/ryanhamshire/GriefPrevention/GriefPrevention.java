@@ -73,7 +73,7 @@ public class GriefPrevention extends JavaPlugin
 	public static GriefPrevention instance;
 	
 	//for logging to the console and log file
-	private static Logger log = Logger.getLogger("Minecraft");
+	private static Logger log;
 	
 	//this handles data storage, like player and region data
 	public DataStore dataStore;
@@ -231,7 +231,7 @@ public class GriefPrevention extends JavaPlugin
 		{
 		    GriefPrevention.instance.customLogger.AddEntry(entry, customLogType);
 		}
-	    if(!excludeFromServerLogs) log.info("GriefPrevention: " + entry);
+	    if(!excludeFromServerLogs) log.info(entry);
 	}
 	
 	public static synchronized void AddLogEntry(String entry, CustomLogEntryTypes customLogType)
@@ -248,8 +248,7 @@ public class GriefPrevention extends JavaPlugin
 	public void onEnable()
 	{ 		
 	    instance = this;
-        
-        AddLogEntry("Grief Prevention boot start.");
+		log = instance.getLogger();
 		
 		this.loadConfig();
 		
