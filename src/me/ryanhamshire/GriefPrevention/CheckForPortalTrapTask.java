@@ -53,5 +53,6 @@ class CheckForPortalTrapTask extends BukkitRunnable
 			return;
 		}
 		player.setPortalCooldown(0);
+        instance.portalReturnTaskMap.remove(player.getUniqueId());
 	}
 }
