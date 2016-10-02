@@ -17,6 +17,10 @@
             <url>https://repo.destroystokyo.com/repository/maven-public/</url>
         </repository>
         <repository>
+            <id>spigot-repo</id> 
+            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url> 
+        </repository>
+        <repository>
             <id>worldedit-worldguard-repo</id>
             <url>http://maven.sk89q.com/repo/</url>
         </repository>
@@ -67,7 +71,7 @@
         <dependency>
                 <groupId>com.sk89q.worldedit</groupId>
                 <artifactId>worldedit-bukkit</artifactId>
-                <version>6.1.4-SNAPSHOT</version>
+                <version>6.1.5-SNAPSHOT</version>
         </dependency>
          <!--Vault dependency-->
         <dependency>
