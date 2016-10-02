@@ -1888,7 +1888,7 @@ public class GriefPrevention extends JavaPlugin
 						this.dataStore.deleteClaim(claim, true, true);
 						
 						//if in a creative mode world, /restorenature the claim
-						if(GriefPrevention.instance.creativeRulesApply(claim.getLesserBoundaryCorner()))
+						if(GriefPrevention.instance.creativeRulesApply(claim.getLesserBoundaryCorner()) || GriefPrevention.instance.config_claims_survivalAutoNatureRestoration)
 						{
 							GriefPrevention.instance.restoreClaim(claim, 0);
 						}
