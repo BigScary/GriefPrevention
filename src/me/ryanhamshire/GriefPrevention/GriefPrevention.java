@@ -3658,8 +3658,8 @@ public class GriefPrevention extends JavaPlugin
 
 		//Cancel existing rescue task
 		if (portalReturnTaskMap.containsKey(player.getUniqueId()))
-			portalReturnTaskMap.get(player.getUniqueId()).cancel();
-
-		portalReturnTaskMap.put(player.getUniqueId(), task);
+			portalReturnTaskMap.put(player.getUniqueId(), task).cancel();
+		else
+			portalReturnTaskMap.put(player.getUniqueId(), task);
 	}
 }

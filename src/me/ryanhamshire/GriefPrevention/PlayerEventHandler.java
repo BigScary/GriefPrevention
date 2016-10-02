@@ -974,14 +974,14 @@ class PlayerEventHandler implements Listener
 	    //if the player isn't going anywhere, take no action
 	    if(event.getTo() == null || event.getTo().getWorld() == null) return;
 	    
-	    //don't track in worlds where claims are not enabled
-        if(!GriefPrevention.instance.claimsEnabledForWorld(event.getTo().getWorld())) return;
-	    
 	    Player player = event.getPlayer();
         if(event.getCause() == TeleportCause.NETHER_PORTAL)
         {
             //FEATURE: when players get trapped in a nether portal, send them back through to the other side
 			instance.startRescueTask(player);
+
+			//don't track in worlds where claims are not enabled
+			if(!GriefPrevention.instance.claimsEnabledForWorld(event.getTo().getWorld())) return;
         
             //FEATURE: if the player teleporting doesn't have permission to build a nether portal and none already exists at the destination, cancel the teleportation
             if(GriefPrevention.instance.config_claims_portalsRequirePermission)
