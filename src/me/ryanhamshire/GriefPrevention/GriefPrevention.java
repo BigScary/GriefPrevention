@@ -2730,22 +2730,6 @@ public class GriefPrevention extends JavaPlugin
             
             return true;
         }
-
-        else if(cmd.getName().equalsIgnoreCase("undorescue"))
-		{
-			Location location = dataStore.getPlayerData(player.getUniqueId()).portalTrappedLocation;
-			if (location == null)
-			{
-				//TODO: tell player they were not initially rescued (if necessary?)
-				return true;
-			}
-			//Start a new rescue task in case the player was indeed trapped, but dumbly sent the command anyway
-			startRescueTask(player, player.getLocation());
-			player.teleport(location);
-			dataStore.getPlayerData(player.getUniqueId()).portalTrappedLocation = null;
-			return true;
-		}
-		
 		return false; 
 	}
 	

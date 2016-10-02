@@ -214,10 +214,6 @@ commands:
       description: Gives a player a manual about claiming land.
       usage: /ClaimBook <player>
       permission: griefprevention.claimbook
-    undorescue:
-      description: Allows a player to undo a portal trap rescue operation
-      usage: /UnodRescue
-      permission: griefprevention.undorescue
 permissions:
     griefprevention.createclaims:
         description: Grants permission to create claims.
@@ -268,9 +264,6 @@ permissions:
         default: op
     griefprevention.trapped:
         description: Grants permission to use /Trapped.
-        default: true
-    griefprevention.undorescue:
-        description: Grants permission to use /UndoRescue
         default: true
     griefprevention.claimslistother:
         description: Grants permission to use /ClaimsList to get another player's information.
