@@ -3609,6 +3609,7 @@ public class GriefPrevention extends JavaPlugin
                !claim.isAdminClaim() && GriefPrevention.instance.config_pvp_noCombatInPlayerLandClaims;
     }
 
+    /*
     protected boolean isPlayerTrappedInPortal(Block block)
 	{
 		Material playerBlock = block.getType();
@@ -3662,14 +3663,13 @@ public class GriefPrevention extends JavaPlugin
 			}
 		}.runTaskLater(this, 600L);
 	}
+	*/
 
-	//remember where players teleport from (via portals) in case they're trapped at the destination
-	ConcurrentHashMap<UUID, Location> portalReturnMap = new ConcurrentHashMap<UUID, Location>();
+	//Track scheduled "rescues" so we can cancel them if the player happens to teleport elsewhere so we can cancel it.
 	ConcurrentHashMap<UUID, BukkitTask> portalReturnTaskMap = new ConcurrentHashMap<UUID, BukkitTask>();
-	public void startRescueTask(Player player, Location rescueLocation)
+	public void startRescueTask(Player player)
 	{
 		BukkitTask task = new CheckForPortalTrapTask(player, this).runTaskLater(GriefPrevention.instance, 600L);
-		portalReturnMap.put(player.getUniqueId(), rescueLocation);
 
 		//Cancel existing rescue task
 		if (portalReturnTaskMap.containsKey(player.getUniqueId()))

@@ -131,9 +131,6 @@ public class PlayerData
 	//this is an anti-bot strategy.
 	Location noChatLocation = null;
 	
-	//last rescue location, if player was recently rescued (to undo if rescue was unnecessary)
-	Location portalTrappedLocation = null;
-	
 	//ignore list
 	//true means invisible (admin-forced ignore), false means player-created ignore
 	public ConcurrentHashMap<UUID, Boolean> ignoredPlayers = new ConcurrentHashMap<UUID, Boolean>();

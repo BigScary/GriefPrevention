@@ -7,10 +7,14 @@
     <groupId>me.ryanhamshire</groupId>
     <artifactId>GriefPrevention</artifactId>
     <version>15.2.4</version>
+    <properties>
+        <maven.compiler.source>1.6</maven.compiler.source>
+        <maven.compiler.target>1.6</maven.compiler.target>
+    </properties>
     <repositories>
         <repository>
-            <id>spigot-repo</id>
-            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+            <id>paper-repo</id>
+            <url>https://repo.destroystokyo.com/repository/maven-public/</url>
         </repository>
         <repository>
             <id>worldedit-worldguard-repo</id>
@@ -48,8 +52,8 @@
     <dependencies>
         <!--Bukkit API-->
         <dependency>
-                 <groupId>org.bukkit</groupId>
-                 <artifactId>bukkit</artifactId>
+                 <groupId>com.destroystokyo.paper</groupId>
+                 <artifactId>paper-api</artifactId>
                  <version>1.10.2-R0.1-SNAPSHOT</version>
                  <scope>provided</scope>
         </dependency>

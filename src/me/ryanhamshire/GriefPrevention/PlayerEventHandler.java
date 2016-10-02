@@ -763,7 +763,7 @@ class PlayerEventHandler implements Listener
         new IgnoreLoaderThread(playerID, playerData.ignoredPlayers).start();
         
         //is he possibly stuck in a portal frame?
-		instance.rescuePlayerTrappedInPortal(player);
+		player.setPortalCooldown(0);
         
         //if we're holding a logout message for this player, don't send that or this event's join message
         if(GriefPrevention.instance.config_spam_logoutMessageDelaySeconds > 0)
@@ -978,11 +978,10 @@ class PlayerEventHandler implements Listener
         if(!GriefPrevention.instance.claimsEnabledForWorld(event.getTo().getWorld())) return;
 	    
 	    Player player = event.getPlayer();
-	    
         if(event.getCause() == TeleportCause.NETHER_PORTAL)
         {
             //FEATURE: when players get trapped in a nether portal, send them back through to the other side
-			instance.startRescueTask(player, event.getFrom());
+			instance.startRescueTask(player);
         
             //FEATURE: if the player teleporting doesn't have permission to build a nether portal and none already exists at the destination, cancel the teleportation
             if(GriefPrevention.instance.config_claims_portalsRequirePermission)

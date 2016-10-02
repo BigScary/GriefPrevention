@@ -52,6 +52,6 @@ class CheckForPortalTrapTask extends BukkitRunnable
 			instance.portalReturnTaskMap.remove(player.getUniqueId());
 			return;
 		}
-		instance.rescuePlayerTrappedInPortal(player);
+		player.setPortalCooldown(0);
 	}
 }
