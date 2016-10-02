@@ -71,7 +71,7 @@
         <dependency>
                 <groupId>com.sk89q.worldedit</groupId>
                 <artifactId>worldedit-bukkit</artifactId>
-                <version>6.1.5-SNAPSHOT</version>
+                <version>6.1.4-SNAPSHOT</version>
         </dependency>
          <!--Vault dependency-->
         <dependency>
