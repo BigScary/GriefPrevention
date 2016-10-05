@@ -764,12 +764,24 @@ public class GriefPrevention extends JavaPlugin
         this.config_logs_mutedChatEnabled = config.getBoolean("GriefPrevention.Abridged Logs.Included Entry Types.Muted Chat Messages", false);
         
         //claims mode by world
-        for(World world : this.config_claims_worldModes.keySet())
-        {
-            outConfig.set(
-                "GriefPrevention.Claims.Mode." + world.getName(), 
-                this.config_claims_worldModes.get(world).name());
-        }
+		try
+		{
+			for(World world : this.config_claims_worldModes.keySet())
+			{
+				outConfig.set(
+						"GriefPrevention.Claims.Mode." + world.getName(),
+						this.config_claims_worldModes.get(world).name());
+			}
+		}
+		catch(NoSuchMethodError e)
+		{
+			this.getLogger().severe("You are running an old version of Java which is susceptible to security exploits. Please update to Java 8.");
+			this.getLogger().severe("If you are on a shared host, tell your hosting provider to update, as Java 7 is End of Life.");
+			this.getLogger().severe("If they refuse, I'd suggesting switching to a more secure and responsive host.");
+			this.getLogger().severe("But if you truly have absolutely no choice, then please download the Java 7 version of GriefPrevention.");
+			this.onDisable();
+		}
+
         
         outConfig.set("GriefPrevention.Claims.PreventTheft", this.config_claims_preventTheft);
         outConfig.set("GriefPrevention.Claims.ProtectCreatures", this.config_claims_protectCreatures);
