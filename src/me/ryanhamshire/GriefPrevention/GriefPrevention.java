@@ -780,6 +780,7 @@ public class GriefPrevention extends JavaPlugin
 			this.getLogger().severe("If they refuse, I'd suggesting switching to a more secure and responsive host.");
 			this.getLogger().severe("But if you truly have absolutely no choice, then please download the Java 7 version of GriefPrevention.");
 			this.onDisable();
+			return;
 		}
 
         
