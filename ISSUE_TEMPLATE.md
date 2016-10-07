@@ -1,12 +1,12 @@
 ### What behaviour is expected:
-___What you expected to see___
+_What you expected to see_
 ### What behaviour is observed:
-___What you actually saw___
+_What you actually saw_
 ### Steps/models to reproduce:
-___This may include a build schematic, a video, or detailed instructions to help reconstruct the issue___
+_This may include a build schematic, a video, or detailed instructions to help reconstruct the issue_
 
 ### Spigot/Craftbukkit/Paper and GriefPrevention version:
-___This can be found by running `/version` and `/version GriefPrevention on your server.___
+___This can be found by running `/version` and `/version` GriefPrevention on your server.___
 
 
 ### Stack trace/error (if applicable)
