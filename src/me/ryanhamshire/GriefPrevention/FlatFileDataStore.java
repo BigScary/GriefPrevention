@@ -613,20 +613,20 @@ public class FlatFileDataStore extends DataStore
     			    List<String> lines = Files.readLines(playerFile, Charset.forName("UTF-8"));
     			    Iterator<String> iterator = lines.iterator();
     			    
-    				//first line is last login timestamp
-    				String lastLoginTimestampString = iterator.next();
-    				
-    				//convert that to a date and store it
-    				DateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss");					
-    				try
-    				{
-    					playerData.setLastLogin(dateFormat.parse(lastLoginTimestampString));
-    				}
-    				catch(ParseException parseException)
-    				{
-    					GriefPrevention.AddLogEntry("Unable to load last login for \"" + playerFile.getName() + "\".");
-    					playerData.setLastLogin(null);
-    				}
+    				//first line is last login timestamp //RoboMWM - not using this anymore
+//    				String lastLoginTimestampString = iterator.next();
+//
+//    				//convert that to a date and store it
+//    				DateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss");
+//    				try
+//    				{
+//    					playerData.setLastLogin(dateFormat.parse(lastLoginTimestampString));
+//    				}
+//    				catch(ParseException parseException)
+//    				{
+//    					GriefPrevention.AddLogEntry("Unable to load last login for \"" + playerFile.getName() + "\".");
+//    					playerData.setLastLogin(null);
+//    				}
     				
     				//second line is accrued claim blocks
     				String accruedBlocksString = iterator.next();
@@ -683,10 +683,10 @@ public class FlatFileDataStore extends DataStore
 		StringBuilder fileContent = new StringBuilder();
 		try
 		{
-			//first line is last login timestamp
-			if(playerData.getLastLogin() == null) playerData.setLastLogin(new Date());
-			DateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss");
-			fileContent.append(dateFormat.format(playerData.getLastLogin()));
+			//first line is last login timestamp //RoboMWM - no longer storing/using
+			//if(playerData.getLastLogin() == null) playerData.setLastLogin(new Date());
+			//DateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss");
+			//fileContent.append(dateFormat.format(playerData.getLastLogin()));
 			fileContent.append("\n");
 			
 			//second line is accrued claim blocks

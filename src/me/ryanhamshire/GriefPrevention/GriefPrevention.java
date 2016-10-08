@@ -776,7 +776,7 @@ public class GriefPrevention extends JavaPlugin
 		catch(NoSuchMethodError e)
 		{
 			this.getLogger().severe("You are running an old version of Java which is susceptible to security exploits. Please update to Java 8.");
-			this.getLogger().severe("If you are on a shared host, tell your hosting provider to update, as Java 7 is End of Life.");
+			this.getLogger().severe("If you are on a shared host, tell your hosting provider to update, as Java 7 is End of Life, and you're missing out on security and performance improvements");
 			this.getLogger().severe("If they refuse, I'd suggesting switching to a more secure and responsive host.");
 			this.getLogger().severe("But if you truly have absolutely no choice, then please download the Java 7 version of GriefPrevention.");
 			getServer().getPluginManager().disablePlugin(this);

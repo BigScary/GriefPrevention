@@ -56,10 +56,10 @@
     <dependencies>
         <!--Bukkit API-->
         <dependency>
-                 <groupId>com.destroystokyo.paper</groupId>
-                 <artifactId>paper-api</artifactId>
-                 <version>1.10.2-R0.1-SNAPSHOT</version>
-                 <scope>provided</scope>
+                <groupId>org.bukkit</groupId>
+                <artifactId>bukkit</artifactId>
+                <version>1.10.2-R0.1-SNAPSHOT</version>
+                <scope>provided</scope>
         </dependency>
          <!--Worldguard dependency-->
         <dependency>

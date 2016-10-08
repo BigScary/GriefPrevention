@@ -627,7 +627,6 @@ class PlayerEventHandler implements Listener
         long now = nowDate.getTime();
 		PlayerData playerData = this.dataStore.getPlayerData(playerID);
 		playerData.lastSpawn = now;
-		playerData.setLastLogin(nowDate);
 		this.lastLoginThisServerSessionMap.put(playerID, nowDate);
 		
 		//if newish, prevent chat until he's moved a bit to prove he's not a bot
@@ -1870,8 +1869,7 @@ class PlayerEventHandler implements Listener
 						{
 						    claim = claim.parent;
 						}
-					    PlayerData otherPlayerData = this.dataStore.getPlayerData(claim.ownerID);
-						Date lastLogin = otherPlayerData.getLastLogin();
+						Date lastLogin = new Date(Bukkit.getOfflinePlayer(claim.ownerID).getLastPlayed());
 						Date now = new Date();
 						long daysElapsed = (now.getTime() - lastLogin.getTime()) / (1000 * 60 * 60 * 24); 
 						
