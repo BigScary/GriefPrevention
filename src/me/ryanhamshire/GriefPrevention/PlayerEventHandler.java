@@ -630,7 +630,7 @@ class PlayerEventHandler implements Listener
 		this.lastLoginThisServerSessionMap.put(playerID, nowDate);
 		
 		//if newish, prevent chat until he's moved a bit to prove he's not a bot
-		if(GriefPrevention.isNewToServer(player))
+		if(instance.isNewToServer(player))
 		{
 		    playerData.noChatLocation = player.getLocation();
 		}

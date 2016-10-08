@@ -613,8 +613,9 @@ public class FlatFileDataStore extends DataStore
     			    List<String> lines = Files.readLines(playerFile, Charset.forName("UTF-8"));
     			    Iterator<String> iterator = lines.iterator();
     			    
-    				//first line is last login timestamp //RoboMWM - not using this anymore
-//    				String lastLoginTimestampString = iterator.next();
+
+    				iterator.next();
+                    //first line is last login timestamp //RoboMWM - not using this anymore
 //
 //    				//convert that to a date and store it
 //    				DateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss");
