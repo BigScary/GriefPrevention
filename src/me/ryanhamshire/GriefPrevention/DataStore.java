@@ -795,7 +795,7 @@ public abstract class DataStore
 		//creative mode claims always go to bedrock
 		if(GriefPrevention.instance.config_claims_worldModes.get(world) == ClaimsMode.Creative)
 		{
-			smally = 2;
+			smally = 0;
 		}
 		
 		//create a new claim instance (but don't save it, yet)
