@@ -280,6 +280,7 @@ public class GriefPrevention extends JavaPlugin
 			{
 				GriefPrevention.AddLogEntry("Because there was a problem with the database, GriefPrevention will not function properly.  Either update the database config settings resolve the issue, or delete those lines from your config.yml so that GriefPrevention can use the file system to store data.");
 				e.printStackTrace();
+				this.getServer().getPluginManager().disablePlugin(this);
 				return;
 			}			
 		}

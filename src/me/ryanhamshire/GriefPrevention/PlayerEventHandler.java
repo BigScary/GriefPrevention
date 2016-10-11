@@ -78,6 +78,13 @@ class PlayerEventHandler implements Listener
 {
 	private DataStore dataStore;
 	private GriefPrevention instance;
+
+	//typical constructor, yawn
+	PlayerEventHandler(DataStore dataStore, GriefPrevention plugin)
+	{
+		this.dataStore = dataStore;
+		this.instance = plugin;
+	}
 	
 	//list of temporarily banned ip's
 	private ArrayList<IpBanInfo> tempBannedIps = new ArrayList<IpBanInfo>();
@@ -96,13 +103,6 @@ class PlayerEventHandler implements Listener
 	
 	//spam tracker
 	SpamDetector spamDetector = new SpamDetector();
-	
-	//typical constructor, yawn
-	PlayerEventHandler(DataStore dataStore, GriefPrevention plugin)
-	{
-		this.dataStore = dataStore;
-		this.instance = plugin;
-	}
 	
 	//when a player chats, monitor for spam
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
