@@ -44,6 +44,7 @@ import org.bukkit.World.Environment;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.command.Command;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Animals;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.Entity;
@@ -770,9 +771,9 @@ class PlayerEventHandler implements Listener
 		}
 		catch (NoSuchMethodError e)
 		{
-			instance.getLogger().severe("Please update your server mod (Craftbukkit/Spigot/Paper/etc.), as mentioned in the update notes.");
 			instance.getLogger().severe("Nether portal trap rescues will not function and you will receive a nice stack trace every time a player uses a nether portal.");
-			instance.getLogger().severe("So yea, read the bold update notes and update Craftbukkit/Spigot/Paper, thanks.");
+			instance.getLogger().severe("Please update your server mod (Craftbukkit/Spigot/Paper), as mentioned in the update notes.");
+			instance.getServer().dispatchCommand(instance.getServer().getConsoleSender(), "version");
 		}
 
         
@@ -1634,7 +1635,7 @@ class PlayerEventHandler implements Listener
 			if(claim != null)
 			{
 				playerData.lastClaim = claim;
-				
+
 				String noAccessReason = claim.allowAccess(player);
 				if(noAccessReason != null)
 				{
@@ -1642,7 +1643,7 @@ class PlayerEventHandler implements Listener
 					instance.sendMessage(player, TextMode.Err, noAccessReason);
 					return;
 				}
-			}	
+			}
 		}
 		
 		//otherwise apply rules for buttons and switches
@@ -1804,42 +1805,42 @@ class PlayerEventHandler implements Listener
 				
 				return;
 			}
-			
+
 			//if he's investigating a claim
 			else if(materialInHand == instance.config_claims_investigationTool &&  hand == EquipmentSlot.HAND)
 			{
 		        //if claims are disabled in this world, do nothing
 			    if(!instance.claimsEnabledForWorld(player.getWorld())) return;
-			    
+
 			    //if holding shift (sneaking), show all claims in area
 			    if(player.isSneaking() && player.hasPermission("griefprevention.visualizenearbyclaims"))
 			    {
 			        //find nearby claims
 			        Set<Claim> claims = this.dataStore.getNearbyClaims(player.getLocation());
-			        
+
 			        //visualize boundaries
                     Visualization visualization = Visualization.fromClaims(claims, player.getEyeLocation().getBlockY(), VisualizationType.Claim, player.getLocation());
                     Visualization.Apply(player, visualization);
-                    
+
                     instance.sendMessage(player, TextMode.Info, Messages.ShowNearbyClaims, String.valueOf(claims.size()));
-                    
+
                     return;
 			    }
-			    
+
 			    //FEATURE: shovel and stick can be used from a distance away
 		        if(action == Action.RIGHT_CLICK_AIR)
 		        {
 		            //try to find a far away non-air block along line of sight
 		            clickedBlock = getTargetBlock(player, 100);
 		            clickedBlockType = clickedBlock.getType();
-		        }           
-		        
+		        }
+
 		        //if no block, stop here
 		        if(clickedBlock == null)
 		        {
 		            return;
 		        }
-			    
+
 			    //air indicates too far away
 				if(clickedBlockType == Material.AIR)
 				{
@@ -1847,33 +1848,33 @@ class PlayerEventHandler implements Listener
 					Visualization.Revert(player);
 					return;
 				}
-				
+
 				if(playerData == null) playerData = this.dataStore.getPlayerData(player.getUniqueId());
 				Claim claim = this.dataStore.getClaimAt(clickedBlock.getLocation(), false /*ignore height*/, playerData.lastClaim);
-				
+
 				//no claim case
 				if(claim == null)
 				{
 					instance.sendMessage(player, TextMode.Info, Messages.BlockNotClaimed);
 					Visualization.Revert(player);
 				}
-				
+
 				//claim case
 				else
 				{
 					playerData.lastClaim = claim;
 					instance.sendMessage(player, TextMode.Info, Messages.BlockClaimed, claim.getOwnerName());
-					
+
 					//visualize boundary
 					Visualization visualization = Visualization.FromClaim(claim, player.getEyeLocation().getBlockY(), VisualizationType.Claim, player.getLocation());
 					Visualization.Apply(player, visualization);
-					
+
 					//if can resize this claim, tell about the boundaries
 					if(claim.allowEdit(player) == null)
 					{
 						instance.sendMessage(player, TextMode.Info, "  " + claim.getWidth() + "x" + claim.getHeight() + "=" + claim.getArea());
 					}
-					
+
 					//if permission, tell about the player's offline time
 					if(!claim.isAdminClaim() && (player.hasPermission("griefprevention.deleteclaims") || player.hasPermission("griefprevention.seeinactivity")))
 					{
@@ -1883,19 +1884,19 @@ class PlayerEventHandler implements Listener
 						}
 						Date lastLogin = new Date(Bukkit.getOfflinePlayer(claim.ownerID).getLastPlayed());
 						Date now = new Date();
-						long daysElapsed = (now.getTime() - lastLogin.getTime()) / (1000 * 60 * 60 * 24); 
-						
+						long daysElapsed = (now.getTime() - lastLogin.getTime()) / (1000 * 60 * 60 * 24);
+
 						instance.sendMessage(player, TextMode.Info, Messages.PlayerOfflineTime, String.valueOf(daysElapsed));
-						
+
 						//drop the data we just loaded, if the player isn't online
 						if(instance.getServer().getPlayer(claim.ownerID) == null)
 							this.dataStore.clearCachedPlayerData(claim.ownerID);
 					}
 				}
-				
+
 				return;
 			}
-			
+
 			//if holding a non-vanilla item
 			else if(Material.getMaterial(itemInHand.getTypeId()) == null)
             {
@@ -1905,7 +1906,7 @@ class PlayerEventHandler implements Listener
                     //try to find a far away non-air block along line of sight
                     clickedBlock = getTargetBlock(player, 100);
                 }
-                
+
                 //if target is claimed, require build trust permission
                 if(playerData == null) playerData = this.dataStore.getPlayerData(player.getUniqueId());
                 Claim claim = this.dataStore.getClaimAt(clickedBlock.getLocation(), false, playerData.lastClaim);
@@ -1919,15 +1920,15 @@ class PlayerEventHandler implements Listener
                         return;
                     }
                 }
-                
+
                 return;
             }
-			
+
 			//if it's a golden shovel
 			else if(materialInHand != instance.config_claims_modificationTool || hand != EquipmentSlot.HAND) return;
-			
+
 			event.setCancelled(true);  //GriefPrevention exclusively reserves this tool  (e.g. no grass path creation for golden shovel)
-			
+
 			//disable golden shovel while under siege
 			if(playerData == null) playerData = this.dataStore.getPlayerData(player.getUniqueId());
 			if(playerData.siegeData != null)
@@ -1936,28 +1937,28 @@ class PlayerEventHandler implements Listener
 				event.setCancelled(true);
 				return;
 			}
-			
+
 			//FEATURE: shovel and stick can be used from a distance away
             if(action == Action.RIGHT_CLICK_AIR)
             {
                 //try to find a far away non-air block along line of sight
                 clickedBlock = getTargetBlock(player, 100);
                 clickedBlockType = clickedBlock.getType();
-            }           
-            
+            }
+
             //if no block, stop here
             if(clickedBlock == null)
             {
                 return;
             }
-			
+
 			//can't use the shovel from too far away
 			if(clickedBlockType == Material.AIR)
 			{
 				instance.sendMessage(player, TextMode.Err, Messages.TooFarAway);
 				return;
 			}
-			
+
 			//if the player is in restore nature mode, do only that
 			UUID playerID = player.getUniqueId();
 			playerData = this.dataStore.getPlayerData(player.getUniqueId());
@@ -1970,18 +1971,18 @@ class PlayerEventHandler implements Listener
 					instance.sendMessage(player, TextMode.Err, Messages.BlockClaimed, claim.getOwnerName());
 					Visualization visualization = Visualization.FromClaim(claim, clickedBlock.getY(), VisualizationType.ErrorClaim, player.getLocation());
 					Visualization.Apply(player, visualization);
-					
+
 					return;
 				}
-				
+
 				//figure out which chunk to repair
 				Chunk chunk = player.getWorld().getChunkAt(clickedBlock.getLocation());
-				
+
 				//start the repair process
-				
+
 				//set boundaries for processing
 				int miny = clickedBlock.getY();
-				
+
 				//if not in aggressive mode, extend the selection down to a little below sea level
 				if(!(playerData.shovelMode == ShovelMode.RestoreNatureAggressive))
 				{
@@ -1990,16 +1991,16 @@ class PlayerEventHandler implements Listener
 						miny = instance.getSeaLevel(chunk.getWorld()) - 10;
 					}
 				}
-				
+
 				instance.restoreChunk(chunk, miny, playerData.shovelMode == ShovelMode.RestoreNatureAggressive, 0, player);
-				
+
 				return;
 			}
-			
+
 			//if in restore nature fill mode
 			if(playerData.shovelMode == ShovelMode.RestoreNatureFill)
 			{
-				ArrayList<Material> allowedFillBlocks = new ArrayList<Material>();				
+				ArrayList<Material> allowedFillBlocks = new ArrayList<Material>();
 				Environment environment = clickedBlock.getWorld().getEnvironment();
 				if(environment == Environment.NETHER)
 				{
@@ -2008,7 +2009,7 @@ class PlayerEventHandler implements Listener
 				else if(environment == Environment.THE_END)
 				{
 					allowedFillBlocks.add(Material.ENDER_STONE);
-				}			
+				}
 				else
 				{
 					allowedFillBlocks.add(Material.GRASS);
@@ -2018,17 +2019,17 @@ class PlayerEventHandler implements Listener
 					allowedFillBlocks.add(Material.SANDSTONE);
 					allowedFillBlocks.add(Material.ICE);
 				}
-				
+
 				Block centerBlock = clickedBlock;
-				
+
 				int maxHeight = centerBlock.getY();
 				int minx = centerBlock.getX() - playerData.fillRadius;
 				int maxx = centerBlock.getX() + playerData.fillRadius;
 				int minz = centerBlock.getZ() - playerData.fillRadius;
-				int maxz = centerBlock.getZ() + playerData.fillRadius;				
+				int maxz = centerBlock.getZ() + playerData.fillRadius;
 				int minHeight = maxHeight - 10;
 				if(minHeight < 0) minHeight = 0;
-				
+
 				Claim cachedClaim = null;
 				for(int x = minx; x <= maxx; x++)
 				{
@@ -2037,16 +2038,16 @@ class PlayerEventHandler implements Listener
 						//circular brush
 						Location location = new Location(centerBlock.getWorld(), x, centerBlock.getY(), z);
 						if(location.distance(centerBlock.getLocation()) > playerData.fillRadius) continue;
-						
+
 						//default fill block is initially the first from the allowed fill blocks list above
 						Material defaultFiller = allowedFillBlocks.get(0);
-						
+
 						//prefer to use the block the player clicked on, if it's an acceptable fill block
 						if(allowedFillBlocks.contains(centerBlock.getType()))
 						{
 							defaultFiller = centerBlock.getType();
 						}
-						
+
 						//if the player clicks on water, try to sink through the water to find something underneath that's useful for a filler
 						else if(centerBlock.getType() == Material.WATER || centerBlock.getType() == Material.STATIONARY_WATER)
 						{
@@ -2060,12 +2061,12 @@ class PlayerEventHandler implements Listener
 								defaultFiller = block.getType();
 							}
 						}
-						
+
 						//fill bottom to top
 						for(int y = minHeight; y <= maxHeight; y++)
 						{
 							Block block = centerBlock.getWorld().getBlockAt(x, y, z);
-							
+
 							//respect claims
 							Claim claim = this.dataStore.getClaimAt(block.getLocation(), false, cachedClaim);
 							if(claim != null)
@@ -2073,16 +2074,16 @@ class PlayerEventHandler implements Listener
 								cachedClaim = claim;
 								break;
 							}
-							
+
 							//only replace air, spilling water, snow, long grass
 							if(block.getType() == Material.AIR || block.getType() == Material.SNOW || (block.getType() == Material.STATIONARY_WATER && block.getData() != 0) || block.getType() == Material.LONG_GRASS)
-							{							
+							{
 								//if the top level, always use the default filler picked above
 								if(y == maxHeight)
 								{
 									block.setType(defaultFiller);
 								}
-								
+
 								//otherwise look to neighbors for an appropriate fill block
 								else
 								{
@@ -2090,7 +2091,7 @@ class PlayerEventHandler implements Listener
 									Block westBlock = block.getRelative(BlockFace.WEST);
 									Block northBlock = block.getRelative(BlockFace.NORTH);
 									Block southBlock = block.getRelative(BlockFace.SOUTH);
-									
+
 									//first, check lateral neighbors (ideally, want to keep natural layers)
 									if(allowedFillBlocks.contains(eastBlock.getType()))
 									{
@@ -2108,7 +2109,7 @@ class PlayerEventHandler implements Listener
 									{
 										block.setType(southBlock.getType());
 									}
-									
+
 									//if all else fails, use the default filler selected above
 									else
 									{
@@ -2119,17 +2120,17 @@ class PlayerEventHandler implements Listener
 						}
 					}
 				}
-				
+
 				return;
 			}
-			
+
 			//if the player doesn't have claims permission, don't do anything
 			if(!player.hasPermission("griefprevention.createclaims"))
 			{
 				instance.sendMessage(player, TextMode.Err, Messages.NoCreateClaimPermission);
 				return;
 			}
-			
+
 			//if he's resizing a claim and that claim hasn't been deleted since he started resizing it
 			if(playerData.claimResizing != null && playerData.claimResizing.inDataStore)
 			{
@@ -2145,7 +2146,7 @@ class PlayerEventHandler implements Listener
 				{
 					newx1 = playerData.claimResizing.getLesserBoundaryCorner().getBlockX();
 				}
-				
+
 				if(playerData.lastShovelLocation.getBlockX() == playerData.claimResizing.getGreaterBoundaryCorner().getBlockX())
 				{
 					newx2 = clickedBlock.getX();
@@ -2154,7 +2155,7 @@ class PlayerEventHandler implements Listener
 				{
 					newx2 = playerData.claimResizing.getGreaterBoundaryCorner().getBlockX();
 				}
-				
+
 				if(playerData.lastShovelLocation.getBlockZ() == playerData.claimResizing.getLesserBoundaryCorner().getBlockZ())
 				{
 					newz1 = clickedBlock.getZ();
@@ -2163,7 +2164,7 @@ class PlayerEventHandler implements Listener
 				{
 					newz1 = playerData.claimResizing.getLesserBoundaryCorner().getBlockZ();
 				}
-				
+
 				if(playerData.lastShovelLocation.getBlockZ() == playerData.claimResizing.getGreaterBoundaryCorner().getBlockZ())
 				{
 					newz2 = clickedBlock.getZ();
@@ -2172,18 +2173,18 @@ class PlayerEventHandler implements Listener
 				{
 					newz2 = playerData.claimResizing.getGreaterBoundaryCorner().getBlockZ();
 				}
-				
+
 				newy1 = playerData.claimResizing.getLesserBoundaryCorner().getBlockY();
 				newy2 = clickedBlock.getY() - instance.config_claims_claimsExtendIntoGroundDistance;
-				
+
 				this.dataStore.resizeClaimWithChecks(player, playerData, newx1, newx2, newy1, newy2, newz1, newz2);
-				
+
 				return;
 			}
-			
+
 			//otherwise, since not currently resizing a claim, must be starting a resize, creating a new claim, or creating a subdivision
-			Claim claim = this.dataStore.getClaimAt(clickedBlock.getLocation(), true /*ignore height*/, playerData.lastClaim);			
-			
+			Claim claim = this.dataStore.getClaimAt(clickedBlock.getLocation(), true /*ignore height*/, playerData.lastClaim);
+
 			//if within an existing claim, he's not creating a new one
 			if(claim != null)
 			{
@@ -2198,19 +2199,19 @@ class PlayerEventHandler implements Listener
 						playerData.lastShovelLocation = clickedBlock.getLocation();
 						instance.sendMessage(player, TextMode.Instr, Messages.ResizeStart);
 					}
-					
+
 					//if he didn't click on a corner and is in subdivision mode, he's creating a new subdivision
 					else if(playerData.shovelMode == ShovelMode.Subdivide)
 					{
 						//if it's the first click, he's trying to start a new subdivision
 						if(playerData.lastShovelLocation == null)
-						{						
+						{
 							//if the clicked claim was a subdivision, tell him he can't start a new subdivision here
 							if(claim.parent != null)
 							{
-								instance.sendMessage(player, TextMode.Err, Messages.ResizeFailOverlapSubdivision);							
+								instance.sendMessage(player, TextMode.Err, Messages.ResizeFailOverlapSubdivision);
 							}
-						
+
 							//otherwise start a new subdivision
 							else
 							{
@@ -2219,7 +2220,7 @@ class PlayerEventHandler implements Listener
 								playerData.claimSubdividing = claim;
 							}
 						}
-						
+
 						//otherwise, he's trying to finish creating a subdivision by setting the other boundary corner
 						else
 						{
@@ -2230,31 +2231,31 @@ class PlayerEventHandler implements Listener
 								this.onPlayerInteract(event);
 								return;
 							}
-							
+
 							//try to create a new claim (will return null if this subdivision overlaps another)
 							CreateClaimResult result = this.dataStore.createClaim(
-									player.getWorld(), 
-									playerData.lastShovelLocation.getBlockX(), clickedBlock.getX(), 
-									playerData.lastShovelLocation.getBlockY() - instance.config_claims_claimsExtendIntoGroundDistance, clickedBlock.getY() - instance.config_claims_claimsExtendIntoGroundDistance, 
-									playerData.lastShovelLocation.getBlockZ(), clickedBlock.getZ(), 
+									player.getWorld(),
+									playerData.lastShovelLocation.getBlockX(), clickedBlock.getX(),
+									playerData.lastShovelLocation.getBlockY() - instance.config_claims_claimsExtendIntoGroundDistance, clickedBlock.getY() - instance.config_claims_claimsExtendIntoGroundDistance,
+									playerData.lastShovelLocation.getBlockZ(), clickedBlock.getZ(),
 									null,  //owner is not used for subdivisions
 									playerData.claimSubdividing,
 									null, player);
-							
+
 							//if it didn't succeed, tell the player why
 							if(!result.succeeded)
 							{
 								instance.sendMessage(player, TextMode.Err, Messages.CreateSubdivisionOverlap);
-																				
+
 								Visualization visualization = Visualization.FromClaim(result.claim, clickedBlock.getY(), VisualizationType.ErrorClaim, player.getLocation());
 								Visualization.Apply(player, visualization);
-								
+
 								return;
 							}
-							
+
 							//otherwise, advise him on the /trust command and show him his new subdivision
 							else
-							{					
+							{
 								instance.sendMessage(player, TextMode.Success, Messages.SubdivisionSuccess);
 								Visualization visualization = Visualization.FromClaim(result.claim, clickedBlock.getY(), VisualizationType.Claim, player.getLocation());
 								Visualization.Apply(player, visualization);
@@ -2263,17 +2264,17 @@ class PlayerEventHandler implements Listener
 							}
 						}
 					}
-					
+
 					//otherwise tell him he can't create a claim here, and show him the existing claim
 					//also advise him to consider /abandonclaim or resizing the existing claim
 					else
-					{						
+					{
 						instance.sendMessage(player, TextMode.Err, Messages.CreateClaimFailOverlap);
 						Visualization visualization = Visualization.FromClaim(claim, clickedBlock.getY(), VisualizationType.Claim, player.getLocation());
 						Visualization.Apply(player, visualization);
 					}
 				}
-				
+
 				//otherwise tell the player he can't claim here because it's someone else's claim, and show him the claim
 				else
 				{
@@ -2281,12 +2282,12 @@ class PlayerEventHandler implements Listener
 					Visualization visualization = Visualization.FromClaim(claim, clickedBlock.getY(), VisualizationType.ErrorClaim, player.getLocation());
 					Visualization.Apply(player, visualization);
 				}
-				
+
 				return;
 			}
-			
+
 			//otherwise, the player isn't in an existing claim!
-			
+
 			//if he hasn't already start a claim with a previous shovel action
 			Location lastShovelLocation = playerData.lastShovelLocation;
 			if(lastShovelLocation == null)
@@ -2297,7 +2298,7 @@ class PlayerEventHandler implements Listener
 					instance.sendMessage(player, TextMode.Err, Messages.ClaimsDisabledWorld);
 					return;
 				}
-				
+
 				//if he's at the claim count per player limit already and doesn't have permission to bypass, display an error message
 				if(instance.config_claims_maxClaimsPerPlayer > 0 &&
 				   !player.hasPermission("griefprevention.overrideclaimcountlimit") &&
@@ -2306,16 +2307,16 @@ class PlayerEventHandler implements Listener
 				    instance.sendMessage(player, TextMode.Err, Messages.ClaimCreationFailedOverClaimCountLimit);
 				    return;
 				}
-				
+
 				//remember it, and start him on the new claim
 				playerData.lastShovelLocation = clickedBlock.getLocation();
 				instance.sendMessage(player, TextMode.Instr, Messages.ClaimStart);
-				
+
 				//show him where he's working
 				Visualization visualization = Visualization.FromClaim(new Claim(clickedBlock.getLocation(), clickedBlock.getLocation(), null, new ArrayList<String>(), new ArrayList<String>(), new ArrayList<String>(), new ArrayList<String>(), null), clickedBlock.getY(), VisualizationType.RestoreNature, player.getLocation());
 				Visualization.Apply(player, visualization);
 			}
-			
+
 			//otherwise, he's trying to finish creating a claim by setting the other boundary corner
 			else
 			{
@@ -2326,18 +2327,18 @@ class PlayerEventHandler implements Listener
 					this.onPlayerInteract(event);
 					return;
 				}
-				
+
 				//apply pvp rule
 				if(playerData.inPvpCombat())
 				{
 				    instance.sendMessage(player, TextMode.Err, Messages.NoClaimDuringPvP);
 				    return;
 				}
-				
+
 				//apply minimum claim dimensions rule
 				int newClaimWidth = Math.abs(playerData.lastShovelLocation.getBlockX() - clickedBlock.getX()) + 1;
 				int newClaimHeight = Math.abs(playerData.lastShovelLocation.getBlockZ() - clickedBlock.getZ()) + 1;
-				
+
 				if(playerData.shovelMode != ShovelMode.Admin)
 				{
 				    if(newClaimWidth < instance.config_claims_minWidth || newClaimHeight < instance.config_claims_minWidth)
@@ -2349,7 +2350,7 @@ class PlayerEventHandler implements Listener
     				    }
     				    return;
 				    }
-					
+
 					int newArea = newClaimWidth * newClaimHeight;
                     if(newArea < instance.config_claims_minArea)
                     {
@@ -2357,15 +2358,15 @@ class PlayerEventHandler implements Listener
                         {
                             instance.sendMessage(player, TextMode.Err, Messages.ResizeClaimInsufficientArea, String.valueOf(instance.config_claims_minArea));
                         }
-                        
+
                         return;
                     }
 				}
-				
+
 				//if not an administrative claim, verify the player has enough claim blocks for this new claim
 				if(playerData.shovelMode != ShovelMode.Admin)
-				{					
-					int newClaimArea = newClaimWidth * newClaimHeight; 
+				{
+					int newClaimArea = newClaimWidth * newClaimHeight;
 					int remainingBlocks = playerData.getRemainingClaimBlocks();
 					if(newClaimArea > remainingBlocks)
 					{
@@ -2373,29 +2374,29 @@ class PlayerEventHandler implements Listener
 						instance.dataStore.tryAdvertiseAdminAlternatives(player);
 						return;
 					}
-				}					
+				}
 				else
 				{
 					playerID = null;
 				}
-				
+
 				//try to create a new claim
 				CreateClaimResult result = this.dataStore.createClaim(
-						player.getWorld(), 
-						lastShovelLocation.getBlockX(), clickedBlock.getX(), 
-						lastShovelLocation.getBlockY() - instance.config_claims_claimsExtendIntoGroundDistance, clickedBlock.getY() - instance.config_claims_claimsExtendIntoGroundDistance, 
-						lastShovelLocation.getBlockZ(), clickedBlock.getZ(), 
+						player.getWorld(),
+						lastShovelLocation.getBlockX(), clickedBlock.getX(),
+						lastShovelLocation.getBlockY() - instance.config_claims_claimsExtendIntoGroundDistance, clickedBlock.getY() - instance.config_claims_claimsExtendIntoGroundDistance,
+						lastShovelLocation.getBlockZ(), clickedBlock.getZ(),
 						playerID,
 						null, null,
 						player);
-				
+
 				//if it didn't succeed, tell the player why
 				if(!result.succeeded)
 				{
 					if(result.claim != null)
 					{
     				    instance.sendMessage(player, TextMode.Err, Messages.CreateClaimFailOverlapShort);
-    					
+
     					Visualization visualization = Visualization.FromClaim(result.claim, clickedBlock.getY(), VisualizationType.ErrorClaim, player.getLocation());
     					Visualization.Apply(player, visualization);
 					}
@@ -2403,25 +2404,25 @@ class PlayerEventHandler implements Listener
 					{
 					    instance.sendMessage(player, TextMode.Err, Messages.CreateClaimFailOverlapRegion);
 					}
-    					
+
 					return;
 				}
-				
+
 				//otherwise, advise him on the /trust command and show him his new claim
 				else
-				{					
+				{
 					instance.sendMessage(player, TextMode.Success, Messages.CreateClaimSuccess);
 					Visualization visualization = Visualization.FromClaim(result.claim, clickedBlock.getY(), VisualizationType.Claim, player.getLocation());
 					Visualization.Apply(player, visualization);
 					playerData.lastShovelLocation = null;
-					
+
 					//if it's a big claim, tell the player about subdivisions
 					if(!player.hasPermission("griefprevention.adminclaims") && result.claim.getArea() >= 1000)
 		            {
 		                instance.sendMessage(player, TextMode.Info, Messages.BecomeMayor, 200L);
 		                instance.sendMessage(player, TextMode.Instr, Messages.SubdivisionVideo2, 201L, DataStore.SUBDIVISION_VIDEO_URL);
 		            }
-					
+
 					instance.autoExtendClaim(result.claim);
 				}
 			}
