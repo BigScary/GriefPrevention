@@ -342,7 +342,7 @@ public class GriefPrevention extends JavaPlugin
 		pluginManager.registerEvents(blockEventHandler, this);
 				
 		//entity events
-		EntityEventHandler entityEventHandler = new EntityEventHandler(this.dataStore);
+		EntityEventHandler entityEventHandler = new EntityEventHandler(this.dataStore, this);
 		pluginManager.registerEvents(entityEventHandler, this);
 		
 		//if economy is enabled
@@ -979,7 +979,7 @@ public class GriefPrevention extends JavaPlugin
     public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args){
 		
 		Player player = null;
-		if (sender instanceof Player) 
+		if (sender instanceof Player)
 		{
 			player = (Player) sender;
 		}
