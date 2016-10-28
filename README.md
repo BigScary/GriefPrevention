@@ -1,6 +1,6 @@
-### Adding GriefPrevention as a gradle/maven/sbt/leiningen dependency
+ ### Adding GriefPrevention as a gradle/maven/sbt/leiningen dependency
 
-Apparently there's this neat thing called JitPack that makes a public maven repo for public Github repos on the fly.
+Apparently there's this neat thing called JitPack [![](https://jitpack.io/v/TechFortress/GriefPrevention.svg)](https://jitpack.io/#TechFortress/GriefPrevention) that makes a public maven repo for public Github repos on the fly.
 According to it, this is all you need to do to add this to your maven project:
 ```xml
 	<repositories>
