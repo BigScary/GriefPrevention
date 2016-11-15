@@ -318,7 +318,7 @@ public class GriefPrevention extends JavaPlugin
 		//20L ~ 1 second
 		if(this.config_claims_blocksAccruedPerHour_default > 0 || this.config_claims_blocksAccruedPerHour_faster > 0 || this.config_claims_blocksAccruedPerHour_fastest > 0)
 		{
-			DeliverClaimBlocksTask task = new DeliverClaimBlocksTask(null);
+			DeliverClaimBlocksTask task = new DeliverClaimBlocksTask(null, this);
 			this.getServer().getScheduler().scheduleSyncRepeatingTask(this, task, 20L * 60 * 10, 20L * 60 * 10);
 		}
 		

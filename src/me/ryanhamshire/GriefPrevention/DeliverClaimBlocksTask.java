@@ -20,6 +20,7 @@
 
 import java.util.Collection;
 
+import me.ryanhamshire.GriefPrevention.events.AccrueClaimBlocksEvent;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -29,10 +30,12 @@ import org.bukkit.entity.Player;
 class DeliverClaimBlocksTask implements Runnable 
 {	
     private Player player;
+    private GriefPrevention instance;
     
-    public DeliverClaimBlocksTask(Player player)
+    public DeliverClaimBlocksTask(Player player, GriefPrevention instance)
     {
         this.player = player;
+        this.instance = instance;
     }
     
 	@Override
@@ -47,17 +50,20 @@ class DeliverClaimBlocksTask implements Runnable
 	        long i = 0;
 	        for(Player onlinePlayer : players)
 	        {
-	            DeliverClaimBlocksTask newTask = new DeliverClaimBlocksTask(onlinePlayer);
-	            GriefPrevention.instance.getServer().getScheduler().scheduleSyncDelayedTask(GriefPrevention.instance, newTask, i++);
+	            DeliverClaimBlocksTask newTask = new DeliverClaimBlocksTask(onlinePlayer, instance);
+	            instance.getServer().getScheduler().scheduleSyncDelayedTask(instance, newTask, i++);
 	        }
 		}
 	    
 	    //otherwise, deliver claim blocks to the specified player
 	    else
 	    {
-	        if(!this.player.isOnline()) return;
+	        if(!this.player.isOnline())
+            {
+                return;
+            }
 	        
-	        DataStore dataStore = GriefPrevention.instance.dataStore;
+	        DataStore dataStore = instance.dataStore;
             PlayerData playerData = dataStore.getPlayerData(player.getUniqueId());
             
             Location lastLocation = playerData.lastAfkCheckLocation;
@@ -69,15 +75,22 @@ class DeliverClaimBlocksTask implements Runnable
                    (lastLocation == null || lastLocation.distanceSquared(player.getLocation()) >= 0) &&
                    !player.getLocation().getBlock().isLiquid())
                 {                   
-                    //determine how fast blocks accrue for this player
-                    int accrualRate = GriefPrevention.instance.config_claims_blocksAccruedPerHour_default;
-                    if(player.hasPermission("griefprevention.fastestaccrual")) accrualRate = GriefPrevention.instance.config_claims_blocksAccruedPerHour_fastest;
-                    else if(player.hasPermission("griefprevention.fasteraccrual")) accrualRate = GriefPrevention.instance.config_claims_blocksAccruedPerHour_faster;
+                    //determine how fast blocks accrue for this player //RoboMWM: addons determine this instead
+                    int accrualRate = instance.config_claims_blocksAccruedPerHour_default;
+//                    if(player.hasPermission("griefprevention.fastestaccrual")) accrualRate = GriefPrevention.instance.config_claims_blocksAccruedPerHour_fastest;
+//                    else if(player.hasPermission("griefprevention.fasteraccrual")) accrualRate = GriefPrevention.instance.config_claims_blocksAccruedPerHour_faster;
                     
                     //add blocks
                     int accruedBlocks = accrualRate / 6;
                     if(accruedBlocks < 0) accruedBlocks = 1;
-                    playerData.accrueBlocks(accruedBlocks);
+                    AccrueClaimBlocksEvent event = new AccrueClaimBlocksEvent(player, accrualRate);
+                    instance.getServer().getPluginManager().callEvent(event);
+                    if (event.isCancelled())
+                    {
+                        GriefPrevention.AddLogEntry(player.getName() + " claim block delivery was canceled by another plugin.", CustomLogEntryTypes.Debug, true);
+                        return;
+                    }
+                    playerData.accrueBlocks(event.getBlocksToAccrue());
                     GriefPrevention.AddLogEntry("Delivering " + accruedBlocks + " blocks to " + player.getName(), CustomLogEntryTypes.Debug, true);
                     
                     //intentionally NOT saving data here to reduce overall secondary storage access frequency
