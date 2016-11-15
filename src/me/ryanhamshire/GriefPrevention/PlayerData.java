@@ -326,10 +326,9 @@ public class PlayerData
         Player player = Bukkit.getServer().getPlayer(this.playerID);
         
         //if the player isn't online, give him the benefit of any doubt
+        //TODO: revisit and perhaps call an event for this(?)
         if(player == null) return Integer.MAX_VALUE;
-        
-        if(player.hasPermission("griefprevention.mostaccrued")) return GriefPrevention.instance.config_claims_maxAccruedBlocks_most;
-        if(player.hasPermission("griefprevention.moreaccrued")) return GriefPrevention.instance.config_claims_maxAccruedBlocks_more;
+
         return GriefPrevention.instance.config_claims_maxAccruedBlocks_default;
     }
 
