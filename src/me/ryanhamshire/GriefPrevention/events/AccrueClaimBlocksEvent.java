@@ -5,7 +5,10 @@ import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
 /**
- * Created by Robo on 11/15/2016.
+ * Called when GP is about to deliver claim blocks to a player (~every 10 minutes)
+ *
+ * @author RoboMWM
+ * 11/15/2016.
  */
 public class AccrueClaimBlocksEvent extends Event
 {
@@ -44,6 +47,10 @@ public class AccrueClaimBlocksEvent extends Event
         return this.cancelled;
     }
 
+    /**
+     * Modify the amount of claim blocks to deliver to the player
+     * @param blocksToAccrue blocks to deliver
+     */
     public void setBlocksToAccrue(int blocksToAccrue)
     {
         this.blocksToAccrue = blocksToAccrue;
