@@ -980,6 +980,7 @@ public class EntityEventHandler implements Listener
                 {
                     //if damaged by anything other than a player (exception villagers injured by zombies in admin claims), cancel the event
                     //why exception?  so admins can set up a village which can't be CHANGED by players, but must be "protected" by players.
+					//TODO: Discuss if this should only apply to admin claims...?
                     if(attacker == null)
                     {
                         //exception case

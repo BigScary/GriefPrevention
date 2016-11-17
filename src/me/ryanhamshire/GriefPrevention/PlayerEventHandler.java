@@ -1150,7 +1150,7 @@ class PlayerEventHandler implements Listener
                    }
                 }
             }
-            else  //world repair code for a now-fixed GP bug
+            else  //world repair code for a now-fixed GP bug //TODO: necessary anymore?
             {
                 //ensure this entity can be tamed by players
                 tameable.setOwner(null);
