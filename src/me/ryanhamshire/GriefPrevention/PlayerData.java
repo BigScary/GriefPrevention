@@ -327,7 +327,7 @@ public class PlayerData
         
         //if the player isn't online, give him the benefit of any doubt
         //TODO: revisit and perhaps call an event for this(?)
-        if(player == null) return Integer.MAX_VALUE;
+        //if(player == null) return Integer.MAX_VALUE;
 
         return GriefPrevention.instance.config_claims_maxAccruedBlocks_default;
     }
