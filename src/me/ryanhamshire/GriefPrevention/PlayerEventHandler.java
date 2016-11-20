@@ -1684,7 +1684,7 @@ class PlayerEventHandler implements Listener
             }           
         }
 		
-		//apply rule for note blocks and repeaters and daylight sensors
+		//apply rule for note blocks and repeaters and daylight sensors //RoboMWM: Include flower pots
 		else if(clickedBlock != null && 
 		        (
 		                clickedBlockType == Material.NOTE_BLOCK || 
@@ -1694,7 +1694,8 @@ class PlayerEventHandler implements Listener
 		                clickedBlockType == Material.DAYLIGHT_DETECTOR ||
 		                clickedBlockType == Material.DAYLIGHT_DETECTOR_INVERTED ||
 		                clickedBlockType == Material.REDSTONE_COMPARATOR_ON ||
-		                clickedBlockType == Material.REDSTONE_COMPARATOR_OFF
+		                clickedBlockType == Material.REDSTONE_COMPARATOR_OFF ||
+						clickedBlockType == Material.FLOWER_POT
 		        ))
 		{
 		    if(playerData == null) playerData = this.dataStore.getPlayerData(player.getUniqueId());
