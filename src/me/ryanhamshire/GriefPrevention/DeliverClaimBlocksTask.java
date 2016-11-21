@@ -85,8 +85,9 @@ class DeliverClaimBlocksTask implements Runnable
                         GriefPrevention.AddLogEntry(player.getName() + " claim block delivery was canceled by another plugin.", CustomLogEntryTypes.Debug, true);
                         return;
                     }
-
-                    playerData.accrueBlocks(event.getBlocksToAccrue());
+                    accrualRate = event.getBlocksToAccrue();
+                    if(accrualRate < 0) accrualRate = 0;
+                    playerData.accrueBlocks(accrualRate);
                     GriefPrevention.AddLogEntry("Delivering " + event.getBlocksToAccrue() + " blocks to " + player.getName(), CustomLogEntryTypes.Debug, true);
                     
                     //intentionally NOT saving data here to reduce overall secondary storage access frequency

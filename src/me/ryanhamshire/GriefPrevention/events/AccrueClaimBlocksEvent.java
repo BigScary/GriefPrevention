@@ -29,7 +29,6 @@ public class AccrueClaimBlocksEvent extends Event
     public AccrueClaimBlocksEvent(Player player, int blocksToAccrue)
     {
         this.player = player;
-        if(blocksToAccrue < 0) blocksToAccrue = 1;
         this.blocksToAccrue = blocksToAccrue / 6;
     }
 
