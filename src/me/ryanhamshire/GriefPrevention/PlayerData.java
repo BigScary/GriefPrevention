@@ -323,10 +323,8 @@ public class PlayerData
     //determine limits based on permissions
     private int getAccruedClaimBlocksLimit()
     {
-        Player player = Bukkit.getServer().getPlayer(this.playerID);
-        
+        //Player player = Bukkit.getServer().getPlayer(this.playerID);
         //if the player isn't online, give him the benefit of any doubt
-        //TODO: revisit and perhaps call an event for this(?)
         //if(player == null) return Integer.MAX_VALUE;
 
         return GriefPrevention.instance.config_claims_maxAccruedBlocks_default;
