@@ -109,6 +109,9 @@ public class PlayerData
 
 	public InetAddress ipAddress;
 
+    //for addons to set per-player claim limits. Any negative value will use config's value
+    private int AccruedClaimBlocksLimit = -1;
+
     //whether or not this player has received a message about unlocking death drops since his last death
 	boolean receivedDropUnlockAdvertisement = false;
 
@@ -320,14 +323,17 @@ public class PlayerData
         return claims;
     }
     
-    //determine limits based on permissions
-    private int getAccruedClaimBlocksLimit()
+    //Limit can be changed by addons
+    public int getAccruedClaimBlocksLimit()
     {
-        //Player player = Bukkit.getServer().getPlayer(this.playerID);
-        //if the player isn't online, give him the benefit of any doubt
-        //if(player == null) return Integer.MAX_VALUE;
+        if (this.AccruedClaimBlocksLimit < 0)
+            return GriefPrevention.instance.config_claims_maxAccruedBlocks_default;
+        return this.AccruedClaimBlocksLimit;
+    }
 
-        return GriefPrevention.instance.config_claims_maxAccruedBlocks_default;
+    public void setAccruedClaimBlocksLimit(int limit)
+    {
+        this.AccruedClaimBlocksLimit = limit;
     }
 
     public void accrueBlocks(int howMany)
