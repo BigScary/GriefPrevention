@@ -77,12 +77,7 @@ class DeliverClaimBlocksTask implements Runnable
                 {                   
                     //determine how fast blocks accrue for this player //RoboMWM: addons determine this instead
                     int accrualRate = instance.config_claims_blocksAccruedPerHour_default;
-//                    if(player.hasPermission("griefprevention.fastestaccrual")) accrualRate = GriefPrevention.instance.config_claims_blocksAccruedPerHour_fastest;
-//                    else if(player.hasPermission("griefprevention.fasteraccrual")) accrualRate = GriefPrevention.instance.config_claims_blocksAccruedPerHour_faster;
-                    
-                    //add blocks
-                    int accruedBlocks = accrualRate / 6;
-                    if(accruedBlocks < 0) accruedBlocks = 1;
+
                     AccrueClaimBlocksEvent event = new AccrueClaimBlocksEvent(player, accrualRate);
                     instance.getServer().getPluginManager().callEvent(event);
                     if (event.isCancelled())
@@ -90,6 +85,7 @@ class DeliverClaimBlocksTask implements Runnable
                         GriefPrevention.AddLogEntry(player.getName() + " claim block delivery was canceled by another plugin.", CustomLogEntryTypes.Debug, true);
                         return;
                     }
+
                     playerData.accrueBlocks(event.getBlocksToAccrue());
                     GriefPrevention.AddLogEntry("Delivering " + accruedBlocks + " blocks to " + player.getName(), CustomLogEntryTypes.Debug, true);
                     

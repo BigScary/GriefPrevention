@@ -29,7 +29,8 @@ public class AccrueClaimBlocksEvent extends Event
     public AccrueClaimBlocksEvent(Player player, int blocksToAccrue)
     {
         this.player = player;
-        this.blocksToAccrue = blocksToAccrue;
+        if(blocksToAccrue < 0) blocksToAccrue = 1;
+        this.blocksToAccrue = blocksToAccrue / 6;
     }
 
     public Player getPlayer()
@@ -37,6 +38,10 @@ public class AccrueClaimBlocksEvent extends Event
         return this.player;
     }
 
+    /**
+     * Gets the amount of claim blocks GP will deliver to the player for this 10 minute interval
+     * @return
+     */
     public int getBlocksToAccrue()
     {
         return this.blocksToAccrue;
@@ -48,12 +53,22 @@ public class AccrueClaimBlocksEvent extends Event
     }
 
     /**
-     * Modify the amount of claim blocks to deliver to the player
+     * Modify the amount of claim blocks to deliver to the player for this 10 minute interval
      * @param blocksToAccrue blocks to deliver
      */
     public void setBlocksToAccrue(int blocksToAccrue)
     {
         this.blocksToAccrue = blocksToAccrue;
+    }
+
+    /**
+     * Similar to setBlocksToAccrue(int), but automatically converting from a per-hour rate value to a 10-minute rate value
+     * @param blocksToAccruePerHour the per-hour rate of blocks to deliver
+     */
+
+    public void setBlocksToAccruePerHour(int blocksToAccruePerHour)
+    {
+        this.blocksToAccrue = blocksToAccruePerHour / 6;
     }
 
     public void setCancelled(boolean cancel)
