@@ -87,7 +87,7 @@ class DeliverClaimBlocksTask implements Runnable
                     }
 
                     playerData.accrueBlocks(event.getBlocksToAccrue());
-                    GriefPrevention.AddLogEntry("Delivering " + accruedBlocks + " blocks to " + player.getName(), CustomLogEntryTypes.Debug, true);
+                    GriefPrevention.AddLogEntry("Delivering " + event.getBlocksToAccrue() + " blocks to " + player.getName(), CustomLogEntryTypes.Debug, true);
                     
                     //intentionally NOT saving data here to reduce overall secondary storage access frequency
                     //many other operations will cause this player's data to save, including his eventual logout
