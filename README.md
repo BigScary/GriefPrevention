@@ -10,12 +10,14 @@ According to it, this is all you need to do to add this to your maven project:
 		</repository>
 	</repositories>
 ```
+
+Replace `<version>` number with this number: [![](https://jitpack.io/v/TechFortress/GriefPrevention.svg)](https://jitpack.io/#TechFortress/GriefPrevention)
 ```xml
 	<dependency>
 	    <groupId>com.github.TechFortress</groupId>
 	    <artifactId>GriefPrevention</artifactId>
-	    <version>master-SNAPSHOT</version>
+	    <version>16.4</version>
 	</dependency>
 ```
 
-You can also add it to gradle/sbt/leiningen projects: https://jitpack.io/#TechFortress/GriefPrevention/master-SNAPSHOT
+You can also add it to gradle/sbt/leiningen projects: https://jitpack.io/#TechFortress/GriefPrevention/
