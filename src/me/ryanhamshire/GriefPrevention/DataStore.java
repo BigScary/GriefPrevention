@@ -26,6 +26,7 @@ import java.util.regex.Pattern;
 
 import me.ryanhamshire.GriefPrevention.events.ClaimDeletedEvent;
 
+import me.ryanhamshire.GriefPrevention.events.DeniedMessageEvent;
 import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -41,6 +42,8 @@ import com.google.common.io.Files;
 //singleton class which manages all GriefPrevention data (except for config options)
 public abstract class DataStore 
 {
+	private GriefPrevention instance;
+
 	//in-memory cache for player data
 	protected ConcurrentHashMap<UUID, PlayerData> playerNameToPlayerDataMap = new ConcurrentHashMap<UUID, PlayerData>();
 	
@@ -1682,8 +1685,11 @@ public abstract class DataStore
 			String param = args[i];
 			message = message.replace("{" + i + "}", param);
 		}
+
+		DeniedMessageEvent event = new DeniedMessageEvent(messageID, message);
+		Bukkit.getPluginManager().callEvent(event);
 		
-		return message;		
+		return event.getMessage();
 	}
 	
 	//used in updating the data schema from 0 to 1.
