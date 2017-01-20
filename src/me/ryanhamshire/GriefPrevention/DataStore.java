@@ -1686,10 +1686,13 @@ public abstract class DataStore
 			message = message.replace("{" + i + "}", param);
 		}
 
-		DeniedMessageEvent event = new DeniedMessageEvent(messageID, message);
-		Bukkit.getPluginManager().callEvent(event);
-		
-		return event.getMessage();
+		if (Bukkit.isPrimaryThread())
+        {
+            DeniedMessageEvent event = new DeniedMessageEvent(messageID, message);
+            Bukkit.getPluginManager().callEvent(event);
+            return event.getMessage();
+        }
+		return message;
 	}
 	
 	//used in updating the data schema from 0 to 1.
