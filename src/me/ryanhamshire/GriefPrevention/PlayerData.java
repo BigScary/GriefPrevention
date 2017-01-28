@@ -19,21 +19,12 @@
 package me.ryanhamshire.GriefPrevention;
 import java.net.InetAddress;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.UUID;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
-import me.ryanhamshire.GriefPrevention.Claim;
-import me.ryanhamshire.GriefPrevention.GriefPrevention;
-import me.ryanhamshire.GriefPrevention.ShovelMode;
-import me.ryanhamshire.GriefPrevention.SiegeData;
-import me.ryanhamshire.GriefPrevention.Visualization;
-
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.entity.Player;
 
 //holds all of GriefPrevention's player-tied data
 public class PlayerData 
@@ -78,9 +69,6 @@ public class PlayerData
 	//whether this player was recently warned about building outside land claims
 	boolean warnedAboutBuildingOutsideClaims = false;
 	
-	//timestamp when last siege ended (where this player was the defender)
-	long lastSiegeEndTimeStamp = 0;
-	
 	//whether the player was kicked (set and used during logout)
 	boolean wasKicked = false;
     
@@ -96,9 +84,6 @@ public class PlayerData
 	
 	//the last claim this player was in, that we know of
 	public Claim lastClaim = null;
-	
-	//siege
-	public SiegeData siegeData = null;
 	
 	//pvp
 	public long lastPvpTimestamp = 0;

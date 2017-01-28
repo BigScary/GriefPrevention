@@ -318,25 +318,6 @@ public class EntityEventHandler implements Listener
                 continue;
             }
             
-            //if claim is under siege, allow soft blocks to be destroyed
-            if(claim != null && claim.siegeData != null)
-            {
-                Material material = block.getType();
-                boolean breakable = false;
-                for(int j = 0; j < GriefPrevention.instance.config_siege_blocks.size(); j++)
-                {
-                    Material breakableMaterial = GriefPrevention.instance.config_siege_blocks.get(j);
-                    if(breakableMaterial == material)
-                    {
-                        breakable = true;
-                        explodedBlocks.add(block);
-                        break;
-                    }
-                }
-
-                if(breakable) continue;
-            }
-            
             //if no, then also consider surface rules
             if(claim == null)
             {
@@ -459,18 +440,12 @@ public class EntityEventHandler implements Listener
 		
 		//FEATURE: when a player is involved in a siege (attacker or defender role)
 		//his death will end the siege
+		//RoboMWM - Idk if he's referencing anything else here, or if this is an old comment and he's now added more if-else here...
 		
 		if(entity.getType() != EntityType.PLAYER) return;  //only tracking players
 		
 		Player player = (Player)entity;
 		PlayerData playerData = this.dataStore.getPlayerData(player.getUniqueId());
-		
-		//if involved in a siege
-		if(playerData.siegeData != null)
-		{
-			//end it, with the dieing player being the loser
-			this.dataStore.endSiege(playerData.siegeData, null, player.getName(), event.getDrops());
-		}
 		
 		//FEATURE: lock dropped items to player who dropped them
         

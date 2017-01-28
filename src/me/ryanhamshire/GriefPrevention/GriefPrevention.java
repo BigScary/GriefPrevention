@@ -129,10 +129,7 @@ public class GriefPrevention extends JavaPlugin
 	public ArrayList<String> config_claims_commandsRequiringAccessTrust; //the list of slash commands requiring access trust when in a claim
 	public boolean config_claims_supplyPlayerManual;                //whether to give new players a book with land claim help in it
 	public int config_claims_manualDeliveryDelaySeconds;            //how long to wait before giving a book to a new player
-	
-	public ArrayList<World> config_siege_enabledWorlds;				//whether or not /siege is enabled on this server
-	public ArrayList<Material> config_siege_blocks;					//which blocks will be breakable in siege mode
-		
+
 	public boolean config_spam_enabled;								//whether or not to monitor for spam
 	public int config_spam_loginCooldownSeconds;					//how long players must wait between logins.  combats login spam.
 	public ArrayList<String> config_spam_monitorSlashCommands;  	//the list of slash commands monitored for spam
@@ -667,78 +664,6 @@ public class GriefPrevention extends JavaPlugin
             this.config_claims_modificationTool = Material.GOLD_SPADE;
         }
         
-        //default for siege worlds list
-        ArrayList<String> defaultSiegeWorldNames = new ArrayList<String>();
-        
-        //get siege world names from the config file
-        List<String> siegeEnabledWorldNames = config.getStringList("GriefPrevention.Siege.Worlds");
-        if(siegeEnabledWorldNames == null)
-        {           
-            siegeEnabledWorldNames = defaultSiegeWorldNames;
-        }
-        
-        //validate that list
-        this.config_siege_enabledWorlds = new ArrayList<World>();
-        for(int i = 0; i < siegeEnabledWorldNames.size(); i++)
-        {
-            String worldName = siegeEnabledWorldNames.get(i);
-            World world = this.getServer().getWorld(worldName);
-            if(world == null)
-            {
-                AddLogEntry("Error: Siege Configuration: There's no world named \"" + worldName + "\".  Please update your config.yml.");
-            }
-            else
-            {
-                this.config_siege_enabledWorlds.add(world);
-            }
-        }
-        
-        //default siege blocks
-        this.config_siege_blocks = new ArrayList<Material>();
-        this.config_siege_blocks.add(Material.DIRT);
-        this.config_siege_blocks.add(Material.GRASS);
-        this.config_siege_blocks.add(Material.LONG_GRASS);
-        this.config_siege_blocks.add(Material.COBBLESTONE);
-        this.config_siege_blocks.add(Material.GRAVEL);
-        this.config_siege_blocks.add(Material.SAND);
-        this.config_siege_blocks.add(Material.GLASS);
-        this.config_siege_blocks.add(Material.THIN_GLASS);
-        this.config_siege_blocks.add(Material.WOOD);
-        this.config_siege_blocks.add(Material.WOOL);
-        this.config_siege_blocks.add(Material.SNOW);
-        
-        //build a default config entry
-        ArrayList<String> defaultBreakableBlocksList = new ArrayList<String>();
-        for(int i = 0; i < this.config_siege_blocks.size(); i++)
-        {
-            defaultBreakableBlocksList.add(this.config_siege_blocks.get(i).name());
-        }
-        
-        //try to load the list from the config file
-        List<String> breakableBlocksList = config.getStringList("GriefPrevention.Siege.BreakableBlocks");
-        
-        //if it fails, use default list instead
-        if(breakableBlocksList == null || breakableBlocksList.size() == 0)
-        {
-            breakableBlocksList = defaultBreakableBlocksList;
-        }
-        
-        //parse the list of siege-breakable blocks
-        this.config_siege_blocks = new ArrayList<Material>();
-        for(int i = 0; i < breakableBlocksList.size(); i++)
-        {
-            String blockName = breakableBlocksList.get(i);
-            Material material = Material.getMaterial(blockName);
-            if(material == null)
-            {
-                GriefPrevention.AddLogEntry("Siege Configuration: Material not found: " + blockName + ".");
-            }
-            else
-            {
-                this.config_siege_blocks.add(material);
-            }
-        }
-        
         this.config_pvp_noCombatInPlayerLandClaims = config.getBoolean("GriefPrevention.PvP.ProtectPlayersInLandClaims.PlayerOwnedClaims", this.config_siege_enabledWorlds.size() == 0);
         this.config_pvp_noCombatInAdminLandClaims = config.getBoolean("GriefPrevention.PvP.ProtectPlayersInLandClaims.AdministrativeClaims", this.config_siege_enabledWorlds.size() == 0);
         this.config_pvp_noCombatInAdminSubdivisions = config.getBoolean("GriefPrevention.PvP.ProtectPlayersInLandClaims.AdministrativeSubdivisions", this.config_siege_enabledWorlds.size() == 0);
@@ -864,9 +789,6 @@ public class GriefPrevention extends JavaPlugin
         outConfig.set("GriefPrevention.SmartBan", this.config_smartBan);
         outConfig.set("GriefPrevention.Mute New Players Using Banned Words", this.config_trollFilterEnabled);
         outConfig.set("GriefPrevention.MaxPlayersPerIpAddress", this.config_ipLimit);
-        
-        outConfig.set("GriefPrevention.Siege.Worlds", siegeEnabledWorldNames);
-        outConfig.set("GriefPrevention.Siege.BreakableBlocks", breakableBlocksList);
         
         outConfig.set("GriefPrevention.EndermenMoveBlocks", this.config_endermenMoveBlocks);
         outConfig.set("GriefPrevention.SilverfishBreakBlocks", this.config_silverfishBreakBlocks);      
@@ -2369,141 +2291,7 @@ public class GriefPrevention extends JavaPlugin
 			
 			return true;
 		}
-		
-		//siege
-		else if(cmd.getName().equalsIgnoreCase("siege") && player != null)
-		{
-			//error message for when siege mode is disabled
-			if(!this.siegeEnabledForWorld(player.getWorld()))
-			{
-				GriefPrevention.sendMessage(player, TextMode.Err, Messages.NonSiegeWorld);
-				return true;
-			}
-			
-			//requires one argument
-			if(args.length > 1)
-			{
-				return false;
-			}
-			
-			//can't start a siege when you're already involved in one
-			Player attacker = player;
-			PlayerData attackerData = this.dataStore.getPlayerData(attacker.getUniqueId());
-			if(attackerData.siegeData != null)
-			{
-				GriefPrevention.sendMessage(player, TextMode.Err, Messages.AlreadySieging);
-				return true;
-			}
-			
-			//can't start a siege when you're protected from pvp combat
-			if(attackerData.pvpImmune)
-			{
-				GriefPrevention.sendMessage(player, TextMode.Err, Messages.CantFightWhileImmune);
-				return true;
-			}
-			
-			//if a player name was specified, use that
-			Player defender = null;
-			if(args.length >= 1)
-			{
-				defender = this.getServer().getPlayer(args[0]);
-				if(defender == null)
-				{
-					GriefPrevention.sendMessage(player, TextMode.Err, Messages.PlayerNotFound2);
-					return true;
-				}
-			}
-			
-			//otherwise use the last player this player was in pvp combat with 
-			else if(attackerData.lastPvpPlayer.length() > 0)
-			{
-				defender = this.getServer().getPlayer(attackerData.lastPvpPlayer);
-				if(defender == null)
-				{
-					return false;
-				}
-			}
-			
-			else
-			{
-				return false;
-			}
 
-                        // First off, you cannot siege yourself, that's just
-                        // silly:
-                        if (attacker.getName().equals( defender.getName() )) {
-                            GriefPrevention.sendMessage(player, TextMode.Err, Messages.NoSiegeYourself);
-                            return true;
-                        }
-			
-			//victim must not have the permission which makes him immune to siege
-			if(defender.hasPermission("griefprevention.siegeimmune"))
-			{
-			    GriefPrevention.sendMessage(player, TextMode.Err, Messages.SiegeImmune);
-                return true;
-			}
-			
-			//victim must not be under siege already
-			PlayerData defenderData = this.dataStore.getPlayerData(defender.getUniqueId());
-			if(defenderData.siegeData != null)
-			{
-				GriefPrevention.sendMessage(player, TextMode.Err, Messages.AlreadyUnderSiegePlayer);
-				return true;
-			}
-			
-			//victim must not be pvp immune
-			if(defenderData.pvpImmune)
-			{
-				GriefPrevention.sendMessage(player, TextMode.Err, Messages.NoSiegeDefenseless);
-				return true;
-			}
-			
-			Claim defenderClaim = this.dataStore.getClaimAt(defender.getLocation(), false, null);
-			
-			//defender must have some level of permission there to be protected
-			if(defenderClaim == null || defenderClaim.allowAccess(defender) != null)
-			{
-				GriefPrevention.sendMessage(player, TextMode.Err, Messages.NotSiegableThere);
-				return true;
-			}									
-			
-			//attacker must be close to the claim he wants to siege
-			if(!defenderClaim.isNear(attacker.getLocation(), 25))
-			{
-				GriefPrevention.sendMessage(player, TextMode.Err, Messages.SiegeTooFarAway);
-				return true;
-			}
-			
-			//claim can't be under siege already
-			if(defenderClaim.siegeData != null)
-			{
-				GriefPrevention.sendMessage(player, TextMode.Err, Messages.AlreadyUnderSiegeArea);
-				return true;
-			}
-			
-			//can't siege admin claims
-			if(defenderClaim.isAdminClaim())
-			{
-				GriefPrevention.sendMessage(player, TextMode.Err, Messages.NoSiegeAdminClaim);
-				return true;
-			}
-			
-			//can't be on cooldown
-			if(dataStore.onCooldown(attacker, defender, defenderClaim))
-			{
-				GriefPrevention.sendMessage(player, TextMode.Err, Messages.SiegeOnCooldown);
-				return true;
-			}
-			
-			//start the siege
-			dataStore.startSiege(attacker, defender, defenderClaim);			
-
-			//confirmation message for attacker, warning message for defender
-			GriefPrevention.sendMessage(defender, TextMode.Warn, Messages.SiegeAlert, attacker.getName());
-			GriefPrevention.sendMessage(player, TextMode.Success, Messages.SiegeConfirmed, defender.getName());
-
-			return true;
-		}
 		else if(cmd.getName().equalsIgnoreCase("softmute"))
 		{
 		    //requires one parameter
@@ -3194,12 +2982,6 @@ public class GriefPrevention extends JavaPlugin
         
 	    return true;
     }
-
-    //checks whether players siege in a world
-	public boolean siegeEnabledForWorld(World world)
-	{
-		return this.config_siege_enabledWorlds.contains(world);
-	}
 
 	//moves a player from the claim he's in to a nearby wilderness location
 	public Location ejectPlayer(Player player)

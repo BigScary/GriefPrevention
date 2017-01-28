@@ -422,7 +422,7 @@ class PlayerEventHandler implements Listener
 		//if in pvp, block any pvp-banned slash commands
 		if(playerData == null) playerData = this.dataStore.getPlayerData(event.getPlayer().getUniqueId());
 
-		if((playerData.inPvpCombat() || playerData.siegeData != null) && instance.config_pvp_blockedCommands.contains(command))
+		if((playerData.inPvpCombat()) && instance.config_pvp_blockedCommands.contains(command))
 		{
 			event.setCancelled(true);
 			instance.sendMessage(event.getPlayer(), TextMode.Err, Messages.CommandBannedInPvP);
@@ -896,14 +896,6 @@ class PlayerEventHandler implements Listener
             player.setHealth(0);
         }
         
-        //FEATURE: during a siege, any player who logs out dies and forfeits the siege
-        
-        //if player was involved in a siege, he forfeits
-        if(playerData.siegeData != null)
-        {
-            if(player.getHealth() > 0) player.setHealth(0);  //might already be zero from above, this avoids a double death message
-        }
-        
         //drop data about this player
         this.dataStore.clearCachedPlayerData(playerID);
         
@@ -971,13 +963,6 @@ class PlayerEventHandler implements Listener
 		{
 			instance.sendMessage(player, TextMode.Err, Messages.PvPNoDrop);
 			event.setCancelled(true);			
-		}
-		
-		//if he's under siege, don't let him drop it
-		else if(playerData.siegeData != null)
-		{
-			instance.sendMessage(player, TextMode.Err, Messages.SiegeNoDrop);
-			event.setCancelled(true);
 		}
 	}
 	
@@ -1059,32 +1044,6 @@ class PlayerEventHandler implements Listener
 					    player.getInventory().addItem(new ItemStack(Material.ENDER_PEARL));
 				}
 			}
-		}
-		
-		//FEATURE: prevent teleport abuse to win sieges
-		
-		//these rules only apply to siege worlds only
-		if(!instance.config_siege_enabledWorlds.contains(player.getWorld())) return;
-		
-		//these rules do not apply to admins
-		if(player.hasPermission("griefprevention.siegeteleport")) return;
-		
-		Location source = event.getFrom();
-		Claim sourceClaim = this.dataStore.getClaimAt(source, false, playerData.lastClaim);
-		if(sourceClaim != null && sourceClaim.siegeData != null)
-		{
-			instance.sendMessage(player, TextMode.Err, Messages.SiegeNoTeleport);
-			event.setCancelled(true);
-			return;
-		}
-		
-		Location destination = event.getTo();
-		Claim destinationClaim = this.dataStore.getClaimAt(destination, false, null);
-		if(destinationClaim != null && destinationClaim.siegeData != null)
-		{
-			instance.sendMessage(player, TextMode.Err, Messages.BesiegedNoTeleport);
-			event.setCancelled(true);
-			return;
 		}
 	}
 	
@@ -1198,13 +1157,6 @@ class PlayerEventHandler implements Listener
         //don't allow container access during pvp combat
         if((entity instanceof StorageMinecart || entity instanceof PoweredMinecart))
         {
-            if(playerData.siegeData != null)
-            {
-                instance.sendMessage(player, TextMode.Err, Messages.SiegeNoContainers);
-                event.setCancelled(true);
-                return;
-            }
-            
             if(playerData.inPvpCombat())
             {
 				instance.sendMessage(player, TextMode.Err, Messages.PvPNoContainers);
@@ -1569,12 +1521,7 @@ class PlayerEventHandler implements Listener
 		    if(playerData == null) playerData = this.dataStore.getPlayerData(player.getUniqueId());
 		    
 		    //block container use while under siege, so players can't hide items from attackers
-			if(playerData.siegeData != null)
-			{
-				instance.sendMessage(player, TextMode.Err, Messages.SiegeNoContainers);
-				event.setCancelled(true);
-				return;
-			}
+			//RoboMWM - removed
 			
 			//block container use during pvp combat, same reason
 			if(playerData.inPvpCombat())
@@ -1947,14 +1894,7 @@ class PlayerEventHandler implements Listener
 
 			event.setCancelled(true);  //GriefPrevention exclusively reserves this tool  (e.g. no grass path creation for golden shovel)
 
-			//disable golden shovel while under siege
 			if(playerData == null) playerData = this.dataStore.getPlayerData(player.getUniqueId());
-			if(playerData.siegeData != null)
-			{
-				instance.sendMessage(player, TextMode.Err, Messages.SiegeNoShovel);
-				event.setCancelled(true);
-				return;
-			}
 
 			//FEATURE: shovel and stick can be used from a distance away
             if(action == Action.RIGHT_CLICK_AIR)
