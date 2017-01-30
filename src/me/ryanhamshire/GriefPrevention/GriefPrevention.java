@@ -1175,26 +1175,6 @@ public class GriefPrevention extends JavaPlugin
 			return this.abandonClaimHandler(player, true);
 		}
 		
-		//ignoreclaims
-		if(cmd.getName().equalsIgnoreCase("ignoreclaims") && player != null)
-		{
-			PlayerData playerData = this.dataStore.getPlayerData(player.getUniqueId());
-			
-			playerData.ignoreClaims = !playerData.ignoreClaims;
-			
-			//toggle ignore claims mode on or off
-			if(!playerData.ignoreClaims)
-			{
-				GriefPrevention.sendMessage(player, TextMode.Success, Messages.RespectingClaims);
-			}
-			else
-			{
-				GriefPrevention.sendMessage(player, TextMode.Success, Messages.IgnoringClaims);
-			}
-			
-			return true;
-		}
-		
 		//abandonallclaims
 		else if(cmd.getName().equalsIgnoreCase("abandonallclaims") && player != null)
 		{
@@ -3082,9 +3062,6 @@ public class GriefPrevention extends JavaPlugin
 	    PlayerData playerData = this.dataStore.getPlayerData(player.getUniqueId());
 		Claim claim = this.dataStore.getClaimAt(location, false, playerData.lastClaim);
 		
-		//exception: administrators in ignore claims mode and special player accounts created by server mods
-		if(playerData.ignoreClaims || GriefPrevention.instance.config_mods_ignoreClaimsAccounts.contains(player.getName())) return null;
-		
 		//wilderness rules
 		if(claim == null)
 		{
@@ -3133,9 +3110,6 @@ public class GriefPrevention extends JavaPlugin
         
         PlayerData playerData = this.dataStore.getPlayerData(player.getUniqueId());
         Claim claim = this.dataStore.getClaimAt(location, false, playerData.lastClaim);
-        
-        //exception: administrators in ignore claims mode, and special player accounts created by server mods
-        if(playerData.ignoreClaims || GriefPrevention.instance.config_mods_ignoreClaimsAccounts.contains(player.getName())) return null;
         
         //wilderness rules
         if(claim == null)
@@ -3372,74 +3346,4 @@ public class GriefPrevention extends JavaPlugin
                 claim.isAdminClaim() && claim.parent != null && GriefPrevention.instance.config_pvp_noCombatInAdminSubdivisions ||
                !claim.isAdminClaim() && GriefPrevention.instance.config_pvp_noCombatInPlayerLandClaims;
     }
-
-    /*
-    protected boolean isPlayerTrappedInPortal(Block block)
-	{
-		Material playerBlock = block.getType();
-		if (playerBlock == Material.PORTAL)
-			return true;
-		//Most blocks you can "stand" inside but cannot pass through (isSolid) usually can be seen through (!isOccluding)
-		//This can cause players to technically be considered not in a portal block, yet in reality is still stuck in the portal animation.
-		if ((!playerBlock.isSolid() || playerBlock.isOccluding())) //If it is _not_ such a block,
-		{
-			//Check the block above
-			playerBlock = block.getRelative(BlockFace.UP).getType();
-			if ((!playerBlock.isSolid() || playerBlock.isOccluding()))
-				return false; //player is not stuck
-		}
-		//Check if this block is also adjacent to a portal
-		return block.getRelative(BlockFace.EAST).getType() == Material.PORTAL
-				|| block.getRelative(BlockFace.WEST).getType() == Material.PORTAL
-				|| block.getRelative(BlockFace.NORTH).getType() == Material.PORTAL
-				|| block.getRelative(BlockFace.SOUTH).getType() == Material.PORTAL;
-	}
-
-	public void rescuePlayerTrappedInPortal(final Player player)
-	{
-		final Location oldLocation = player.getLocation();
-		if (!isPlayerTrappedInPortal(oldLocation.getBlock()))
-		{
-			//Note that he 'escaped' the portal frame
-			instance.portalReturnMap.remove(player.getUniqueId());
-			instance.portalReturnTaskMap.remove(player.getUniqueId());
-			return;
-		}
-
-		Location rescueLocation = portalReturnMap.get(player.getUniqueId());
-
-		if (rescueLocation == null)
-			return;
-
-		//Temporarily store the old location, in case the player wishes to undo the rescue
-		dataStore.getPlayerData(player.getUniqueId()).portalTrappedLocation = oldLocation;
-
-		player.teleport(rescueLocation);
-		sendMessage(player, TextMode.Info, Messages.RescuedFromPortalTrap);
-		portalReturnMap.remove(player.getUniqueId());
-
-		new BukkitRunnable()
-		{
-			public void run()
-			{
-				if (oldLocation == dataStore.getPlayerData(player.getUniqueId()).portalTrappedLocation)
-					dataStore.getPlayerData(player.getUniqueId()).portalTrappedLocation = null;
-			}
-		}.runTaskLater(this, 600L);
-	}
-	*/
-
-	//Track scheduled "rescues" so we can cancel them if the player happens to teleport elsewhere so we can cancel it.
-	ConcurrentHashMap<UUID, BukkitTask> portalReturnTaskMap = new ConcurrentHashMap<UUID, BukkitTask>();
-	public void startRescueTask(Player player)
-	{
-		//Schedule task to reset player's portal cooldown after 20 seconds
-		BukkitTask task = new CheckForPortalTrapTask(player, this).runTaskLater(GriefPrevention.instance, 400L);
-
-		//Cancel existing rescue task
-		if (portalReturnTaskMap.containsKey(player.getUniqueId()))
-			portalReturnTaskMap.put(player.getUniqueId(), task).cancel();
-		else
-			portalReturnTaskMap.put(player.getUniqueId(), task);
-	}
 }

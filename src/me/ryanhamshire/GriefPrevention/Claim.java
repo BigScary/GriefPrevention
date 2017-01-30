@@ -317,8 +317,8 @@ public class Claim
 			return GriefPrevention.instance.dataStore.getMessage(Messages.NoBuildPvP);			
 		}
 		
-		//owners can make changes, or admins with ignore claims mode enabled
-		if(player.getUniqueId().equals(this.ownerID) || GriefPrevention.instance.dataStore.getPlayerData(player.getUniqueId()).ignoreClaims) return null;
+		//owners can make changes
+		if(player.getUniqueId().equals(this.ownerID)) return null;
 		
 		//anyone with explicit build permission can make changes
 		if(this.hasExplicitPermission(player, ClaimPermission.Build)) return null;
@@ -343,9 +343,6 @@ public class Claim
 		
 		//failure message for all other cases
 		String reason = GriefPrevention.instance.dataStore.getMessage(Messages.NoBuildPermission, this.getOwnerName());
-		if(player.hasPermission("griefprevention.ignoreclaims"))
-				reason += "  " + GriefPrevention.instance.dataStore.getMessage(Messages.IgnoreClaimsAdvertisement);
-		
 		return reason;
 	}
 	
@@ -392,8 +389,8 @@ public class Claim
 			if(player.hasPermission("griefprevention.adminclaims")) return null;
 		}
 		
-		//claim owner and admins in ignoreclaims mode have access
-		if(player.getUniqueId().equals(this.ownerID) || GriefPrevention.instance.dataStore.getPlayerData(player.getUniqueId()).ignoreClaims) return null;
+		//claim owner has access
+		if(player.getUniqueId().equals(this.ownerID)) return null;
 		
 		//look for explicit individual access, inventory, or build permission
 		if(this.hasExplicitPermission(player, ClaimPermission.Access)) return null;
@@ -410,8 +407,6 @@ public class Claim
 		
 		//catch-all error message for all other cases
 		String reason = GriefPrevention.instance.dataStore.getMessage(Messages.NoAccessPermission, this.getOwnerName());
-		if(player.hasPermission("griefprevention.ignoreclaims"))
-			reason += "  " + GriefPrevention.instance.dataStore.getMessage(Messages.IgnoreClaimsAdvertisement);
 		return reason;
 	}
 	
@@ -421,8 +416,8 @@ public class Claim
 		//if we don't know who's asking, always say no (i've been told some mods can make this happen somehow)
 		if(player == null) return "";
 		
-		//owner and administrators in ignoreclaims mode have access
-		if(player.getUniqueId().equals(this.ownerID) || GriefPrevention.instance.dataStore.getPlayerData(player.getUniqueId()).ignoreClaims) return null;
+		//owner has access
+		if(player.getUniqueId().equals(this.ownerID)) return null;
 		
 		//admin claims need adminclaims permission only.
 		if(this.isAdminClaim())
@@ -444,8 +439,6 @@ public class Claim
 		
 		//error message for all other cases
 		String reason = GriefPrevention.instance.dataStore.getMessage(Messages.NoContainersPermission, this.getOwnerName());
-		if(player.hasPermission("griefprevention.ignoreclaims"))
-			reason += "  " + GriefPrevention.instance.dataStore.getMessage(Messages.IgnoreClaimsAdvertisement);
 		return reason;
 	}
 	
@@ -478,8 +471,6 @@ public class Claim
 		
 		//generic error message
 		String reason = GriefPrevention.instance.dataStore.getMessage(Messages.NoPermissionTrust, this.getOwnerName());
-		if(player.hasPermission("griefprevention.ignoreclaims"))
-			reason += "  " + GriefPrevention.instance.dataStore.getMessage(Messages.IgnoreClaimsAdvertisement);
 		return reason;
 	}
 	

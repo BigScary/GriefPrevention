@@ -885,16 +885,10 @@ public class EntityEventHandler implements Listener
                     if(tameable.isTamed() && tameable.getOwner() != null)
                     {
                         //limit attacks by players to owners and admins in ignore claims mode
-                        if(attacker != null)
-                        {
                             UUID ownerID = tameable.getOwner().getUniqueId();
                            
                             //if the player interacting is the owner, always allow
                             if(attacker.getUniqueId().equals(ownerID)) return;
-                            
-                            //allow for admin override
-                            PlayerData attackerData = this.dataStore.getPlayerData(attacker.getUniqueId());
-                            if(attackerData.ignoreClaims) return;
                            
                             //otherwise disallow in non-pvp worlds (and also pvp worlds if configured to do so)
                             if(!GriefPrevention.instance.pvpRulesApply(subEvent.getEntity().getLocation().getWorld()) || (GriefPrevention.instance.config_pvp_protectPets && subEvent.getEntityType() != EntityType.WOLF))
@@ -921,7 +915,6 @@ public class EntityEventHandler implements Listener
                                 if(sendErrorMessagesToPlayers) GriefPrevention.sendMessage(attacker, TextMode.Err, Messages.CantFightWhileImmune);
                                 return;
                             }
-                        }
                     }
                 }
                 

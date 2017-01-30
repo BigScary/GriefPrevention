@@ -976,9 +976,6 @@ class PlayerEventHandler implements Listener
 	    Player player = event.getPlayer();
         if(event.getCause() == TeleportCause.NETHER_PORTAL)
         {
-            //FEATURE: when players get trapped in a nether portal, send them back through to the other side
-			instance.startRescueTask(player);
-
 			//don't track in worlds where claims are not enabled
 			if(!instance.claimsEnabledForWorld(event.getTo().getWorld())) return;
         
@@ -1082,8 +1079,8 @@ class PlayerEventHandler implements Listener
                 {
                    UUID ownerID = tameable.getOwner().getUniqueId();
                    
-                   //if the player interacting is the owner or an admin in ignore claims mode, always allow
-                   if(player.getUniqueId().equals(ownerID) || playerData.ignoreClaims)
+                   //if the player interacting is the owner, always allow
+                   if(player.getUniqueId().equals(ownerID))
                    {
                        //if giving away pet, do that instead
                        if(playerData.petGiveawayRecipient != null)
@@ -1103,8 +1100,6 @@ class PlayerEventHandler implements Listener
                        String ownerName = owner.getName();
                        if(ownerName == null) ownerName = "someone";
                        String message = instance.dataStore.getMessage(Messages.NotYourPet, ownerName);
-                       if(player.hasPermission("griefprevention.ignoreclaims"))
-                           message += "  " + instance.dataStore.getMessage(Messages.IgnoreClaimsAdvertisement);
                        instance.sendMessage(player, TextMode.Err, message);
                        event.setCancelled(true);
                        return;
@@ -1150,9 +1145,6 @@ class PlayerEventHandler implements Listener
                 return;
             }
 		}
-		
-		//always allow interactions when player is in ignore claims mode
-        if(playerData.ignoreClaims) return;
         
         //don't allow container access during pvp combat
         if((entity instanceof StorageMinecart || entity instanceof PoweredMinecart))
@@ -1196,8 +1188,6 @@ class PlayerEventHandler implements Listener
                 if(claim.allowContainers(player) != null)
                 {
                     String message = instance.dataStore.getMessage(Messages.NoDamageClaimedEntity, claim.getOwnerName());
-                    if(player.hasPermission("griefprevention.ignoreclaims"))
-                        message += "  " + instance.dataStore.getMessage(Messages.IgnoreClaimsAdvertisement);
 					instance.sendMessage(player, TextMode.Err, message);
                     event.setCancelled(true);
                     return;

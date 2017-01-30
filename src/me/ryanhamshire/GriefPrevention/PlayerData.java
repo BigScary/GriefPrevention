@@ -79,9 +79,6 @@ public class PlayerData
 	public boolean pvpImmune = false;
 	public long lastSpawn = 0;
 	
-	//ignore claims mode
-	public boolean ignoreClaims = false;
-	
 	//the last claim this player was in, that we know of
 	public Claim lastClaim = null;
 	
