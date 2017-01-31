@@ -77,7 +77,7 @@ public class GriefPrevention extends JavaPlugin
 	
 	//this handles data storage, like player and region data
 	public DataStore dataStore;
-	
+
 	//this tracks item stacks expected to drop which will need protection
     ArrayList<PendingItemProtection> pendingItemWatchList = new ArrayList<PendingItemProtection>();
     
@@ -2040,34 +2040,6 @@ public class GriefPrevention extends JavaPlugin
 
             return true;
         }
-		
-		//unlockItems
-		else if(cmd.getName().equalsIgnoreCase("unlockdrops") && player != null)
-		{
-			PlayerData playerData;
-
-			if (player.hasPermission("griefprevention.unlockothersdrops") && args.length == 1)
-			{
-				Player otherPlayer = Bukkit.getPlayer(args[0]);
-				if (otherPlayer == null)
-				{
-					GriefPrevention.sendMessage(player, TextMode.Err, Messages.PlayerNotFound2);
-					return true;
-				}
-
-				playerData = this.dataStore.getPlayerData(otherPlayer.getUniqueId());
-				GriefPrevention.sendMessage(player, TextMode.Success, Messages.DropUnlockOthersConfirmation, otherPlayer.getName());
-			}
-			else
-			{
-				playerData = this.dataStore.getPlayerData(player.getUniqueId());
-				GriefPrevention.sendMessage(player, TextMode.Success, Messages.DropUnlockConfirmation);
-			}
-
-		    playerData.dropsAreUnlocked = true;
-			
-			return true;
-		}
 		
 		//deletealladminclaims
 		else if(player != null && cmd.getName().equalsIgnoreCase("deletealladminclaims"))

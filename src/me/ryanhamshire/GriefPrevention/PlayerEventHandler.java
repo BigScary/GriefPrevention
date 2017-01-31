@@ -1244,40 +1244,6 @@ class PlayerEventHandler implements Listener
 	public void onPlayerPickupItem(PlayerPickupItemEvent event)
 	{
 		Player player = event.getPlayer();
-
-		//FEATURE: lock dropped items to player who dropped them
-		
-		//who owns this stack?
-		Item item = event.getItem();
-		List<MetadataValue> data = item.getMetadata("GP_ITEMOWNER");
-		if(data != null && data.size() > 0)
-		{
-		    UUID ownerID = (UUID)data.get(0).value();
-		    
-		    //has that player unlocked his drops?
-		    OfflinePlayer owner = instance.getServer().getOfflinePlayer(ownerID);
-		    String ownerName = instance.lookupPlayerName(ownerID);
-		    if(owner.isOnline() && !player.equals(owner))
-		    {
-		        PlayerData playerData = this.dataStore.getPlayerData(ownerID);
-
-                //if locked, don't allow pickup
-		        if(!playerData.dropsAreUnlocked)
-		        {
-		            event.setCancelled(true);
-		            
-		            //if hasn't been instructed how to unlock, send explanatory messages
-		            if(!playerData.receivedDropUnlockAdvertisement)
-		            {
-						instance.sendMessage(owner.getPlayer(), TextMode.Instr, Messages.DropUnlockAdvertisement);
-						instance.sendMessage(player, TextMode.Err, Messages.PickupBlockedExplanation, ownerName);
-		                playerData.receivedDropUnlockAdvertisement = true;
-		            }
-		            
-		            return;
-		        }
-		    }
-		}
 		
 		//the rest of this code is specific to pvp worlds
 		if(!instance.pvpRulesApply(player.getWorld())) return;
