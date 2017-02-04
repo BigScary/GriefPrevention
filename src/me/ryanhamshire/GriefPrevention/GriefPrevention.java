@@ -3532,7 +3532,7 @@ public class GriefPrevention extends JavaPlugin
             {
                 if(world.isChunkLoaded(chunkx, chunkz))
                 {
-                    snapshots.add(world.getChunkAt(chunkx, chunkz).getChunkSnapshot(true, true, true));
+                    snapshots.add(world.getChunkAt(chunkx, chunkz).getChunkSnapshot(true, true, false));
                 }
             }
         }
