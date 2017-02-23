@@ -262,7 +262,6 @@ public class EntityEventHandler implements Listener
         this.handleExplosion(explodeEvent.getBlock().getLocation(), null, explodeEvent.blockList());
     }
 
-    @SuppressWarnings("deprecation")
     void handleExplosion(Location location, Entity entity, List<Block> blocks)
     {
         //only applies to claims-enabled worlds
@@ -531,7 +530,6 @@ public class EntityEventHandler implements Listener
     {
         //handle it just like we would an entity damge by entity event, except don't send player messages to avoid double messages
         //in cases like attacking with a flame sword or flame arrow, which would ALSO trigger the direct damage event handler
-        @SuppressWarnings("deprecation")
         EntityDamageByEntityEvent eventWrapper = new EntityDamageByEntityEvent(event.getCombuster(), event.getEntity(), DamageCause.FIRE_TICK, event.getDuration());
         this.handleEntityDamageEvent(eventWrapper, false);
         event.setCancelled(eventWrapper.isCancelled());
@@ -618,89 +616,6 @@ public class EntityEventHandler implements Listener
                             if (!pvpEvent.isCancelled())
                             {
                                 event.setCancelled(true);
-                                return;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        //if the attacker is a player and defender is a player (pvp combat)
-        if (attacker != null && event.getEntityType() == EntityType.PLAYER && GriefPrevention.instance.pvpRulesApply(attacker.getWorld()))
-        {
-            //FEATURE: prevent pvp in the first minute after spawn, and prevent pvp when one or both players have no inventory
-
-            Player defender = (Player) (event.getEntity());
-
-            if (attacker != defender)
-            {
-                PlayerData defenderData = this.dataStore.getPlayerData(((Player) event.getEntity()).getUniqueId());
-                PlayerData attackerData = this.dataStore.getPlayerData(attacker.getUniqueId());
-
-                //otherwise if protecting spawning players
-                if (GriefPrevention.instance.config_pvp_protectFreshSpawns)
-                {
-                    if (defenderData.pvpImmune)
-                    {
-                        event.setCancelled(true);
-                        if (sendErrorMessagesToPlayers)
-                        {
-                            GriefPrevention.sendMessage(attacker, TextMode.Err, Messages.ThatPlayerPvPImmune);
-                        }
-                        return;
-                    }
-
-                    if (attackerData.pvpImmune)
-                    {
-                        event.setCancelled(true);
-                        if (sendErrorMessagesToPlayers)
-                        {
-                            GriefPrevention.sendMessage(attacker, TextMode.Err, Messages.CantFightWhileImmune);
-                        }
-                        return;
-                    }
-                }
-
-                //FEATURE: prevent players from engaging in PvP combat inside land claims (when it's disabled)
-                if (GriefPrevention.instance.config_pvp_noCombatInPlayerLandClaims || GriefPrevention.instance.config_pvp_noCombatInAdminLandClaims)
-                {
-                    Claim attackerClaim = this.dataStore.getClaimAt(attacker.getLocation(), false, attackerData.lastClaim);
-                    if (!attackerData.ignoreClaims)
-                    {
-                        if (attackerClaim != null && //ignore claims mode allows for pvp inside land claims
-                                !attackerData.inPvpCombat() &&
-                                GriefPrevention.instance.claimIsPvPSafeZone(attackerClaim))
-                        {
-                            attackerData.lastClaim = attackerClaim;
-                            PreventPvPEvent pvpEvent = new PreventPvPEvent(attackerClaim);
-                            Bukkit.getPluginManager().callEvent(pvpEvent);
-                            if (!pvpEvent.isCancelled())
-                            {
-                                event.setCancelled(true);
-                                if (sendErrorMessagesToPlayers)
-                                {
-                                    GriefPrevention.sendMessage(attacker, TextMode.Err, Messages.CantFightWhileImmune);
-                                }
-                                return;
-                            }
-                        }
-
-                        Claim defenderClaim = this.dataStore.getClaimAt(defender.getLocation(), false, defenderData.lastClaim);
-                        if (defenderClaim != null &&
-                                !defenderData.inPvpCombat() &&
-                                GriefPrevention.instance.claimIsPvPSafeZone(defenderClaim))
-                        {
-                            defenderData.lastClaim = defenderClaim;
-                            PreventPvPEvent pvpEvent = new PreventPvPEvent(defenderClaim);
-                            Bukkit.getPluginManager().callEvent(pvpEvent);
-                            if (!pvpEvent.isCancelled())
-                            {
-                                event.setCancelled(true);
-                                if (sendErrorMessagesToPlayers)
-                                {
-                                    GriefPrevention.sendMessage(attacker, TextMode.Err, Messages.PlayerInPvPSafeZone);
-                                }
                                 return;
                             }
                         }
@@ -943,65 +858,6 @@ public class EntityEventHandler implements Listener
                     }
                 }
             }
-        }
-    }
-
-    //when an entity is damaged
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
-    public void onEntityDamageMonitor(EntityDamageEvent event)
-    {
-        //FEATURE: prevent players who very recently participated in pvp combat from hiding inventory to protect it from looting
-        //FEATURE: prevent players who are in pvp combat from logging out to avoid being defeated
-
-        if (event.getEntity().getType() != EntityType.PLAYER) return;
-
-        Player defender = (Player) event.getEntity();
-
-        //only interested in entities damaging entities (ignoring environmental damage)
-        if (!(event instanceof EntityDamageByEntityEvent)) return;
-
-        //Ignore "damage" from snowballs, eggs, etc. from triggering the PvP timer
-        if (event.getDamage() == 0) return;
-
-        EntityDamageByEntityEvent subEvent = (EntityDamageByEntityEvent) event;
-
-        //if not in a pvp rules world, do nothing
-        if (!GriefPrevention.instance.pvpRulesApply(defender.getWorld())) return;
-
-        //determine which player is attacking, if any
-        Player attacker = null;
-        Projectile arrow = null;
-        Entity damageSource = subEvent.getDamager();
-
-        if (damageSource != null)
-        {
-            if (damageSource.getType() == EntityType.PLAYER)
-            {
-                attacker = (Player) damageSource;
-            }
-            else if (damageSource instanceof Projectile)
-            {
-                arrow = (Projectile) damageSource;
-                if (arrow.getShooter() instanceof Player)
-                {
-                    attacker = (Player) arrow.getShooter();
-                }
-            }
-        }
-
-        //if attacker not a player, do nothing
-        if (attacker == null) return;
-
-        PlayerData defenderData = this.dataStore.getPlayerData(defender.getUniqueId());
-        PlayerData attackerData = this.dataStore.getPlayerData(attacker.getUniqueId());
-
-        if (attacker != defender)
-        {
-            long now = Calendar.getInstance().getTimeInMillis();
-            defenderData.lastPvpTimestamp = now;
-            defenderData.lastPvpPlayer = attacker.getName();
-            attackerData.lastPvpTimestamp = now;
-            attackerData.lastPvpPlayer = defender.getName();
         }
     }
 
