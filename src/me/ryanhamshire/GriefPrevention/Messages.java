@@ -187,6 +187,7 @@ public enum Messages
     DropUnlockAdvertisement,
     PickupBlockedExplanation,
     DropUnlockConfirmation,
+    DropUnlockOthersConfirmation,
     AdvertiseACandACB,
     AdvertiseAdminClaims,
     AdvertiseACB,
