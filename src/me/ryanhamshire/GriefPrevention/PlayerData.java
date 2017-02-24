@@ -302,13 +302,19 @@ public class PlayerData
                 this.accruedClaimBlocks = totalClaimsArea;
                 int accruedLimit = this.getAccruedClaimBlocksLimit();
                 this.accruedClaimBlocks = Math.min(accruedLimit, this.accruedClaimBlocks);
-                
+                GriefPrevention.AddLogEntry("New accrued blocks: " + this.accruedClaimBlocks, CustomLogEntryTypes.Debug, true);
+
                 //if that didn't fix it, then make up the difference with bonus blocks
                 totalBlocks = this.accruedClaimBlocks + this.getBonusClaimBlocks() + GriefPrevention.instance.dataStore.getGroupBonusBlocks(this.playerID);
+                GriefPrevention.AddLogEntry("New total blocks: " + totalBlocks, CustomLogEntryTypes.Debug, true);
                 if(totalBlocks < totalClaimsArea)
                 {
-                    this.bonusClaimBlocks += totalClaimsArea - totalBlocks;
+                    int bonusBlocksToAdd = totalClaimsArea - totalBlocks;
+                    this.bonusClaimBlocks += bonusBlocksToAdd;
+                    GriefPrevention.AddLogEntry("Accrued blocks weren't enough. Adding" + bonusBlocksToAdd, CustomLogEntryTypes.Debug, true);
                 }
+                GriefPrevention.AddLogEntry(player.getName() + " Accrued blocks: " + this.getAccruedClaimBlocks() + " Bonus blocks" + this.getBonusClaimBlocks(), CustomLogEntryTypes.Debug, true);
+                GriefPrevention.AddLogEntry("Total blocks: " + totalBlocks + " Total claimed area: " + totalClaimsArea, CustomLogEntryTypes.Debug, true);
             }
         }
         
