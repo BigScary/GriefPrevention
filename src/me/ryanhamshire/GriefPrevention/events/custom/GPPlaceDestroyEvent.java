@@ -10,7 +10,7 @@ import org.bukkit.metadata.Metadatable;
 import javax.annotation.Nullable;
 
 /**
- * Fired when a block or block-like entity is placed or destroyed
+ * Fired when a block or block-like sourceEntity is placed or destroyed
  * Block-like entities include item frames, armor stands, paintings, etc.
  *
  * Created on 2/23/2017.
@@ -19,42 +19,12 @@ import javax.annotation.Nullable;
  */
 public class GPPlaceDestroyEvent extends GPBaseEvent
 {
-    private Entity entity;
-    private Location location;
-    private Metadatable thing; //TODO: rename?
-
-    public GPPlaceDestroyEvent(Event baseEvent, @Nullable Entity entity, Location location, Metadatable thing)
+    public GPPlaceDestroyEvent(Event baseEvent, @Nullable Entity sourceEntity, Location location, Metadatable target)
     {
-        super(baseEvent);
-        this.entity = entity;
-        this.location = location;
-        this.thing = thing;
+        super(baseEvent, sourceEntity, location, target);
     }
-
-    public Entity getEntity()
+    public GPPlaceDestroyEvent(Event baseEvent, @Nullable Metadatable source, Location location, Metadatable target)
     {
-        return entity;
-    }
-
-    public boolean isPlayer()
-    {
-        return entity != null && entity.getType() == EntityType.PLAYER;
-    }
-
-    public Player getPlayer()
-    {
-        if (isPlayer())
-            return (Player)entity;
-        return null;
-    }
-
-    public Location getLocation()
-    {
-        return location;
-    }
-
-    public Metadatable getThing()
-    {
-        return thing;
+        super(baseEvent, source, location, target);
     }
 }
