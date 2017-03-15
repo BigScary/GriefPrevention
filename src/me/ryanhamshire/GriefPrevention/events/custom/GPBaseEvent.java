@@ -59,6 +59,7 @@ public class GPBaseEvent extends Event implements Cancellable
 
     public GPBaseEvent(Event baseEvent, @Nullable Entity sourceEntity, Location location, Metadatable target)
     {
+        this.baseEvent = baseEvent;
         this.sourceEntity = sourceEntity;
         this.source = sourceEntity;
         this.location = location;
@@ -96,6 +97,10 @@ public class GPBaseEvent extends Event implements Cancellable
         return null;
     }
 
+    /**
+     * Gets location of target block/entity
+     * @return
+     */
     public Location getLocation()
     {
         return location;

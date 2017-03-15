@@ -208,24 +208,6 @@ public class EntityEventHandler implements Listener
         }
     }
 
-    //Used by "sand cannon" fix to ignore fallingblocks that fell through End Portals
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
-    public void onFallingBlockEnterPortal(EntityPortalEnterEvent event)
-    {
-        if (event.getEntityType() != EntityType.FALLING_BLOCK)
-        {
-            return;
-        }
-        event.getEntity().removeMetadata("GP_FALLINGBLOCK", instance);
-    }
-
-    //don't allow zombies to break down doors
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
-    public void onZombieBreakDoor(EntityBreakDoorEvent event)
-    {
-        if (!GriefPrevention.instance.config_zombiesBreakDoors) event.setCancelled(true);
-    }
-
     //don't allow entities to trample crops //RoboMWM - TODO: this isn't covered by the prior event handler?
     @EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
     public void onEntityInteract(EntityInteractEvent event)
@@ -337,70 +319,7 @@ public class EntityEventHandler implements Listener
         blocks.addAll(explodedBlocks);
     }
 
-    //when an item spawns...
-    @EventHandler(priority = EventPriority.LOWEST)
-    public void onItemSpawn(ItemSpawnEvent event)
-    {
-        //if in a creative world, cancel the event (don't drop items on the ground)
-        if (GriefPrevention.instance.creativeRulesApply(event.getLocation()))
-        {
-            event.setCancelled(true);
-        }
-    }
-
-    //when an experience bottle explodes...
-    @EventHandler(priority = EventPriority.LOWEST)
-    public void onExpBottle(ExpBottleEvent event)
-    {
-        //if in a creative world, cancel the event (don't drop exp on the ground)
-        if (GriefPrevention.instance.creativeRulesApply(event.getEntity().getLocation()))
-        {
-            event.setExperience(0);
-        }
-    }
-
-    //when a creature spawns...
-    @EventHandler(priority = EventPriority.LOWEST)
-    public void onEntitySpawn(CreatureSpawnEvent event)
-    {
-        //these rules apply only to creative worlds
-        if (!GriefPrevention.instance.creativeRulesApply(event.getLocation())) return;
-
-        //chicken eggs and breeding could potentially make a mess in the wilderness, once griefers get involved
-        SpawnReason reason = event.getSpawnReason();
-        if (reason != SpawnReason.SPAWNER_EGG && reason != SpawnReason.BUILD_IRONGOLEM && reason != SpawnReason.BUILD_SNOWMAN && event.getEntityType() != EntityType.ARMOR_STAND)
-        {
-            event.setCancelled(true);
-            return;
-        }
-
-        //otherwise, just apply the limit on total entities per claim (and no spawning in the wilderness!)
-        Claim claim = this.dataStore.getClaimAt(event.getLocation(), false, null);
-        if (claim == null || claim.allowMoreEntities(true) != null)
-        {
-            event.setCancelled(true);
-            return;
-        }
-    }
-
-    //when an entity dies...
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onEntityDeath(EntityDeathEvent event)
-    {
-        LivingEntity entity = event.getEntity();
-
-        //don't do the rest in worlds where claims are not enabled
-        if (!GriefPrevention.instance.claimsEnabledForWorld(entity.getWorld())) return;
-
-        //special rule for creative worlds: killed entities don't drop items or experience orbs
-        if (GriefPrevention.instance.creativeRulesApply(entity.getLocation()))
-        {
-            event.setDroppedExp(0);
-            event.getDrops().clear();
-        }
-    }
-
-    //when an entity picks up an item
+    //when an entity picks up an item //TODO: include with entitychangeblockevent above
     @EventHandler(priority = EventPriority.LOWEST)
     public void onEntityPickup(EntityChangeBlockEvent event)
     {
