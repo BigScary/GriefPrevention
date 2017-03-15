@@ -42,26 +42,26 @@ public class GPBaseEvent extends Event implements Cancellable
     }
 
     private Event baseEvent;
-    private Metadatable source;
-    //Most of these events contain an entity as a source.
+    private Metadatable causer;
+    //Most of these events contain an entity as a causer.
     //Thus, we'll store it as an entity to avoid needless instanceof calls
     private Entity sourceEntity;
     private Location location;
     private Metadatable target;
 
-    public GPBaseEvent(Event baseEvent, @Nullable Metadatable source, Location location, Metadatable target)
+    public GPBaseEvent(Event baseEvent, @Nullable Metadatable causer, Location location, Metadatable target)
     {
         this.baseEvent = baseEvent;
         this.location = location;
         this.target = target;
-        this.source = source;
+        this.causer = causer;
     }
 
     public GPBaseEvent(Event baseEvent, @Nullable Entity sourceEntity, Location location, Metadatable target)
     {
         this.baseEvent = baseEvent;
         this.sourceEntity = sourceEntity;
-        this.source = sourceEntity;
+        this.causer = sourceEntity;
         this.location = location;
         this.target = target;
     }
@@ -71,14 +71,14 @@ public class GPBaseEvent extends Event implements Cancellable
         return baseEvent;
     }
 
-    public Metadatable getSource()
+    public Metadatable getCauser()
     {
-        return source;
+        return causer;
     }
 
     /**
-     * Gets the source entity.
-     * @return null if no source, or if source is not an entity
+     * Gets the causer entity.
+     * @return null if no causer, or if causer is not an entity
      */
     public Entity getSourceEntity()
     {
