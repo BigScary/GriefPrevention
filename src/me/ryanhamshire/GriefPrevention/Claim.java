@@ -34,21 +34,22 @@ public class Claim
 {
 	//two locations, which together define the boundaries of the claim
 	//note that the upper Y value is always ignored, because claims ALWAYS extend up to the sky
-	Location lesserBoundaryCorner;
-	Location greaterBoundaryCorner;
+	private Location lesserBoundaryCorner;
+	private Location greaterBoundaryCorner;
 	
 	//modification date.  this comes from the file timestamp during load, and is updated with runtime changes
-	public Date modifiedDate;
+	//TODO: RoboMWM - is this even needed
+	private Date modifiedDate;
 	
 	//id number.  unique to this claim, never changes.
 	Long id = null;
 	
 	//ownerID.  for admin claims, this is NULL
 	//use getOwnerName() to get a friendly name (will be "an administrator" for admin claims)
-	public UUID ownerID;
+	private UUID ownerID;
 	
 	//list of players who (beyond the claim owner) have permission to grant permissions in this claim
-	public ArrayList<String> managers = new ArrayList<String>();
+	private ArrayList<String> managers = new ArrayList<String>();
 	
 	//permissions for this claim, see ClaimPermission class
 	private HashMap<String, ClaimPermission> playerIDToClaimPermissionMap = new HashMap<String, ClaimPermission>();
@@ -57,24 +58,16 @@ public class Claim
 	//if a claim instance isn't in the data store, it isn't "active" - players can't interract with it 
 	//why keep this?  so that claims which have been removed from the data store can be correctly 
 	//ignored even though they may have references floating around
-	public boolean inDataStore = false;
-	
-	public boolean areExplosivesAllowed = false;
-	
-	//parent claim
-	//only used for claim subdivisions.  top level claims have null here
-	public Claim parent = null;
-	
-	//children (subdivisions)
-	//note subdivisions themselves never have children
-	public ArrayList<Claim> children = new ArrayList<Claim>();
+	//TODO: RoboMWM - probably should aim to remove this
+	private boolean inDataStore = false;
+
+	//TODO: change name, probably(?)
+	private boolean areExplosivesAllowed = false;
 	
 	//whether or not this is an administrative claim
 	//administrative claims are created and maintained by players with the griefprevention.adminclaims permission.
 	public boolean isAdminClaim()
 	{
-		if(this.parent != null) return this.parent.isAdminClaim();
-	    
 		return (this.ownerID == null);
 	}
 	
@@ -123,7 +116,7 @@ public class Claim
 				{
 					//dodge the exclusion claim
 					Block block = lesser.getWorld().getBlockAt(x, y, z);
-					if(exclusionClaim != null && exclusionClaim.contains(block.getLocation(), true, false)) continue;
+					if(exclusionClaim != null && exclusionClaim.contains(block.getLocation(), false)) continue;
 					
 					if(block.getType() == Material.STATIONARY_LAVA || block.getType() == Material.WATER || block.getType() == Material.STATIONARY_WATER || block.getType() == Material.LAVA)
 					{
@@ -246,7 +239,7 @@ public class Claim
 			 new Location(this.greaterBoundaryCorner.getWorld(), this.greaterBoundaryCorner.getBlockX() + howNear, this.greaterBoundaryCorner.getBlockY(), this.greaterBoundaryCorner.getBlockZ() + howNear),
 			 null, new ArrayList<String>(), new ArrayList<String>(), new ArrayList<String>(), new ArrayList<String>(), null);
 		
-		return claim.contains(location, false, true);
+		return claim.contains(location, true);
 	}
 	
 	//permissions.  note administrative "public" claims have different rules than other claims
@@ -275,10 +268,6 @@ public class Claim
 		{
 			return null;
 		}
-		
-		//permission inheritance for subdivisions
-		if(this.parent != null)
-			return this.parent.allowEdit(player);
 		
 		//error message if all else fails
 		return GriefPrevention.instance.dataStore.getMessage(Messages.OnlyOwnersModifyClaims, this.getOwnerName());
@@ -336,10 +325,6 @@ public class Claim
                 return null;
             }
         }
-		
-		//subdivision permission inheritance
-		if(this.parent != null)
-			return this.parent.allowBuild(player, material);
 		
 		//failure message for all other cases
 		String reason = GriefPrevention.instance.dataStore.getMessage(Messages.NoBuildPermission, this.getOwnerName());
@@ -399,11 +384,7 @@ public class Claim
 		
 		//also check for public permission
 		ClaimPermission permissionLevel = this.playerIDToClaimPermissionMap.get("public");
-		if(ClaimPermission.Build == permissionLevel || ClaimPermission.Inventory == permissionLevel || ClaimPermission.Access == permissionLevel) return null;		
-		
-		//permission inheritance for subdivisions
-		if(this.parent != null)
-			return this.parent.allowAccess(player);
+		if(ClaimPermission.Build == permissionLevel || ClaimPermission.Inventory == permissionLevel || ClaimPermission.Access == permissionLevel) return null;
 		
 		//catch-all error message for all other cases
 		String reason = GriefPrevention.instance.dataStore.getMessage(Messages.NoAccessPermission, this.getOwnerName());
@@ -433,10 +414,6 @@ public class Claim
 		ClaimPermission permissionLevel = this.playerIDToClaimPermissionMap.get("public");
 		if(ClaimPermission.Build == permissionLevel || ClaimPermission.Inventory == permissionLevel) return null;
 		
-		//permission inheritance for subdivisions
-		if(this.parent != null)
-			return this.parent.allowContainers(player);
-		
 		//error message for all other cases
 		String reason = GriefPrevention.instance.dataStore.getMessage(Messages.NoContainersPermission, this.getOwnerName());
 		return reason;
@@ -465,10 +442,6 @@ public class Claim
 			}
 		}
 		
-		//permission inheritance for subdivisions
-		if(this.parent != null)
-			return this.parent.allowGrantPermission(player);
-		
 		//generic error message
 		String reason = GriefPrevention.instance.dataStore.getMessage(Messages.NoPermissionTrust, this.getOwnerName());
 		return reason;
@@ -484,11 +457,6 @@ public class Claim
 	public void dropPermission(String playerID)
 	{
 		this.playerIDToClaimPermissionMap.remove(playerID.toLowerCase());
-		
-		for(Claim child : this.children)
-		{
-		    child.dropPermission(playerID);
-		}
 	}
 	
 	//clears all permissions (except owner of course)
@@ -496,11 +464,6 @@ public class Claim
 	{
 		this.playerIDToClaimPermissionMap.clear();
 		this.managers.clear();
-		
-		for(Claim child : this.children)
-        {
-            child.clearPermissions();
-        }
 	}
 	
 	//gets ALL permissions
@@ -551,10 +514,7 @@ public class Claim
 	//returns a friendly owner name (for admin claims, returns "an administrator" as the owner)
 	public String getOwnerName()
 	{
-		if(this.parent != null)
-			return this.parent.getOwnerName();
-		
-		if(this.ownerID == null)
+		if (this.ownerID == null)
 			return GriefPrevention.instance.dataStore.getMessage(Messages.OwnerNameForAdminClaims);
 		
 		return GriefPrevention.lookupPlayerName(this.ownerID);
@@ -563,7 +523,7 @@ public class Claim
 	//whether or not a location is in a claim
 	//ignoreHeight = true means location UNDER the claim will return TRUE
 	//excludeSubdivisions = true means that locations inside subdivisions of the claim will return FALSE
-	public boolean contains(Location location, boolean ignoreHeight, boolean excludeSubdivisions)
+	public boolean contains(Location location, boolean ignoreHeight)
 	{
 	    //not in the same world implies false
 		if(!location.getWorld().equals(this.lesserBoundaryCorner.getWorld())) return false;
@@ -580,29 +540,6 @@ public class Claim
 				z < this.greaterBoundaryCorner.getZ() + 1;
 				
 		if(!inClaim) return false;
-				
-	    //additional check for subdivisions
-		//you're only in a subdivision when you're also in its parent claim
-		//NOTE: if a player creates subdivions then resizes the parent claim, it's possible that
-		//a subdivision can reach outside of its parent's boundaries.  so this check is important!
-		if(this.parent != null)
-	    {
-	    	return this.parent.contains(location, ignoreHeight, false);
-	    }
-		
-		//code to exclude subdivisions in this check
-		else if(excludeSubdivisions)
-		{
-			//search all subdivisions to see if the location is in any of them
-			for(int i = 0; i < this.children.size(); i++)
-			{
-				//if we find such a subdivision, return false
-				if(this.children.get(i).contains(location, ignoreHeight, true))
-				{
-					return false;
-				}
-			}
-		}
 		
 		//otherwise yes
 		return true;				
@@ -618,13 +555,13 @@ public class Claim
 		if(!this.lesserBoundaryCorner.getWorld().equals(otherClaim.getLesserBoundaryCorner().getWorld())) return false;
 		
 		//first, check the corners of this claim aren't inside any existing claims
-		if(otherClaim.contains(this.lesserBoundaryCorner, true, false)) return true;
-		if(otherClaim.contains(this.greaterBoundaryCorner, true, false)) return true;
-		if(otherClaim.contains(new Location(this.lesserBoundaryCorner.getWorld(), this.lesserBoundaryCorner.getBlockX(), 0, this.greaterBoundaryCorner.getBlockZ()), true, false)) return true;
-		if(otherClaim.contains(new Location(this.lesserBoundaryCorner.getWorld(), this.greaterBoundaryCorner.getBlockX(), 0, this.lesserBoundaryCorner.getBlockZ()), true, false)) return true;
+		if(otherClaim.contains(this.lesserBoundaryCorner, false)) return true;
+		if(otherClaim.contains(this.greaterBoundaryCorner, false)) return true;
+		if(otherClaim.contains(new Location(this.lesserBoundaryCorner.getWorld(), this.lesserBoundaryCorner.getBlockX(), 0, this.greaterBoundaryCorner.getBlockZ()), false)) return true;
+		if(otherClaim.contains(new Location(this.lesserBoundaryCorner.getWorld(), this.greaterBoundaryCorner.getBlockX(), 0, this.lesserBoundaryCorner.getBlockZ()), false)) return true;
 		
 		//verify that no claim's lesser boundary point is inside this new claim, to cover the "existing claim is entirely inside new claim" case
-		if(this.contains(otherClaim.getLesserBoundaryCorner(), true, false)) return true;
+		if(this.contains(otherClaim.getLesserBoundaryCorner(), false)) return true;
 		
 		//verify this claim doesn't band across an existing claim, either horizontally or vertically		
 		if(	this.getLesserBoundaryCorner().getBlockZ() <= otherClaim.getGreaterBoundaryCorner().getBlockZ() && 
@@ -657,8 +594,6 @@ public class Claim
 	//whether more entities may be added to a claim
 	public String allowMoreEntities(boolean remove)
 	{
-		if(this.parent != null) return this.parent.allowMoreEntities(remove);
-		
 		//this rule only applies to creative mode worlds
 		if(!GriefPrevention.instance.creativeRulesApply(this.getLesserBoundaryCorner())) return null;
 		
@@ -681,7 +616,7 @@ public class Claim
 			for(int i = 0; i < entities.length; i++)
 			{
 				Entity entity = entities[i];
-				if(!(entity instanceof Player) && this.contains(entity.getLocation(), false, false))
+				if(!(entity instanceof Player) && this.contains(entity.getLocation(), false))
 				{
 					totalEntities++;
 					if(remove && totalEntities > maxEntities) entity.remove();
@@ -696,8 +631,6 @@ public class Claim
 	
 	public String allowMoreActiveBlocks()
     {
-	    if(this.parent != null) return this.parent.allowMoreActiveBlocks();
-	    
 	    //determine maximum allowable entity count, based on claim size
         int maxActives = this.getArea() / 100;      
         if(maxActives == 0) return GriefPrevention.instance.dataStore.getMessage(Messages.ClaimTooSmallForActiveBlocks);
@@ -713,7 +646,7 @@ public class Claim
                 BlockState active = actives[i];
                 if(BlockEventHandler.isActiveBlock(active))
                 {
-                    if(this.contains(active.getLocation(), false, false))
+                    if(this.contains(active.getLocation(), false))
                     {
                         totalActives++;
                     }

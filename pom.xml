@@ -8,8 +8,8 @@
     <artifactId>GriefPrevention</artifactId>
     <version>16.5.1</version>
     <properties>
-        <maven.compiler.source>1.6</maven.compiler.source>
-        <maven.compiler.target>1.6</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
     <repositories>
         <repository>
@@ -50,14 +50,14 @@
         <dependency>
                 <groupId>org.bukkit</groupId>
                 <artifactId>bukkit</artifactId>
-                <version>1.11.2-R0.1-SNAPSHOT</version>
+                <version>1.12-pre2-SNAPSHOT</version>
                 <scope>provided</scope>
         </dependency>
-        <!--Google stuff-->
+        <!--Google stuff (probably included in CB)-->
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>19.0</version>
+            <version>21.0</version>
         </dependency>
         <!--json stuff-->
         <dependency>
