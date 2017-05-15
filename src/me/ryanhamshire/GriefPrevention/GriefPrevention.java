@@ -37,7 +37,6 @@ import me.ryanhamshire.GriefPrevention.events.PreventBlockBreakEvent;
 import me.ryanhamshire.GriefPrevention.events.SaveTrappedPlayerEvent;
 import net.milkbowl.vault.economy.Economy;
 
-import org.bukkit.Achievement;
 import org.bukkit.BanList;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
