@@ -61,8 +61,12 @@ public class Claim
 	//TODO: RoboMWM - probably should aim to remove this
 	private boolean inDataStore = false;
 
-	//TODO: change name, probably(?)
-	private boolean areExplosivesAllowed = false;
+	private boolean explosivesTemporarilyAllowed = false;
+
+	public boolean areExplosivesAllowed()
+	{
+		return explosivesTemporarilyAllowed;
+	}
 	
 	//whether or not this is an administrative claim
 	//administrative claims are created and maintained by players with the griefprevention.adminclaims permission.
@@ -241,241 +245,36 @@ public class Claim
 		
 		return claim.contains(location, true);
 	}
-	
-	//permissions.  note administrative "public" claims have different rules than other claims
-	//all of these return NULL when a player has permission, or a String error message when the player doesn't have permission
-	public String allowEdit(Player player)
-	{
-		//if we don't know who's asking, always say no (i've been told some mods can make this happen somehow)
-		if(player == null) return "";
-		
-		//special cases...
-		
-		//admin claims need adminclaims permission only.
-		if(this.isAdminClaim())
-		{
-			if(player.hasPermission("griefprevention.adminclaims")) return null;
-		}
-		
-		//anyone with deleteclaims permission can modify non-admin claims at any time
-		else
-		{
-			if(player.hasPermission("griefprevention.deleteclaims")) return null;
-		}
 
-		//owners can do whatever
-		if(player.getUniqueId().equals(this.ownerID))
-		{
-			return null;
-		}
-		
-		//error message if all else fails
-		return GriefPrevention.instance.dataStore.getMessage(Messages.OnlyOwnersModifyClaims, this.getOwnerName());
-	}
-	
-	private List<Material> placeableFarmingBlocksList = Arrays.asList(
-	        Material.PUMPKIN_STEM,
-	        Material.CROPS,
-	        Material.MELON_STEM,
-	        Material.CARROT,
-	        Material.POTATO,
-	        Material.NETHER_WARTS,
-	        Material.BEETROOT_BLOCK);
-	    
-    private boolean placeableForFarming(Material material)
-    {
-        return this.placeableFarmingBlocksList.contains(material);
-    }
-	
-	//build permission check
-	public String allowBuild(Player player, Material material)
-	{
-		//if we don't know who's asking, always say no (i've been told some mods can make this happen somehow)
-		if(player == null) return "";
-		
-		//admin claims can always be modified by admins, no exceptions
-		if(this.isAdminClaim())
-		{
-			if(player.hasPermission("griefprevention.adminclaims")) return null;
-		}
-		
-		//no building while in pvp combat
-		PlayerData playerData = GriefPrevention.instance.dataStore.getPlayerData(player.getUniqueId());
-		if(playerData.inPvpCombat())
-		{
-			return GriefPrevention.instance.dataStore.getMessage(Messages.NoBuildPvP);			
-		}
-		
-		//owners can make changes
-		if(player.getUniqueId().equals(this.ownerID)) return null;
-		
-		//anyone with explicit build permission can make changes
-		if(this.hasExplicitPermission(player, ClaimPermission.Build)) return null;
-		
-		//also everyone is a member of the "public", so check for public permission
-		ClaimPermission permissionLevel = this.playerIDToClaimPermissionMap.get("public");
-		if(ClaimPermission.Build == permissionLevel) return null;
-		
-		//allow for farming with /containertrust permission
-        if(this.allowContainers(player) == null)
-        {
-            //do allow for farming, if player has /containertrust permission
-            if(this.placeableForFarming(material))
-            {
-                return null;
-            }
-        }
-		
-		//failure message for all other cases
-		String reason = GriefPrevention.instance.dataStore.getMessage(Messages.NoBuildPermission, this.getOwnerName());
-		return reason;
-	}
-	
-	private boolean hasExplicitPermission(Player player, ClaimPermission level)
-	{
-		String playerID = player.getUniqueId().toString();
-		Set<String> keys = this.playerIDToClaimPermissionMap.keySet();
-		Iterator<String> iterator = keys.iterator();
-		while(iterator.hasNext())
-		{
-			String identifier = iterator.next();
-			if(playerID.equalsIgnoreCase(identifier) && this.playerIDToClaimPermissionMap.get(identifier) == level) return true;
-			
-			else if(identifier.startsWith("[") && identifier.endsWith("]"))
-			{
-				//drop the brackets
-				String permissionIdentifier = identifier.substring(1, identifier.length() - 1);
-				
-				//defensive coding
-				if(permissionIdentifier == null || permissionIdentifier.isEmpty()) continue;
-				
-				//check permission
-				if(player.hasPermission(permissionIdentifier) && this.playerIDToClaimPermissionMap.get(identifier) == level) return true;
-			}
-		}
-		
-		return false;			
-	}
-	
-	//break permission check
-	//RoboMWM: Was used to account for the now-removed siege rules
-	@Deprecated
-	public String allowBreak(Player player, Material material)
-	{
-		return this.allowBuild(player, material);
-	}
-	
-	//access permission check
-	public String allowAccess(Player player)
-	{
-		//admin claims need adminclaims permission only.
-		if(this.isAdminClaim())
-		{
-			if(player.hasPermission("griefprevention.adminclaims")) return null;
-		}
-		
-		//claim owner has access
-		if(player.getUniqueId().equals(this.ownerID)) return null;
-		
-		//look for explicit individual access, inventory, or build permission
-		if(this.hasExplicitPermission(player, ClaimPermission.Access)) return null;
-		if(this.hasExplicitPermission(player, ClaimPermission.Inventory)) return null;
-		if(this.hasExplicitPermission(player, ClaimPermission.Build)) return null;
-		
-		//also check for public permission
-		ClaimPermission permissionLevel = this.playerIDToClaimPermissionMap.get("public");
-		if(ClaimPermission.Build == permissionLevel || ClaimPermission.Inventory == permissionLevel || ClaimPermission.Access == permissionLevel) return null;
-		
-		//catch-all error message for all other cases
-		String reason = GriefPrevention.instance.dataStore.getMessage(Messages.NoAccessPermission, this.getOwnerName());
-		return reason;
-	}
-	
-	//inventory permission check
-	public String allowContainers(Player player)
-	{		
-		//if we don't know who's asking, always say no (i've been told some mods can make this happen somehow)
-		if(player == null) return "";
-		
-		//owner has access
-		if(player.getUniqueId().equals(this.ownerID)) return null;
-		
-		//admin claims need adminclaims permission only.
-		if(this.isAdminClaim())
-		{
-			if(player.hasPermission("griefprevention.adminclaims")) return null;
-		}
-		
-		//check for explicit individual container or build permission 
-		if(this.hasExplicitPermission(player, ClaimPermission.Inventory)) return null;
-		if(this.hasExplicitPermission(player, ClaimPermission.Build)) return null;
-		
-		//check for public container or build permission
-		ClaimPermission permissionLevel = this.playerIDToClaimPermissionMap.get("public");
-		if(ClaimPermission.Build == permissionLevel || ClaimPermission.Inventory == permissionLevel) return null;
-		
-		//error message for all other cases
-		String reason = GriefPrevention.instance.dataStore.getMessage(Messages.NoContainersPermission, this.getOwnerName());
-		return reason;
-	}
-	
-	//grant permission check, relatively simple
-	public String allowGrantPermission(Player player)
-	{
-		//if we don't know who's asking, always say no (i've been told some mods can make this happen somehow)
-		if(player == null) return "";
-		
-		//anyone who can modify the claim can do this
-		if(this.allowEdit(player) == null) return null;
-		
-		//anyone who's in the managers (/PermissionTrust) list can do this
-		for(int i = 0; i < this.managers.size(); i++)
-		{
-			String managerID = this.managers.get(i);
-			if(player.getUniqueId().toString().equals(managerID)) return null;
-			
-			else if(managerID.startsWith("[") && managerID.endsWith("]"))
-			{
-				managerID = managerID.substring(1, managerID.length() - 1);
-				if(managerID == null || managerID.isEmpty()) continue;
-				if(player.hasPermission(managerID)) return null;
-			}
-		}
-		
-		//generic error message
-		String reason = GriefPrevention.instance.dataStore.getMessage(Messages.NoPermissionTrust, this.getOwnerName());
-		return reason;
-	}
-	
 	//grants a permission for a player or the public
 	public void setPermission(String playerID, ClaimPermission permissionLevel)
 	{
 		this.playerIDToClaimPermissionMap.put(playerID.toLowerCase(),  permissionLevel);
 	}
-	
+
 	//revokes a permission for a player or the public
 	public void dropPermission(String playerID)
 	{
 		this.playerIDToClaimPermissionMap.remove(playerID.toLowerCase());
 	}
-	
+
 	//clears all permissions (except owner of course)
 	public void clearPermissions()
 	{
 		this.playerIDToClaimPermissionMap.clear();
 		this.managers.clear();
 	}
-	
+
 	//gets ALL permissions
 	//useful for  making copies of permissions during a claim resize and listing all permissions in a claim
 	public void getPermissions(ArrayList<String> builders, ArrayList<String> containers, ArrayList<String> accessors, ArrayList<String> managers)
 	{
 		//loop through all the entries in the hash map
-		Iterator<Map.Entry<String, ClaimPermission>> mappingsIterator = this.playerIDToClaimPermissionMap.entrySet().iterator(); 
+		Iterator<Map.Entry<String, ClaimPermission>> mappingsIterator = this.playerIDToClaimPermissionMap.entrySet().iterator();
 		while(mappingsIterator.hasNext())
 		{
 			Map.Entry<String, ClaimPermission> entry = mappingsIterator.next();
-			
+
 			//build up a list for each permission level
 			if(entry.getValue() == ClaimPermission.Build)
 			{
@@ -488,9 +287,9 @@ public class Claim
 			else
 			{
 				accessors.add(entry.getKey());
-			}			
+			}
 		}
-		
+
 		//managers are handled a little differently
 		for(int i = 0; i < this.managers.size(); i++)
 		{
