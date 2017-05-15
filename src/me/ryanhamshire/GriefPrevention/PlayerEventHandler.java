@@ -34,6 +34,7 @@ import java.util.regex.Pattern;
 
 
 import me.ryanhamshire.GriefPrevention.events.VisualizationEvent;
+import org.bukkit.BanList;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
@@ -687,7 +688,7 @@ class PlayerEventHandler implements Listener
 							if(info2.address.toString().equals(address))
 							{
 								OfflinePlayer bannedAccount = instance.getServer().getOfflinePlayer(info2.bannedAccountName);
-								bannedAccount.setBanned(false);
+								instance.getServer().getBanList(BanList.Type.NAME).pardon(bannedAccount.getName());
 								this.tempBannedIps.remove(j--);
 							}
 						}
