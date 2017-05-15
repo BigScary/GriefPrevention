@@ -47,6 +47,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.Statistic;
 import org.bukkit.World;
 import org.bukkit.BanList.Type;
 import org.bukkit.World.Environment;
@@ -3559,7 +3560,7 @@ public class GriefPrevention extends JavaPlugin
 
     public static boolean isNewToServer(Player player)
     {
-        if(player.hasAchievement(Achievement.MINE_WOOD)) return false;
+        if(player.getStatistic(Statistic.PICKUP, Material.WOOD) > 0) return false;
         
         PlayerData playerData = instance.dataStore.getPlayerData(player.getUniqueId());
         if(playerData.getClaims().size() > 0) return false;
