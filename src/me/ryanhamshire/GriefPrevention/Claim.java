@@ -255,7 +255,7 @@ public class Claim
 	
 	//whether or not two claims overlap
 	//used internally to prevent overlaps when creating claims
-	boolean overlaps(Claim otherClaim)
+	public boolean overlaps(Claim otherClaim)
 	{
 		//NOTE:  if trying to understand this makes your head hurt, don't feel bad - it hurts mine too.  
 		//try drawing pictures to visualize test cases.
@@ -298,23 +298,6 @@ public class Claim
 
 		return false;
 	}
-	
-	//implements a strict ordering of claims, used to keep the claims collection sorted for faster searching
-	boolean greaterThan(Claim otherClaim)
-	{
-		Location thisCorner = this.getLesserBoundaryCorner();
-		Location otherCorner = otherClaim.getLesserBoundaryCorner();
-		
-		if(thisCorner.getBlockX() > otherCorner.getBlockX()) return true;
-		
-		if(thisCorner.getBlockX() < otherCorner.getBlockX()) return false;
-		
-		if(thisCorner.getBlockZ() > otherCorner.getBlockZ()) return true;
-		
-		if(thisCorner.getBlockZ() < otherCorner.getBlockZ()) return false;
-		
-		return thisCorner.getWorld().getName().compareTo(otherCorner.getWorld().getName()) < 0;
-	}
 
     public ArrayList<Chunk> getChunks()
     {
@@ -333,24 +316,5 @@ public class Claim
         }
         
         return chunks;
-    }
-
-    ArrayList<Long> getChunkHashes()
-    {
-        ArrayList<Long> hashes = new ArrayList<Long>();
-        int smallX = this.getLesserBoundaryCorner().getBlockX() >> 4;
-        int smallZ = this.getLesserBoundaryCorner().getBlockZ() >> 4;
-		int largeX = this.getGreaterBoundaryCorner().getBlockX() >> 4;
-		int largeZ = this.getGreaterBoundaryCorner().getBlockZ() >> 4;
-		
-		for(int x = smallX; x <= largeX; x++)
-		{
-		    for(int z = smallZ; z <= largeZ; z++)
-		    {
-		        hashes.add(DataStore.getChunkHash(x, z));
-		    }
-		}
-		
-		return hashes;
     }
 }
