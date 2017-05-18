@@ -2231,40 +2231,6 @@ public class GriefPrevention extends JavaPlugin
 			
 			return true;
 		}
-
-		else if(cmd.getName().equalsIgnoreCase("softmute"))
-		{
-		    //requires one parameter
-		    if(args.length != 1) return false;
-		    
-		    //find the specified player
-            OfflinePlayer targetPlayer = this.resolvePlayerByName(args[0]);
-            if(targetPlayer == null)
-            {
-                GriefPrevention.sendMessage(player, TextMode.Err, Messages.PlayerNotFound2);
-                return true;
-            }
-            
-            //toggle mute for player
-            boolean isMuted = this.dataStore.toggleSoftMute(targetPlayer.getUniqueId());
-            if(isMuted)
-            {
-                GriefPrevention.sendMessage(player, TextMode.Success, Messages.SoftMuted, targetPlayer.getName());
-                String executorName = "console";
-                if(player != null)
-                {
-                    executorName = player.getName();
-                }
-                
-                GriefPrevention.AddLogEntry(executorName + " muted " + targetPlayer.getName() + ".", CustomLogEntryTypes.AdminActivity, true);
-            }
-            else
-            {
-                GriefPrevention.sendMessage(player, TextMode.Success, Messages.UnSoftMuted, targetPlayer.getName());
-            }
-            
-            return true;
-		}
 		
 		else if(cmd.getName().equalsIgnoreCase("gpreload"))
 		{
