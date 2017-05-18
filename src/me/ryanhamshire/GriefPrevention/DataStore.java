@@ -135,11 +135,6 @@ public abstract class DataStore
             for(Claim claim : this.claims)
             {
                 this.saveClaim(claim);
-                
-                for(Claim subClaim : claim.children)
-                {
-                    this.saveClaim(subClaim);
-                }
             }
             
             //clean up any UUID conversion work
@@ -401,21 +396,6 @@ public abstract class DataStore
 	//adds a claim to the datastore, making it an effective claim
 	synchronized void addClaim(Claim newClaim, boolean writeToStorage)
 	{
-		//subdivisions are added under their parent, not directly to the hash map for direct search
-		if(newClaim.parent != null)
-		{
-			if(!newClaim.parent.children.contains(newClaim))
-			{
-			    newClaim.parent.children.add(newClaim);
-			}
-			newClaim.inDataStore = true;
-			if(writeToStorage)
-			{
-			    this.saveClaim(newClaim);
-			}
-			return;
-		}
-		
 		//add it and mark it as added
 		this.claims.add(newClaim);
 		ArrayList<Long> chunkHashes = newClaim.getChunkHashes();
@@ -557,19 +537,6 @@ public abstract class DataStore
 	
 	synchronized void deleteClaim(Claim claim, boolean fireEvent, boolean releasePets)
 	{
-	    //delete any children
-        for(int j = 1; (j - 1) < claim.children.size(); j++)
-        {
-            this.deleteClaim(claim.children.get(j-1), true);
-        }
-        
-	    //subdivisions must also be removed from the parent claim child list
-		if(claim.parent != null)
-		{
-			Claim parentClaim = claim.parent;
-			parentClaim.children.remove(claim);
-		}
-		
 		//mark as deleted so any references elsewhere can be ignored
         claim.inDataStore = false;
 		
@@ -679,16 +646,8 @@ public abstract class DataStore
 		
 		for(Claim claim : claimsInChunk)
 		{
-		    if(claim.inDataStore && claim.contains(location, ignoreHeight, false))
+		    if(claim.inDataStore && claim.contains(location, false))
 		    {
-		        //when we find a top level claim, if the location is in one of its subdivisions,
-                //return the SUBDIVISION, not the top level claim
-                for(int j = 0; j < claim.children.size(); j++)
-                {
-                    Claim subdivision = claim.children.get(j);
-                    if(subdivision.inDataStore && subdivision.contains(location, ignoreHeight, false)) return subdivision;
-                }                       
-                    
                 return claim;
 		    }
 		}
@@ -815,15 +774,7 @@ public abstract class DataStore
 		newClaim.parent = parent;
 		
 		//ensure this new claim won't overlap any existing claims
-		ArrayList<Claim> claimsToCheck;
-		if(newClaim.parent != null)
-		{
-		    claimsToCheck = newClaim.parent.children;
-		}
-		else
-		{
-			claimsToCheck = this.claims;
-		}
+		ArrayList<Claim> claimsToCheck = this.claims;
 
 		for(int i = 0; i < claimsToCheck.size(); i++)
 		{
@@ -928,12 +879,6 @@ public abstract class DataStore
 		//adjust to new depth
 		claim.lesserBoundaryCorner.setY(newDepth);
 		claim.greaterBoundaryCorner.setY(newDepth);
-		for(Claim subdivision : claim.children)
-		{
-		    subdivision.lesserBoundaryCorner.setY(newDepth);
-            subdivision.greaterBoundaryCorner.setY(newDepth);
-		    this.saveClaim(subdivision);
-		}
 		
 		//save changes
 		this.saveClaim(claim);
@@ -996,13 +941,6 @@ public abstract class DataStore
 			for(int i = 0; i < managers.size(); i++)
 			{
 				result.claim.managers.add(managers.get(i));
-			}
-			
-			//restore subdivisions
-			for(Claim subdivision : claim.children)
-			{
-			    subdivision.parent = result.claim;
-			    result.claim.children.add(subdivision);
 			}
 			
 			//save those changes
@@ -1117,13 +1055,6 @@ public abstract class DataStore
             if(!player.getUniqueId().equals(playerData.claimResizing.ownerID) && playerData.claimResizing.parent == null)
             {
                 GriefPrevention.AddLogEntry(player.getName() + " resized " + playerData.claimResizing.getOwnerName() + "'s claim at " + GriefPrevention.getfriendlyLocationString(playerData.claimResizing.lesserBoundaryCorner) + ".");
-            }
-            
-            //if increased to a sufficiently large size and no subdivisions yet, send subdivision instructions
-            if(oldClaim.getArea() < 1000 && result.claim.getArea() >= 1000 && result.claim.children.size() == 0 && !player.hasPermission("griefprevention.adminclaims"))
-            {
-              GriefPrevention.sendMessage(player, TextMode.Info, Messages.BecomeMayor, 200L);
-              GriefPrevention.sendMessage(player, TextMode.Instr, Messages.SubdivisionVideo2, 201L, DataStore.SUBDIVISION_VIDEO_URL);
             }
             
             //if in a creative mode world and shrinking an existing claim, restore any unclaimed area
