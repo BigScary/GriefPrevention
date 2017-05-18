@@ -2837,37 +2837,6 @@ public class GriefPrevention extends JavaPlugin
 		AddLogEntry("GriefPrevention disabled.");
 	}
 	
-	//called when a player spawns, applies protection for that player if necessary
-	public void checkPvpProtectionNeeded(Player player)
-	{
-	    //if anti spawn camping feature is not enabled, do nothing
-        if(!this.config_pvp_protectFreshSpawns) return;
-        
-	    //if pvp is disabled, do nothing
-		if(!pvpRulesApply(player.getWorld())) return;
-		
-		//if player is in creative mode, do nothing
-		if(player.getGameMode() == GameMode.CREATIVE) return;
-		
-		//if the player has the damage any player permission enabled, do nothing
-		if(player.hasPermission("griefprevention.nopvpimmunity")) return;
-		
-		//check inventory for well, anything
-		if(GriefPrevention.isInventoryEmpty(player))
-		{
-    		//if empty, apply immunity
-    		PlayerData playerData = this.dataStore.getPlayerData(player.getUniqueId());
-    		playerData.pvpImmune = true;
-    		
-    		//inform the player after he finishes respawning
-    		GriefPrevention.sendMessage(player, TextMode.Success, Messages.PvPImmunityStart, 5L);
-    		
-    		//start a task to re-check this player's inventory every minute until his immunity is gone
-    		PvPImmunityValidationTask task = new PvPImmunityValidationTask(player);
-    		this.getServer().getScheduler().scheduleSyncDelayedTask(this, task, 1200L);
-		}
-	}
-	
 	static boolean isInventoryEmpty(Player player)
 	{
 	    PlayerInventory inventory = player.getInventory();
