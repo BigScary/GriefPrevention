@@ -18,14 +18,18 @@
 
 package me.ryanhamshire.GriefPrevention;
 
-import java.util.*;
+import org.bukkit.Chunk;
+import org.bukkit.Location;
+import org.bukkit.World;
 
-import org.bukkit.*;
-import org.bukkit.World.Environment;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockState;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 //represents a player claim
 //creating an instance doesn't make an effective claim
@@ -49,10 +53,11 @@ public class Claim
 	private UUID ownerID;
 	
 	//list of players who (beyond the claim owner) have permission to grant permissions in this claim
-	private ArrayList<String> managers = new ArrayList<String>();
+	//TODO: RoboMWM - removing for simplicity/incorporating with normal permission hierarchy
+	//private ArrayList<String> managers = new ArrayList<String>();
 	
 	//permissions for this claim, see ClaimPermission class
-	private HashMap<String, ClaimPermission> playerIDToClaimPermissionMap = new HashMap<String, ClaimPermission>();
+	private HashMap<UUID, ClaimPermission> playerIDToClaimPermissionMap = new HashMap<UUID, ClaimPermission>();
 	
 	//whether or not this claim is in the data store
 	//if a claim instance isn't in the data store, it isn't "active" - players can't interract with it 
@@ -89,7 +94,7 @@ public class Claim
 	}
 	
 	//main constructor.  note that only creating a claim instance does nothing - a claim must be added to the data store to be effective
-	Claim(Location lesserBoundaryCorner, Location greaterBoundaryCorner, UUID ownerID, List<String> builderIDs, List<String> containerIDs, List<String> accessorIDs, List<String> managerIDs, Long id)
+	Claim(Location lesserBoundaryCorner, Location greaterBoundaryCorner, UUID ownerID, List<UUID> builderIDs, List<UUID> containerIDs, List<UUID> accessorIDs, List<UUID> managerIDs, Long id)
 	{
 		//modification date
 		this.modifiedDate = Calendar.getInstance().getTime();
@@ -105,46 +110,31 @@ public class Claim
 		this.ownerID = ownerID;
 		
 		//other permissions
-		for(String builderID : builderIDs)
+		for(UUID builderID : builderIDs)
 		{
-			if(builderID != null && !builderID.isEmpty())
-			{
-				this.playerIDToClaimPermissionMap.put(builderID, ClaimPermission.Build);
-			}
+			this.playerIDToClaimPermissionMap.put(builderID, ClaimPermission.Build);
 		}
 		
-		for(String containerID : containerIDs)
+		for(UUID containerID : containerIDs)
 		{
-			if(containerID != null && !containerID.isEmpty())
-			{
-				this.playerIDToClaimPermissionMap.put(containerID, ClaimPermission.Inventory);
-			}
+			this.playerIDToClaimPermissionMap.put(containerID, ClaimPermission.Inventory);
 		}
 		
-		for(String accessorID : accessorIDs)
+		for(UUID accessorID : accessorIDs)
 		{
-			if(accessorID != null && !accessorID.isEmpty())
-			{
-				this.playerIDToClaimPermissionMap.put(accessorID, ClaimPermission.Access);
-			}
+			this.playerIDToClaimPermissionMap.put(accessorID, ClaimPermission.Access);
 		}
 		
-		for(String managerID : managerIDs)
+		for(UUID managerID : managerIDs)
 		{
-			if(managerID != null && !managerID.isEmpty())
-			{
-				this.managers.add(managerID);
-			}
+			this.playerIDToClaimPermissionMap.put(managerID, ClaimPermission.Manage);
 		}
 	}
 	
 	//measurements.  all measurements are in blocks
 	public int getArea()
 	{
-		int claimWidth = this.greaterBoundaryCorner.getBlockX() - this.lesserBoundaryCorner.getBlockX() + 1;
-		int claimHeight = this.greaterBoundaryCorner.getBlockZ() - this.lesserBoundaryCorner.getBlockZ() + 1;
-		
-		return claimWidth * claimHeight;		
+		return this.getWidth() * this.getHeight();
 	}
 	
 	public int getWidth()
@@ -163,7 +153,7 @@ public class Claim
 		Claim claim = new Claim
 			(new Location(this.lesserBoundaryCorner.getWorld(), this.lesserBoundaryCorner.getBlockX() - howNear, this.lesserBoundaryCorner.getBlockY(), this.lesserBoundaryCorner.getBlockZ() - howNear),
 			 new Location(this.greaterBoundaryCorner.getWorld(), this.greaterBoundaryCorner.getBlockX() + howNear, this.greaterBoundaryCorner.getBlockY(), this.greaterBoundaryCorner.getBlockZ() + howNear),
-			 null, new ArrayList<String>(), new ArrayList<String>(), new ArrayList<String>(), new ArrayList<String>(), null);
+			 null, new ArrayList<UUID>(), new ArrayList<UUID>(), new ArrayList<UUID>(), new ArrayList<UUID>(), null);
 		
 		return claim.contains(location, true);
 	}
@@ -171,7 +161,7 @@ public class Claim
 	//grants a permission for a player or the public
 	public void setPermission(String playerID, ClaimPermission permissionLevel)
 	{
-		this.playerIDToClaimPermissionMap.put(playerID.toLowerCase(),  permissionLevel);
+		this.playerIDToClaimPermissionMap.put(UUID.fromString(playerID),  permissionLevel);
 	}
 
 	//revokes a permission for a player or the public
@@ -184,7 +174,6 @@ public class Claim
 	public void clearPermissions()
 	{
 		this.playerIDToClaimPermissionMap.clear();
-		this.managers.clear();
 	}
 
 	//gets ALL permissions
@@ -192,30 +181,28 @@ public class Claim
 	public void getPermissions(ArrayList<String> builders, ArrayList<String> containers, ArrayList<String> accessors, ArrayList<String> managers)
 	{
 		//loop through all the entries in the hash map
-		Iterator<Map.Entry<String, ClaimPermission>> mappingsIterator = this.playerIDToClaimPermissionMap.entrySet().iterator();
+		Iterator<Map.Entry<UUID, ClaimPermission>> mappingsIterator = this.playerIDToClaimPermissionMap.entrySet().iterator();
 		while(mappingsIterator.hasNext())
 		{
-			Map.Entry<String, ClaimPermission> entry = mappingsIterator.next();
+			Map.Entry<UUID, ClaimPermission> entry = mappingsIterator.next();
 
 			//build up a list for each permission level
 			if(entry.getValue() == ClaimPermission.Build)
 			{
-				builders.add(entry.getKey());
+				builders.add(entry.getKey().toString());
 			}
 			else if(entry.getValue() == ClaimPermission.Inventory)
 			{
-				containers.add(entry.getKey());
+				containers.add(entry.getKey().toString());
 			}
-			else
+			else if (entry.getValue() == ClaimPermission.Access)
 			{
-				accessors.add(entry.getKey());
+				accessors.add(entry.getKey().toString());
 			}
-		}
-
-		//managers are handled a little differently
-		for(int i = 0; i < this.managers.size(); i++)
-		{
-			managers.add(this.managers.get(i));
+			else if (entry.getValue() == ClaimPermission.Manage)
+			{
+				managers.add(entry.getKey().toString());
+			}
 		}
 	}
 	
@@ -302,13 +289,13 @@ public class Claim
 			this.getLesserBoundaryCorner().getBlockZ() < otherClaim.getLesserBoundaryCorner().getBlockZ() &&
 			this.getGreaterBoundaryCorner().getBlockZ() > otherClaim.getGreaterBoundaryCorner().getBlockZ() )
 			return true;
-			
-		if(	this.getGreaterBoundaryCorner().getBlockX() <= otherClaim.getGreaterBoundaryCorner().getBlockX() && 
-			this.getGreaterBoundaryCorner().getBlockX() >= otherClaim.getLesserBoundaryCorner().getBlockX() && 
+
+		if(	this.getGreaterBoundaryCorner().getBlockX() <= otherClaim.getGreaterBoundaryCorner().getBlockX() &&
+			this.getGreaterBoundaryCorner().getBlockX() >= otherClaim.getLesserBoundaryCorner().getBlockX() &&
 			this.getLesserBoundaryCorner().getBlockZ() < otherClaim.getLesserBoundaryCorner().getBlockZ() &&
 			this.getGreaterBoundaryCorner().getBlockZ() > otherClaim.getGreaterBoundaryCorner().getBlockZ() )
 			return true;
-		
+
 		return false;
 	}
 	
