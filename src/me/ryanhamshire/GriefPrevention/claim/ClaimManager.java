@@ -26,6 +26,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created on 5/19/2017.
@@ -34,6 +35,10 @@ import java.util.UUID;
  */
 public class ClaimManager
 {
+    //in-memory cache for claim data
+    ArrayList<Claim> claims = new ArrayList<Claim>();
+    ConcurrentHashMap<Long, ArrayList<Claim>> chunksToClaimsMap = new ConcurrentHashMap<Long, ArrayList<Claim>>();
+
     public void changeClaimOwner(Claim claim, UUID newOwnerID)
     {
         //determine current claim owner

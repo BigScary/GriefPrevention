@@ -58,10 +58,6 @@ public class Claim
 	{
 		return ownerID;
 	}
-
-	//list of players who (beyond the claim owner) have permission to grant permissions in this claim
-	//TODO: RoboMWM - removing for simplicity/incorporating with normal permission hierarchy
-	//private ArrayList<String> managers = new ArrayList<String>();
 	
 	//permissions for this claim, see ClaimPermission class
 	private HashMap<UUID, ClaimPermission> playerIDToClaimPermissionMap = new HashMap<UUID, ClaimPermission>();

@@ -40,13 +40,6 @@ public abstract class DataStore
 	//in-memory cache for group (permission-based) data
 	protected ConcurrentHashMap<String, Integer> permissionToBonusBlocksMap = new ConcurrentHashMap<String, Integer>();
 	
-	//in-memory cache for claim data
-	ArrayList<Claim> claims = new ArrayList<Claim>();
-	ConcurrentHashMap<Long, ArrayList<Claim>> chunksToClaimsMap = new ConcurrentHashMap<Long, ArrayList<Claim>>();
-	
-	//in-memory cache for messages
-	private String [] messages;
-	
 	//pattern for unique user identifiers (UUIDs)
 	protected final static Pattern uuidpattern = Pattern.compile("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}");
 	

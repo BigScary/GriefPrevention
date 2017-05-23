@@ -18,6 +18,9 @@ import java.util.HashMap;
  */
 public class MessagesLoader
 {
+    //in-memory cache for messages
+    private String [] messages;
+
     private void loadMessages()
     {
         Messages[] messageIDs = Messages.values();
