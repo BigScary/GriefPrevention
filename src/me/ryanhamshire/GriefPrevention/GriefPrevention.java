@@ -154,10 +154,6 @@ public class GriefPrevention extends JavaPlugin
     public boolean config_logs_adminEnabled;
     public boolean config_logs_debugEnabled;
     public boolean config_logs_mutedChatEnabled;
-    
-    //ban management plugin interop settings
-    public boolean config_ban_useCommand;
-    public String config_ban_commandFormat;
 	
 	private String databaseUrl;
 	private String databaseUserName;
