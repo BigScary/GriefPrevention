@@ -416,17 +416,6 @@ public class ClaimManager
             }
         }
 
-        //if worldguard is installed, also prevent claims from overlapping any worldguard regions
-        if(GriefPrevention.instance.config_claims_respectWorldGuard && this.worldGuard != null && creatingPlayer != null)
-        {
-            if(!this.worldGuard.canBuild(newClaim.lesserBoundaryCorner, newClaim.greaterBoundaryCorner, creatingPlayer))
-            {
-                result.succeeded = false;
-                result.claim = null;
-                return result;
-            }
-        }
-
         //otherwise add this new claim to the data store to make it effective
         this.addClaim(newClaim, true);
 
