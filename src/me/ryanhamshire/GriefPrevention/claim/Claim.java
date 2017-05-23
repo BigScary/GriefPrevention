@@ -53,7 +53,12 @@ public class Claim
 	//ownerID.  for admin claims, this is NULL
 	//use getOwnerName() to get a friendly name (will be "an administrator" for admin claims)
 	private UUID ownerID;
-	
+
+	public UUID getOwnerID()
+	{
+		return ownerID;
+	}
+
 	//list of players who (beyond the claim owner) have permission to grant permissions in this claim
 	//TODO: RoboMWM - removing for simplicity/incorporating with normal permission hierarchy
 	//private ArrayList<String> managers = new ArrayList<String>();
@@ -87,7 +92,19 @@ public class Claim
 	{
 		return this.id;
 	}
-	
+
+	//copy constructor
+	public Claim(Claim claim, UUID ownerID)
+	{
+		this.modifiedDate = Calendar.getInstance().getTime();
+		this.lesserBoundaryCorner = claim.lesserBoundaryCorner;
+		this.greaterBoundaryCorner = claim.greaterBoundaryCorner;
+		this.playerIDToClaimPermissionMap = claim.playerIDToClaimPermissionMap;
+		this.id = claim.id;
+
+		this.ownerID = ownerID;
+	}
+
 	//basic constructor, just notes the creation time
 	//see above declarations for other defaults
 	Claim()
@@ -220,15 +237,6 @@ public class Claim
 	{
 		return this.greaterBoundaryCorner.clone();
 	}
-	
-	//returns a friendly owner name (for admin claims, returns "an administrator" as the owner)
-	public String getOwnerName()
-	{
-		if (this.ownerID == null)
-			return GriefPrevention.instance.dataStore.getMessage(Messages.OwnerNameForAdminClaims);
-		
-		return GriefPrevention.lookupPlayerName(this.ownerID);
-	}	
 	
 	//whether or not a location is in a claim
 	//ignoreHeight = true means location UNDER the claim will return TRUE

@@ -52,7 +52,8 @@ public class ClaimManager
         }
 
         //transfer
-        claim.ownerID = newOwnerID;
+        //TODO: use copy constructor
+        claim.setOwnerID(newOwnerID);
         this.saveClaim(claim);
 
         //adjust blocks and other records
