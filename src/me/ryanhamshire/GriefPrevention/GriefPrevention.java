@@ -33,6 +33,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import me.ryanhamshire.GriefPrevention.DataStore.NoTransferException;
+import me.ryanhamshire.GriefPrevention.claim.Claim;
+import me.ryanhamshire.GriefPrevention.claim.ClaimPermission;
+import me.ryanhamshire.GriefPrevention.claim.ClaimsMode;
 import me.ryanhamshire.GriefPrevention.events.PreventBlockBreakEvent;
 import me.ryanhamshire.GriefPrevention.events.SaveTrappedPlayerEvent;
 
@@ -60,10 +63,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.PluginManager;
-import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.BlockIterator;
 
 public class GriefPrevention extends JavaPlugin
@@ -83,7 +83,7 @@ public class GriefPrevention extends JavaPlugin
 	//configuration variables, loaded/saved from a config.yml
 	
 	//claim mode for each world
-	public ConcurrentHashMap<World, ClaimsMode> config_claims_worldModes;   
+	public ConcurrentHashMap<World, ClaimsMode> config_claims_worldModes;
 	private boolean config_creativeWorldsExist;                     //note on whether there are any creative mode worlds, to save cpu cycles on a common hash lookup
 	
 	public boolean config_claims_preventTheft;						//whether containers and crafting blocks are protectable

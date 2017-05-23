@@ -23,6 +23,7 @@ import java.util.UUID;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
+import me.ryanhamshire.GriefPrevention.claim.Claim;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 

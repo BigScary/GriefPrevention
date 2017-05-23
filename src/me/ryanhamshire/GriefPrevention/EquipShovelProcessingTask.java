@@ -18,6 +18,7 @@
  
 package me.ryanhamshire.GriefPrevention;
 
+import me.ryanhamshire.GriefPrevention.claim.Claim;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 

@@ -19,25 +19,15 @@
 package me.ryanhamshire.GriefPrevention;
 
 import java.io.*;
-import java.nio.charset.Charset;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
-import me.ryanhamshire.GriefPrevention.events.ClaimDeletedEvent;
+import me.ryanhamshire.GriefPrevention.claim.Claim;
 
 import me.ryanhamshire.GriefPrevention.events.DeniedMessageEvent;
 import org.bukkit.*;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.AnimalTamer;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Tameable;
-import org.bukkit.inventory.InventoryHolder;
-import org.bukkit.inventory.ItemStack;
-
-import com.google.common.io.Files;
 
 //singleton class which manages all GriefPrevention data (except for config options)
 public abstract class DataStore 

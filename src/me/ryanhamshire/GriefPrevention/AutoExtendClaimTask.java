@@ -2,6 +2,7 @@ package me.ryanhamshire.GriefPrevention;
 
 import java.util.ArrayList;
 
+import me.ryanhamshire.GriefPrevention.claim.Claim;
 import org.bukkit.Bukkit;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.World.Environment;

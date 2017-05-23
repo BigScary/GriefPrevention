@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import me.ryanhamshire.GriefPrevention.claim.Claim;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;

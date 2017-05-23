@@ -18,6 +18,7 @@
  
  package me.ryanhamshire.GriefPrevention;
 
+import me.ryanhamshire.GriefPrevention.claim.Claim;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 

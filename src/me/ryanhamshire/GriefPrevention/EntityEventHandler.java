@@ -25,6 +25,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
+import me.ryanhamshire.GriefPrevention.claim.Claim;
+import me.ryanhamshire.GriefPrevention.claim.ClaimsMode;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;

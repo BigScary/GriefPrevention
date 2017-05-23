@@ -22,6 +22,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Vector;
 
+import me.ryanhamshire.GriefPrevention.claim.Claim;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 

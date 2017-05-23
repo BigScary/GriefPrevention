@@ -16,8 +16,10 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package me.ryanhamshire.GriefPrevention;
+package me.ryanhamshire.GriefPrevention.claim;
 
+import me.ryanhamshire.GriefPrevention.GriefPrevention;
+import me.ryanhamshire.GriefPrevention.Messages;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
