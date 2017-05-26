@@ -26,6 +26,7 @@ import java.util.regex.Pattern;
 import me.ryanhamshire.GriefPrevention.claim.Claim;
 
 import me.ryanhamshire.GriefPrevention.events.DeniedMessageEvent;
+import me.ryanhamshire.GriefPrevention.player.PlayerData;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 
@@ -34,11 +35,7 @@ public abstract class DataStore
 {
 	private GriefPrevention instance;
 
-	//in-memory cache for player data
-	protected ConcurrentHashMap<UUID, PlayerData> playerNameToPlayerDataMap = new ConcurrentHashMap<UUID, PlayerData>();
-	
-	//in-memory cache for group (permission-based) data
-	protected ConcurrentHashMap<String, Integer> permissionToBonusBlocksMap = new ConcurrentHashMap<String, Integer>();
+
 	
 	//pattern for unique user identifiers (UUIDs)
 	protected final static Pattern uuidpattern = Pattern.compile("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}");
@@ -132,54 +129,6 @@ public abstract class DataStore
 	{
 		this.playerNameToPlayerDataMap.remove(playerID);
 	}
-	
-	//gets the number of bonus blocks a player has from his permissions
-	//Bukkit doesn't allow for checking permissions of an offline player.
-	//this will return 0 when he's offline, and the correct number when online.
-	synchronized public int getGroupBonusBlocks(UUID playerID)
-	{
-		int bonusBlocks = 0;
-		Set<String> keys = permissionToBonusBlocksMap.keySet();
-		Iterator<String> iterator = keys.iterator();
-		while(iterator.hasNext())
-		{
-			String groupName = iterator.next();
-			Player player = GriefPrevention.instance.getServer().getPlayer(playerID);
-			if(player != null && player.hasPermission(groupName))
-			{
-				bonusBlocks += this.permissionToBonusBlocksMap.get(groupName);
-			}
-		}
-		
-		return bonusBlocks;
-	}
-	
-	//grants a group (players with a specific permission) bonus claim blocks as long as they're still members of the group
-	synchronized public int adjustGroupBonusBlocks(String groupName, int amount)
-	{
-		Integer currentValue = this.permissionToBonusBlocksMap.get(groupName);
-		if(currentValue == null) currentValue = 0;
-		
-		currentValue += amount;
-		this.permissionToBonusBlocksMap.put(groupName, currentValue);
-		
-		//write changes to storage to ensure they don't get lost
-		this.saveGroupBonusBlocks(groupName, currentValue);
-		
-		return currentValue;		
-	}
-	
-	abstract void saveGroupBonusBlocks(String groupName, int amount);
-	
-	class NoTransferException extends Exception
-	{
-        private static final long serialVersionUID = 1L;
-
-        NoTransferException(String message)
-	    {
-	        super(message);
-	    }
-	}
 
 	//saves any changes to a claim to secondary storage
 	synchronized public void saveClaim(Claim claim)
@@ -199,31 +148,11 @@ public abstract class DataStore
 	//increments the claim ID and updates secondary storage to be sure it's saved
 	abstract void incrementNextClaimID();
 	
-	//retrieves player data from memory or secondary storage, as necessary
-	//if the player has never been on the server before, this will return a fresh player data with default values
-	synchronized public PlayerData getPlayerData(UUID playerID)
-	{
-		//first, look in memory
-		PlayerData playerData = this.playerNameToPlayerDataMap.get(playerID);
-		
-		//if not there, build a fresh instance with some blanks for what may be in secondary storage
-		if(playerData == null)
-		{
-			playerData = new PlayerData();
-			playerData.playerID = playerID;
-			
-			//shove that new player data into the hash map cache
-			this.playerNameToPlayerDataMap.put(playerID, playerData);
-		}
-		
-		return playerData;
-	}
+
 	
 	abstract PlayerData getPlayerDataFromStorage(UUID playerID);
 	
 	abstract void deleteClaimFromSecondaryStorage(Claim claim);
-	
-
 	
 	//saves changes to player data to secondary storage.  MUST be called after you're done making changes, otherwise a reload will lose them
     public void savePlayerDataSync(UUID playerID, PlayerData playerData)
@@ -293,45 +222,6 @@ public abstract class DataStore
         }
 		return message;
 	}
-	
-	//used in updating the data schema from 0 to 1.
-	//converts player names in a list to uuids
-	protected List<String> convertNameListToUUIDList(List<String> names)
-	{
-	    //doesn't apply after schema has been updated to version 1
-	    if(this.getSchemaVersion() >= 1) return names;
-	    
-	    //list to build results
-	    List<String> resultNames = new ArrayList<String>();
-	    
-	    for(String name : names)
-	    {
-	        //skip non-player-names (groups and "public"), leave them as-is
-	        if(name.startsWith("[") || name.equals("public"))
-            {
-	            resultNames.add(name);
-	            continue;
-            }
-	        
-	        //otherwise try to convert to a UUID
-	        UUID playerID = null;
-	        try
-	        {
-	            playerID = UUIDFetcher.getUUIDOf(name);
-	        }
-	        catch(Exception ex){ }
-	        
-	        //if successful, replace player name with corresponding UUID
-	        if(playerID != null)
-	        {
-	            resultNames.add(playerID.toString());
-	        }
-	    }
-	    
-	    return resultNames;
-    }
-	
-	abstract void close();
 	
 	private class SavePlayerDataThread extends Thread
 	{

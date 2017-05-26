@@ -21,6 +21,7 @@ package me.ryanhamshire.GriefPrevention;
 import java.util.ArrayList;
 
 import me.ryanhamshire.GriefPrevention.claim.Claim;
+import me.ryanhamshire.GriefPrevention.player.PlayerData;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;

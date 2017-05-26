@@ -21,6 +21,7 @@
 import java.util.Collection;
 
 import me.ryanhamshire.GriefPrevention.events.AccrueClaimBlocksEvent;
+import me.ryanhamshire.GriefPrevention.player.PlayerData;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 

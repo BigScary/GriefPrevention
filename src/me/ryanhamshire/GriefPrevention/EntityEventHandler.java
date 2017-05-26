@@ -27,6 +27,7 @@ import java.util.UUID;
 
 import me.ryanhamshire.GriefPrevention.claim.Claim;
 import me.ryanhamshire.GriefPrevention.claim.ClaimsMode;
+import me.ryanhamshire.GriefPrevention.player.PlayerData;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;

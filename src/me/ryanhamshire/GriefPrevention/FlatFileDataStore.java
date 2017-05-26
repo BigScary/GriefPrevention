@@ -25,6 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 
 import me.ryanhamshire.GriefPrevention.claim.Claim;
+import me.ryanhamshire.GriefPrevention.player.PlayerData;
 import org.bukkit.*;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -610,22 +611,6 @@ public class FlatFileDataStore extends DataStore
     			    //read the file content and immediately close it
     			    List<String> lines = Files.readLines(playerFile, Charset.forName("UTF-8"));
     			    Iterator<String> iterator = lines.iterator();
-    			    
-
-    				iterator.next();
-                    //first line is last login timestamp //RoboMWM - not using this anymore
-//
-//    				//convert that to a date and store it
-//    				DateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss");
-//    				try
-//    				{
-//    					playerData.setLastLogin(dateFormat.parse(lastLoginTimestampString));
-//    				}
-//    				catch(ParseException parseException)
-//    				{
-//    					GriefPrevention.AddLogEntry("Unable to load last login for \"" + playerFile.getName() + "\".");
-//    					playerData.setLastLogin(null);
-//    				}
     				
     				//second line is accrued claim blocks
     				String accruedBlocksString = iterator.next();
@@ -682,12 +667,6 @@ public class FlatFileDataStore extends DataStore
 		StringBuilder fileContent = new StringBuilder();
 		try
 		{
-			//first line is last login timestamp //RoboMWM - no longer storing/using
-			//if(playerData.getLastLogin() == null) playerData.setLastLogin(new Date());
-			//DateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss");
-			//fileContent.append(dateFormat.format(playerData.getLastLogin()));
-			fileContent.append("\n");
-			
 			//second line is accrued claim blocks
 			fileContent.append(String.valueOf(playerData.getAccruedClaimBlocks()));
 			fileContent.append("\n");			
@@ -743,115 +722,6 @@ public class FlatFileDataStore extends DataStore
 			if(outStream != null) outStream.close();
 		}
 		catch(IOException exception) {} 
-	}
-	
-	//grants a group (players with a specific permission) bonus claim blocks as long as they're still members of the group
-	@Override
-	synchronized void saveGroupBonusBlocks(String groupName, int currentValue)
-	{
-		//write changes to file to ensure they don't get lost
-		BufferedWriter outStream = null;
-		try
-		{
-			//open the group's file
-			File groupDataFile = new File(playerDataFolderPath + File.separator + "$" + groupName);
-			groupDataFile.createNewFile();
-			outStream = new BufferedWriter(new FileWriter(groupDataFile));
-			
-			//first line is number of bonus blocks
-			outStream.write(String.valueOf(currentValue));
-			outStream.newLine();			
-		}		
-		
-		//if any problem, log it
-		catch(Exception e)
-		{
-			GriefPrevention.AddLogEntry("Unexpected exception saving data for group \"" + groupName + "\": " + e.getMessage());
-		}
-		
-		try
-		{
-			//close the file
-			if(outStream != null)
-			{
-				outStream.close();
-			}
-		}
-		catch(IOException exception){}		
-	}
-	
-	synchronized void migrateData(DatabaseDataStore databaseStore)
-	{
-		//migrate claims
-		for(int i = 0; i < this.claims.size(); i++)
-		{
-			Claim claim = this.claims.get(i);
-			databaseStore.addClaim(claim, true);
-			for(Claim child : claim.children)
-			{
-			    databaseStore.addClaim(child,  true);
-			}
-		}
-		
-		//migrate groups
-		Iterator<String> groupNamesEnumerator = this.permissionToBonusBlocksMap.keySet().iterator();
-		while(groupNamesEnumerator.hasNext())
-		{
-			String groupName = groupNamesEnumerator.next();
-			databaseStore.saveGroupBonusBlocks(groupName, this.permissionToBonusBlocksMap.get(groupName));
-		}
-		
-		//migrate players
-		File playerDataFolder = new File(playerDataFolderPath);
-		File [] files = playerDataFolder.listFiles();
-		for(int i = 0; i < files.length; i++)
-		{
-			File file = files[i];
-			if(!file.isFile()) continue;  //avoids folders
-			
-			//all group data files start with a dollar sign.  ignoring those, already handled above
-			if(file.getName().startsWith("$")) continue;
-			
-			//ignore special files
-			if(file.getName().startsWith("_")) continue;
-			if(file.getName().endsWith(".ignore")) continue;
-			
-			UUID playerID = UUID.fromString(file.getName());
-			databaseStore.savePlayerData(playerID, this.getPlayerData(playerID));
-			this.clearCachedPlayerData(playerID);
-		}
-		
-		//migrate next claim ID
-		if(this.nextClaimID > databaseStore.nextClaimID)
-		{
-			databaseStore.setNextClaimID(this.nextClaimID);
-		}
-		
-		//rename player and claim data folders so the migration won't run again
-		int i = 0;
-		File claimsBackupFolder;
-		File playersBackupFolder;
-		do
-		{
-			String claimsFolderBackupPath = claimDataFolderPath;
-			if(i > 0) claimsFolderBackupPath += String.valueOf(i);
-			claimsBackupFolder = new File(claimsFolderBackupPath);
-			
-			String playersFolderBackupPath = playerDataFolderPath;
-			if(i > 0) playersFolderBackupPath += String.valueOf(i);
-			playersBackupFolder = new File(playersFolderBackupPath);
-			i++;
-		} while(claimsBackupFolder.exists() || playersBackupFolder.exists());
-		
-		File claimsFolder = new File(claimDataFolderPath);
-		File playersFolder = new File(playerDataFolderPath);
-		
-		claimsFolder.renameTo(claimsBackupFolder);
-		playersFolder.renameTo(playersBackupFolder);			
-		
-		GriefPrevention.AddLogEntry("Backed your file system data up to " + claimsBackupFolder.getName() + " and " + playersBackupFolder.getName() + ".");
-		GriefPrevention.AddLogEntry("If your migration encountered any problems, you can restore those data with a quick copy/paste.");
-		GriefPrevention.AddLogEntry("When you're satisfied that all your data have been safely migrated, consider deleting those folders.");
 	}
 
 	@Override

@@ -18,6 +18,7 @@
  
 package me.ryanhamshire.GriefPrevention;
 
+import me.ryanhamshire.GriefPrevention.player.PlayerData;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 

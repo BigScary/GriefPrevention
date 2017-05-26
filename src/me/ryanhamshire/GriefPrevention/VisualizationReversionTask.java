@@ -18,6 +18,7 @@
  
  package me.ryanhamshire.GriefPrevention;
 
+import me.ryanhamshire.GriefPrevention.player.PlayerData;
 import org.bukkit.entity.Player;
 
 //applies a visualization for a player by sending him block change packets

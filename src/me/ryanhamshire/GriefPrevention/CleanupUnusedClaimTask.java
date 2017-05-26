@@ -23,6 +23,7 @@ import java.util.Date;
 import java.util.Vector;
 
 import me.ryanhamshire.GriefPrevention.claim.Claim;
+import me.ryanhamshire.GriefPrevention.player.PlayerData;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 
