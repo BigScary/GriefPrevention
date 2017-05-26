@@ -36,7 +36,7 @@ import org.bukkit.OfflinePlayer;
 public class PlayerData 
 {
 	//the player's ID
-	public UUID playerID;
+	private UUID playerID;
 	
 	//the player's claims
 	private Vector<Claim> claims = null;
@@ -48,102 +48,48 @@ public class PlayerData
 	private int newlyAccruedClaimBlocks = 0;
 	
 	//where this player was the last time we checked on him for earning claim blocks
-	public Location lastAfkCheckLocation = null;
+    private Location lastAfkCheckLocation = null;
 	
-	//how many claim blocks the player has been gifted by admins, or purchased via economy integration 
+	//how many claim blocks the player has been gifted/purchased
 	private Integer bonusClaimBlocks = null;
 	
 	//what "mode" the shovel is in determines what it will do when it's used
-	public ShovelMode shovelMode = ShovelMode.Basic;
-	
-	//radius for restore nature fill mode
-	int fillRadius = 0;
+    private ShovelMode shovelMode = ShovelMode.Basic;
 	
 	//last place the player used the shovel, useful in creating and resizing claims, 
 	//because the player must use the shovel twice in those instances
-	public Location lastShovelLocation = null;	
+    private Location lastShovelLocation = null;
 	
 	//the claim this player is currently resizing
-	public Claim claimResizing = null;
+    private Claim claimResizing = null;
 	
 	//the claim this player is currently subdividing
-	public Claim claimSubdividing = null;
+    private Claim claimSubdividing = null;
 	
 	//whether or not the player has a pending /trapped rescue
-	public boolean pendingTrapped = false;
+    private boolean pendingTrapped = false;
 	
 	//whether this player was recently warned about building outside land claims
 	boolean warnedAboutBuildingOutsideClaims = false;
-	
-	//whether the player was kicked (set and used during logout)
-	boolean wasKicked = false;
     
 	//visualization
-	public Visualization currentVisualization = null;
-	
-	//anti-camping pvp protection
-	public boolean pvpImmune = false;
-	public long lastSpawn = 0;
+    private Visualization currentVisualization = null;
 	
 	//the last claim this player was in, that we know of
-	public Claim lastClaim = null;
-	
-	//pvp
-	public long lastPvpTimestamp = 0;
-	public String lastPvpPlayer = "";
-	
-	//safety confirmation for deleting multi-subdivision claims
-	public boolean warnedAboutMajorDeletion = false;
+    private Claim lastClaim = null;
 
-	public InetAddress ipAddress;
+    private InetAddress ipAddress;
 
     //for addons to set per-player claim limits. Any negative value will use config's value
     private int AccruedClaimBlocksLimit = -1;
-
-    //whether or not this player has received a message about unlocking death drops since his last death
-	boolean receivedDropUnlockAdvertisement = false;
-
-    //whether or not this player's dropped items (on death) are unlocked for other players to pick up
-	boolean dropsAreUnlocked = false;
-
-    //message to send to player after he respawns
-	String messageOnRespawn = null;
 
     //player which a pet will be given to when it's right-clicked
 	OfflinePlayer petGiveawayRecipient = null;
 	
 	//timestamp for last "you're building outside your land claims" message
 	Long buildWarningTimestamp = null;
-	
-	//spot where a player can't talk, used to mute new players until they've moved a little
-	//this is an anti-bot strategy.
-	Location noChatLocation = null;
-	
-	//ignore list
-	//true means invisible (admin-forced ignore), false means player-created ignore
-	public ConcurrentHashMap<UUID, Boolean> ignoredPlayers = new ConcurrentHashMap<UUID, Boolean>();
+
 	public boolean ignoreListChanged = false;
-
-    //profanity warning, once per play session
-	boolean profanityWarned = false;
-
-	//whether or not this player is "in" pvp combat
-	public boolean inPvpCombat()
-	{
-		if(this.lastPvpTimestamp == 0) return false;
-		
-		long now = Calendar.getInstance().getTimeInMillis();
-		
-		long elapsed = now - this.lastPvpTimestamp;
-		
-		if(elapsed > GriefPrevention.instance.config_pvp_combatTimeoutSeconds * 1000) //X seconds
-		{
-			this.lastPvpTimestamp = 0;
-			return false;
-		}
-		
-		return true;
-	}
 	
 	//the number of claim blocks a player has available for claiming land
 	public int getRemainingClaimBlocks()
@@ -205,42 +151,7 @@ public class PlayerData
         this.bonusClaimBlocks = bonusClaimBlocks;
     }
     
-    private void loadDataFromSecondaryStorage()
-    {
-        //reach out to secondary storage to get any data there
-        PlayerData storageData = GriefPrevention.instance.dataStore.getPlayerDataFromStorage(this.playerID);
-        
-        if(this.accruedClaimBlocks == null)
-        {
-            if(storageData.accruedClaimBlocks != null)
-            {
-                this.accruedClaimBlocks = storageData.accruedClaimBlocks;
 
-                //ensure at least minimum accrued are accrued (in case of settings changes to increase initial amount)
-                if(this.accruedClaimBlocks < GriefPrevention.instance.config_claims_initialBlocks)
-                {
-                    this.accruedClaimBlocks = GriefPrevention.instance.config_claims_initialBlocks;
-                }
-                
-            }
-            else
-            {
-                this.accruedClaimBlocks = GriefPrevention.instance.config_claims_initialBlocks;
-            }
-        }
-        
-        if(this.bonusClaimBlocks == null)
-        {
-            if(storageData.bonusClaimBlocks != null)
-            {
-                this.bonusClaimBlocks = storageData.bonusClaimBlocks;
-            }
-            else
-            {
-                this.bonusClaimBlocks = 0;
-            }
-        }
-    }
     
     public Vector<Claim> getClaims()
     {
