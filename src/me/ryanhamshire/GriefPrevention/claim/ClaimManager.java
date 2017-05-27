@@ -209,7 +209,7 @@ public class ClaimManager
     //Utilities useful for claims
 
     //turns a location into a string, useful in data storage
-    public String locationStringDelimiter = ";";
+    private String locationStringDelimiter = ";";
     String locationToString(Location location)
     {
         StringBuilder stringBuilder = new StringBuilder(location.getWorld().getName());

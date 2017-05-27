@@ -18,19 +18,11 @@
 
 package me.ryanhamshire.GriefPrevention;
 
-import java.io.*;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.regex.Pattern;
-
 import me.ryanhamshire.GriefPrevention.claim.Claim;
-
-import me.ryanhamshire.GriefPrevention.events.DeniedMessageEvent;
 import me.ryanhamshire.GriefPrevention.player.PlayerData;
-import org.bukkit.*;
-import org.bukkit.entity.Player;
 
-//singleton class which manages all GriefPrevention data (except for config options)
+import java.util.UUID;
+
 public interface DataStore
 {
 	//TODO: where is this _needed_
