@@ -38,6 +38,7 @@ public class FlatFileDataStore extends DataStore
 	private final static String claimDataFolderPath = dataLayerFolderPath + File.separator + "ClaimData";
 	private final static String nextClaimIdFilePath = claimDataFolderPath + File.separator + "_nextClaimID";
 	private final static String schemaVersionFilePath = dataLayerFolderPath + File.separator + "_schemaVersion";
+    private final static String playerDataFolderPath = dataLayerFolderPath + File.separator + "PlayerData";
 	
 	static boolean hasData()
 	{
@@ -228,7 +229,7 @@ public class FlatFileDataStore extends DataStore
                 catch(Exception e)
                 {
                     claimID = this.nextClaimID;
-                    this.incrementNextClaimID();
+                    this.setNextClaimID();
                     File newFile = new File(claimDataFolderPath + File.separator + String.valueOf(this.nextClaimID));
                     files[i].renameTo(newFile);
                     files[i] = newFile;
@@ -410,7 +411,7 @@ public class FlatFileDataStore extends DataStore
                 catch(Exception e)
                 {
                     claimID = this.nextClaimID;
-                    this.incrementNextClaimID();
+                    this.setNextClaimID();
                     File newFile = new File(claimDataFolderPath + File.separator + String.valueOf(this.nextClaimID) + ".yml");
                     files[i].renameTo(newFile);
                     files[i] = newFile;
@@ -692,7 +693,7 @@ public class FlatFileDataStore extends DataStore
 	}
 	
 	@Override
-	synchronized void incrementNextClaimID()
+	synchronized void setNextClaimID()
 	{
 		//increment in memory
 		this.nextClaimID++;

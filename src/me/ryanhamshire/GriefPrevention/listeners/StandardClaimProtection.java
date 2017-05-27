@@ -1,5 +1,6 @@
 package me.ryanhamshire.GriefPrevention.listeners;
 
+import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import me.ryanhamshire.GriefPrevention.events.custom.GPPlaceDestroyEvent;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -12,6 +13,12 @@ import org.bukkit.event.Listener;
  */
 public class StandardClaimProtection implements Listener
 {
+    GriefPrevention instance;
+    public StandardClaimProtection(GriefPrevention griefPrevention)
+    {
+        instance = griefPrevention;
+    }
+
     @EventHandler(ignoreCancelled = true)
     void onGPPlaceorDestroy(GPPlaceDestroyEvent event)
     {

@@ -40,15 +40,10 @@ public abstract class DataStore
 	//pattern for unique user identifiers (UUIDs)
 	protected final static Pattern uuidpattern = Pattern.compile("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}");
 	
-	//next claim ID
-	Long nextClaimID = (long)0;
-	
 	//path information, for where stuff stored on disk is well...  stored
 	protected final static String dataLayerFolderPath = "plugins" + File.separator + "GriefPreventionData";
 	final static String playerDataFolderPath = dataLayerFolderPath + File.separator + "PlayerData";
     final static String configFilePath = dataLayerFolderPath + File.separator + "config.yml";
-	final static String messagesFilePath = dataLayerFolderPath + File.separator + "messages.yml";
-	final static String bannedWordsFilePath = dataLayerFolderPath + File.separator + "bannedWords.txt";
 
     //the latest version of the data schema implemented here
 	protected static final int latestSchemaVersion = 2;
@@ -59,12 +54,7 @@ public abstract class DataStore
 	
 	//current version of the schema of data in secondary storage
     private int currentSchemaVersion = -1;  //-1 means not determined yet
-    
-    //video links
-    static final String SURVIVAL_VIDEO_URL = "" + ChatColor.DARK_AQUA + ChatColor.UNDERLINE + "bit.ly/mcgpuser" + ChatColor.RESET;
-    static final String CREATIVE_VIDEO_URL = "" + ChatColor.DARK_AQUA + ChatColor.UNDERLINE + "bit.ly/mcgpcrea" + ChatColor.RESET;
-    static final String SUBDIVISION_VIDEO_URL = "" + ChatColor.DARK_AQUA + ChatColor.UNDERLINE + "bit.ly/mcgpsub" + ChatColor.RESET;
-    
+
     protected int getSchemaVersion()
     {
         if(this.currentSchemaVersion >= 0)
@@ -123,32 +113,17 @@ public abstract class DataStore
         //make a note of the data store schema version
 		this.setSchemaVersion(latestSchemaVersion);
 	}
-	
-    //removes cached player data from memory
-	synchronized void clearCachedPlayerData(UUID playerID)
-	{
-		this.playerNameToPlayerDataMap.remove(playerID);
-	}
 
-	//saves any changes to a claim to secondary storage
-	synchronized public void saveClaim(Claim claim)
-	{
-		//ensure a unique identifier for the claim which will be used to name the file on disk
-		if(claim.id == null || claim.id == -1)
-		{
-			claim.id = this.nextClaimID;
-			this.incrementNextClaimID();
-		}
-		
-		this.writeClaimToStorage(claim);
-	}
+
 	
 	abstract void writeClaimToStorage(Claim claim);
 	
 	//increments the claim ID and updates secondary storage to be sure it's saved
-	abstract void incrementNextClaimID();
-	
+	//As far as I know, 2 billion claim IDs _should_ be enough
+	abstract void setNextClaimID(int ID);
 
+	//Used on startup
+	abstract void getNextClaimID();
 	
 	abstract PlayerData getPlayerDataFromStorage(UUID playerID);
 	
@@ -178,50 +153,11 @@ public abstract class DataStore
 	
 	abstract void overrideSavePlayerData(UUID playerID, PlayerData playerData);
 
-    //educates a player about /adminclaims and /acb, if he can use them
-    void tryAdvertiseAdminAlternatives(Player player)
-    {
-        if(player.hasPermission("griefprevention.adminclaims") && player.hasPermission("griefprevention.adjustclaimblocks"))
-        {
-            GriefPrevention.sendMessage(player, TextMode.Info, Messages.AdvertiseACandACB);
-        }
-        else if(player.hasPermission("griefprevention.adminclaims"))
-        {
-            GriefPrevention.sendMessage(player, TextMode.Info, Messages.AdvertiseAdminClaims);
-        }
-        else if(player.hasPermission("griefprevention.adjustclaimblocks"))
-        {
-            GriefPrevention.sendMessage(player, TextMode.Info, Messages.AdvertiseACB);
-        }
-    }
+
 	
 
 
-	private void addDefault(HashMap<String, CustomizableMessage> defaults,
-			Messages id, String text, String notes)
-	{
-		CustomizableMessage message = new CustomizableMessage(id, text, notes);
-		defaults.put(id.name(), message);		
-	}
 
-	synchronized public String getMessage(Messages messageID, String... args)
-	{
-		String message = messages[messageID.ordinal()];
-		
-		for(int i = 0; i < args.length; i++)
-		{
-			String param = args[i];
-			message = message.replace("{" + i + "}", param);
-		}
-
-		if (Bukkit.isPrimaryThread())
-        {
-            DeniedMessageEvent event = new DeniedMessageEvent(messageID, message);
-            Bukkit.getPluginManager().callEvent(event);
-            return event.getMessage();
-        }
-		return message;
-	}
 	
 	private class SavePlayerDataThread extends Thread
 	{

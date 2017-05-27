@@ -39,6 +39,9 @@ public class ClaimManager
     ArrayList<Claim> claims = new ArrayList<Claim>();
     ConcurrentHashMap<Long, ArrayList<Claim>> chunksToClaimsMap = new ConcurrentHashMap<Long, ArrayList<Claim>>();
 
+    //next claim ID
+    Long nextClaimID = (long)0;
+
     public void changeClaimOwner(Claim claim, UUID newOwnerID)
     {
         //determine current claim owner
@@ -691,5 +694,18 @@ public class ClaimManager
                 i--;
             }
         }
+    }
+
+    //saves any changes to a claim to secondary storage
+    public void saveClaim(Claim claim)
+    {
+        //ensure a unique identifier for the claim which will be used to name the file on disk
+        if(claim.id == null || claim.id == -1)
+        {
+            claim.id = this.nextClaimID;
+            this.incrementNextClaimID();
+        }
+
+        this.writeClaimToStorage(claim);
     }
 }

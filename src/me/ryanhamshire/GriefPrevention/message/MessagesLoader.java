@@ -4,8 +4,13 @@ import me.ryanhamshire.GriefPrevention.CustomizableMessage;
 import me.ryanhamshire.GriefPrevention.DataStore;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import me.ryanhamshire.GriefPrevention.Messages;
+import me.ryanhamshire.GriefPrevention.TextMode;
+import me.ryanhamshire.GriefPrevention.events.DeniedMessageEvent;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,6 +23,11 @@ import java.util.HashMap;
  */
 public class MessagesLoader
 {
+    //video links
+    static final String SURVIVAL_VIDEO_URL = "" + ChatColor.DARK_AQUA + ChatColor.UNDERLINE + "bit.ly/mcgpuser" + ChatColor.RESET;
+    static final String CREATIVE_VIDEO_URL = "" + ChatColor.DARK_AQUA + ChatColor.UNDERLINE + "bit.ly/mcgpcrea" + ChatColor.RESET;
+    static final String SUBDIVISION_VIDEO_URL = "" + ChatColor.DARK_AQUA + ChatColor.UNDERLINE + "bit.ly/mcgpsub" + ChatColor.RESET;
+
     //in-memory cache for messages
     private String [] messages;
 
@@ -274,5 +284,49 @@ public class MessagesLoader
         }
 
         defaults.clear();
+    }
+
+
+    //educates a player about /adminclaims and /acb, if he can use them
+    void tryAdvertiseAdminAlternatives(Player player)
+    {
+        if(player.hasPermission("griefprevention.adminclaims") && player.hasPermission("griefprevention.adjustclaimblocks"))
+        {
+            GriefPrevention.sendMessage(player, TextMode.Info, Messages.AdvertiseACandACB);
+        }
+        else if(player.hasPermission("griefprevention.adminclaims"))
+        {
+            GriefPrevention.sendMessage(player, TextMode.Info, Messages.AdvertiseAdminClaims);
+        }
+        else if(player.hasPermission("griefprevention.adjustclaimblocks"))
+        {
+            GriefPrevention.sendMessage(player, TextMode.Info, Messages.AdvertiseACB);
+        }
+    }
+
+    private void addDefault(HashMap<String, CustomizableMessage> defaults,
+                            Messages id, String text, String notes)
+    {
+        CustomizableMessage message = new CustomizableMessage(id, text, notes);
+        defaults.put(id.name(), message);
+    }
+
+    synchronized public String getMessage(Messages messageID, String... args)
+    {
+        String message = messages[messageID.ordinal()];
+
+        for(int i = 0; i < args.length; i++)
+        {
+            String param = args[i];
+            message = message.replace("{" + i + "}", param);
+        }
+
+        if (Bukkit.isPrimaryThread())
+        {
+            DeniedMessageEvent event = new DeniedMessageEvent(messageID, message);
+            Bukkit.getPluginManager().callEvent(event);
+            return event.getMessage();
+        }
+        return message;
     }
 }
