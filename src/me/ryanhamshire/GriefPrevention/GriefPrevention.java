@@ -39,6 +39,7 @@ import me.ryanhamshire.GriefPrevention.claim.ClaimsMode;
 import me.ryanhamshire.GriefPrevention.events.PreventBlockBreakEvent;
 import me.ryanhamshire.GriefPrevention.events.SaveTrappedPlayerEvent;
 
+import me.ryanhamshire.GriefPrevention.message.Messages;
 import me.ryanhamshire.GriefPrevention.player.PlayerData;
 import org.bukkit.Achievement;
 import org.bukkit.BanList;

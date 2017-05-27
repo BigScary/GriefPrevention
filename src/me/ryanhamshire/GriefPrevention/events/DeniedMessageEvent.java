@@ -1,6 +1,6 @@
 package me.ryanhamshire.GriefPrevention.events;
 
-import me.ryanhamshire.GriefPrevention.Messages;
+import me.ryanhamshire.GriefPrevention.message.Messages;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 

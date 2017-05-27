@@ -18,8 +18,6 @@
 
 package me.ryanhamshire.GriefPrevention.claim;
 
-import me.ryanhamshire.GriefPrevention.GriefPrevention;
-import me.ryanhamshire.GriefPrevention.Messages;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;

@@ -658,9 +658,9 @@ public class FlatFileDataStore extends DataStore
 		return playerData;
 	}
 	
-	//saves changes to player data.  MUST be called after you're done making changes, otherwise a reload will lose them
+	//saves changes to player data.
 	@Override
-	public void overrideSavePlayerData(UUID playerID, PlayerData playerData)
+	public void savePlayerDataSync(UUID playerID, PlayerData playerData)
 	{
 		//never save data for the "administrative" account.  null for claim owner ID indicates administrative account
 		if(playerID == null) return;
@@ -668,15 +668,15 @@ public class FlatFileDataStore extends DataStore
 		StringBuilder fileContent = new StringBuilder();
 		try
 		{
-			//second line is accrued claim blocks
+			//first line is accrued claim blocks
 			fileContent.append(String.valueOf(playerData.getAccruedClaimBlocks()));
 			fileContent.append("\n");			
 			
-			//third line is bonus claim blocks
+			//second line is bonus claim blocks
 			fileContent.append(String.valueOf(playerData.getBonusClaimBlocks()));
 			fileContent.append("\n");
 			
-			//fourth line is blank
+			//third line is blank
 			fileContent.append("\n");
 			
 			//write data to file
@@ -792,4 +792,31 @@ public class FlatFileDataStore extends DataStore
         catch(IOException exception) {}
         
     }
+
+    @Override
+    public void savePlayerData(UUID playerID, PlayerData playerData)
+    {
+        new SavePlayerDataThread(playerID, playerData).start();
+    }
+
+    private class SavePlayerDataThread extends Thread
+    {
+        private UUID playerID;
+        private PlayerData playerData;
+
+        SavePlayerDataThread(UUID playerID, PlayerData playerData)
+        {
+            this.playerID = playerID;
+            this.playerData = playerData;
+        }
+
+        public void run()
+        {
+            //ensure player data is already read from file before trying to save
+            playerData.getAccruedClaimBlocks();
+            playerData.getClaims();
+            savePlayerDataSync(this.playerID, this.playerData);
+        }
+    }
 }
+

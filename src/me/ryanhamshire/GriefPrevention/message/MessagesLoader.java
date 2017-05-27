@@ -1,9 +1,7 @@
 package me.ryanhamshire.GriefPrevention.message;
 
-import me.ryanhamshire.GriefPrevention.CustomizableMessage;
 import me.ryanhamshire.GriefPrevention.DataStore;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
-import me.ryanhamshire.GriefPrevention.Messages;
 import me.ryanhamshire.GriefPrevention.TextMode;
 import me.ryanhamshire.GriefPrevention.events.DeniedMessageEvent;
 import org.bukkit.Bukkit;
