@@ -18,6 +18,8 @@
  
  package me.ryanhamshire.GriefPrevention;
 
+import me.ryanhamshire.GriefPrevention.claim.Claim;
+import me.ryanhamshire.GriefPrevention.player.PlayerData;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 
@@ -43,6 +45,7 @@ class CleanupUnusedClaimPreTask implements Runnable
 	    //expiration code uses last logout timestamp to decide whether to expire claims
 	    //don't expire claims for online players
 	    if(ownerInfo.isOnline()) return;
+		if(ownerInfo.getLastPlayed() <= 0) return;
 	    
 	    GriefPrevention.AddLogEntry("Looking for expired claims.  Checking data for " + claim.ownerID.toString(), CustomLogEntryTypes.Debug, true);
 	    

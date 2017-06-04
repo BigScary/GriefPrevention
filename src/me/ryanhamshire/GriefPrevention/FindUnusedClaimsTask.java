@@ -20,6 +20,7 @@
 
 import java.util.Random;
 
+import me.ryanhamshire.GriefPrevention.claim.Claim;
 import org.bukkit.Bukkit;
 
 //FEATURE: automatically remove claims owned by inactive players which:

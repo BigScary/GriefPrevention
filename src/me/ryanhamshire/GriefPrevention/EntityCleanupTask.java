@@ -21,6 +21,8 @@ package me.ryanhamshire.GriefPrevention;
 import java.util.ArrayList;
 import java.util.List;
 
+import me.ryanhamshire.GriefPrevention.claim.Claim;
+import me.ryanhamshire.GriefPrevention.claim.ClaimsMode;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Boat;

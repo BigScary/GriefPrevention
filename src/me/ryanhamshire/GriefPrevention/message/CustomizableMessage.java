@@ -16,16 +16,20 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package me.ryanhamshire.GriefPrevention;
+package me.ryanhamshire.GriefPrevention.message;
 
-import me.ryanhamshire.GriefPrevention.claim.Claim;
+import me.ryanhamshire.GriefPrevention.message.Messages;
 
-public class CreateClaimResult
+public class CustomizableMessage
 {
-	//whether or not the creation succeeded (it would fail if the new claim overlapped another existing claim)
-	public boolean succeeded;
+	public Messages id;
+	public String text;
+	public String notes;
 	
-	//when succeeded, this is a reference to the new claim
-	//when failed, this is a reference to the pre-existing, conflicting claim
-	public Claim claim;
+	public CustomizableMessage(Messages id, String text, String notes)
+	{
+		this.id = id;
+		this.text = text;
+		this.notes = notes;
+	}
 }

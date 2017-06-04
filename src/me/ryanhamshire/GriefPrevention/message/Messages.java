@@ -16,7 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package me.ryanhamshire.GriefPrevention;
+package me.ryanhamshire.GriefPrevention.message;
 
 public enum Messages
 {
@@ -62,18 +62,6 @@ public enum Messages
     AdjustBlocksSuccess,
     NotTrappedHere,
     RescuePending,
-    NonSiegeWorld,
-    AlreadySieging,
-    NotSiegableThere,
-    SiegeTooFarAway,
-    NoSiegeYourself,
-    NoSiegeDefenseless,
-    AlreadyUnderSiegePlayer,
-    AlreadyUnderSiegeArea,
-    NoSiegeAdminClaim,
-    SiegeOnCooldown,
-    SiegeAlert,
-    SiegeConfirmed,
     AbandonClaimMissing,
     NotYourClaim,
     DeleteTopLevelClaim,
@@ -91,7 +79,6 @@ public enum Messages
     LocationCurrentClaim,
     LocationAllClaims,
     PvPImmunityStart,
-    SiegeNoDrop,
     DonateItemsInstruction,
     ChestFull,
     DonationSuccess,
@@ -110,9 +97,6 @@ public enum Messages
     TrappedChatKeyword,
     TrappedInstructions,
     PvPNoDrop,
-    SiegeNoTeleport,
-    BesiegedNoTeleport,
-    SiegeNoContainers,
     PvPNoContainers,
     PvPImmunityEnd,
     NoBedPermission,
@@ -121,7 +105,6 @@ public enum Messages
     TooFarAway,
     BlockNotClaimed,
     BlockClaimed,
-    SiegeNoShovel,
     RestoreNaturePlayerInChunk,
     NoCreateClaimPermission,
     ResizeNeedMoreBlocks,
@@ -142,18 +125,11 @@ public enum Messages
     AbandonClaimAdvertisement,
     CreateClaimFailOverlapShort,
     CreateClaimSuccess,
-    SiegeWinDoorsOpen,
     RescueAbortedMoved,
-    SiegeDoorsLockedEjection,
-    NoModifyDuringSiege,
     OnlyOwnersModifyClaims,
-    NoBuildUnderSiege,
     NoBuildPvP,
     NoBuildPermission,
-    NonSiegeMaterial,
-    NoOwnerBuildUnderSiege,
     NoAccessPermission,
-    NoContainersSiege,
     NoContainersPermission,
     OwnerNameForAdminClaims,
     ClaimTooSmallForEntities,
@@ -184,9 +160,6 @@ public enum Messages
     NoPistonsOutsideClaims,
     SoftMuted,
     UnSoftMuted,
-    DropUnlockAdvertisement,
-    PickupBlockedExplanation,
-    DropUnlockConfirmation,
     AdvertiseACandACB,
     AdvertiseAdminClaims,
     AdvertiseACB,
@@ -202,7 +175,6 @@ public enum Messages
     NoBuildPortalPermission,
     ShowNearbyClaims,
     NoChatUntilMove,
-    SiegeImmune,
     SetClaimBlocksSuccess,
     IgnoreConfirmation,
     NotIgnoringPlayer,
@@ -246,5 +218,5 @@ public enum Messages
     ConsoleOnlyCommand,
     WorldNotFound,
     AdjustBlocksAllSuccess,
-    TooMuchIpOverlap	
+    TooMuchIpOverlap
 }

@@ -1,4 +1,4 @@
-package me.ryanhamshire.GriefPrevention;
+package me.ryanhamshire.GriefPrevention.claim;
 
 public enum ClaimsMode
 {

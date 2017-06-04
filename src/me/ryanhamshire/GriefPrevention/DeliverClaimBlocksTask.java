@@ -20,6 +20,8 @@
 
 import java.util.Collection;
 
+import me.ryanhamshire.GriefPrevention.events.AccrueClaimBlocksEvent;
+import me.ryanhamshire.GriefPrevention.player.PlayerData;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -29,10 +31,14 @@ import org.bukkit.entity.Player;
 class DeliverClaimBlocksTask implements Runnable 
 {	
     private Player player;
+    private GriefPrevention instance;
+    private int idleThresholdSquared;
     
-    public DeliverClaimBlocksTask(Player player)
+    public DeliverClaimBlocksTask(Player player, GriefPrevention instance)
     {
         this.player = player;
+        this.instance = instance;
+        this.idleThresholdSquared = instance.config_claims_accruedIdleThreshold * instance.config_claims_accruedIdleThreshold;
     }
     
 	@Override
@@ -47,17 +53,20 @@ class DeliverClaimBlocksTask implements Runnable
 	        long i = 0;
 	        for(Player onlinePlayer : players)
 	        {
-	            DeliverClaimBlocksTask newTask = new DeliverClaimBlocksTask(onlinePlayer);
-	            GriefPrevention.instance.getServer().getScheduler().scheduleSyncDelayedTask(GriefPrevention.instance, newTask, i++);
+	            DeliverClaimBlocksTask newTask = new DeliverClaimBlocksTask(onlinePlayer, instance);
+	            instance.getServer().getScheduler().scheduleSyncDelayedTask(instance, newTask, i++);
 	        }
 		}
 	    
 	    //otherwise, deliver claim blocks to the specified player
 	    else
 	    {
-	        if(!this.player.isOnline()) return;
+	        if(!this.player.isOnline())
+            {
+                return;
+            }
 	        
-	        DataStore dataStore = GriefPrevention.instance.dataStore;
+	        DataStore dataStore = instance.dataStore;
             PlayerData playerData = dataStore.getPlayerData(player.getUniqueId());
             
             Location lastLocation = playerData.lastAfkCheckLocation;
@@ -66,23 +75,29 @@ class DeliverClaimBlocksTask implements Runnable
                 //if he's not in a vehicle and has moved at least three blocks since the last check
                 //and he's not being pushed around by fluids
                 if(!player.isInsideVehicle() && 
-                   (lastLocation == null || lastLocation.distanceSquared(player.getLocation()) >= 0) &&
+                   (lastLocation == null || lastLocation.distanceSquared(player.getLocation()) > idleThresholdSquared) &&
                    !player.getLocation().getBlock().isLiquid())
                 {                   
-                    //determine how fast blocks accrue for this player
-                    int accrualRate = GriefPrevention.instance.config_claims_blocksAccruedPerHour_default;
-                    if(player.hasPermission("griefprevention.fastestaccrual")) accrualRate = GriefPrevention.instance.config_claims_blocksAccruedPerHour_fastest;
-                    else if(player.hasPermission("griefprevention.fasteraccrual")) accrualRate = GriefPrevention.instance.config_claims_blocksAccruedPerHour_faster;
-                    
-                    //add blocks
-                    int accruedBlocks = accrualRate / 6;
-                    if(accruedBlocks < 0) accruedBlocks = 1;
-                    playerData.accrueBlocks(accruedBlocks);
-                    GriefPrevention.AddLogEntry("Delivering " + accruedBlocks + " blocks to " + player.getName(), CustomLogEntryTypes.Debug, true);
-                    
-                    //intentionally NOT saving data here to reduce overall secondary storage access frequency
-                    //many other operations will cause this player's data to save, including his eventual logout
-                    //dataStore.savePlayerData(player.getUniqueIdentifier(), playerData);
+                    //determine how fast blocks accrue for this player //RoboMWM: addons determine this instead
+                    int accrualRate = instance.config_claims_blocksAccruedPerHour_default;
+
+                    AccrueClaimBlocksEvent event = new AccrueClaimBlocksEvent(player, accrualRate);
+                    instance.getServer().getPluginManager().callEvent(event);
+                    if (event.isCancelled())
+                    {
+                        GriefPrevention.AddLogEntry(player.getName() + " claim block delivery was canceled by another plugin.", CustomLogEntryTypes.Debug, true);
+                    }
+                    else
+                    {
+                        accrualRate = event.getBlocksToAccrue();
+                        if (accrualRate < 0) accrualRate = 0;
+                        playerData.accrueBlocks(accrualRate);
+                        GriefPrevention.AddLogEntry("Delivering " + event.getBlocksToAccrue() + " blocks to " + player.getName(), CustomLogEntryTypes.Debug, true);
+
+                        //intentionally NOT saving data here to reduce overall secondary storage access frequency
+                        //many other operations will cause this player's data to save, including his eventual logout
+                        //dataStore.savePlayerData(player.getUniqueIdentifier(), playerData);
+                    }
                 }
                 else
                 {
