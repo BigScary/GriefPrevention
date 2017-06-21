@@ -256,6 +256,17 @@ public class GriefPrevention extends JavaPlugin
 		this.customLogger = new CustomLogger();
         
 		AddLogEntry("Finished loading configuration.");
+
+                // Check we can run with this Minecraft version
+                if (!Bukkit.getVersion().startsWith("1.12")) {
+                    AddLogEntry(
+                            "WARNING: this GriefPrevention version may not work"
+                            + " with Bukkit API version "
+                            + Bukkit.getVersion()
+                            + " - download an appropriate GP version"
+                    );
+                    return;
+                }
 		
 		//when datastore initializes, it loads player and claim data, and posts some stats to the log
 		if(this.databaseUrl.length() > 0)
