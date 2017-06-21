@@ -23,65 +23,36 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 
 //players can be "trapped" in a portal frame if they don't have permission to break
 //solid blocks blocking them from exiting the frame
 //if that happens, we detect the problem and send them back through the portal.
-class CheckForPortalTrapTask implements Runnable 
+class CheckForPortalTrapTask extends BukkitRunnable
 {
+	GriefPrevention instance;
 	//player who recently teleported via nether portal 
 	private Player player;
 	
 	//where to send the player back to if he hasn't left the portal frame
-	private Location returnLocation;
+	//private Location returnLocation;
 	
-	public CheckForPortalTrapTask(Player player, Location location)
+	public CheckForPortalTrapTask(Player player, GriefPrevention plugin)
 	{
 		this.player = player;
-		this.returnLocation = location;
+		this.instance = plugin;
 	}
 	
 	@Override
 	public void run()
 	{
 	    //if player has logged out, do nothing
-	    if(!player.isOnline()) return;
-
-		Block playerBlock = this.player.getLocation().getBlock();
-		//if still standing in a portal frame, teleport him back through
-		if(playerBlock.getType() == Material.PORTAL || isInNonOccludingBlock(playerBlock))
+	    if(!player.isOnline())
 		{
-			this.player.teleport(this.returnLocation);
+			instance.portalReturnTaskMap.remove(player.getUniqueId());
+			return;
 		}
-	    
-	    //otherwise, note that he 'escaped' the portal frame
-	    else
-	    {
-	        PlayerEventHandler.portalReturnMap.remove(player.getUniqueId());
-	    }
+		player.setPortalCooldown(0);
+        instance.portalReturnTaskMap.remove(player.getUniqueId());
 	}
-
-	boolean isInNonOccludingBlock(Block block)
-	{
-		Material playerBlock = block.getType();
-		//Most blocks you can "stand" inside but cannot pass through (isSolid) usually can be seen through (!isOccluding)
-		//This can cause players to technically be considered not in a portal block, yet in reality is still stuck in the portal animation.
-		if ((!playerBlock.isSolid() || playerBlock.isOccluding())) //If it is _not_ such a block,
-		{
-			//Check the block above
-			playerBlock = block.getRelative(BlockFace.UP).getType();
-			if ((!playerBlock.isSolid() || playerBlock.isOccluding()))
-				return false; //player is not stuck
-		}
-		//Check if this block is also adjacent to a portal
-		if (block.getRelative(BlockFace.EAST).getType() == Material.PORTAL
-				|| block.getRelative(BlockFace.WEST).getType() == Material.PORTAL
-				|| block.getRelative(BlockFace.NORTH).getType() == Material.PORTAL
-				|| block.getRelative(BlockFace.SOUTH).getType() == Material.PORTAL)
-			return true;
-		return false;
-	}
-
-
-
 }

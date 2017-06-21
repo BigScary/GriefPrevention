@@ -187,6 +187,7 @@ public enum Messages
     DropUnlockAdvertisement,
     PickupBlockedExplanation,
     DropUnlockConfirmation,
+    DropUnlockOthersConfirmation,
     AdvertiseACandACB,
     AdvertiseAdminClaims,
     AdvertiseACB,
@@ -246,5 +247,5 @@ public enum Messages
     ConsoleOnlyCommand,
     WorldNotFound,
     AdjustBlocksAllSuccess,
-    TooMuchIpOverlap	
+    TooMuchIpOverlap
 }

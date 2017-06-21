@@ -18,15 +18,15 @@
 
 package me.ryanhamshire.GriefPrevention;
 
-import java.io.*;
-import java.nio.charset.Charset;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.regex.Pattern;
-
+import com.google.common.io.Files;
 import me.ryanhamshire.GriefPrevention.events.ClaimDeletedEvent;
-
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Chunk;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.AnimalTamer;
@@ -36,11 +36,32 @@ import org.bukkit.entity.Tameable;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
-import com.google.common.io.Files;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
 
 //singleton class which manages all GriefPrevention data (except for config options)
 public abstract class DataStore 
 {
+	private GriefPrevention instance;
+
 	//in-memory cache for player data
 	protected ConcurrentHashMap<UUID, PlayerData> playerNameToPlayerDataMap = new ConcurrentHashMap<UUID, PlayerData>();
 	
@@ -310,7 +331,7 @@ public abstract class DataStore
 	//gets the number of bonus blocks a player has from his permissions
 	//Bukkit doesn't allow for checking permissions of an offline player.
 	//this will return 0 when he's offline, and the correct number when online.
-	synchronized int getGroupBonusBlocks(UUID playerID)
+	synchronized public int getGroupBonusBlocks(UUID playerID)
 	{
 		int bonusBlocks = 0;
 		Set<String> keys = permissionToBonusBlocksMap.keySet();
@@ -555,9 +576,9 @@ public abstract class DataStore
 	synchronized void deleteClaim(Claim claim, boolean fireEvent, boolean releasePets)
 	{
 	    //delete any children
-        for(int j = 0; j < claim.children.size(); j++)
+        for(int j = 1; (j - 1) < claim.children.size(); j++)
         {
-            this.deleteClaim(claim.children.get(j--), true);
+            this.deleteClaim(claim.children.get(j-1), true);
         }
         
 	    //subdivisions must also be removed from the parent claim child list
@@ -795,7 +816,7 @@ public abstract class DataStore
 		//creative mode claims always go to bedrock
 		if(GriefPrevention.instance.config_claims_worldModes.get(world) == ClaimsMode.Creative)
 		{
-			smally = 2;
+			smally = 0;
 		}
 		
 		//create a new claim instance (but don't save it, yet)
@@ -1156,13 +1177,13 @@ public abstract class DataStore
 			if((playerID == claim.ownerID || (playerID != null && playerID.equals(claim.ownerID))))
 				claimsToDelete.add(claim);
 		}
-		
+
 		//delete them one by one
 		for(int i = 0; i < claimsToDelete.size(); i++)
 		{
 			Claim claim = claimsToDelete.get(i); 
 			claim.removeSurfaceFluids(null);
-			
+
 			this.deleteClaim(claim, releasePets);
 			
 			//if in a creative mode world, delete the claim
@@ -1557,6 +1578,7 @@ public abstract class DataStore
 		this.addDefault(defaults, Messages.DropUnlockAdvertisement, "Other players can't pick up your dropped items unless you /UnlockDrops first.", null);
 		this.addDefault(defaults, Messages.PickupBlockedExplanation, "You can't pick this up unless {0} uses /UnlockDrops.", "0: The item stack's owner.");
 		this.addDefault(defaults, Messages.DropUnlockConfirmation, "Unlocked your drops.  Other players may now pick them up (until you die again).", null);
+		this.addDefault(defaults, Messages.DropUnlockOthersConfirmation, "Unlocked {0}'s drops.", "0: The owner of the unlocked drops.");
 		this.addDefault(defaults, Messages.AdvertiseACandACB, "You may use /ACB to give yourself more claim blocks, or /AdminClaims to create a free administrative claim.", null);
 		this.addDefault(defaults, Messages.AdvertiseAdminClaims, "You could create an administrative land claim instead using /AdminClaims, which you'd share with other administrators.", null);
 		this.addDefault(defaults, Messages.AdvertiseACB, "You may use /ACB to give yourself more claim blocks.", null);
@@ -1681,8 +1703,8 @@ public abstract class DataStore
 			String param = args[i];
 			message = message.replace("{" + i + "}", param);
 		}
-		
-		return message;		
+
+		return message;
 	}
 	
 	//used in updating the data schema from 0 to 1.

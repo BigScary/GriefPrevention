@@ -500,8 +500,7 @@ public class DatabaseDataStore extends DataStore
 		
 			//if data for this player exists, use it
 			if(results.next())
-			{			
-				playerData.setLastLogin(results.getTimestamp("lastlogin"));
+			{
 				playerData.setAccruedClaimBlocks(results.getInt("accruedblocks"));
 				playerData.setBonusClaimBlocks(results.getInt("bonusblocks"));				
 			}
@@ -531,9 +530,10 @@ public class DatabaseDataStore extends DataStore
 		try
 		{
 			this.refreshDataConnection();
+			OfflinePlayer player = Bukkit.getOfflinePlayer(UUID.fromString(playerID));
 			
 			SimpleDateFormat sqlFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			String dateString = sqlFormat.format(playerData.getLastLogin());
+			String dateString = sqlFormat.format(new Date(player.getLastPlayed()));
 			
 			Statement statement = databaseConnection.createStatement();
 			statement.execute("DELETE FROM griefprevention_playerdata WHERE name='" + playerID.toString() + "';");
