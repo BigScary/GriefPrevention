@@ -814,6 +814,7 @@ public class FlatFileDataStore extends DataStore
 		{
 			File file = files[i];
 			if(!file.isFile()) continue;  //avoids folders
+            if(file.isHidden()) continue; //avoid hidden files, which are likely not created by GriefPrevention
 			
 			//all group data files start with a dollar sign.  ignoring those, already handled above
 			if(file.getName().startsWith("$")) continue;
