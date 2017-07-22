@@ -3316,7 +3316,14 @@ public class GriefPrevention extends JavaPlugin
 	static void sendMessage(Player player, ChatColor color, String message, long delayInTicks)
 	{
 		SendPlayerMessageTask task = new SendPlayerMessageTask(player, color, message);
-		GriefPrevention.instance.getServer().getScheduler().runTaskLater(GriefPrevention.instance, task, delayInTicks);
+		if(delayInTicks > 0)
+		{
+			GriefPrevention.instance.getServer().getScheduler().runTaskLater(GriefPrevention.instance, task, delayInTicks);
+		}
+		else
+		{
+			task.run();
+		}
 	}
 	
 	//checks whether players can create claims in a world
