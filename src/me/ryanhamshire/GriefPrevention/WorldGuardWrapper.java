@@ -26,7 +26,13 @@ class WorldGuardWrapper
     public boolean canBuild(Location lesserCorner, Location greaterCorner, Player creatingPlayer)
     {
         World world = lesserCorner.getWorld();
-        
+
+        if (worldGuard == null)
+        {
+            GriefPrevention.AddLogEntry("WorldGuard is out of date. Please update or remove WorldGuard.");
+            return true;
+        }
+
         if(new RegionPermissionModel(this.worldGuard, creatingPlayer).mayIgnoreRegionProtection(world)) return true;
         
         RegionManager manager = this.worldGuard.getRegionManager(world);
