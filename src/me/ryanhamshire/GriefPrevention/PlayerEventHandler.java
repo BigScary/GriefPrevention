@@ -766,17 +766,18 @@ class PlayerEventHandler implements Listener
         //create a thread to load ignore information
         new IgnoreLoaderThread(playerID, playerData.ignoredPlayers).start();
         
-        //is he possibly stuck in a portal frame?
-		//Because people can't read update notes, this try-catch will be here for a while
-		try
+        //is he stuck in a portal frame?
+		if (player.hasMetadata("GP_PORTALRESCUE"))
 		{
-			player.setPortalCooldown(0);
-		}
-		catch (NoSuchMethodError e)
-		{
-			instance.getLogger().severe("Nether portal trap rescues will not function and you will receive a nice stack trace every time a player uses a nether portal.");
-			instance.getLogger().severe("Please update your server mod (Craftbukkit/Spigot/Paper), as mentioned in the update notes.");
-			instance.getServer().dispatchCommand(instance.getServer().getConsoleSender(), "version");
+			new BukkitRunnable()
+			{
+				@Override
+				public void run()
+				{
+					player.teleport((Location)player.getMetadata("GP_PORTALRESCUE").get(0).value());
+					player.removeMetadata("GP_PORTALRESCUE", instance);
+				}
+			}.runTaskLater(instance, 1L);
 		}
 
         
@@ -857,6 +858,14 @@ class PlayerEventHandler implements Listener
 		UUID playerID = player.getUniqueId();
 	    PlayerData playerData = this.dataStore.getPlayerData(playerID);
 		boolean isBanned;
+
+		//If player is not trapped in a portal and has a pending rescue task, remove the associated metadata
+		//Why 9? No idea why, but this is decremented by 1 when the player disconnects.
+		if (player.getPortalCooldown() < 9)
+		{
+			player.removeMetadata("GP_PORTALRESCUE", instance);
+		}
+
 		if(playerData.wasKicked)
 		{
 		    isBanned = player.isBanned();
@@ -997,7 +1006,7 @@ class PlayerEventHandler implements Listener
         if(event.getCause() == TeleportCause.NETHER_PORTAL)
         {
             //FEATURE: when players get trapped in a nether portal, send them back through to the other side
-			instance.startRescueTask(player);
+			instance.startRescueTask(player, player.getLocation());
 
 			//don't track in worlds where claims are not enabled
 			if(!instance.claimsEnabledForWorld(event.getTo().getWorld())) return;

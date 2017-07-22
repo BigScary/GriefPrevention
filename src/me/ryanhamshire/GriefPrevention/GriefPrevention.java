@@ -3704,10 +3704,10 @@ public class GriefPrevention extends JavaPlugin
 
 	//Track scheduled "rescues" so we can cancel them if the player happens to teleport elsewhere so we can cancel it.
 	ConcurrentHashMap<UUID, BukkitTask> portalReturnTaskMap = new ConcurrentHashMap<UUID, BukkitTask>();
-	public void startRescueTask(Player player)
+	public void startRescueTask(Player player, Location location)
 	{
 		//Schedule task to reset player's portal cooldown after 20 seconds
-		BukkitTask task = new CheckForPortalTrapTask(player, this).runTaskLater(GriefPrevention.instance, 400L);
+		BukkitTask task = new CheckForPortalTrapTask(player, this, location).runTaskLater(GriefPrevention.instance, 400L);
 
 		//Cancel existing rescue task
 		if (portalReturnTaskMap.containsKey(player.getUniqueId()))
