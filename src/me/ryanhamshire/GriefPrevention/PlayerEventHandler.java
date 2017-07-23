@@ -769,16 +769,25 @@ class PlayerEventHandler implements Listener
         //is he stuck in a portal frame?
 		if (player.hasMetadata("GP_PORTALRESCUE"))
 		{
+			//If so, let him know and rescue him in 10 seconds. If he is in fact not trapped, hopefully chunks will have loaded by this time so he can walk out.
+			instance.sendMessage(player, TextMode.Info, Messages.NetherPortalTrapDetectionMessage, 20L);
 			new BukkitRunnable()
 			{
 				@Override
 				public void run()
 				{
-					player.teleport((Location)player.getMetadata("GP_PORTALRESCUE").get(0).value());
-					player.removeMetadata("GP_PORTALRESCUE", instance);
+					if (player.getPortalCooldown() > 8)
+					{
+						instance.AddLogEntry("Rescued " + player.getName() + " from a nether portal.\nTeleported from " + player.getLocation().toString() + " to " + ((Location)player.getMetadata("GP_PORTALRESCUE").get(0).value()).toString(), CustomLogEntryTypes.Debug);
+						player.teleport((Location)player.getMetadata("GP_PORTALRESCUE").get(0).value());
+						player.removeMetadata("GP_PORTALRESCUE", instance);
+					}
 				}
-			}.runTaskLater(instance, 1L);
+			}.runTaskLater(instance, 200L);
 		}
+		//Otherwise just reset cooldown, just in case they happened to logout again...
+		else
+			player.setPortalCooldown(0);
 
         
         //if we're holding a logout message for this player, don't send that or this event's join message

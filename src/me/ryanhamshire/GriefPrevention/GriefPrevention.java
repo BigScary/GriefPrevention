@@ -3706,8 +3706,8 @@ public class GriefPrevention extends JavaPlugin
 	ConcurrentHashMap<UUID, BukkitTask> portalReturnTaskMap = new ConcurrentHashMap<UUID, BukkitTask>();
 	public void startRescueTask(Player player, Location location)
 	{
-		//Schedule task to reset player's portal cooldown after 20 seconds
-		BukkitTask task = new CheckForPortalTrapTask(player, this, location).runTaskLater(GriefPrevention.instance, 400L);
+		//Schedule task to reset player's portal cooldown after 30 seconds (Maximum timeout time for client, in case their network is slow and taking forever to load chunks)
+		BukkitTask task = new CheckForPortalTrapTask(player, this, location).runTaskLater(GriefPrevention.instance, 600L);
 
 		//Cancel existing rescue task
 		if (portalReturnTaskMap.containsKey(player.getUniqueId()))
