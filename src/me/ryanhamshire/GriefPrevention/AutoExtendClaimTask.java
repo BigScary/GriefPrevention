@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChunkSnapshot;
+import org.bukkit.Material;
 import org.bukkit.World.Environment;
 import org.bukkit.block.Biome;
 
@@ -41,7 +42,7 @@ class AutoExtendClaimTask implements Runnable
         for(ChunkSnapshot chunk : this.chunks)
         {
             Biome biome = chunk.getBiome(0,  0);
-            ArrayList<Integer> playerBlockIDs = RestoreNatureProcessingTask.getPlayerBlocks(this.worldType, biome);
+            ArrayList<Material> playerBlockIDs = RestoreNatureProcessingTask.getPlayerBlocks(this.worldType, biome);
             
             boolean ychanged = true;
             while(!this.yTooSmall(y) && ychanged)
@@ -51,11 +52,11 @@ class AutoExtendClaimTask implements Runnable
                 {
                     for(int z = 0; z < 16; z++)
                     {
-                        int blockType = chunk.getBlockTypeId(x, y, z);
+                        Material blockType = chunk.getBlockType(x, y, z);
                         while(!this.yTooSmall(y) && playerBlockIDs.contains(blockType))
                         {
                             ychanged = true;
-                            blockType = chunk.getBlockTypeId(x, --y, z);
+                            blockType = chunk.getBlockType(x, --y, z);
                         }
                         
                         if(this.yTooSmall(y)) return y;
