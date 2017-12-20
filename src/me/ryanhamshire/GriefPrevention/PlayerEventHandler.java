@@ -1107,6 +1107,9 @@ class PlayerEventHandler implements Listener
 		
 		//these rules do not apply to admins
 		if(player.hasPermission("griefprevention.siegeteleport")) return;
+
+		//Ignore vanilla teleports (usually corrective teleports? See issue #210)
+		if(event.getCause() == TeleportCause.UNKNOWN) return;
 		
 		Location source = event.getFrom();
 		Claim sourceClaim = this.dataStore.getClaimAt(source, false, playerData.lastClaim);
