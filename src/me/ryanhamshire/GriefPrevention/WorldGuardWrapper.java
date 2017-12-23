@@ -29,7 +29,7 @@ class WorldGuardWrapper
 
         if (worldGuard == null)
         {
-            GriefPrevention.AddLogEntry("WorldGuard is out of date. Please update or remove WorldGuard.");
+            GriefPrevention.AddLogEntry("WorldGuard is out of date and not enabled. Please update or remove WorldGuard.", CustomLogEntryTypes.Debug, false);
             return true;
         }
 
