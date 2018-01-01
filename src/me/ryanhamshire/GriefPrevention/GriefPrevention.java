@@ -3296,20 +3296,20 @@ public class GriefPrevention extends JavaPlugin
 	}
 	
 	//sends a color-coded message to a player
-	static void sendMessage(Player player, ChatColor color, Messages messageID, String... args)
+	public static void sendMessage(Player player, ChatColor color, Messages messageID, String... args)
 	{
 		sendMessage(player, color, messageID, 0, args);
 	}
 	
 	//sends a color-coded message to a player
-	static void sendMessage(Player player, ChatColor color, Messages messageID, long delayInTicks, String... args)
+	public static void sendMessage(Player player, ChatColor color, Messages messageID, long delayInTicks, String... args)
 	{
 		String message = GriefPrevention.instance.dataStore.getMessage(messageID, args);
 		sendMessage(player, color, message, delayInTicks);
 	}
 	
 	//sends a color-coded message to a player
-	static void sendMessage(Player player, ChatColor color, String message)
+	public static void sendMessage(Player player, ChatColor color, String message)
 	{
 		if(message == null || message.length() == 0) return;
 		
@@ -3323,7 +3323,7 @@ public class GriefPrevention extends JavaPlugin
 		}
 	}
 	
-	static void sendMessage(Player player, ChatColor color, String message, long delayInTicks)
+	public static void sendMessage(Player player, ChatColor color, String message, long delayInTicks)
 	{
 		SendPlayerMessageTask task = new SendPlayerMessageTask(player, color, message);
 
