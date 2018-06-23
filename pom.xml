@@ -6,11 +6,20 @@
 
     <groupId>me.ryanhamshire</groupId>
     <artifactId>GriefPrevention</artifactId>
-    <version>15.1</version>
+    <version>16.8.dev</version>
+    <properties>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
     <repositories>
         <repository>
-            <id>spigot-repo</id>
-            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+            <id>paper-repo</id>
+            <url>https://repo.destroystokyo.com/repository/maven-public/</url>
+        </repository>
+        <repository>
+            <id>spigot-repo</id> 
+            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url> 
         </repository>
         <repository>
             <id>worldedit-worldguard-repo</id>
@@ -23,13 +32,14 @@
 
     </repositories>
     <build>
+
     <!--Maintain existing structure (as much as possible)-->
-        <sourceDirectory>${project.basedir}/src</sourceDirectory>
+        <sourceDirectory>${project.basedir}/src/main/java</sourceDirectory>
         <!--currently in same folder as source files...-->
-        <testSourceDirectory>${project.basedir}/tests/java</testSourceDirectory>
+        <testSourceDirectory>${project.basedir}/src/tests/java</testSourceDirectory>
         <testResources>
           <testResource>
-            <directory>${project.basedir}/tests/resources</directory>
+            <directory>${project.basedir}/src/tests/resources</directory>
           </testResource>
         </testResources>
         <finalName>${project.name}</finalName>
@@ -37,8 +47,9 @@
             <resource>
             <!-- Use plugin.yml in root directory-->
             <!-- This can also automatically update plugin.yml version from pom, if you use ${project.version} as version number-->
-                <directory>${basedir}</directory>
+                <directory>${project.basedir}/src/main/resources</directory>
                 <filtering>true</filtering>
+                <targetPath>.</targetPath>
                 <includes>
                     <include>plugin.yml</include>
                 </includes>
@@ -48,10 +59,10 @@
     <dependencies>
         <!--Bukkit API-->
         <dependency>
-                 <groupId>org.bukkit</groupId>
-                 <artifactId>bukkit</artifactId>
-                 <version>1.10.2-R0.1-SNAPSHOT</version>
-                 <scope>provided</scope>
+                <groupId>org.bukkit</groupId>
+                <artifactId>bukkit</artifactId>
+                <version>1.12.2-R0.1-SNAPSHOT</version>
+                <scope>provided</scope>
         </dependency>
          <!--Worldguard dependency-->
         <dependency>
@@ -75,7 +86,7 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>19.0</version>
+            <version>21.0</version>
         </dependency>
         <!--json stuff-->
         <dependency>
