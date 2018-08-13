@@ -6,7 +6,7 @@
 
     <groupId>me.ryanhamshire</groupId>
     <artifactId>GriefPrevention</artifactId>
-    <version>16.8.dev</version>
+    <version>16.9.alpha</version>
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
@@ -25,6 +25,7 @@
             <id>worldedit-worldguard-repo</id>
             <url>http://maven.sk89q.com/repo/</url>
         </repository>
+        <!--Used to resolve WorldGuard's issue with acquiring Bukkit 1.6.2 for whatever reason. See PR #340 and #343-->
         <repository>
             <id>codemc-repo</id>
             <url>https://repo.codemc.org/repository/maven-public/</url>
