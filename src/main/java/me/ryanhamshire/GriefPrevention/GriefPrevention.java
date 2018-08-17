@@ -2631,10 +2631,10 @@ public class GriefPrevention extends JavaPlugin
 		else if(cmd.getName().equalsIgnoreCase("gpblockinfo") && player != null)
 		{
 		    ItemStack inHand = player.getItemInHand();
-		    player.sendMessage("In Hand: " + String.format("%s(%d:%s)", inHand.getType().name(), inHand.getType(), inHand.getData().getData()));
+		    player.sendMessage("In Hand: " + String.format("%s(dValue:%s)", inHand.getType().name(), inHand.getData().getData()));
 		    
 		    Block inWorld = GriefPrevention.getTargetNonAirBlock(player, 300);
-		    player.sendMessage("In World: " + String.format("%s(%d:%s)", inWorld.getType().name(), inWorld.getType(), inWorld.getData()));
+		    player.sendMessage("In World: " + String.format("%s(dValue:%s)", inWorld.getType().name(), inWorld.getData()));
 		    
 		    return true;
 		}
