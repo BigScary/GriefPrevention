@@ -38,6 +38,7 @@ import org.bukkit.entity.Animals;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Fish;
 import org.bukkit.entity.Hanging;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -1294,7 +1295,7 @@ class PlayerEventHandler implements Listener
 		}
 		
 		//if the entity is an animal, apply container rules
-        if((instance.config_claims_preventTheft && entity instanceof Animals) || (entity.getType() == EntityType.VILLAGER && instance.config_claims_villagerTradingRequiresTrust))
+        if((instance.config_claims_preventTheft && (entity instanceof Animals || entity instanceof Fish)) || (entity.getType() == EntityType.VILLAGER && instance.config_claims_villagerTradingRequiresTrust))
         {
             //if the entity is in a claim
             Claim claim = this.dataStore.getClaimAt(entity.getLocation(), false, null);
