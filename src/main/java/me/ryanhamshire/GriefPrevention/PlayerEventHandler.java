@@ -1566,7 +1566,6 @@ class PlayerEventHandler implements Listener
 	    //not interested in left-click-on-air actions
 	    Action action = event.getAction();
 	    if(action == Action.LEFT_CLICK_AIR) return;
-	    if(action == Action.PHYSICAL) return;
 	    
 	    Player player = event.getPlayer();
 		Block clickedBlock = event.getClickedBlock(); //null returned here means interacting with air
@@ -1580,9 +1579,32 @@ class PlayerEventHandler implements Listener
 		{
 		    clickedBlockType = Material.AIR;
 		}
+
+		PlayerData playerData = null;
+
+		//Turtle eggs
+		if(action == Action.PHYSICAL)
+		{
+			if (clickedBlockType != Material.TURTLE_EGG)
+				return;
+			playerData = this.dataStore.getPlayerData(player.getUniqueId());
+			Claim claim = this.dataStore.getClaimAt(clickedBlock.getLocation(), false, playerData.lastClaim);
+			if(claim != null)
+			{
+				playerData.lastClaim = claim;
+
+				String noAccessReason = claim.allowBreak(player, clickedBlockType);
+				if(noAccessReason != null)
+				{
+					event.setCancelled(true);
+					instance.sendMessage(player, TextMode.Err, noAccessReason);
+					return;
+				}
+			}
+			return;
+		}
 		
 		//don't care about left-clicking on most blocks, this is probably a break action
-                PlayerData playerData = null;
                 if(action == Action.LEFT_CLICK_BLOCK && clickedBlock != null)
                 {
                         if(clickedBlock.getY() < clickedBlock.getWorld().getMaxHeight() - 1 || event.getBlockFace() != BlockFace.UP)
