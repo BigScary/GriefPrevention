@@ -2861,7 +2861,7 @@ public class GriefPrevention extends JavaPlugin
 			}
 
 			//adjust claim blocks when abandoning a top level claim
-			if(this.config_claims_abandonReturnRatio != 1.0D && claim.parent == null)
+			if(this.config_claims_abandonReturnRatio != 1.0D && claim.parent == null && claim.ownerID.equals(playerData.playerID))
 			{
 			    playerData.setAccruedClaimBlocks(playerData.getAccruedClaimBlocks() - (int)Math.ceil((claim.getArea() * (1 - this.config_claims_abandonReturnRatio))));
 			}
