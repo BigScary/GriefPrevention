@@ -6,7 +6,7 @@
 
     <groupId>me.ryanhamshire</groupId>
     <artifactId>GriefPrevention</artifactId>
-    <version>16.9.alpha</version>
+    <version>16.9</version>
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
@@ -37,10 +37,7 @@
 
     </repositories>
     <build>
-
-    <!--Maintain existing structure (as much as possible)-->
         <sourceDirectory>src/main/java</sourceDirectory>
-        <!--currently in same folder as source files...-->
         <testSourceDirectory>src/test/java</testSourceDirectory>
         <testResources>
           <testResource>
@@ -50,8 +47,6 @@
         <finalName>${project.name}</finalName>
         <resources>
             <resource>
-            <!-- Use plugin.yml in root directory-->
-            <!-- This can also automatically update plugin.yml version from pom, if you use ${project.version} as version number-->
                 <directory>src/main/resources</directory>
                 <filtering>true</filtering>
                 <targetPath>.</targetPath>
@@ -66,7 +61,7 @@
         <dependency>
                 <groupId>org.bukkit</groupId>
                 <artifactId>bukkit</artifactId>
-                <version>1.13-R0.1-SNAPSHOT</version>
+                <version>1.13.1-R0.1-SNAPSHOT</version>
                 <scope>provided</scope>
         </dependency>
          <!--Worldguard dependency-->
