@@ -171,7 +171,7 @@ public class PlayerData
 	}
 	
 	//don't load data from secondary storage until it's needed
-	public int getAccruedClaimBlocks()
+	public synchronized int getAccruedClaimBlocks()
 	{
 	    if(this.accruedClaimBlocks == null) this.loadDataFromSecondaryStorage();
         
