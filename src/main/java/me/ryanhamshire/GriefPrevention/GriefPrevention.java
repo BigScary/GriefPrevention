@@ -270,9 +270,7 @@ public class GriefPrevention extends JavaPlugin
 					FlatFileDataStore flatFileStore = new FlatFileDataStore();
 					this.dataStore = flatFileStore;
 					flatFileStore.migrateData(databaseStore);
-					GriefPrevention.AddLogEntry("Data migration process complete.  Reloading data from the database...");
-					databaseStore.close();
-					databaseStore = new DatabaseDataStore(this.databaseUrl, this.databaseUserName, this.databasePassword);
+					GriefPrevention.AddLogEntry("Data migration process complete.");
 				}
 				
 				this.dataStore = databaseStore;
