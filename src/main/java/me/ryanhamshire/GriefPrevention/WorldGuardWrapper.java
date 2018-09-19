@@ -26,35 +26,38 @@ class WorldGuardWrapper
 
     public boolean canBuild(Location lesserCorner, Location greaterCorner, Player creatingPlayer)
     {
-        if (worldGuard == null)
+        try
         {
-            GriefPrevention.AddLogEntry("WorldGuard is out of date and not enabled. Please update or remove WorldGuard.", CustomLogEntryTypes.Debug, false);
-            return true;
-        }
+            BukkitPlayer localPlayer = new BukkitPlayer(this.worldGuard, creatingPlayer);
+            World world = WorldGuard.getInstance().getPlatform().getWorldByName(lesserCorner.getWorld().getName());
 
-        BukkitPlayer localPlayer = new BukkitPlayer(this.worldGuard, creatingPlayer);
-        World world = WorldGuard.getInstance().getPlatform().getWorldByName(lesserCorner.getWorld().getName());
+            if(new RegionPermissionModel(localPlayer).mayIgnoreRegionProtection(world)) return true;
 
-        if(new RegionPermissionModel(localPlayer).mayIgnoreRegionProtection(world)) return true;
+            RegionManager manager =  WorldGuard.getInstance().getPlatform().getRegionContainer().get(world);
 
-        RegionManager manager =  WorldGuard.getInstance().getPlatform().getRegionContainer().get(world);
+            if(manager != null)
+            {
+                ProtectedCuboidRegion tempRegion = new ProtectedCuboidRegion(
+                        "GP_TEMP",
+                        new BlockVector(lesserCorner.getX(), 0, lesserCorner.getZ()),
+                        new BlockVector(greaterCorner.getX(), world.getMaxY(), greaterCorner.getZ()));
 
-        if(manager != null)
-        {
-            ProtectedCuboidRegion tempRegion = new ProtectedCuboidRegion(
-                    "GP_TEMP",
-                    new BlockVector(lesserCorner.getX(), 0, lesserCorner.getZ()),
-                    new BlockVector(greaterCorner.getX(), world.getMaxY(), greaterCorner.getZ()));
-
-            ApplicableRegionSet overlaps = manager.getApplicableRegions(tempRegion);
-            for (ProtectedRegion r : overlaps.getRegions()) {
-                if (!manager.getApplicableRegions(r).testState(localPlayer, Flags.BUILD)) {
-                    return false;
+                ApplicableRegionSet overlaps = manager.getApplicableRegions(tempRegion);
+                for (ProtectedRegion r : overlaps.getRegions()) {
+                    if (!manager.getApplicableRegions(r).testState(localPlayer, Flags.BUILD)) {
+                        return false;
+                    }
                 }
+                return true;
             }
+
+            return true;
+        }
+        catch (Throwable rock)
+        {
+            GriefPrevention.AddLogEntry("WorldGuard is out of date. Please update or remove WorldGuard, or disable WorldGuard integration in GP's config (CreationRequiresWorldGuardBuildPermission)", CustomLogEntryTypes.Debug, false);
             return true;
         }
 
-        return true;
     }
 }
