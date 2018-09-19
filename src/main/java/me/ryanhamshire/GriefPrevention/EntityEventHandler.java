@@ -42,6 +42,7 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Rabbit;
 import org.bukkit.entity.Tameable;
 import org.bukkit.entity.ThrownPotion;
+import org.bukkit.entity.Vehicle;
 import org.bukkit.entity.WaterMob;
 import org.bukkit.entity.minecart.ExplosiveMinecart;
 import org.bukkit.event.EventHandler;
@@ -153,6 +154,17 @@ public class EntityEventHandler implements Listener
 				Block block = event.getBlock();
 				if(GriefPrevention.instance.allowBreak(player, block, block.getLocation()) != null)
 				{
+					event.setCancelled(true);
+				}
+			}
+		}
+
+		//Prevent breaking lilypads via collision with a boat. Thanks Jikoo.
+		else if (event.getEntity() instanceof Vehicle && !event.getEntity().getPassengers().isEmpty()) {
+			Entity driver = event.getEntity().getPassengers().get(0);
+			if (driver instanceof Player) {
+				Block block = event.getBlock();
+				if (GriefPrevention.instance.allowBreak((Player) driver, block, block.getLocation()) != null) {
 					event.setCancelled(true);
 				}
 			}
