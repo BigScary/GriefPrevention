@@ -63,6 +63,7 @@ import org.bukkit.event.entity.EntityInteractEvent;
 import org.bukkit.event.entity.EntityPortalEnterEvent;
 import org.bukkit.event.entity.EntityPortalExitEvent;
 import org.bukkit.event.entity.ExpBottleEvent;
+import org.bukkit.event.entity.ItemMergeEvent;
 import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
@@ -504,6 +505,14 @@ public class EntityEventHandler implements Listener
                 playerData.receivedDropUnlockAdvertisement = false;
             }
         }
+	}
+
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
+	public void onItemMerge(ItemMergeEvent event)
+	{
+		Item item = event.getTarget();
+		List<MetadataValue> data = item.getMetadata("GP_ITEMOWNER");
+		event.setCancelled(data != null && data.size() > 0);
 	}
 	
 	//when an entity picks up an item
