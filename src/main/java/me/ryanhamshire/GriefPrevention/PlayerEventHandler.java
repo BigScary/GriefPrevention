@@ -1606,7 +1606,6 @@ class PlayerEventHandler implements Listener
 				if(noAccessReason != null)
 				{
 					event.setCancelled(true);
-					instance.sendMessage(player, TextMode.Err, noAccessReason);
 					return;
 				}
 			}
