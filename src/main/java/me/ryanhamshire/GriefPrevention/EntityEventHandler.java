@@ -678,7 +678,9 @@ public class EntityEventHandler implements Listener
                     cause == DamageCause.FIRE ||
                     cause == DamageCause.FIRE_TICK ||
                     cause == DamageCause.LAVA ||
-                    cause == DamageCause.SUFFOCATION))
+                    cause == DamageCause.SUFFOCATION ||
+					cause == DamageCause.CONTACT ||
+					cause == DamageCause.DROWNING))
                 {
                     event.setCancelled(true);
                     return;
