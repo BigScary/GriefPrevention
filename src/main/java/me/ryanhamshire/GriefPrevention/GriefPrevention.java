@@ -198,6 +198,7 @@ public class GriefPrevention extends JavaPlugin
 	public boolean config_pistonsInClaimsOnly;                      //whether pistons are limited to only move blocks located within the piston's land claim
 
 	public boolean config_advanced_fixNegativeClaimblockAmounts;	//whether to attempt to fix negative claim block amounts (some addons cause/assume players can go into negative amounts)
+	public int config_advanced_claim_expiration_check_rate;			//How often GP should check for expired claims, amount in seconds
 	
 	//custom log settings
 	public int config_logs_daysToKeep;
@@ -327,7 +328,7 @@ public class GriefPrevention extends JavaPlugin
 		
 		//start recurring cleanup scan for unused claims belonging to inactive players
 		FindUnusedClaimsTask task2 = new FindUnusedClaimsTask();
-		this.getServer().getScheduler().scheduleSyncRepeatingTask(this, task2, 20L * 60, 20L * 60);
+		this.getServer().getScheduler().scheduleSyncRepeatingTask(this, task2, 20L * 60, 20L * config_advanced_claim_expiration_check_rate);
 		
 		//register for events
 		PluginManager pluginManager = this.getServer().getPluginManager();
@@ -767,6 +768,7 @@ public class GriefPrevention extends JavaPlugin
         this.databasePassword = config.getString("GriefPrevention.Database.Password", "");
 
         this.config_advanced_fixNegativeClaimblockAmounts = config.getBoolean("GriefPrevention.Advanced.fixNegativeClaimblockAmounts", true);
+        this.config_advanced_claim_expiration_check_rate = config.getInt("GriefPrevention.Advanced.ClaimExpirationCheckRate", 60);
         
         //custom logger settings
         this.config_logs_daysToKeep = config.getInt("GriefPrevention.Abridged Logs.Days To Keep", 7);
@@ -893,6 +895,7 @@ public class GriefPrevention extends JavaPlugin
         outConfig.set("GriefPrevention.BanCommandPattern", this.config_ban_commandFormat);
 
         outConfig.set("GriefPrevention.Advanced.fixNegativeClaimblockAmounts", this.config_advanced_fixNegativeClaimblockAmounts);
+        outConfig.set("GriefPrevention.Advanced.ClaimExpirationCheckRate", this.config_advanced_claim_expiration_check_rate);
 
         //custom logger settings
         outConfig.set("GriefPrevention.Abridged Logs.Days To Keep", this.config_logs_daysToKeep);

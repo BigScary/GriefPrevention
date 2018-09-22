@@ -18,7 +18,10 @@
  
  package me.ryanhamshire.GriefPrevention;
 
-import java.util.Random;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 
@@ -29,38 +32,36 @@ import org.bukkit.Bukkit;
 
 //runs every 1 minute in the main thread
 class FindUnusedClaimsTask implements Runnable 
-{	
-	int nextClaimIndex;
+{
+	private Set<UUID> claimOwnerUUIDs = new HashSet<>();
+	private Iterator<UUID> claimOwnerIterator;
 	
 	FindUnusedClaimsTask()
 	{
-		//start scanning in a random spot
-		if(GriefPrevention.instance.dataStore.claims.size() == 0)
-		{
-			this.nextClaimIndex = 0;
-		}
-		else
-		{
-			Random randomNumberGenerator = new Random();
-			this.nextClaimIndex = randomNumberGenerator.nextInt(GriefPrevention.instance.dataStore.claims.size());
-		}
+		refreshUUIDs();
 	}
 	
 	@Override
 	public void run()
 	{
 		//don't do anything when there are no claims
-		if(GriefPrevention.instance.dataStore.claims.size() == 0) return;
+		if(claimOwnerUUIDs.isEmpty()) return;
 
 		//wrap search around to beginning
-		if(this.nextClaimIndex >= GriefPrevention.instance.dataStore.claims.size()) this.nextClaimIndex = 0;
+		if(!claimOwnerIterator.hasNext())
+		{
+			refreshUUIDs();
+			return;
+		}
 		
-		//decide which claim to check next
-		Claim claim = GriefPrevention.instance.dataStore.claims.get(this.nextClaimIndex++);
-		
-		//skip administrative claims
-		if(claim.isAdminClaim()) return;
-		
-		Bukkit.getScheduler().runTaskAsynchronously(GriefPrevention.instance, new CleanupUnusedClaimPreTask(claim));
+		Bukkit.getScheduler().runTaskAsynchronously(GriefPrevention.instance, new CleanupUnusedClaimPreTask(claimOwnerIterator.next()));
+	}
+
+	public void refreshUUIDs()
+	{
+		claimOwnerUUIDs.clear();
+		for (Claim claim : GriefPrevention.instance.dataStore.claims)
+			claimOwnerUUIDs.add(claim.ownerID);
+		claimOwnerIterator = claimOwnerUUIDs.iterator();
 	}
 }
