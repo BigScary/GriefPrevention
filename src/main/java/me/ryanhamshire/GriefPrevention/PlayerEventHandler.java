@@ -811,7 +811,7 @@ class PlayerEventHandler implements Listener
 				@Override
 				public void run()
 				{
-					if (player.getPortalCooldown() > 8)
+					if (player.getPortalCooldown() > 8 && player.hasMetadata("GP_PORTALRESCUE"))
 					{
 						instance.AddLogEntry("Rescued " + player.getName() + " from a nether portal.\nTeleported from " + player.getLocation().toString() + " to " + ((Location)player.getMetadata("GP_PORTALRESCUE").get(0).value()).toString(), CustomLogEntryTypes.Debug);
 						player.teleport((Location)player.getMetadata("GP_PORTALRESCUE").get(0).value());
