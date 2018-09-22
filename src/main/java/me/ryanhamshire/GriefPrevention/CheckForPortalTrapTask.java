@@ -49,9 +49,9 @@ class CheckForPortalTrapTask extends BukkitRunnable
 	@Override
 	public void run()
 	{
-	    if(player.isOnline() && player.getPortalCooldown() >= 10)
+	    if(player.isOnline() && player.getPortalCooldown() >= 10 && player.hasMetadata("GP_PORTALRESCUE"))
 		{
-			instance.AddLogEntry("Rescued " + player.getName() + " from a nether portal.\nTeleported from " + player.getLocation().toString() + " to " + ((Location)player.getMetadata("GP_PORTALRESCUE").get(0).value()).toString(), CustomLogEntryTypes.Debug);
+			instance.AddLogEntry("Rescued " + player.getName() + " from a nether portal.\nTeleported from " + player.getLocation().toString() + " to " + returnLocation.toString(), CustomLogEntryTypes.Debug);
 			player.teleport(returnLocation);
 			player.removeMetadata("GP_PORTALRESCUE", instance);
 		}
