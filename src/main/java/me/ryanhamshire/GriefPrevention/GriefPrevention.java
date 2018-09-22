@@ -199,6 +199,7 @@ public class GriefPrevention extends JavaPlugin
 
 	public boolean config_advanced_fixNegativeClaimblockAmounts;	//whether to attempt to fix negative claim block amounts (some addons cause/assume players can go into negative amounts)
 	public int config_advanced_claim_expiration_check_rate;			//How often GP should check for expired claims, amount in seconds
+	public int config_advanced_offlineplayer_cache_days;			//Cache players who have logged in within the last x number of days
 	
 	//custom log settings
 	public int config_logs_daysToKeep;
@@ -769,6 +770,7 @@ public class GriefPrevention extends JavaPlugin
 
         this.config_advanced_fixNegativeClaimblockAmounts = config.getBoolean("GriefPrevention.Advanced.fixNegativeClaimblockAmounts", true);
         this.config_advanced_claim_expiration_check_rate = config.getInt("GriefPrevention.Advanced.ClaimExpirationCheckRate", 60);
+        this.config_advanced_offlineplayer_cache_days = config.getInt("GriefPrevention.Advanced.OfflinePlayer_cache_days", 90);
         
         //custom logger settings
         this.config_logs_daysToKeep = config.getInt("GriefPrevention.Abridged Logs.Days To Keep", 7);
@@ -896,6 +898,7 @@ public class GriefPrevention extends JavaPlugin
 
         outConfig.set("GriefPrevention.Advanced.fixNegativeClaimblockAmounts", this.config_advanced_fixNegativeClaimblockAmounts);
         outConfig.set("GriefPrevention.Advanced.ClaimExpirationCheckRate", this.config_advanced_claim_expiration_check_rate);
+        outConfig.set("GriefPrevention.Advanced.OfflinePlayer_cache_days", this.config_advanced_offlineplayer_cache_days);
 
         //custom logger settings
         outConfig.set("GriefPrevention.Abridged Logs.Days To Keep", this.config_logs_daysToKeep);
@@ -3087,7 +3090,7 @@ public class GriefPrevention extends JavaPlugin
                     //if the player has been seen in the last 90 days, cache his name/UUID pair
                     long diff = now - lastSeen;
                     long daysDiff = diff / millisecondsPerDay;
-                    if(daysDiff <= 90)
+                    if(daysDiff <= config_advanced_claim_expiration_check_rate)
                     {
                         String playerName = player.getName();
                         if(playerName == null) continue;
