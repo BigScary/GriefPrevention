@@ -35,6 +35,7 @@ import java.util.regex.Pattern;
 import me.ryanhamshire.GriefPrevention.DataStore.NoTransferException;
 import me.ryanhamshire.GriefPrevention.events.PreventBlockBreakEvent;
 import me.ryanhamshire.GriefPrevention.events.SaveTrappedPlayerEvent;
+import me.ryanhamshire.GriefPrevention.metrics.MetricsHandler;
 import net.milkbowl.vault.economy.Economy;
 
 import org.bukkit.BanList;
@@ -63,7 +64,6 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.BlockIterator;
 
@@ -197,7 +197,7 @@ public class GriefPrevention extends JavaPlugin
 	public boolean config_limitTreeGrowth;                          //whether trees should be prevented from growing into a claim from outside
 	public boolean config_pistonsInClaimsOnly;                      //whether pistons are limited to only move blocks located within the piston's land claim
 
-	public boolean config_advanced_fixNegativeClaimblockAmounts;					//whether to attempt to fix negative claim block amounts (some addons cause/assume players can go into negative amounts)
+	public boolean config_advanced_fixNegativeClaimblockAmounts;	//whether to attempt to fix negative claim block amounts (some addons cause/assume players can go into negative amounts)
 	
 	//custom log settings
 	public int config_logs_daysToKeep;
@@ -395,6 +395,12 @@ public class GriefPrevention extends JavaPlugin
 		}
 		
 		AddLogEntry("Boot finished.");
+
+		try
+		{
+			new MetricsHandler(this, dataMode);
+		}
+		catch (Throwable ignored){}
 	}
 	
 	private void loadConfig()
@@ -771,23 +777,11 @@ public class GriefPrevention extends JavaPlugin
         this.config_logs_mutedChatEnabled = config.getBoolean("GriefPrevention.Abridged Logs.Included Entry Types.Muted Chat Messages", false);
         
         //claims mode by world
-		try
+		for(World world : this.config_claims_worldModes.keySet())
 		{
-			for(World world : this.config_claims_worldModes.keySet())
-			{
-				outConfig.set(
-						"GriefPrevention.Claims.Mode." + world.getName(),
-						this.config_claims_worldModes.get(world).name());
-			}
-		}
-		catch(NoSuchMethodError e)
-		{
-			this.getLogger().severe("You are running an old version of Java which is susceptible to security exploits. Please update to Java 8.");
-			this.getLogger().severe("If you are on a shared host, tell your hosting provider to update, as Java 7 is End of Life, and you're missing out on security and performance improvements");
-			this.getLogger().severe("If they refuse, I'd suggesting switching to a more secure and responsive host.");
-			this.getLogger().severe("But if you truly have absolutely no choice, then please download the Java 7 version of GriefPrevention.");
-			getServer().getPluginManager().disablePlugin(this);
-			return;
+			outConfig.set(
+					"GriefPrevention.Claims.Mode." + world.getName(),
+					this.config_claims_worldModes.get(world).name());
 		}
 
 		
