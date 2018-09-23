@@ -62,6 +62,7 @@ class FindUnusedClaimsTask implements Runnable
 		claimOwnerUUIDs.clear();
 		for (Claim claim : GriefPrevention.instance.dataStore.claims)
 			claimOwnerUUIDs.add(claim.ownerID);
+		claimOwnerUUIDs.remove(null);
 		claimOwnerIterator = claimOwnerUUIDs.iterator();
 	}
 }
