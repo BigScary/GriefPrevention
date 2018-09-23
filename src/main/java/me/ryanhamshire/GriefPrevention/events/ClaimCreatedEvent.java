@@ -17,6 +17,10 @@ public class ClaimCreatedEvent extends Event implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
 
+    public static HandlerList getHandlerList() {
+        return handlers;
+    }
+
     private final Claim claim;
 
     private final CommandSender creator;
