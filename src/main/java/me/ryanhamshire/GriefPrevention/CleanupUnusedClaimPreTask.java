@@ -61,7 +61,7 @@ class CleanupUnusedClaimPreTask implements Runnable
 
 	    for (Claim claim : GriefPrevention.instance.dataStore.getClaims())
 		{
-			if (claim.ownerID.equals(ownerID))
+			if (ownerID.equals(claim.ownerID))
 			{
 				claimToExpire = claim;
 				break;

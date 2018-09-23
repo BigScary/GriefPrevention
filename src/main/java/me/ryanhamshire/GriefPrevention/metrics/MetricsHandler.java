@@ -18,6 +18,8 @@ public class MetricsHandler
     {
         metrics = new Metrics(plugin);
 
+        addSimplePie("custom_build", plugin.getDescription().getVersion().equals("15.2.2"));
+
         //enums and etc. would be amazing.
 
         //PvP - only send PvP configs for those who use them
