@@ -18,7 +18,12 @@ public class MetricsHandler
     {
         metrics = new Metrics(plugin);
 
-        addSimplePie("custom_build", plugin.getDescription().getVersion().equals("15.2.2"));
+        try
+        {
+            addSimplePie("custom_build", plugin.getDescription().getVersion().equals("15.2.2"));
+            addSimplePie("bukkit_impl", plugin.getServer().getVersion().split("-")[1]);
+        }
+        catch (Throwable ignored){}
 
         //enums and etc. would be amazing.
 
