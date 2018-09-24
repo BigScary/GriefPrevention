@@ -62,7 +62,6 @@ import java.util.regex.Pattern;
 //singleton class which manages all GriefPrevention data (except for config options)
 public abstract class DataStore 
 {
-	private GriefPrevention instance;
 
 	//in-memory cache for player data
 	protected ConcurrentHashMap<UUID, PlayerData> playerNameToPlayerDataMap = new ConcurrentHashMap<UUID, PlayerData>();
@@ -141,9 +140,9 @@ public abstract class DataStore
 		{
 			if (claim.id >= nextClaimID)
 			{
-				instance.getLogger().severe("nextClaimID was lesser or equal to an already-existing claim ID!\n" +
+				GriefPrevention.instance.getLogger().severe("nextClaimID was lesser or equal to an already-existing claim ID!\n" +
 						"This usually happens if you ran out of storage space.");
-				instance.AddLogEntry("Changing nextClaimID from " + nextClaimID + " to " + claim.id, CustomLogEntryTypes.Debug, false);
+				GriefPrevention.AddLogEntry("Changing nextClaimID from " + nextClaimID + " to " + claim.id, CustomLogEntryTypes.Debug, false);
 				nextClaimID = claim.id + 1;
 			}
 		}
