@@ -27,13 +27,15 @@ public class MetricsHandler
 
         //enums and etc. would be amazing.
 
+        addSimplePie("lock_death_drops_pvp", plugin.config_lockDeathDropsInPvpWorlds);
+        addSimplePie("lock_death_drops_nonpvp", plugin.config_lockDeathDropsInNonPvpWorlds);
+
         //PvP - only send PvP configs for those who use them
         boolean pvpApplies = false;
         for (World world : plugin.getServer().getWorlds())
         {
             if (plugin.pvpRulesApply(world))
             {
-                addSimplePie("lock_death_drops", plugin.config_lockDeathDropsInNonPvpWorlds || plugin.config_lockDeathDropsInPvpWorlds);
                 addSimplePie("no_pvp_in_player_claims", plugin.config_pvp_noCombatInPlayerLandClaims);
                 addSimplePie("protect_pets_pvp", plugin.config_pvp_protectPets);
                 addSimplePie("protect_fresh_spawns_pvp", plugin.config_pvp_protectFreshSpawns);
