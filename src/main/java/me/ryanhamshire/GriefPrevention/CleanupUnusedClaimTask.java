@@ -43,10 +43,7 @@ class CleanupUnusedClaimTask implements Runnable
 	@Override
 	public void run()
 	{
-	    //see if any other plugins don't want this claim deleted
-	    ClaimExpirationEvent event = new ClaimExpirationEvent(this.claim);
-	    Bukkit.getPluginManager().callEvent(event);
-	    if(event.isCancelled()) return;
+
 	    
 	    //determine area of the default chest claim
 		int areaOfDefaultClaim = 0;
@@ -64,6 +61,8 @@ class CleanupUnusedClaimTask implements Runnable
 	        boolean newPlayerClaimsExpired = sevenDaysAgo.getTime().after(new Date(ownerInfo.getLastPlayed()));
 			if(newPlayerClaimsExpired && ownerData.getClaims().size() == 1)
 			{
+				if (expireEventCanceled())
+					return;
 				claim.removeSurfaceFluids(null);
 				GriefPrevention.instance.dataStore.deleteClaim(claim, true, true);
 				
@@ -85,6 +84,8 @@ class CleanupUnusedClaimTask implements Runnable
 			
 			if(earliestPermissibleLastLogin.getTime().after(new Date(ownerInfo.getLastPlayed())))
 			{
+				if (expireEventCanceled())
+					return;
 				//make a copy of this player's claim list
 				Vector<Claim> claims = new Vector<Claim>();
 				for(int i = 0; i < ownerData.getClaims().size(); i++)
@@ -125,6 +126,8 @@ class CleanupUnusedClaimTask implements Runnable
 	            boolean claimExpired = sevenDaysAgo.getTime().after(new Date(ownerInfo.getLastPlayed()));
 	            if(claimExpired)
 	            {
+					if (expireEventCanceled())
+						return;
     			    GriefPrevention.instance.dataStore.deleteClaim(claim, true, true);
     				GriefPrevention.AddLogEntry("Removed " + claim.getOwnerName() + "'s unused claim @ " + GriefPrevention.getfriendlyLocationString(claim.getLesserBoundaryCorner()), CustomLogEntryTypes.AdminActivity);
     				
@@ -133,5 +136,13 @@ class CleanupUnusedClaimTask implements Runnable
 	            }
 			}
 		}
+	}
+
+	public boolean expireEventCanceled()
+	{
+		//see if any other plugins don't want this claim deleted
+		ClaimExpirationEvent event = new ClaimExpirationEvent(this.claim);
+		Bukkit.getPluginManager().callEvent(event);
+		return event.isCancelled();
 	}
 }
