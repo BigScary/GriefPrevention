@@ -82,8 +82,8 @@ class RestoreNatureExecutionTask implements Runnable
 						
 						try
 						{
-						currentBlock.setType(blockUpdate.typeId, false);
-						currentBlock.setBlockData(blockUpdate.data, false);
+							currentBlock.setType(blockUpdate.typeId, false);
+							// currentBlock.setBlockData(blockUpdate.data, false);
 						}
 						catch(IllegalArgumentException e)
 						{
