@@ -480,7 +480,7 @@ public class DatabaseDataStore extends DataStore
 	}
 
 	@Override
-	synchronized PlayerData getPlayerDataFromStorage(UUID playerID)
+	PlayerData getPlayerDataFromStorage(UUID playerID)
 	{
 		PlayerData playerData = new PlayerData();
 		playerData.playerID = playerID;
