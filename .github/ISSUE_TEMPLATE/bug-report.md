@@ -28,14 +28,14 @@ Paste of `/version GriefPrevention`:
 ```
 Paste entire stack trace right here inside these backticks.
 
-If not applicable, paste the server.log at gist.github.com and paste the link here.
 ```
+Or, paste the server.log at gist.github.com and paste the link here: 
 
 ### GriefPrevention config.yml
 
 ```yml
 
-Paste the config.yml right here inside these backticks.
+Paste the config.yml right here inside these backticks. Please do not use a paste service for this.
 
 ```
 
