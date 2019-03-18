@@ -379,7 +379,7 @@ public abstract class DataStore
 	
 	abstract void saveGroupBonusBlocks(String groupName, int amount);
 	
-	class NoTransferException extends Exception
+	public class NoTransferException extends RuntimeException
 	{
         private static final long serialVersionUID = 1L;
 
@@ -388,7 +388,7 @@ public abstract class DataStore
 	        super(message);
 	    }
 	}
-	synchronized public void changeClaimOwner(Claim claim, UUID newOwnerID) throws NoTransferException
+	synchronized public void changeClaimOwner(Claim claim, UUID newOwnerID)
 	{
 		//if it's a subdivision, throw an exception
 		if(claim.parent != null)
