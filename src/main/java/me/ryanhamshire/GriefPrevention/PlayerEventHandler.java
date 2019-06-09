@@ -1810,7 +1810,8 @@ class PlayerEventHandler implements Listener
 			ItemStack itemInHand = instance.getItemInHand(player, hand);
 			Material materialInHand = itemInHand.getType();	
 			
-			ArrayList<Material> spawn_eggs = new ArrayList<Material>();
+			Set<Material> spawn_eggs = new HashSet<>();
+			Set<Material> dyes = new HashSet<>();
 			
 			spawn_eggs.add(Material.BAT_SPAWN_EGG);
 			spawn_eggs.add(Material.BLAZE_SPAWN_EGG);
@@ -1863,9 +1864,21 @@ class PlayerEventHandler implements Listener
 			spawn_eggs.add(Material.ZOMBIE_HORSE_SPAWN_EGG);
 			spawn_eggs.add(Material.ZOMBIE_PIGMAN_SPAWN_EGG);
 			spawn_eggs.add(Material.ZOMBIE_VILLAGER_SPAWN_EGG);
+
+			for (Material material : Material.values())
+			{
+				if (!material.isLegacy() && material.name().endsWith("_DYE"))
+					dyes.add(material);
+			}
+
 			
 			//if it's bonemeal, armor stand, spawn egg, etc - check for build permission //RoboMWM: also check flint and steel to stop TNT ignition
-			if(clickedBlock != null && (materialInHand == Material.BONE_MEAL || materialInHand == Material.ARMOR_STAND || (spawn_eggs.contains(materialInHand) && GriefPrevention.instance.config_claims_preventGlobalMonsterEggs) || materialInHand == Material.END_CRYSTAL || materialInHand == Material.FLINT_AND_STEEL))
+			if(clickedBlock != null && (materialInHand == Material.BONE_MEAL
+					|| materialInHand == Material.ARMOR_STAND
+					|| (spawn_eggs.contains(materialInHand) && GriefPrevention.instance.config_claims_preventGlobalMonsterEggs)
+					|| materialInHand == Material.END_CRYSTAL
+					|| materialInHand == Material.FLINT_AND_STEEL)
+					|| dyes.contains(materialInHand))
 			{
 				String noBuildReason = instance.allowBuild(player, clickedBlock.getLocation(), clickedBlockType);
 				if(noBuildReason != null)
