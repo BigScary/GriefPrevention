@@ -719,8 +719,10 @@ public class EntityEventHandler implements Listener
         
         EntityDamageByEntityEvent subEvent = (EntityDamageByEntityEvent) event;
 
-        if(subEvent.getDamager() instanceof LightningStrike && subEvent.getDamager().getMetadata("GP_TRIDENT").size() >= 1){
+        if(subEvent.getDamager() instanceof LightningStrike && subEvent.getDamager().hasMetadata("GP_TRIDENT"))
+        {
 			event.setCancelled(true);
+			return;
 		}
         //determine which player is attacking, if any
         Player attacker = null;
