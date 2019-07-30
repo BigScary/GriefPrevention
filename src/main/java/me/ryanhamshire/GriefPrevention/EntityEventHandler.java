@@ -144,90 +144,99 @@ public class EntityEventHandler implements Listener
 		else if(!GriefPrevention.instance.config_rabbitsEatCrops && event.getEntityType() == EntityType.RABBIT)
 		{
 		    event.setCancelled(true);
-		} else if(event.getEntityType() == EntityType.WITHER && GriefPrevention.instance.config_claims_worldModes.get(event.getBlock().getWorld()) != ClaimsMode.Disabled)
-		{
-			Claim claim = this.dataStore.getClaimAt(event.getBlock().getLocation(), false, null);
-			if(claim == null || !claim.areExplosivesAllowed || !GriefPrevention.instance.config_blockClaimExplosions)
-			{
-			   event.setCancelled(true);
-			}
 		}
-	    
-		//don't allow crops to be trampled, except by a player with build permission
-		else if(event.getTo() == Material.DIRT && event.getBlock().getType() == Material.FARMLAND)
-		{
-			if(event.getEntityType() != EntityType.PLAYER)
-			{
-				event.setCancelled(true);
-			}
-			else
-			{
-				Player player = (Player)event.getEntity();
-				Block block = event.getBlock();
-				if(GriefPrevention.instance.allowBreak(player, block, block.getLocation()) != null)
-				{
-					event.setCancelled(true);
-				}
-			}
-		}
+		else if(GriefPrevention.instance.config_claims_worldModes.get(event.getBlock().getWorld()) != ClaimsMode.Disabled)
+        {
+            if (event.getEntityType() == EntityType.WITHER)
+            {
+                Claim claim = this.dataStore.getClaimAt(event.getBlock().getLocation(), false, null);
+                if (claim == null || !claim.areExplosivesAllowed || !GriefPrevention.instance.config_blockClaimExplosions)
+                {
+                    event.setCancelled(true);
+                }
+            }
 
-		//Prevent breaking lilypads via collision with a boat. Thanks Jikoo.
-		else if (event.getEntity() instanceof Vehicle && !event.getEntity().getPassengers().isEmpty()) {
-			Entity driver = event.getEntity().getPassengers().get(0);
-			if (driver instanceof Player) {
-				Block block = event.getBlock();
-				if (GriefPrevention.instance.allowBreak((Player) driver, block, block.getLocation()) != null) {
-					event.setCancelled(true);
-				}
-			}
-		}
-		
-		//sand cannon fix - when the falling block doesn't fall straight down, take additional anti-grief steps
-		else if (event.getEntityType() == EntityType.FALLING_BLOCK)
-		{
-		    FallingBlock entity = (FallingBlock)event.getEntity();
-		    Block block = event.getBlock();
-		    
-		    //if changing a block TO air, this is when the falling block formed.  note its original location
-		    if(event.getTo() == Material.AIR)
-		    {
-		        entity.setMetadata("GP_FALLINGBLOCK", new FixedMetadataValue(GriefPrevention.instance, block.getLocation()));
-		    }
-		    //otherwise, the falling block is forming a block.  compare new location to original source
-		    else
-		    {
-		         List<MetadataValue> values = entity.getMetadata("GP_FALLINGBLOCK");
-		         //if we're not sure where this entity came from (maybe another plugin didn't follow the standard?), allow the block to form
-				 //Or if entity fell through an end portal, allow it to form, as the event is erroneously fired twice in this scenario.
-		         if(values.size() < 1) return;
-		         
-		         Location originalLocation = (Location)(values.get(0).value());
-		         Location newLocation = block.getLocation();
-		         
-		         //if did not fall straight down
-		         if(originalLocation.getBlockX() != newLocation.getBlockX() || originalLocation.getBlockZ() != newLocation.getBlockZ())
-		         {
-		             //in creative mode worlds, never form the block
-		             if(GriefPrevention.instance.config_claims_worldModes.get(newLocation.getWorld()) == ClaimsMode.Creative)
-		             {
-		                 event.setCancelled(true);
-		                 return;
-		             }
-		             
-		             //in other worlds, if landing in land claim, only allow if source was also in the land claim
-		             Claim claim = this.dataStore.getClaimAt(newLocation, false, null);
-		             if(claim != null && !claim.contains(originalLocation, false, false))
-		             {
-		                 //when not allowed, drop as item instead of forming a block
-		                 event.setCancelled(true);
-		                 @SuppressWarnings("deprecation")
-		                 ItemStack itemStack = new ItemStack(entity.getMaterial(), 1);
-		                 Item item = block.getWorld().dropItem(entity.getLocation(), itemStack);
-		                 item.setVelocity(new Vector());
-		             }
-		         }
-		    }
-		}
+            else if (!GriefPrevention.instance.config_claims_ravagersBreakBlocks && event.getEntityType() == EntityType.RAVAGER)
+            {
+                event.setCancelled(true);
+            }
+
+            //don't allow crops to be trampled, except by a player with build permission
+            else if (event.getTo() == Material.DIRT && event.getBlock().getType() == Material.FARMLAND)
+            {
+                if (event.getEntityType() != EntityType.PLAYER)
+                {
+                    event.setCancelled(true);
+                } else
+                {
+                    Player player = (Player) event.getEntity();
+                    Block block = event.getBlock();
+                    if (GriefPrevention.instance.allowBreak(player, block, block.getLocation()) != null)
+                    {
+                        event.setCancelled(true);
+                    }
+                }
+            }
+        }
+
+            //Prevent breaking lilypads via collision with a boat. Thanks Jikoo.
+            else if (event.getEntity() instanceof Vehicle && !event.getEntity().getPassengers().isEmpty()) {
+                Entity driver = event.getEntity().getPassengers().get(0);
+                if (driver instanceof Player) {
+                    Block block = event.getBlock();
+                    if (GriefPrevention.instance.allowBreak((Player) driver, block, block.getLocation()) != null) {
+                        event.setCancelled(true);
+                    }
+                }
+            }
+
+            //sand cannon fix - when the falling block doesn't fall straight down, take additional anti-grief steps
+            else if (event.getEntityType() == EntityType.FALLING_BLOCK)
+            {
+                FallingBlock entity = (FallingBlock)event.getEntity();
+                Block block = event.getBlock();
+
+                //if changing a block TO air, this is when the falling block formed.  note its original location
+                if(event.getTo() == Material.AIR)
+                {
+                    entity.setMetadata("GP_FALLINGBLOCK", new FixedMetadataValue(GriefPrevention.instance, block.getLocation()));
+                }
+                //otherwise, the falling block is forming a block.  compare new location to original source
+                else
+                {
+                    List<MetadataValue> values = entity.getMetadata("GP_FALLINGBLOCK");
+                    //if we're not sure where this entity came from (maybe another plugin didn't follow the standard?), allow the block to form
+                    //Or if entity fell through an end portal, allow it to form, as the event is erroneously fired twice in this scenario.
+                    if(values.size() < 1) return;
+
+                    Location originalLocation = (Location)(values.get(0).value());
+                    Location newLocation = block.getLocation();
+
+                    //if did not fall straight down
+                    if(originalLocation.getBlockX() != newLocation.getBlockX() || originalLocation.getBlockZ() != newLocation.getBlockZ())
+                    {
+                        //in creative mode worlds, never form the block
+                        if(GriefPrevention.instance.config_claims_worldModes.get(newLocation.getWorld()) == ClaimsMode.Creative)
+                        {
+                            event.setCancelled(true);
+                            return;
+                        }
+
+                        //in other worlds, if landing in land claim, only allow if source was also in the land claim
+                        Claim claim = this.dataStore.getClaimAt(newLocation, false, null);
+                        if(claim != null && !claim.contains(originalLocation, false, false))
+                        {
+                            //when not allowed, drop as item instead of forming a block
+                            event.setCancelled(true);
+                            @SuppressWarnings("deprecation")
+                            ItemStack itemStack = new ItemStack(entity.getMaterial(), 1);
+                            Item item = block.getWorld().dropItem(entity.getLocation(), itemStack);
+                            item.setVelocity(new Vector());
+                        }
+                    }
+                }
+            }
+        }
 	}
 
 	//Used by "sand cannon" fix to ignore fallingblocks that fell through End Portals
