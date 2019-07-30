@@ -563,6 +563,9 @@ public class EntityEventHandler implements Listener
     {
 	    //don't track in worlds where claims are not enabled
         if(!GriefPrevention.instance.claimsEnabledForWorld(event.getEntity().getWorld())) return;
+
+        //Ignore cases where itemframes should break due to no supporting blocks
+		if(event.getCause() == RemoveCause.PHYSICS) return;
 	    
 	    //FEATURE: claimed paintings are protected from breakage
 		
