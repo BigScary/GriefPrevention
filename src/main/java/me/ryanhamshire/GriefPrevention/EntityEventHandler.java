@@ -236,7 +236,6 @@ public class EntityEventHandler implements Listener
                     }
                 }
             }
-        }
 	}
 
 	//Used by "sand cannon" fix to ignore fallingblocks that fell through End Portals
