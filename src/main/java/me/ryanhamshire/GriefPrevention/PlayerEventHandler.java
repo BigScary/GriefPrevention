@@ -1883,7 +1883,13 @@ class PlayerEventHandler implements Listener
 					|| materialInHand == Material.FLINT_AND_STEEL)
 					|| dyes.contains(materialInHand))
 			{
-				String noBuildReason = instance.allowBuild(player, clickedBlock.getLocation(), clickedBlockType);
+				if (instance == null)
+					System.out.println("[GP] instance is null which means _somebody_ did something to this plugin.");
+				
+				String noBuildReason = instance
+						.allowBuild(player, clickedBlock
+								.getLocation(),
+								clickedBlockType);
 				if(noBuildReason != null)
 				{
 					instance.sendMessage(player, TextMode.Err, noBuildReason);
