@@ -1880,12 +1880,9 @@ class PlayerEventHandler implements Listener
 					|| materialInHand == Material.ARMOR_STAND
 					|| (spawn_eggs.contains(materialInHand) && GriefPrevention.instance.config_claims_preventGlobalMonsterEggs)
 					|| materialInHand == Material.END_CRYSTAL
-					|| materialInHand == Material.FLINT_AND_STEEL)
-					|| dyes.contains(materialInHand))
+					|| materialInHand == Material.FLINT_AND_STEEL
+					|| dyes.contains(materialInHand)))
 			{
-				if (instance == null)
-					System.out.println("[GP] instance is null which means _somebody_ did something to this plugin.");
-				
 				String noBuildReason = instance
 						.allowBuild(player, clickedBlock
 								.getLocation(),
