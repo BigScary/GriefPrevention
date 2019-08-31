@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -36,8 +37,11 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Hopper;
 import org.bukkit.block.Lectern;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.entity.minecart.HopperMinecart;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -55,6 +59,7 @@ import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.BlockSpreadEvent;
 import org.bukkit.event.block.SignChangeEvent;
+import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.inventory.InventoryPickupItemEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.inventory.InventoryHolder;
@@ -746,6 +751,8 @@ public class BlockEventHandler implements Listener
 			burnEvent.setCancelled(true);
 		}
 	}
+
+
 	
 	//ensures fluids don't flow into land claims from outside
 	private Claim lastSpreadClaim = null;
@@ -802,6 +809,46 @@ public class BlockEventHandler implements Listener
 	            }
 	        }
 	    }
+	}
+
+	//Stop projectiles from destroying blocks that don't fire a proper event
+	@EventHandler
+	private void chorusFlower(ProjectileHitEvent event)
+	{
+		//don't track in worlds where claims are not enabled
+		if(!GriefPrevention.instance.claimsEnabledForWorld(event.getEntity().getWorld())) return;
+
+		if (event.getHitBlock() == null || event.getHitBlock().getType() != Material.CHORUS_FLOWER)
+			return;
+
+		Block block = event.getHitBlock();
+
+		Claim claim = dataStore.getClaimAt(block.getLocation(), false, null);
+		if (claim == null)
+			return;
+
+		Player shooter = null;
+		Projectile projectile = event.getEntity();
+
+		if (projectile.getShooter() instanceof Player)
+			shooter = (Player)projectile.getShooter();
+
+		if (shooter == null)
+		{
+			event.getHitBlock().setType(Material.AIR);
+			Bukkit.getScheduler().runTask(GriefPrevention.instance, () -> event.getHitBlock().setType(Material.CHORUS_FLOWER));
+			return;
+		}
+
+		String allowContainer = claim.allowContainers(shooter);
+
+		if (allowContainer != null)
+		{
+			event.getHitBlock().setType(Material.AIR);
+			Bukkit.getScheduler().runTask(GriefPrevention.instance, () -> event.getHitBlock().setType(Material.CHORUS_FLOWER));
+			GriefPrevention.sendMessage(shooter, TextMode.Err, allowContainer);
+			return;
+		}
 	}
 	
 	//ensures dispensers can't be used to dispense a block(like water or lava) or item across a claim boundary
