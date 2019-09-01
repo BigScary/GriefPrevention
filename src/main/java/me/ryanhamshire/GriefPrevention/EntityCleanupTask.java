@@ -115,8 +115,7 @@ class EntityCleanupTask implements Runnable
 				
 				if(remove)
 				{
-					//TODO BEFORE RELEASE: remove
-					GriefPrevention.AddLogEntry("Removing entity " + entity.getType().name() + " @ " + entity.getLocation(), CustomLogEntryTypes.AdminActivity);
+					GriefPrevention.AddLogEntry("Removing entity " + entity.getType().name() + " @ " + entity.getLocation(), CustomLogEntryTypes.Debug);
 					entity.remove();
 				}
 			}
