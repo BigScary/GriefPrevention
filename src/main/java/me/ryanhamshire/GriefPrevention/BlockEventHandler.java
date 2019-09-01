@@ -812,7 +812,7 @@ public class BlockEventHandler implements Listener
 	}
 
 	//Stop projectiles from destroying blocks that don't fire a proper event
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	private void chorusFlower(ProjectileHitEvent event)
 	{
 		//don't track in worlds where claims are not enabled
