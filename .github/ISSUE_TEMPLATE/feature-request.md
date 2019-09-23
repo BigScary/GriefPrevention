@@ -7,8 +7,8 @@ assignees: ''
 
 ---
 
-**AS** a player/administrator/etc.
-**I WANT** a feature
-**BECAUSE** I want to be satisfied with my Minecrafting experience
+**As** a player
+**I want** to capture animals in a snowball
+**Because** I wanna be the very best, Like no one ever was.
 
 Here's how to increase your chances of your feature request being understood (and potentially considered for implementation): https://content.pivotal.io/blog/how-to-write-well-formed-user-stories
