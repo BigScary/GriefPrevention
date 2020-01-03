@@ -2,7 +2,7 @@
 name: Feature enhancement or request
 about: Improvements or ideas for GriefPrevention
 title: Name of feature goes here. No brackets, please.
-labels: Add-on suggestion
+labels: Add-on Suggestion
 assignees: ''
 
 ---

@@ -2,7 +2,7 @@
 name: Bug report
 about: Report bugs or scary stacktraces (the big scary red lines that say SomethingException)
 title: ''
-labels: ''
+labels: Unverified Bug
 assignees: ''
 
 ---
@@ -25,7 +25,6 @@ ___This can be found by running `/version` and `/version GriefPrevention` on you
 Paste of `/version`: 
 Paste of `/version GriefPrevention`:
 
-
 ### Stack trace/error or server log
 
 ```
@@ -41,5 +40,11 @@ Or, paste the server.log at gist.github.com and paste the link here:
 Paste the config.yml right here inside these backticks. Please do not use a paste service for this.
 
 ```
+
+### Resolutions attempted
+> Replace the `- [ ]` with a `- [x]` if the statement is true
+
+- [ ] Issue still occurs even if GriefPrevention is the only plugin running
+- [ ] Issue still occurs even after testing on a new server
 
 ### Plugin list (if applicable):
