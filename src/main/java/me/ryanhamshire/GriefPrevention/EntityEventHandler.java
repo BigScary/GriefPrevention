@@ -1306,7 +1306,7 @@ public class EntityEventHandler implements Listener
 	}
 	
 	//when a splash potion effects one or more entities...
-	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
     public void onPotionSplash (PotionSplashEvent event)
 	{
 	    ThrownPotion potion = event.getPotion();
