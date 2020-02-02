@@ -548,6 +548,8 @@ class PlayerEventHandler implements Listener
 	    aliases.add("minecraft:" + commandName);
 	    for(Plugin plugin : Bukkit.getServer().getPluginManager().getPlugins())
         {
+            if (!(plugin instanceof JavaPlugin))
+                continue;
             JavaPlugin javaPlugin = (JavaPlugin)plugin;
             Command command = javaPlugin.getCommand(commandName);
             if(command != null)
