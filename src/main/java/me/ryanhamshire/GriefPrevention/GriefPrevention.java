@@ -3171,9 +3171,6 @@ public class GriefPrevention extends JavaPlugin
 		//try online players first
 		Player targetPlayer = this.getServer().getPlayerExact(name);
 		if(targetPlayer != null) return targetPlayer;
-		
-		targetPlayer = this.getServer().getPlayer(name);
-        if(targetPlayer != null) return targetPlayer;
         
         UUID bestMatchID = null;
         
