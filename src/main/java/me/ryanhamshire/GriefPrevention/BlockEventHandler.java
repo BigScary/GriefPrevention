@@ -18,11 +18,6 @@
 
 package me.ryanhamshire.GriefPrevention;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -64,6 +59,11 @@ import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.MetadataValue;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.UUID;
 
 //event handlers related to blocks
 public class BlockEventHandler implements Listener 
@@ -840,7 +840,7 @@ public class BlockEventHandler implements Listener
 		if (shooter == null)
 		{
 			event.getHitBlock().setType(Material.AIR);
-			Bukkit.getScheduler().runTask(GriefPrevention.instance, () -> event.getHitBlock().setType(Material.CHORUS_FLOWER));
+			Bukkit.getScheduler().runTask(GriefPrevention.instance, () -> event.getHitBlock().setBlockData(block.getBlockData()));
 			return;
 		}
 
@@ -849,7 +849,7 @@ public class BlockEventHandler implements Listener
 		if (allowContainer != null)
 		{
 			event.getHitBlock().setType(Material.AIR);
-			Bukkit.getScheduler().runTask(GriefPrevention.instance, () -> event.getHitBlock().setType(Material.CHORUS_FLOWER));
+			Bukkit.getScheduler().runTask(GriefPrevention.instance, () -> event.getHitBlock().setBlockData(block.getBlockData()));
 			GriefPrevention.sendMessage(shooter, TextMode.Err, allowContainer);
 			return;
 		}
