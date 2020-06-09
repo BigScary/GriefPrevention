@@ -105,7 +105,8 @@ class CleanupUnusedClaimTask implements Runnable
                     }
                 }
             }
-        } else if (GriefPrevention.instance.config_claims_unusedClaimExpirationDays > 0 && GriefPrevention.instance.creativeRulesApply(claim.getLesserBoundaryCorner()))
+        }
+        else if (GriefPrevention.instance.config_claims_unusedClaimExpirationDays > 0 && GriefPrevention.instance.creativeRulesApply(claim.getLesserBoundaryCorner()))
         {
             //avoid scanning large claims and administrative claims
             if (claim.isAdminClaim() || claim.getWidth() > 25 || claim.getHeight() > 25) return;

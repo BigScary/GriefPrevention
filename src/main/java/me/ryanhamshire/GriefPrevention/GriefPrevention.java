@@ -475,7 +475,8 @@ public class GriefPrevention extends JavaPlugin
                     this.config_claims_worldModes.put(world, claimsMode);
                     if (claimsMode == ClaimsMode.Creative) this.config_creativeWorldsExist = true;
                     continue;
-                } else
+                }
+                else
                 {
                     GriefPrevention.AddLogEntry("Error: Invalid claim mode \"" + configSetting + "\".  Options are Survival, Creative, and Disabled.");
                     this.config_claims_worldModes.put(world, ClaimsMode.Creative);
@@ -488,7 +489,8 @@ public class GriefPrevention extends JavaPlugin
             {
                 this.config_claims_worldModes.put(world, ClaimsMode.Creative);
                 this.config_creativeWorldsExist = true;
-            } else if (deprecated_claimsEnabledWorldNames.contains(world.getName()))
+            }
+            else if (deprecated_claimsEnabledWorldNames.contains(world.getName()))
             {
                 this.config_claims_worldModes.put(world, ClaimsMode.Survival);
             }
@@ -497,7 +499,8 @@ public class GriefPrevention extends JavaPlugin
             else if (world.getName().toLowerCase().contains("survival"))
             {
                 this.config_claims_worldModes.put(world, ClaimsMode.Survival);
-            } else if (world.getName().toLowerCase().contains("creative"))
+            }
+            else if (world.getName().toLowerCase().contains("creative"))
             {
                 this.config_claims_worldModes.put(world, ClaimsMode.Creative);
                 this.config_creativeWorldsExist = true;
@@ -508,10 +511,12 @@ public class GriefPrevention extends JavaPlugin
             {
                 this.config_claims_worldModes.put(world, ClaimsMode.Creative);
                 this.config_creativeWorldsExist = true;
-            } else if (world.getEnvironment() == Environment.NORMAL)
+            }
+            else if (world.getEnvironment() == Environment.NORMAL)
             {
                 this.config_claims_worldModes.put(world, ClaimsMode.Survival);
-            } else
+            }
+            else
             {
                 this.config_claims_worldModes.put(world, ClaimsMode.Disabled);
             }
@@ -688,7 +693,8 @@ public class GriefPrevention extends JavaPlugin
             if (world == null)
             {
                 AddLogEntry("Error: Siege Configuration: There's no world named \"" + worldName + "\".  Please update your config.yml.");
-            } else
+            }
+            else
             {
                 this.config_siege_enabledWorlds.add(world);
             }
@@ -755,7 +761,8 @@ public class GriefPrevention extends JavaPlugin
             if (material == null)
             {
                 GriefPrevention.AddLogEntry("Siege Configuration: Material not found: " + blockName + ".");
-            } else
+            }
+            else
             {
                 this.config_siege_blocks.add(material);
             }
@@ -975,16 +982,20 @@ public class GriefPrevention extends JavaPlugin
         if (configSetting.equalsIgnoreCase("Survival"))
         {
             return ClaimsMode.Survival;
-        } else if (configSetting.equalsIgnoreCase("Creative"))
+        }
+        else if (configSetting.equalsIgnoreCase("Creative"))
         {
             return ClaimsMode.Creative;
-        } else if (configSetting.equalsIgnoreCase("Disabled"))
+        }
+        else if (configSetting.equalsIgnoreCase("Disabled"))
         {
             return ClaimsMode.Disabled;
-        } else if (configSetting.equalsIgnoreCase("SurvivalRequiringClaims"))
+        }
+        else if (configSetting.equalsIgnoreCase("SurvivalRequiringClaims"))
         {
             return ClaimsMode.SurvivalRequiringClaims;
-        } else
+        }
+        else
         {
             return null;
         }
@@ -1061,7 +1072,8 @@ public class GriefPrevention extends JavaPlugin
                 {
                     GriefPrevention.sendMessage(player, TextMode.Err, Messages.MinimumRadius, String.valueOf(radius));
                     return true;
-                } else
+                }
+                else
                 {
                     radius = specifiedRadius;
                 }
@@ -1096,11 +1108,13 @@ public class GriefPrevention extends JavaPlugin
 
                     Visualization visualization = Visualization.FromClaim(result.claim, player.getEyeLocation().getBlockY(), VisualizationType.ErrorClaim, player.getLocation());
                     Visualization.Apply(player, visualization);
-                } else
+                }
+                else
                 {
                     GriefPrevention.sendMessage(player, TextMode.Err, Messages.CreateClaimFailOverlapRegion);
                 }
-            } else
+            }
+            else
             {
                 GriefPrevention.sendMessage(player, TextMode.Success, Messages.CreateClaimSuccess);
 
@@ -1108,7 +1122,8 @@ public class GriefPrevention extends JavaPlugin
                 if (GriefPrevention.instance.creativeRulesApply(player.getLocation()))
                 {
                     GriefPrevention.sendMessage(player, TextMode.Instr, Messages.CreativeBasicsVideo2, DataStore.CREATIVE_VIDEO_URL);
-                } else if (GriefPrevention.instance.claimsEnabledForWorld(player.getLocation().getWorld()))
+                }
+                else if (GriefPrevention.instance.claimsEnabledForWorld(player.getLocation().getWorld()))
                 {
                     GriefPrevention.sendMessage(player, TextMode.Instr, Messages.SurvivalBasicsVideo2, DataStore.SURVIVAL_VIDEO_URL);
                 }
@@ -1132,7 +1147,8 @@ public class GriefPrevention extends JavaPlugin
                 if (GriefPrevention.instance.creativeRulesApply(player.getLocation()))
                 {
                     GriefPrevention.sendMessage(player, TextMode.Instr, Messages.CreativeBasicsVideo2, DataStore.CREATIVE_VIDEO_URL);
-                } else if (GriefPrevention.instance.claimsEnabledForWorld(player.getLocation().getWorld()))
+                }
+                else if (GriefPrevention.instance.claimsEnabledForWorld(player.getLocation().getWorld()))
                 {
                     GriefPrevention.sendMessage(player, TextMode.Instr, Messages.SurvivalBasicsVideo2, DataStore.SURVIVAL_VIDEO_URL);
                 }
@@ -1150,7 +1166,8 @@ public class GriefPrevention extends JavaPlugin
                 if (GriefPrevention.instance.creativeRulesApply(player.getLocation()))
                 {
                     GriefPrevention.sendMessage(player, TextMode.Instr, Messages.CreativeBasicsVideo2, DataStore.CREATIVE_VIDEO_URL);
-                } else if (GriefPrevention.instance.claimsEnabledForWorld(player.getLocation().getWorld()))
+                }
+                else if (GriefPrevention.instance.claimsEnabledForWorld(player.getLocation().getWorld()))
                 {
                     GriefPrevention.sendMessage(player, TextMode.Instr, Messages.SurvivalBasicsVideo2, DataStore.SURVIVAL_VIDEO_URL);
                 }
@@ -1210,7 +1227,8 @@ public class GriefPrevention extends JavaPlugin
                 if (direction.getZ() > 0)
                 {
                     newz2 += amount;  //north
-                } else
+                }
+                else
                 {
                     newz1 -= amount;  //south
                 }
@@ -1222,7 +1240,8 @@ public class GriefPrevention extends JavaPlugin
                 if (direction.getX() > 0)
                 {
                     newx2 += amount;  //east
-                } else
+                }
+                else
                 {
                     newx1 -= amount;  //west
                 }
@@ -1234,7 +1253,8 @@ public class GriefPrevention extends JavaPlugin
                 if (direction.getX() > 0)
                 {
                     newx2 += amount;
-                } else
+                }
+                else
                 {
                     newx1 -= amount;
                 }
@@ -1242,7 +1262,8 @@ public class GriefPrevention extends JavaPlugin
                 if (direction.getZ() > 0)
                 {
                     newz2 += amount;
-                } else
+                }
+                else
                 {
                     newz1 -= amount;
                 }
@@ -1279,7 +1300,8 @@ public class GriefPrevention extends JavaPlugin
             if (!playerData.ignoreClaims)
             {
                 GriefPrevention.sendMessage(player, TextMode.Success, Messages.RespectingClaims);
-            } else
+            }
+            else
             {
                 GriefPrevention.sendMessage(player, TextMode.Success, Messages.IgnoringClaims);
             }
@@ -1541,12 +1563,14 @@ public class GriefPrevention extends JavaPlugin
                 if (claim == null || claim.allowEdit(player) == null)
                 {
                     clearPermissions = true;
-                } else
+                }
+                else
                 {
                     GriefPrevention.sendMessage(player, TextMode.Err, Messages.ClearPermsOwnerOnly);
                     return true;
                 }
-            } else
+            }
+            else
             {
                 //validate player argument or group argument
                 if (!args[0].startsWith("[") || !args[0].endsWith("]"))
@@ -1616,7 +1640,8 @@ public class GriefPrevention extends JavaPlugin
                 if (!clearPermissions)
                 {
                     GriefPrevention.sendMessage(player, TextMode.Success, Messages.UntrustIndividualAllClaims, args[0]);
-                } else
+                }
+                else
                 {
                     GriefPrevention.sendMessage(player, TextMode.Success, Messages.UntrustEveryoneAllClaims);
                 }
@@ -1627,7 +1652,8 @@ public class GriefPrevention extends JavaPlugin
             {
                 GriefPrevention.sendMessage(player, TextMode.Err, Messages.NoPermissionTrust, claim.getOwnerName());
                 return true;
-            } else
+            }
+            else
             {
                 //if clearing all
                 if (clearPermissions)
@@ -1665,7 +1691,8 @@ public class GriefPrevention extends JavaPlugin
                     {
                         GriefPrevention.sendMessage(player, TextMode.Err, Messages.ManagersDontUntrustManagers, claim.getOwnerName());
                         return true;
-                    } else
+                    }
+                    else
                     {
                         //calling the event
                         TrustChangedEvent event = new TrustChangedEvent(player, claim, null, false, idToDrop);
@@ -1753,7 +1780,8 @@ public class GriefPrevention extends JavaPlugin
             {
                 claim.setSubclaimRestrictions(false);
                 GriefPrevention.sendMessage(player, TextMode.Success, Messages.SubclaimUnrestricted);
-            } else
+            }
+            else
             {
                 claim.setSubclaimRestrictions(true);
                 GriefPrevention.sendMessage(player, TextMode.Success, Messages.SubclaimRestricted);
@@ -1790,7 +1818,8 @@ public class GriefPrevention extends JavaPlugin
             {
                 GriefPrevention.sendMessage(player, TextMode.Info, Messages.BlockPurchaseCost, String.valueOf(GriefPrevention.instance.config_economy_claimBlocksPurchaseCost), String.valueOf(GriefPrevention.economy.getBalance(player.getName())));
                 return false;
-            } else
+            }
+            else
             {
                 PlayerData playerData = this.dataStore.getPlayerData(player.getUniqueId());
 
@@ -1962,7 +1991,8 @@ public class GriefPrevention extends JavaPlugin
             if (claim == null)
             {
                 GriefPrevention.sendMessage(player, TextMode.Err, Messages.DeleteClaimMissing);
-            } else
+            }
+            else
             {
                 //deleting an admin claim additionally requires the adminclaims permission
                 if (!claim.isAdminClaim() || player.hasPermission("griefprevention.adminclaims"))
@@ -1972,7 +2002,8 @@ public class GriefPrevention extends JavaPlugin
                     {
                         GriefPrevention.sendMessage(player, TextMode.Warn, Messages.DeletionSubdivisionWarning);
                         playerData.warnedAboutMajorDeletion = true;
-                    } else
+                    }
+                    else
                     {
                         claim.removeSurfaceFluids(null);
                         this.dataStore.deleteClaim(claim, true, true);
@@ -1991,14 +2022,16 @@ public class GriefPrevention extends JavaPlugin
 
                         playerData.warnedAboutMajorDeletion = false;
                     }
-                } else
+                }
+                else
                 {
                     GriefPrevention.sendMessage(player, TextMode.Err, Messages.CantDeleteAdminClaim);
                 }
             }
 
             return true;
-        } else if (cmd.getName().equalsIgnoreCase("claimexplosions") && player != null)
+        }
+        else if (cmd.getName().equalsIgnoreCase("claimexplosions") && player != null)
         {
             //determine which claim the player is standing in
             Claim claim = this.dataStore.getClaimAt(player.getLocation(), true /*ignore height*/, null);
@@ -2006,7 +2039,8 @@ public class GriefPrevention extends JavaPlugin
             if (claim == null)
             {
                 GriefPrevention.sendMessage(player, TextMode.Err, Messages.DeleteClaimMissing);
-            } else
+            }
+            else
             {
                 String noBuildReason = claim.allowBuild(player, Material.STONE);
                 if (noBuildReason != null)
@@ -2019,7 +2053,8 @@ public class GriefPrevention extends JavaPlugin
                 {
                     claim.areExplosivesAllowed = false;
                     GriefPrevention.sendMessage(player, TextMode.Success, Messages.ExplosivesDisabled);
-                } else
+                }
+                else
                 {
                     claim.areExplosivesAllowed = true;
                     GriefPrevention.sendMessage(player, TextMode.Success, Messages.ExplosivesEnabled);
@@ -2056,7 +2091,8 @@ public class GriefPrevention extends JavaPlugin
             }
 
             return true;
-        } else if (cmd.getName().equalsIgnoreCase("deleteclaimsinworld"))
+        }
+        else if (cmd.getName().equalsIgnoreCase("deleteclaimsinworld"))
         {
             //must be executed at the console
             if (player != null)
@@ -2080,7 +2116,8 @@ public class GriefPrevention extends JavaPlugin
             this.dataStore.deleteClaimsInWorld(world, true);
             GriefPrevention.AddLogEntry("Deleted all claims in world: " + world.getName() + ".", CustomLogEntryTypes.AdminActivity);
             return true;
-        } else if (cmd.getName().equalsIgnoreCase("deleteuserclaimsinworld"))
+        }
+        else if (cmd.getName().equalsIgnoreCase("deleteuserclaimsinworld"))
         {
             //must be executed at the console
             if (player != null)
@@ -2118,7 +2155,8 @@ public class GriefPrevention extends JavaPlugin
             {
                 GriefPrevention.sendMessage(player, TextMode.Err, Messages.PlayerNotFound2);
                 return true;
-            } else
+            }
+            else
             {
                 WelcomeTask task = new WelcomeTask(otherPlayer);
                 task.run();
@@ -2229,7 +2267,8 @@ public class GriefPrevention extends JavaPlugin
 
                 playerData = this.dataStore.getPlayerData(otherPlayer.getUniqueId());
                 GriefPrevention.sendMessage(player, TextMode.Success, Messages.DropUnlockOthersConfirmation, otherPlayer.getName());
-            } else
+            }
+            else
             {
                 playerData = this.dataStore.getPlayerData(player.getUniqueId());
                 GriefPrevention.sendMessage(player, TextMode.Success, Messages.DropUnlockConfirmation);
@@ -2498,7 +2537,8 @@ public class GriefPrevention extends JavaPlugin
                 {
                     return false;
                 }
-            } else
+            }
+            else
             {
                 return false;
             }
@@ -2578,7 +2618,8 @@ public class GriefPrevention extends JavaPlugin
             GriefPrevention.sendMessage(player, TextMode.Success, Messages.SiegeConfirmed, defender.getName());
 
             return true;
-        } else if (cmd.getName().equalsIgnoreCase("softmute"))
+        }
+        else if (cmd.getName().equalsIgnoreCase("softmute"))
         {
             //requires one parameter
             if (args.length != 1) return false;
@@ -2603,19 +2644,22 @@ public class GriefPrevention extends JavaPlugin
                 }
 
                 GriefPrevention.AddLogEntry(executorName + " muted " + targetPlayer.getName() + ".", CustomLogEntryTypes.AdminActivity, true);
-            } else
+            }
+            else
             {
                 GriefPrevention.sendMessage(player, TextMode.Success, Messages.UnSoftMuted, targetPlayer.getName());
             }
 
             return true;
-        } else if (cmd.getName().equalsIgnoreCase("gpreload"))
+        }
+        else if (cmd.getName().equalsIgnoreCase("gpreload"))
         {
             this.loadConfig();
             if (player != null)
             {
                 GriefPrevention.sendMessage(player, TextMode.Success, "Configuration updated.  If you have updated your Grief Prevention JAR, you still need to /reload or reboot your server.");
-            } else
+            }
+            else
             {
                 GriefPrevention.AddLogEntry("Configuration updated.  If you have updated your Grief Prevention JAR, you still need to /reload or reboot your server.");
             }
@@ -2740,7 +2784,8 @@ public class GriefPrevention extends JavaPlugin
             if (list.isEmpty())
             {
                 GriefPrevention.sendMessage(player, TextMode.Info, Messages.NotIgnoringAnyone);
-            } else
+            }
+            else
             {
                 GriefPrevention.sendMessage(player, TextMode.Info, list);
             }
@@ -2813,7 +2858,8 @@ public class GriefPrevention extends JavaPlugin
         if (mode == IgnoreMode.None)
         {
             playerData.ignoredPlayers.remove(ignoree.getUniqueId());
-        } else
+        }
+        else
         {
             playerData.ignoredPlayers.put(ignoree.getUniqueId(), mode == IgnoreMode.StandardIgnore ? false : true);
         }
@@ -2834,7 +2880,8 @@ public class GriefPrevention extends JavaPlugin
         if (entry.startsWith("[") || entry.equals("public"))
         {
             return entry;
-        } else
+        }
+        else
         {
             return GriefPrevention.lookupPlayerName(entry);
         }
@@ -2867,7 +2914,8 @@ public class GriefPrevention extends JavaPlugin
         {
             GriefPrevention.sendMessage(player, TextMode.Instr, Messages.DeleteTopLevelClaim);
             return true;
-        } else
+        }
+        else
         {
             //delete it
             claim.removeSurfaceFluids(null);
@@ -2919,10 +2967,12 @@ public class GriefPrevention extends JavaPlugin
                 GriefPrevention.sendMessage(player, TextMode.Err, Messages.InvalidPermissionID);
                 return;
             }
-        } else if (recipientName.contains("."))
+        }
+        else if (recipientName.contains("."))
         {
             permission = recipientName;
-        } else
+        }
+        else
         {
             otherPlayer = this.resolvePlayerByName(recipientName);
             if (otherPlayer == null && !recipientName.equals("public") && !recipientName.equals("all"))
@@ -2935,7 +2985,8 @@ public class GriefPrevention extends JavaPlugin
             {
                 recipientName = otherPlayer.getName();
                 recipientID = otherPlayer.getUniqueId();
-            } else
+            }
+            else
             {
                 recipientName = "public";
             }
@@ -2950,7 +3001,8 @@ public class GriefPrevention extends JavaPlugin
             {
                 targetClaims.add(playerData.getClaims().get(i));
             }
-        } else
+        }
+        else
         {
             //check permission here
             if (claim.allowGrantPermission(player) != null)
@@ -3009,7 +3061,8 @@ public class GriefPrevention extends JavaPlugin
         if (permission != null)
         {
             identifierToAdd = "[" + permission + "]";
-        } else if (recipientID != null)
+        }
+        else if (recipientID != null)
         {
             identifierToAdd = recipientID.toString();
         }
@@ -3034,7 +3087,8 @@ public class GriefPrevention extends JavaPlugin
                 {
                     currentClaim.managers.add(identifierToAdd);
                 }
-            } else
+            }
+            else
             {
                 currentClaim.setPermission(identifierToAdd, permissionLevel);
             }
@@ -3047,13 +3101,16 @@ public class GriefPrevention extends JavaPlugin
         if (permissionLevel == null)
         {
             permissionDescription = this.dataStore.getMessage(Messages.PermissionsPermission);
-        } else if (permissionLevel == ClaimPermission.Build)
+        }
+        else if (permissionLevel == ClaimPermission.Build)
         {
             permissionDescription = this.dataStore.getMessage(Messages.BuildPermission);
-        } else if (permissionLevel == ClaimPermission.Access)
+        }
+        else if (permissionLevel == ClaimPermission.Access)
         {
             permissionDescription = this.dataStore.getMessage(Messages.AccessPermission);
-        } else //ClaimPermission.Inventory
+        }
+        else //ClaimPermission.Inventory
         {
             permissionDescription = this.dataStore.getMessage(Messages.ContainersPermission);
         }
@@ -3062,7 +3119,8 @@ public class GriefPrevention extends JavaPlugin
         if (claim == null)
         {
             location = this.dataStore.getMessage(Messages.LocationAllClaims);
-        } else
+        }
+        else
         {
             location = this.dataStore.getMessage(Messages.LocationCurrentClaim);
         }
@@ -3152,7 +3210,8 @@ public class GriefPrevention extends JavaPlugin
         if (player.hasPlayedBefore() || player.isOnline())
         {
             return player.getName();
-        } else
+        }
+        else
         {
             return "someone(" + playerID.toString() + ")";
         }
@@ -3320,7 +3379,8 @@ public class GriefPrevention extends JavaPlugin
         if (player == null)
         {
             GriefPrevention.AddLogEntry(color + message);
-        } else
+        }
+        else
         {
             player.sendMessage(color + message);
         }
@@ -3334,7 +3394,8 @@ public class GriefPrevention extends JavaPlugin
         if (delayInTicks > 0)
         {
             GriefPrevention.instance.getServer().getScheduler().runTaskLater(GriefPrevention.instance, task, delayInTicks);
-        } else
+        }
+        else
         {
             task.run();
         }
@@ -3384,7 +3445,8 @@ public class GriefPrevention extends JavaPlugin
                         reason += "  " + this.dataStore.getMessage(Messages.IgnoreClaimsAdvertisement);
                     reason += "  " + this.dataStore.getMessage(Messages.CreativeBasicsVideo2, DataStore.CREATIVE_VIDEO_URL);
                     return reason;
-                } else
+                }
+                else
                 {
                     return null;
                 }
@@ -3439,7 +3501,8 @@ public class GriefPrevention extends JavaPlugin
             {
                 return null;
             }
-        } else
+        }
+        else
         {
             //cache the claim for later reference
             playerData.lastClaim = claim;
@@ -3545,7 +3608,8 @@ public class GriefPrevention extends JavaPlugin
         if (overrideValue == null || overrideValue == -1)
         {
             return world.getSeaLevel();
-        } else
+        }
+        else
         {
             return overrideValue;
         }
@@ -3633,7 +3697,8 @@ public class GriefPrevention extends JavaPlugin
             Bukkit.getServer().dispatchCommand(
                     Bukkit.getConsoleSender(),
                     GriefPrevention.instance.config_ban_commandFormat.replace("%name%", player.getName()).replace("%reason%", reason));
-        } else
+        }
+        else
         {
             BanList bans = Bukkit.getServer().getBanList(Type.NAME);
             bans.addBan(player.getName(), reason, null, source);

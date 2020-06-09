@@ -195,7 +195,8 @@ public class BlockEventHandler implements Listener
         if (GriefPrevention.instance.pvpRulesApply(world))
         {
             return GriefPrevention.instance.config_pvp_allowFireNearPlayers;
-        } else
+        }
+        else
         {
             return GriefPrevention.instance.config_pvp_allowFireNearPlayers_NonPvp;
         }

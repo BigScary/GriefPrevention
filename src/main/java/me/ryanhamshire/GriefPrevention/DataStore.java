@@ -117,7 +117,8 @@ public abstract class DataStore
         if (this.currentSchemaVersion >= 0)
         {
             return this.currentSchemaVersion;
-        } else
+        }
+        else
         {
             this.currentSchemaVersion = this.getSchemaVersionFromStorage();
             return this.currentSchemaVersion;
@@ -776,7 +777,8 @@ public abstract class DataStore
         if (chunkClaims != null)
         {
             return Collections.unmodifiableCollection(chunkClaims);
-        } else
+        }
+        else
         {
             return Collections.unmodifiableCollection(new ArrayList<Claim>());
         }
@@ -827,7 +829,8 @@ public abstract class DataStore
         {
             smallx = x1;
             bigx = x2;
-        } else
+        }
+        else
         {
             smallx = x2;
             bigx = x1;
@@ -837,7 +840,8 @@ public abstract class DataStore
         {
             smally = y1;
             bigy = y2;
-        } else
+        }
+        else
         {
             smally = y2;
             bigy = y1;
@@ -847,7 +851,8 @@ public abstract class DataStore
         {
             smallz = z1;
             bigz = z2;
-        } else
+        }
+        else
         {
             smallz = z2;
             bigz = z1;
@@ -889,7 +894,8 @@ public abstract class DataStore
         if (newClaim.parent != null)
         {
             claimsToCheck = newClaim.parent.children;
-        } else
+        }
+        else
         {
             claimsToCheck = this.claims;
         }
@@ -1058,16 +1064,19 @@ public abstract class DataStore
             if (siegeData.attacker.getName().equals(loserName))
             {
                 winnerName = siegeData.defender.getName();
-            } else
+            }
+            else
             {
                 winnerName = siegeData.attacker.getName();
             }
-        } else if (winnerName != null && loserName == null)
+        }
+        else if (winnerName != null && loserName == null)
         {
             if (siegeData.attacker.getName().equals(winnerName))
             {
                 loserName = siegeData.defender.getName();
-            } else
+            }
+            else
             {
                 loserName = siegeData.attacker.getName();
             }
@@ -1370,7 +1379,8 @@ public abstract class DataStore
                 if (ownerID == player.getUniqueId())
                 {
                     claimBlocksRemaining = playerData.getRemainingClaimBlocks();
-                } else
+                }
+                else
                 {
                     PlayerData ownerData = this.getPlayerData(ownerID);
                     claimBlocksRemaining = ownerData.getRemainingClaimBlocks();
@@ -1411,7 +1421,8 @@ public abstract class DataStore
             //clean up
             playerData.claimResizing = null;
             playerData.lastShovelLocation = null;
-        } else
+        }
+        else
         {
             if (result.claim != null)
             {
@@ -1421,7 +1432,8 @@ public abstract class DataStore
                 //show the player the conflicting claim
                 Visualization visualization = Visualization.FromClaim(result.claim, player.getEyeLocation().getBlockY(), VisualizationType.ErrorClaim, player.getLocation());
                 Visualization.Apply(player, visualization);
-            } else
+            }
+            else
             {
                 GriefPrevention.sendMessage(player, TextMode.Err, Messages.ResizeFailOverlapRegion);
             }
@@ -1434,10 +1446,12 @@ public abstract class DataStore
         if (player.hasPermission("griefprevention.adminclaims") && player.hasPermission("griefprevention.adjustclaimblocks"))
         {
             GriefPrevention.sendMessage(player, TextMode.Info, Messages.AdvertiseACandACB);
-        } else if (player.hasPermission("griefprevention.adminclaims"))
+        }
+        else if (player.hasPermission("griefprevention.adminclaims"))
         {
             GriefPrevention.sendMessage(player, TextMode.Info, Messages.AdvertiseAdminClaims);
-        } else if (player.hasPermission("griefprevention.adjustclaimblocks"))
+        }
+        else if (player.hasPermission("griefprevention.adjustclaimblocks"))
         {
             GriefPrevention.sendMessage(player, TextMode.Info, Messages.AdvertiseACB);
         }

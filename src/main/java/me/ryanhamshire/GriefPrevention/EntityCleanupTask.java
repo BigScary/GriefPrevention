@@ -73,7 +73,8 @@ class EntityCleanupTask implements Runnable
                 {
                     Boat boat = (Boat) entity;
                     if (boat.isEmpty()) remove = true;
-                } else if (entity instanceof Vehicle)
+                }
+                else if (entity instanceof Vehicle)
                 {
                     Vehicle vehicle = (Vehicle) entity;
 
@@ -104,7 +105,8 @@ class EntityCleanupTask implements Runnable
                     if (claim != null)
                     {
                         cachedClaim = claim;
-                    } else
+                    }
+                    else
                     {
                         remove = true;
                     }

@@ -167,7 +167,8 @@ class PlayerEventHandler implements Listener
                 if (this.dataStore.isSoftMuted(recipient.getUniqueId()))
                 {
                     recipientsToKeep.add(recipient);
-                } else if (recipient.hasPermission("griefprevention.eavesdrop"))
+                }
+                else if (recipient.hasPermission("griefprevention.eavesdrop"))
                 {
                     recipient.sendMessage(ChatColor.GRAY + notificationMessage);
                 }
@@ -235,7 +236,8 @@ class PlayerEventHandler implements Listener
                         if (playerData.ignoredPlayers.containsKey(recipient.getUniqueId()))
                         {
                             recipientsToRemove.add(recipient);
-                        } else
+                        }
+                        else
                         {
                             PlayerData targetPlayerData = this.dataStore.getPlayerData(recipient.getUniqueId());
                             if (targetPlayerData.ignoredPlayers.containsKey(player.getUniqueId()))
@@ -266,7 +268,8 @@ class PlayerEventHandler implements Listener
             if (instance.creativeRulesApply(player.getLocation()))
             {
                 instance.sendMessage(player, TextMode.Info, Messages.CreativeBasicsVideo2, 10L, DataStore.CREATIVE_VIDEO_URL);
-            } else
+            }
+            else
             {
                 instance.sendMessage(player, TextMode.Info, Messages.SurvivalBasicsVideo2, 10L, DataStore.SURVIVAL_VIDEO_URL);
             }
@@ -323,7 +326,8 @@ class PlayerEventHandler implements Listener
             {
                 instance.sendMessage(player, TextMode.Err, Messages.NoChatUntilMove, 10L);
                 result.muteReason = "pre-movement chat";
-            } else
+            }
+            else
             {
                 playerData.noChatLocation = null;
             }
@@ -350,7 +354,8 @@ class PlayerEventHandler implements Listener
                 //kick and ban
                 PlayerKickBanTask task = new PlayerKickBanTask(player, instance.config_spam_banMessage, "GriefPrevention Anti-Spam", true);
                 instance.getServer().getScheduler().scheduleSyncDelayedTask(instance, task, 1L);
-            } else
+            }
+            else
             {
                 //log entry
                 instance.AddLogEntry("Kicking " + player.getName() + " for spam.", CustomLogEntryTypes.AdminActivity);
@@ -359,7 +364,8 @@ class PlayerEventHandler implements Listener
                 PlayerKickBanTask task = new PlayerKickBanTask(player, "", "GriefPrevention Anti-Spam", false);
                 instance.getServer().getScheduler().scheduleSyncDelayedTask(instance, task, 1L);
             }
-        } else if (result.shouldWarnChatter)
+        }
+        else if (result.shouldWarnChatter)
         {
             //warn and log
             instance.sendMessage(player, TextMode.Warn, instance.config_spam_warningMessage, 10L);
@@ -581,7 +587,8 @@ class PlayerEventHandler implements Listener
             if (instance.config_eavesdrop_whisperCommands.contains("/" + alias))
             {
                 category = CommandCategory.Whisper;
-            } else if (instance.config_spam_monitorSlashCommands.contains("/" + alias))
+            }
+            else if (instance.config_spam_monitorSlashCommands.contains("/" + alias))
             {
                 category = CommandCategory.Chat;
             }
@@ -919,7 +926,8 @@ class PlayerEventHandler implements Listener
         if (playerData.wasKicked)
         {
             isBanned = player.isBanned();
-        } else
+        }
+        else
         {
             isBanned = false;
         }
@@ -999,7 +1007,8 @@ class PlayerEventHandler implements Listener
             if (now - notificationTimestamp > ONE_MINUTE)
             {
                 this.recentLoginLogoutNotifications.remove(i--);
-            } else
+            }
+            else
             {
                 break;
             }
@@ -1184,7 +1193,8 @@ class PlayerEventHandler implements Listener
                         return;
                     }
                 }
-            } else  //world repair code for a now-fixed GP bug //TODO: necessary anymore?
+            }
+            else  //world repair code for a now-fixed GP bug //TODO: necessary anymore?
             {
                 //ensure this entity can be tamed by players
                 tameable.setOwner(null);
@@ -1513,7 +1523,8 @@ class PlayerEventHandler implements Listener
         if (GriefPrevention.instance.pvpRulesApply(world))
         {
             return GriefPrevention.instance.config_pvp_allowLavaNearPlayers;
-        } else
+        }
+        else
         {
             return GriefPrevention.instance.config_pvp_allowLavaNearPlayers_NonPvp;
         }
@@ -1564,7 +1575,8 @@ class PlayerEventHandler implements Listener
         if (clickedBlock != null)
         {
             clickedBlockType = clickedBlock.getType();
-        } else
+        }
+        else
         {
             clickedBlockType = Material.AIR;
         }
@@ -1904,7 +1916,8 @@ class PlayerEventHandler implements Listener
                 }
 
                 return;
-            } else if (clickedBlock != null && (
+            }
+            else if (clickedBlock != null && (
                     materialInHand == Material.OAK_BOAT ||
                             materialInHand == Material.SPRUCE_BOAT ||
                             materialInHand == Material.BIRCH_BOAT ||
@@ -2182,10 +2195,12 @@ class PlayerEventHandler implements Listener
                 if (environment == Environment.NETHER)
                 {
                     allowedFillBlocks.add(Material.NETHERRACK);
-                } else if (environment == Environment.THE_END)
+                }
+                else if (environment == Environment.THE_END)
                 {
                     allowedFillBlocks.add(Material.END_STONE);
-                } else
+                }
+                else
                 {
                     allowedFillBlocks.add(Material.GRASS);
                     allowedFillBlocks.add(Material.DIRT);
@@ -2271,13 +2286,16 @@ class PlayerEventHandler implements Listener
                                     if (allowedFillBlocks.contains(eastBlock.getType()))
                                     {
                                         block.setType(eastBlock.getType());
-                                    } else if (allowedFillBlocks.contains(westBlock.getType()))
+                                    }
+                                    else if (allowedFillBlocks.contains(westBlock.getType()))
                                     {
                                         block.setType(westBlock.getType());
-                                    } else if (allowedFillBlocks.contains(northBlock.getType()))
+                                    }
+                                    else if (allowedFillBlocks.contains(northBlock.getType()))
                                     {
                                         block.setType(northBlock.getType());
-                                    } else if (allowedFillBlocks.contains(southBlock.getType()))
+                                    }
+                                    else if (allowedFillBlocks.contains(southBlock.getType()))
                                     {
                                         block.setType(southBlock.getType());
                                     }
@@ -2313,7 +2331,8 @@ class PlayerEventHandler implements Listener
                 if (playerData.lastShovelLocation.getBlockX() == playerData.claimResizing.getLesserBoundaryCorner().getBlockX())
                 {
                     newx1 = clickedBlock.getX();
-                } else
+                }
+                else
                 {
                     newx1 = playerData.claimResizing.getLesserBoundaryCorner().getBlockX();
                 }
@@ -2321,7 +2340,8 @@ class PlayerEventHandler implements Listener
                 if (playerData.lastShovelLocation.getBlockX() == playerData.claimResizing.getGreaterBoundaryCorner().getBlockX())
                 {
                     newx2 = clickedBlock.getX();
-                } else
+                }
+                else
                 {
                     newx2 = playerData.claimResizing.getGreaterBoundaryCorner().getBlockX();
                 }
@@ -2329,7 +2349,8 @@ class PlayerEventHandler implements Listener
                 if (playerData.lastShovelLocation.getBlockZ() == playerData.claimResizing.getLesserBoundaryCorner().getBlockZ())
                 {
                     newz1 = clickedBlock.getZ();
-                } else
+                }
+                else
                 {
                     newz1 = playerData.claimResizing.getLesserBoundaryCorner().getBlockZ();
                 }
@@ -2337,7 +2358,8 @@ class PlayerEventHandler implements Listener
                 if (playerData.lastShovelLocation.getBlockZ() == playerData.claimResizing.getGreaterBoundaryCorner().getBlockZ())
                 {
                     newz2 = clickedBlock.getZ();
-                } else
+                }
+                else
                 {
                     newz2 = playerData.claimResizing.getGreaterBoundaryCorner().getBlockZ();
                 }
@@ -2563,7 +2585,8 @@ class PlayerEventHandler implements Listener
                         instance.dataStore.tryAdvertiseAdminAlternatives(player);
                         return;
                     }
-                } else
+                }
+                else
                 {
                     playerID = null;
                 }
@@ -2591,7 +2614,8 @@ class PlayerEventHandler implements Listener
                         Bukkit.getPluginManager().callEvent(new VisualizationEvent(player, result.claim));
 
                         Visualization.Apply(player, visualization);
-                    } else
+                    }
+                    else
                     {
                         instance.sendMessage(player, TextMode.Err, Messages.CreateClaimFailOverlapRegion);
                     }
@@ -2656,7 +2680,8 @@ class PlayerEventHandler implements Listener
         {
             return cachedValue.booleanValue();
 
-        } else
+        }
+        else
         {
             boolean isHolder = clickedBlock.getState() instanceof InventoryHolder;
             this.inventoryHolderCache.put(cacheKey, isHolder);

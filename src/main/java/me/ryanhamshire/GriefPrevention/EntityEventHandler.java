@@ -137,13 +137,16 @@ public class EntityEventHandler implements Listener
         if (!GriefPrevention.instance.config_endermenMoveBlocks && event.getEntityType() == EntityType.ENDERMAN)
         {
             event.setCancelled(true);
-        } else if (!GriefPrevention.instance.config_silverfishBreakBlocks && event.getEntityType() == EntityType.SILVERFISH)
+        }
+        else if (!GriefPrevention.instance.config_silverfishBreakBlocks && event.getEntityType() == EntityType.SILVERFISH)
         {
             event.setCancelled(true);
-        } else if (!GriefPrevention.instance.config_rabbitsEatCrops && event.getEntityType() == EntityType.RABBIT)
+        }
+        else if (!GriefPrevention.instance.config_rabbitsEatCrops && event.getEntityType() == EntityType.RABBIT)
         {
             event.setCancelled(true);
-        } else if (GriefPrevention.instance.config_claims_worldModes.get(event.getBlock().getWorld()) != ClaimsMode.Disabled)
+        }
+        else if (GriefPrevention.instance.config_claims_worldModes.get(event.getBlock().getWorld()) != ClaimsMode.Disabled)
         {
             if (event.getEntityType() == EntityType.WITHER)
             {
@@ -152,7 +155,8 @@ public class EntityEventHandler implements Listener
                 {
                     event.setCancelled(true);
                 }
-            } else if (!GriefPrevention.instance.config_claims_ravagersBreakBlocks && event.getEntityType() == EntityType.RAVAGER)
+            }
+            else if (!GriefPrevention.instance.config_claims_ravagersBreakBlocks && event.getEntityType() == EntityType.RAVAGER)
             {
                 event.setCancelled(true);
             }
@@ -163,7 +167,8 @@ public class EntityEventHandler implements Listener
                 if (event.getEntityType() != EntityType.PLAYER)
                 {
                     event.setCancelled(true);
-                } else
+                }
+                else
                 {
                     Player player = (Player) event.getEntity();
                     Block block = event.getBlock();
@@ -276,7 +281,8 @@ public class EntityEventHandler implements Listener
             if (!GriefPrevention.instance.config_creaturesTrampleCrops)
             {
                 event.setCancelled(true);
-            } else
+            }
+            else
             {
                 Entity rider = event.getEntity().getPassenger();
                 if (rider != null && rider.getType() == EntityType.PLAYER)
@@ -745,14 +751,16 @@ public class EntityEventHandler implements Listener
             if (damageSource.getType() == EntityType.PLAYER)
             {
                 attacker = (Player) damageSource;
-            } else if (damageSource instanceof Projectile)
+            }
+            else if (damageSource instanceof Projectile)
             {
                 arrow = (Projectile) damageSource;
                 if (arrow.getShooter() instanceof Player)
                 {
                     attacker = (Player) arrow.getShooter();
                 }
-            } else if (subEvent.getDamager() instanceof Firework)
+            }
+            else if (subEvent.getDamager() instanceof Firework)
             {
                 damageSource = subEvent.getDamager();
                 if (damageSource.hasMetadata("GP_FIREWORK"))
@@ -1182,14 +1190,16 @@ public class EntityEventHandler implements Listener
             if (damageSource.getType() == EntityType.PLAYER)
             {
                 attacker = (Player) damageSource;
-            } else if (damageSource instanceof Projectile)
+            }
+            else if (damageSource instanceof Projectile)
             {
                 arrow = (Projectile) damageSource;
                 if (arrow.getShooter() instanceof Player)
                 {
                     attacker = (Player) arrow.getShooter();
                 }
-            } else if (damageSource instanceof Firework)
+            }
+            else if (damageSource instanceof Firework)
             {
                 if (damageSource.hasMetadata("GP_FIREWORK"))
                 {
@@ -1244,14 +1254,16 @@ public class EntityEventHandler implements Listener
             if (damageSource.getType() == EntityType.PLAYER)
             {
                 attacker = (Player) damageSource;
-            } else if (damageSource instanceof Projectile)
+            }
+            else if (damageSource instanceof Projectile)
             {
                 Projectile arrow = (Projectile) damageSource;
                 if (arrow.getShooter() instanceof Player)
                 {
                     attacker = (Player) arrow.getShooter();
                 }
-            } else if (damageSource instanceof Firework)
+            }
+            else if (damageSource instanceof Firework)
             {
                 if (damageSource.hasMetadata("GP_FIREWORK"))
                 {

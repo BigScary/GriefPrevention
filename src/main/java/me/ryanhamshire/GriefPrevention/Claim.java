@@ -469,10 +469,12 @@ public class Claim
             if (!breakable)
             {
                 return GriefPrevention.instance.dataStore.getMessage(Messages.NonSiegeMaterial);
-            } else if (player.getUniqueId().equals(this.ownerID))
+            }
+            else if (player.getUniqueId().equals(this.ownerID))
             {
                 return GriefPrevention.instance.dataStore.getMessage(Messages.NoOwnerBuildUnderSiege);
-            } else
+            }
+            else
             {
                 return null;
             }
@@ -664,10 +666,12 @@ public class Claim
             if (entry.getValue() == ClaimPermission.Build)
             {
                 builders.add(entry.getKey());
-            } else if (entry.getValue() == ClaimPermission.Inventory)
+            }
+            else if (entry.getValue() == ClaimPermission.Inventory)
             {
                 containers.add(entry.getKey());
-            } else
+            }
+            else
             {
                 accessors.add(entry.getKey());
             }
@@ -918,7 +922,8 @@ public class Claim
                         if (block.getType() == Material.CHEST && !creativeMode)
                         {
                             score += 10;
-                        } else
+                        }
+                        else
                         {
                             score += .5;
                         }
@@ -933,10 +938,12 @@ public class Claim
                         if (block.getType() == Material.CHEST && !creativeMode)
                         {
                             score += 10;
-                        } else if (creativeMode && (block.getType() == Material.LAVA))
+                        }
+                        else if (creativeMode && (block.getType() == Material.LAVA))
                         {
                             score -= 10;
-                        } else
+                        }
+                        else
                         {
                             score += 1;
                         }

@@ -79,7 +79,8 @@ public class MaterialInfo
             {
                 allDataValues = true;
                 data = 0;
-            } else
+            }
+            else
             {
                 allDataValues = false;
                 data = Byte.parseByte(parts[1]);

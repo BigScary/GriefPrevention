@@ -136,7 +136,8 @@ class UUIDFetcher
                                 GriefPrevention.AddLogEntry("Mojang says we're sending requests too fast.  Will retry every 30 seconds until we succeed...");
                                 Thread.sleep(30000);
                             }
-                        } else
+                        }
+                        else
                         {
                             throw e;
                         }

@@ -303,7 +303,8 @@ public class DatabaseDataStore extends DataStore
                     {
                         GriefPrevention.AddLogEntry("Failed to load a claim (ID:" + claimID.toString() + ") because its world isn't loaded (yet?).  Please delete the claim or contact the GriefPrevention developer with information about which plugin(s) you're using to load or create worlds.  " + lesserCornerString);
                         continue;
-                    } else
+                    }
+                    else
                     {
                         throw e;
                     }
@@ -314,7 +315,8 @@ public class DatabaseDataStore extends DataStore
                 if (ownerName.isEmpty() || ownerName.startsWith("--"))
                 {
                     ownerID = null;  //administrative land claim or subdivision
-                } else if (this.getSchemaVersion() < 1)
+                }
+                else if (this.getSchemaVersion() < 1)
                 {
                     try
                     {
@@ -325,7 +327,8 @@ public class DatabaseDataStore extends DataStore
                         GriefPrevention.AddLogEntry("This owner name did not convert to a UUID: " + ownerName + ".");
                         GriefPrevention.AddLogEntry("  Converted land claim to administrative @ " + lesserBoundaryCorner.toString());
                     }
-                } else
+                }
+                else
                 {
                     try
                     {
@@ -358,11 +361,13 @@ public class DatabaseDataStore extends DataStore
                 if (removeClaim)
                 {
                     claimsToRemove.add(claim);
-                } else if (parentId == -1)
+                }
+                else if (parentId == -1)
                 {
                     //top level claim
                     this.addClaim(claim, false);
-                } else
+                }
+                else
                 {
                     //subdivision
                     subdivisionsToLoad.add(claim);

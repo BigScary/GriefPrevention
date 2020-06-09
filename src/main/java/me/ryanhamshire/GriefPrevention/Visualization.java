@@ -151,19 +151,23 @@ public class Visualization
         {
             cornerBlockData = Material.GLOWSTONE.createBlockData();
             accentBlockData = Material.GOLD_BLOCK.createBlockData();
-        } else if (visualizationType == VisualizationType.AdminClaim)
+        }
+        else if (visualizationType == VisualizationType.AdminClaim)
         {
             cornerBlockData = Material.GLOWSTONE.createBlockData();
             accentBlockData = Material.PUMPKIN.createBlockData();
-        } else if (visualizationType == VisualizationType.Subdivision)
+        }
+        else if (visualizationType == VisualizationType.Subdivision)
         {
             cornerBlockData = Material.IRON_BLOCK.createBlockData();
             accentBlockData = Material.WHITE_WOOL.createBlockData();
-        } else if (visualizationType == VisualizationType.RestoreNature)
+        }
+        else if (visualizationType == VisualizationType.RestoreNature)
         {
             cornerBlockData = Material.DIAMOND_BLOCK.createBlockData();
             accentBlockData = Material.DIAMOND_BLOCK.createBlockData();
-        } else
+        }
+        else
         {
             cornerBlockData = Material.REDSTONE_ORE.createBlockData();
             ((Lightable) cornerBlockData).setLit(true);

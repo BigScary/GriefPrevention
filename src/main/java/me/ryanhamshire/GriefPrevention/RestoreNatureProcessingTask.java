@@ -217,7 +217,8 @@ class RestoreNatureProcessingTask implements Runnable
                             underBlock.typeId == Material.SAND)
                     {
                         snapshots[x][y][z].typeId = Material.SAND;
-                    } else
+                    }
+                    else
                     {
                         snapshots[x][y][z].typeId = Material.AIR;
                     }
@@ -441,7 +442,8 @@ class RestoreNatureProcessingTask implements Runnable
                     if (this.biome == Biome.DESERT || this.biome == Biome.DESERT_HILLS || this.biome == Biome.BEACH)
                     {
                         this.snapshots[x][y][z].typeId = Material.SAND;
-                    } else
+                    }
+                    else
                     {
                         this.snapshots[x][y][z].typeId = Material.GRASS_BLOCK;
                     }

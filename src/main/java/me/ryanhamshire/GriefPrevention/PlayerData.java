@@ -223,7 +223,8 @@ public class PlayerData
                     this.accruedClaimBlocks = GriefPrevention.instance.config_claims_initialBlocks;
                 }
 
-            } else
+            }
+            else
             {
                 this.accruedClaimBlocks = GriefPrevention.instance.config_claims_initialBlocks;
             }
@@ -234,7 +235,8 @@ public class PlayerData
             if (storageData.bonusClaimBlocks != null)
             {
                 this.bonusClaimBlocks = storageData.bonusClaimBlocks;
-            } else
+            }
+            else
             {
                 this.bonusClaimBlocks = 0;
             }

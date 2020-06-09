@@ -206,7 +206,8 @@ public class FlatFileDataStore extends DataStore
         if (this.getSchemaVersion() <= 1)
         {
             this.loadClaimData_Legacy(files);
-        } else
+        }
+        else
         {
             this.loadClaimData(files);
         }
@@ -283,7 +284,8 @@ public class FlatFileDataStore extends DataStore
                         if (ownerName.isEmpty() || ownerName.startsWith("--"))
                         {
                             ownerID = null;  //administrative land claim or subdivision
-                        } else if (this.getSchemaVersion() == 0)
+                        }
+                        else if (this.getSchemaVersion() == 0)
                         {
                             try
                             {
@@ -294,7 +296,8 @@ public class FlatFileDataStore extends DataStore
                                 GriefPrevention.AddLogEntry("Couldn't resolve this name to a UUID: " + ownerName + ".");
                                 GriefPrevention.AddLogEntry("  Converted land claim to administrative @ " + lesserBoundaryCorner.toString());
                             }
-                        } else
+                        }
+                        else
                         {
                             try
                             {
@@ -370,7 +373,8 @@ public class FlatFileDataStore extends DataStore
                         GriefPrevention.AddLogEntry("Failed to load a claim " + files[i].getName() + " because its world isn't loaded (yet?).  Please delete the claim file or contact the GriefPrevention developer with information about which plugin(s) you're using to load or create worlds.  " + lesserCornerString);
                         inStream.close();
 
-                    } else
+                    }
+                    else
                     {
                         StringWriter errors = new StringWriter();
                         e.printStackTrace(new PrintWriter(errors));
@@ -431,7 +435,8 @@ public class FlatFileDataStore extends DataStore
                     if (out_parentID.size() == 0 || out_parentID.get(0) == -1)
                     {
                         this.addClaim(claim, false);
-                    } else
+                    }
+                    else
                     {
                         orphans.put(claim, out_parentID.get(0));
                     }
@@ -443,7 +448,8 @@ public class FlatFileDataStore extends DataStore
                     if (e.getMessage() != null && e.getMessage().contains("World not found"))
                     {
                         files[i].delete();
-                    } else
+                    }
+                    else
                     {
                         StringWriter errors = new StringWriter();
                         e.printStackTrace(new PrintWriter(errors));
@@ -897,7 +903,8 @@ public class FlatFileDataStore extends DataStore
             catch (IOException exception) {}
 
             return schemaVersion;
-        } else
+        }
+        else
         {
             this.updateSchemaVersionInStorage(0);
             return 0;

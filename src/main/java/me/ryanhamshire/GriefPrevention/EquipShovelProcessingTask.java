@@ -62,7 +62,8 @@ class EquipShovelProcessingTask implements Runnable
         if (GriefPrevention.instance.creativeRulesApply(player.getLocation()))
         {
             GriefPrevention.sendMessage(player, TextMode.Instr, Messages.CreativeBasicsVideo2, DataStore.CREATIVE_VIDEO_URL);
-        } else if (GriefPrevention.instance.claimsEnabledForWorld(player.getLocation().getWorld()))
+        }
+        else if (GriefPrevention.instance.claimsEnabledForWorld(player.getLocation().getWorld()))
         {
             GriefPrevention.sendMessage(player, TextMode.Instr, Messages.SurvivalBasicsVideo2, DataStore.SURVIVAL_VIDEO_URL);
         }
