@@ -53,7 +53,7 @@ class RestoreNatureProcessingTask implements Runnable
     private ArrayList<Material> notAllowedToHang;    //natural blocks which don't naturally hang in their air
     private ArrayList<Material> playerBlocks;        //a "complete" list of player-placed blocks.  MUST BE MAINTAINED as patches introduce more
 
-    @SuppressWarnings("deprecation")
+
     public RestoreNatureProcessingTask(BlockSnapshot[][][] snapshots, int miny, Environment environment, Biome biome, Location lesserBoundaryCorner, Location greaterBoundaryCorner, int seaLevel, boolean aggressiveMode, boolean creativeMode, Player player)
     {
         this.snapshots = snapshots;
@@ -165,7 +165,7 @@ class RestoreNatureProcessingTask implements Runnable
         GriefPrevention.instance.getServer().getScheduler().scheduleSyncDelayedTask(GriefPrevention.instance, task);
     }
 
-    @SuppressWarnings("deprecation")
+
     private void removePlayerLeaves()
     {
         if (this.seaLevel < 1) return;
@@ -187,7 +187,7 @@ class RestoreNatureProcessingTask implements Runnable
     }
 
     //converts sandstone adjacent to sand to sand, and any other sandstone to air
-    @SuppressWarnings("deprecation")
+
     private void removeSandstone()
     {
         for (int x = 1; x < snapshots.length - 1; x++)
@@ -227,7 +227,7 @@ class RestoreNatureProcessingTask implements Runnable
         }
     }
 
-    @SuppressWarnings("deprecation")
+
     private void reduceStone()
     {
         if (this.seaLevel < 1) return;
@@ -275,7 +275,7 @@ class RestoreNatureProcessingTask implements Runnable
         }
     }
 
-    @SuppressWarnings("deprecation")
+
     private void reduceLogs()
     {
         if (this.seaLevel < 1) return;
@@ -313,7 +313,7 @@ class RestoreNatureProcessingTask implements Runnable
         }
     }
 
-    @SuppressWarnings("deprecation")
+
     private void removePlayerBlocks()
     {
         int miny = this.miny;
@@ -337,7 +337,7 @@ class RestoreNatureProcessingTask implements Runnable
         }
     }
 
-    @SuppressWarnings("deprecation")
+
     private void removeHanging()
     {
         int miny = this.miny;
@@ -364,7 +364,7 @@ class RestoreNatureProcessingTask implements Runnable
         }
     }
 
-    @SuppressWarnings("deprecation")
+
     private void removeWallsAndTowers()
     {
         Material[] excludedBlocksArray = new Material[]
@@ -427,7 +427,7 @@ class RestoreNatureProcessingTask implements Runnable
         } while (changed);
     }
 
-    @SuppressWarnings("deprecation")
+
     private void coverSurfaceStone()
     {
         for (int x = 1; x < snapshots.length - 1; x++)
@@ -452,7 +452,7 @@ class RestoreNatureProcessingTask implements Runnable
         }
     }
 
-    @SuppressWarnings("deprecation")
+
     private void fillHolesAndTrenches()
     {
         ArrayList<Material> fillableBlocks = new ArrayList<Material>();
@@ -510,7 +510,7 @@ class RestoreNatureProcessingTask implements Runnable
         } while (changed);
     }
 
-    @SuppressWarnings("deprecation")
+
     private void fixWater()
     {
         int miny = this.miny;
@@ -597,7 +597,7 @@ class RestoreNatureProcessingTask implements Runnable
         } while (changed);
     }
 
-    @SuppressWarnings("deprecation")
+
     private void removeDumpedFluids()
     {
         if (this.seaLevel < 1) return;
@@ -621,7 +621,7 @@ class RestoreNatureProcessingTask implements Runnable
         }
     }
 
-    @SuppressWarnings("deprecation")
+
     private int highestY(int x, int z, boolean ignoreLeaves)
     {
         int y;
@@ -641,7 +641,7 @@ class RestoreNatureProcessingTask implements Runnable
         return y;
     }
 
-    @SuppressWarnings("deprecation")
+
     static ArrayList<Material> getPlayerBlocks(Environment environment, Biome biome)
     {
         //NOTE on this list.  why not make a list of natural blocks?

@@ -402,7 +402,7 @@ class PlayerEventHandler implements Listener
         if (category == CommandCategory.Whisper && args.length > 1)
         {
             //determine target player, might be NULL
-            @SuppressWarnings("deprecation")
+
             Player targetPlayer = instance.getServer().getPlayer(args[1]);
 
             //softmute feature
@@ -666,7 +666,7 @@ class PlayerEventHandler implements Listener
     }
 
     //when a player successfully joins the server...
-    @SuppressWarnings("deprecation")
+
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     void onPlayerJoin(PlayerJoinEvent event)
     {
@@ -2673,7 +2673,7 @@ class PlayerEventHandler implements Listener
 
     private boolean isInventoryHolder(Block clickedBlock)
     {
-        @SuppressWarnings("deprecation")
+
         Material cacheKey = clickedBlock.getType();
         Boolean cachedValue = this.inventoryHolderCache.get(cacheKey);
         if (cachedValue != null)

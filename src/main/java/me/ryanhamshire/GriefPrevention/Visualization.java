@@ -56,7 +56,7 @@ public class Visualization
     }
 
     //reverts a visualization by sending another block change list, this time with the real world block values
-    @SuppressWarnings("deprecation")
+
     public static void Revert(Player player)
     {
         if (!player.isOnline()) return;
@@ -129,7 +129,7 @@ public class Visualization
     //adds a claim's visualization to the current visualization
     //handy for combining several visualizations together, as when visualization a top level claim with several subdivisions inside
     //locality is a performance consideration.  only create visualization blocks for around 100 blocks of the locality
-    @SuppressWarnings("deprecation")
+
     private void addClaimElements(Claim claim, int height, VisualizationType visualizationType, Location locality)
     {
         Location smallXsmallZ = claim.getLesserBoundaryCorner();

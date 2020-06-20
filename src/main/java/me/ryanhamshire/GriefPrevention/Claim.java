@@ -897,7 +897,7 @@ public class Claim
         return thisCorner.getWorld().getName().compareTo(otherCorner.getWorld().getName()) < 0;
     }
 
-    @SuppressWarnings("deprecation")
+
     long getPlayerInvestmentScore()
     {
         //decide which blocks will be considered player placed

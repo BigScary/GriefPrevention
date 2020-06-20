@@ -1126,7 +1126,7 @@ public abstract class DataStore
         //if the claim should be opened to looting
         if (grantAccess)
         {
-            @SuppressWarnings("deprecation")
+
             Player winner = GriefPrevention.instance.getServer().getPlayer(winnerName);
             if (winner != null)
             {
@@ -1145,9 +1145,9 @@ public abstract class DataStore
         //if the siege ended due to death, transfer inventory to winner
         if (drops != null)
         {
-            @SuppressWarnings("deprecation")
+
             Player winner = GriefPrevention.instance.getServer().getPlayer(winnerName);
-            @SuppressWarnings("deprecation")
+
             Player loser = GriefPrevention.instance.getServer().getPlayer(loserName);
             if (winner != null && loser != null)
             {

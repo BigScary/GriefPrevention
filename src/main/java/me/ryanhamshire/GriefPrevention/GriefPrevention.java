@@ -1002,7 +1002,6 @@ public class GriefPrevention extends JavaPlugin
     }
 
     //handles slash commands
-    @SuppressWarnings("deprecation")
     public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args)
     {
 
@@ -3174,7 +3173,7 @@ public class GriefPrevention extends JavaPlugin
         }
     }
 
-    @SuppressWarnings("deprecation")
+
     public OfflinePlayer resolvePlayerByName(String name)
     {
         //try online players first
@@ -3541,7 +3540,7 @@ public class GriefPrevention extends JavaPlugin
         }
     }
 
-    @SuppressWarnings("deprecation")
+
     public void restoreChunk(Chunk chunk, int miny, boolean aggressiveMode, long delayInTicks, Player playerReceivingVisualization)
     {
         //build a snapshot of this chunk, including 1 block boundary outside of the chunk all the way around
