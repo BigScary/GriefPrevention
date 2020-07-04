@@ -1513,7 +1513,7 @@ class PlayerEventHandler implements Listener
 
             if (makeLogEntry)
             {
-                instance.AddLogEntry(player.getName() + " placed suspicious " + bucketEvent.getBucket().name() + " @ " + instance.getfriendlyLocationString(block.getLocation()), CustomLogEntryTypes.SuspiciousActivity);
+                instance.AddLogEntry(player.getName() + " placed suspicious " + bucketEvent.getBucket().name() + " @ " + instance.getfriendlyLocationString(block.getLocation()), CustomLogEntryTypes.SuspiciousActivity, true);
             }
         }
     }
