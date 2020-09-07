@@ -832,8 +832,8 @@ public class EntityEventHandler implements Listener
                             if (!pvpEvent.isCancelled())
                             {
                                 event.setCancelled(true);
-                                return;
                             }
+                            return;
                         }
                     }
                 }
@@ -902,8 +902,8 @@ public class EntityEventHandler implements Listener
                                 event.setCancelled(true);
                                 if (sendErrorMessagesToPlayers)
                                     GriefPrevention.sendMessage(attacker, TextMode.Err, Messages.CantFightWhileImmune);
-                                return;
                             }
+                            return;
                         }
 
                         Claim defenderClaim = this.dataStore.getClaimAt(defender.getLocation(), false, defenderData.lastClaim);
@@ -919,8 +919,8 @@ public class EntityEventHandler implements Listener
                                 event.setCancelled(true);
                                 if (sendErrorMessagesToPlayers)
                                     GriefPrevention.sendMessage(attacker, TextMode.Err, Messages.PlayerInPvPSafeZone);
-                                return;
                             }
+                            return;
                         }
                     }
                 }
@@ -963,8 +963,8 @@ public class EntityEventHandler implements Listener
                                 {
                                     event.setCancelled(true);
                                     if (damager instanceof Creature) ((Creature) damager).setTarget(null);
-                                    return;
                                 }
+                                return;
                             }
                         }
                     }
@@ -1430,8 +1430,8 @@ public class EntityEventHandler implements Listener
                         {
                             event.setIntensity(effected, 0);
                             GriefPrevention.sendMessage(thrower, TextMode.Err, Messages.CantFightWhileImmune);
-                            continue;
                         }
+                        continue;
                     }
 
                     Claim defenderClaim = this.dataStore.getClaimAt(effectedPlayer.getLocation(), false, defenderData.lastClaim);
@@ -1444,7 +1444,6 @@ public class EntityEventHandler implements Listener
                         {
                             event.setIntensity(effected, 0);
                             GriefPrevention.sendMessage(thrower, TextMode.Err, Messages.PlayerInPvPSafeZone);
-                            continue;
                         }
                     }
                 }
