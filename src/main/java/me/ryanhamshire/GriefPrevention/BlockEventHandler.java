@@ -664,7 +664,10 @@ public class BlockEventHandler implements Listener
             if (pistonClaim == null || !Objects.equals(pistonClaim.ownerID, claim.ownerID))
             {
                 event.setCancelled(true);
-                pistonBlock.getWorld().createExplosion(pistonBlock.getLocation(), 0);
+                if (GriefPrevention.instance.config_pistonExplosionSound)
+                {
+                    pistonBlock.getWorld().createExplosion(pistonBlock.getLocation(), 0);
+                }
                 pistonBlock.getWorld().dropItem(pistonBlock.getLocation(), new ItemStack(event.isSticky() ? Material.STICKY_PISTON : Material.PISTON));
                 pistonBlock.setType(Material.AIR);
                 return;
@@ -1029,7 +1032,7 @@ public class BlockEventHandler implements Listener
             }
         }
     }
-    
+
     @EventHandler(ignoreCancelled = true)
     public void onItemFrameBrokenByBoat(final HangingBreakEvent event)
     {
