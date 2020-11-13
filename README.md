@@ -24,7 +24,7 @@ and (for most servers) no configuration customization.
 
 ### Community
 
-Discussion about GriefPrevention can be found at these community sites:
+Discussion and community support for GriefPrevention can be found at these sites:
 
 [#GriefPrevention IRC channel on irc.spi.gt](https://griefprevention.com/chat) (dumcord also available)
 
