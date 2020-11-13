@@ -19,8 +19,8 @@ and (for most servers) no configuration customization.
 ## Help+Support
 
 - **[Documentation](https://docs.griefprevention.com)** - Information on using Grief Prevention, its range of commands and permissions, configuration parameters, etc.
-- [FAQ](../../issues/752) - Frequently Asked Questions about GriefPrevention.
-- [Issue Tracker (GitHub Issues)](../../issues) - The place to file bug reports or request features.
+- [FAQ](https://github.com/TechFortress/GriefPrevention/issues/752) - Frequently Asked Questions about GriefPrevention.
+- [Issue Tracker (GitHub Issues)](https://github.com/TechFortress/GriefPrevention/issues) - The place to file bug reports or request features.
 
 ### Community
 
