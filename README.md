@@ -1,4 +1,4 @@
-# GriefPrevention - Minecraft anti-griefing plugin
+# GriefPrevention - The self-service anti-griefing Bukkit plugin for Minecraft servers since 2011.
 
 Stop responding to grief and prevent it instead. Grief Prevention will solve
 your grief problems without a roster of trained administrators, without 10
@@ -28,7 +28,7 @@ Discussion and community support for GriefPrevention can be found at these sites
 
 [GitHub Discussions](https://github.com/TechFortress/GriefPrevention/discussions)
 
-[#GriefPrevention IRC chatroom on irc.spi.gt](https://griefprevention.com/chat) (dumcord also available)
+[#GriefPrevention IRC chatroom on irc.spi.gt](https://griefprevention.com/chat) (discord also available)
 
 [Grief Prevention on dev.bukkit.org](https://dev.bukkit.org/projects/grief-prevention)
 
