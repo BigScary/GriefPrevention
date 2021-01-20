@@ -720,9 +720,7 @@ public class BlockEventHandler implements Listener
 
         if (igniteEvent.getCause() == IgniteCause.LIGHTNING && GriefPrevention.instance.dataStore.getClaimAt(igniteEvent.getIgnitingEntity().getLocation(), false, null) != null)
         {
-//        	if(igniteEvent.getIgnitingEntity().hasMetadata("GP_TRIDENT")){ //BlockIgniteEvent is called before LightningStrikeEvent. See #532
-            igniteEvent.setCancelled(true);
-//			}
+            igniteEvent.setCancelled(true); //BlockIgniteEvent is called before LightningStrikeEvent. See #532. However, see #1125 for further discussion on detecting trident-caused lightning.
         }
 
         // If a fire is started by a fireball from a dispenser, allow it if the dispenser is in the same claim.

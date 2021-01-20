@@ -134,13 +134,6 @@ public class EntityEventHandler implements Listener
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
-    public void onLightningStrike(LightningStrikeEvent event)
-    {
-        if (event.getCause() == LightningStrikeEvent.Cause.TRIDENT)
-            event.getLightning().setMetadata("GP_TRIDENT", new FixedMetadataValue(GriefPrevention.instance, event.getLightning().getLocation()));
-    }
-
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
     public void onEntityChangeBLock(EntityChangeBlockEvent event)
     {
         if (!GriefPrevention.instance.config_endermenMoveBlocks && event.getEntityType() == EntityType.ENDERMAN)
