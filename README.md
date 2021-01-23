@@ -3,8 +3,10 @@
 Stop responding to grief and prevent it instead. GriefPrevention stops grief 
 before it starts automatically without any effort from administrators, 
 and with very little (self service) effort from players.
-Because Grief Prevention teaches players for you, you won't have to publish a
+Because GriefPrevention teaches players for you, you won't have to publish a
 training manual or tutorial for players, or add explanatory signs to your world.
+
+> GriefPrevention is a Bukkit plugin, therefore it is compatible with any implemention of the Bukkit API. Implementations include CraftBukkit, Spigot, Paper, Tuinity, Purpur, etc.
 
 - [Downloads](https://dev.bukkit.org/projects/grief-prevention/files)
 - [Release Notes](https://github.com/TechFortress/GriefPrevention/releases)
