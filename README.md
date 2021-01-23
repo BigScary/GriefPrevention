@@ -6,19 +6,14 @@ and with very little (self service) effort from players.
 Because Grief Prevention teaches players for you, you won't have to publish a
 training manual or tutorial for players, or add explanatory signs to your world.
 
-## Downloads
-
 - [Downloads](https://dev.bukkit.org/projects/grief-prevention/files)
 - [Release Notes](https://github.com/TechFortress/GriefPrevention/releases)
 
-## Documentation for Commands, Permissions, Configuration, FAQ, etc.
-
-- **[Documentation (The Manual)](https://docs.griefprevention.com)** - Reference for commands, permissions, configurations, answers to common questions, etc.
-
 ## Help+Support
 
-- [Issue Tracker](https://github.com/TechFortress/GriefPrevention/issues) - The place to file bug reports
-- [Discussions](https://github.com/TechFortress/GriefPrevention/discussions) - The place to ask questions and suggest ideas/features
+- **[Documentation (The Manual)](https://docs.griefprevention.com)** - Check here first! This contains the list of commands, permissions, configurations, answers to common questions, etc.
+- [Issue Tracker](https://github.com/TechFortress/GriefPrevention/issues) - For reporting bugs
+- [Discussions](https://github.com/TechFortress/GriefPrevention/discussions) - For asking questions, suggesting new ideas/features, and general discussion
 
 Community support and general discussion on GriefPrevention can be found at these sites:
 
