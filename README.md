@@ -1,24 +1,22 @@
 # GriefPrevention - The self-service anti-griefing Bukkit plugin for Minecraft servers since 2011.
 
-Stop responding to grief and prevent it instead. Grief Prevention will solve
-your grief problems without a roster of trained administrators, without 10
-different anti-grief plugins, and without disabling any standard game features.
+Stop responding to grief and prevent it instead. GriefPrevention stops grief 
+before it starts automatically without any effort from administrators, 
+and with very little (self service) effort from players.
 Because Grief Prevention teaches players for you, you won't have to publish a
 training manual or tutorial for players, or add explanatory signs to your world.
-
-Grief Prevention stops grief before it starts automatically without any effort
-from administrators, and with very little (self service) effort from players.
-Solve all your grief problems with a single anti grief download, no database,
-and (for most servers) no configuration customization.
 
 ## Downloads
 
 - [Downloads](https://dev.bukkit.org/projects/grief-prevention/files)
 - [Release Notes](https://github.com/TechFortress/GriefPrevention/releases)
 
+## Documentation for Commands, Permissions, Configuration, FAQ, etc.
+
+- **[Documentation (The Manual)](https://docs.griefprevention.com)** - Reference for commands, permissions, configurations, answers to common questions, etc.
+
 ## Help+Support
 
-- **[Documentation (The Manual)](https://docs.griefprevention.com)** - Where you'll find answers to common questions and information on (nearly) everything about GriefPrevention such as its range of commands and permissions, configuration parameters, etc.
 - [Issue Tracker](https://github.com/TechFortress/GriefPrevention/issues) - The place to file bug reports
 - [Discussions](https://github.com/TechFortress/GriefPrevention/discussions) - The place to ask questions and suggest ideas/features
 
