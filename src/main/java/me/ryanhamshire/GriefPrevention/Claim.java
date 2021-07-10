@@ -335,7 +335,10 @@ public class Claim
             Material.POTATOES,
             Material.NETHER_WART,
             Material.BEETROOTS,
-            Material.COCOA);
+            Material.COCOA,
+            Material.GLOW_BERRIES,
+            Material.CAVE_VINES,
+            Material.CAVE_VINES_PLANT);
 
     private static boolean placeableForFarming(Material material)
     {

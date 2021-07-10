@@ -106,6 +106,8 @@ public class BlockEventHandler implements Listener
         this.trashBlocks.add(Material.SAND);
         this.trashBlocks.add(Material.TNT);
         this.trashBlocks.add(Material.CRAFTING_TABLE);
+        this.trashBlocks.add(Material.TUFF);
+        this.trashBlocks.add(Material.COBBLED_DEEPSLATE);
     }
 
     //when a player breaks a block...
