@@ -1750,7 +1750,8 @@ class PlayerEventHandler implements Listener
                                 clickedBlockType == Material.RESPAWN_ANCHOR ||
                                 clickedBlockType == Material.CAVE_VINES ||
                                 clickedBlockType == Material.CAVE_VINES_PLANT ||
-                                clickedBlockType == Material.PUMPKIN
+                                clickedBlockType == Material.PUMPKIN ||
+                                Tag.CANDLES.isTagged(clickedBlockType)
                         )))
         {
             if (playerData == null) playerData = this.dataStore.getPlayerData(player.getUniqueId());
