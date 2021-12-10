@@ -1591,9 +1591,8 @@ public class GriefPrevention extends JavaPlugin
                 }
 
                 //dropping permissions
-                for (int i = 0; i < playerData.getClaims().size(); i++)
-                {
-                    claim = playerData.getClaims().get(i);
+                for (Claim targetClaim : event.getClaims()) {
+                    claim = targetClaim;
 
                     //if untrusting "all" drop all permissions
                     if (clearPermissions)
@@ -1656,7 +1655,7 @@ public class GriefPrevention extends JavaPlugin
                         return true;
                     }
 
-                    claim.clearPermissions();
+                    event.getClaims().forEach(Claim::clearPermissions);
                     GriefPrevention.sendMessage(player, TextMode.Success, Messages.ClearPermissionsOneClaim);
                 }
 
@@ -1685,8 +1684,7 @@ public class GriefPrevention extends JavaPlugin
                             return true;
                         }
 
-                        claim.dropPermission(idToDrop);
-                        claim.managers.remove(idToDrop);
+                        event.getClaims().forEach(targetClaim -> targetClaim.dropPermission(event.getIdentifier()));
 
                         //beautify for output
                         if (args[0].equals("public"))
@@ -3054,7 +3052,7 @@ public class GriefPrevention extends JavaPlugin
         }
 
         //apply changes
-        for (Claim currentClaim : targetClaims)
+        for (Claim currentClaim : event.getClaims())
         {
             if (permissionLevel == null)
             {
