@@ -41,7 +41,7 @@ body:
       label: Stack trace or error log
       description: |
         Please paste in the entire stack trace or error log. Be careful to include both the exception itself and the cause!
-        If the logs are particularly long, please create a [gist](https://gist.github.com) and paste the link instead.
+        If the logs are egregiously long, please create a [gist](https://gist.github.com) and paste the link instead.
       placeholder: |
         [12:34:56] [Server thread/ERROR]: null
         org.bukkit.command.CommandException: Unhandled exception executing command 'example' in plugin GriefPrevention v1.2.3
@@ -90,7 +90,7 @@ body:
   - type: textarea
     attributes:
       label: Configuration
-      description: Please paste your entire configuration here.
+      description: Please paste your entire configuration here. Please do not use paste sites.
       render: yaml
     validations:
       required: true
