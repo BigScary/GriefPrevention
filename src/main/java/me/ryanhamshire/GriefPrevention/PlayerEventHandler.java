@@ -1751,9 +1751,7 @@ class PlayerEventHandler implements Listener
                                 clickedBlockType == Material.RESPAWN_ANCHOR ||
                                 clickedBlockType == Material.ROOTED_DIRT ||
                                 clickedBlockType == Material.STONECUTTER ||
-                                clickedBlockType == Material.SWEET_BERRY_BUSH ||
-                                Tag.CANDLES.isTagged(clickedBlockType) ||
-                                Tag.CANDLE_CAKES.isTagged(clickedBlockType)
+                                clickedBlockType == Material.SWEET_BERRY_BUSH
                         )))
         {
             if (playerData == null) playerData = this.dataStore.getPlayerData(player.getUniqueId());
@@ -1865,7 +1863,7 @@ class PlayerEventHandler implements Listener
             }
         }
 
-        //apply rule for note blocks and repeaters and daylight sensors //RoboMWM: Include flower pots
+        //apply rule for redstone and various decor blocks that require full trust
         else if (clickedBlock != null &&
                 (
                         clickedBlockType == Material.NOTE_BLOCK ||
@@ -1874,7 +1872,8 @@ class PlayerEventHandler implements Listener
                                 clickedBlockType == Material.DAYLIGHT_DETECTOR ||
                                 clickedBlockType == Material.COMPARATOR ||
                                 clickedBlockType == Material.REDSTONE_WIRE ||
-                                Tag.FLOWER_POTS.isTagged(clickedBlockType)
+                                Tag.FLOWER_POTS.isTagged(clickedBlockType) ||
+                                Tag.CANDLES.isTagged(clickedBlockType)
                 ))
         {
             if (playerData == null) playerData = this.dataStore.getPlayerData(player.getUniqueId());
