@@ -31,7 +31,6 @@ import org.bukkit.BanList.Type;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
-import org.bukkit.ChunkSnapshot;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -1110,7 +1109,7 @@ public class GriefPrevention extends JavaPlugin
                 playerData.claimResizing = null;
                 playerData.lastShovelLocation = null;
 
-                this.autoExtendClaim(result.claim);
+                AutoExtendClaimTask.scheduleAsync(result.claim);
             }
 
             return true;
@@ -3634,27 +3633,6 @@ public class GriefPrevention extends JavaPlugin
         }
 
         return false;
-    }
-
-    void autoExtendClaim(Claim newClaim)
-    {
-        //auto-extend it downward to cover anything already built underground
-        Location lesserCorner = newClaim.getLesserBoundaryCorner();
-        Location greaterCorner = newClaim.getGreaterBoundaryCorner();
-        World world = lesserCorner.getWorld();
-        ArrayList<ChunkSnapshot> snapshots = new ArrayList<>();
-        for (int chunkx = lesserCorner.getBlockX() / 16; chunkx <= greaterCorner.getBlockX() / 16; chunkx++)
-        {
-            for (int chunkz = lesserCorner.getBlockZ() / 16; chunkz <= greaterCorner.getBlockZ() / 16; chunkz++)
-            {
-                if (world.isChunkLoaded(chunkx, chunkz))
-                {
-                    snapshots.add(world.getChunkAt(chunkx, chunkz).getChunkSnapshot(true, true, false));
-                }
-            }
-        }
-
-        Bukkit.getScheduler().runTaskAsynchronously(GriefPrevention.instance, new AutoExtendClaimTask(newClaim, snapshots, world.getEnvironment()));
     }
 
     public boolean pvpRulesApply(World world)
