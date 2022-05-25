@@ -64,6 +64,7 @@ import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.hanging.HangingBreakEvent;
 import org.bukkit.event.inventory.InventoryPickupItemEvent;
+import org.bukkit.event.world.PortalCreateEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
@@ -1075,6 +1076,47 @@ public class BlockEventHandler implements Listener
         if (this.dataStore.getClaimAt(event.getEntity().getLocation(), false, null) != null)
         {
             event.setCancelled(true);
+        }
+    }
+
+
+    @EventHandler(ignoreCancelled = true)
+    public void onNetherPortalCreate(final PortalCreateEvent event)
+    {
+        if (event.getReason() != PortalCreateEvent.CreateReason.NETHER_PAIR)
+        {
+            return;
+        }
+
+        // Ignore this event if preventNonPlayerCreatedPortals config option is disabled, and we don't know the entity.
+        if (!(event.getEntity() instanceof Player) && !GriefPrevention.instance.config_claims_preventNonPlayerCreatedPortals)
+        {
+            return;
+        }
+
+        for (BlockState blockState : event.getBlocks())
+        {
+            Claim claim = this.dataStore.getClaimAt(blockState.getLocation(), false, null);
+            if (claim != null)
+            {
+                if (event.getEntity() instanceof Player player)
+                {
+                    Supplier<String> noPortalReason = claim.checkPermission(player, ClaimPermission.Build, event);
+
+                    if (noPortalReason != null)
+                    {
+                        event.setCancelled(true);
+                        GriefPrevention.sendMessage(player, TextMode.Err, noPortalReason.get());
+                        return;
+                    }
+                }
+                else
+                {
+                    // Cancels the event if in a claim, as we can not efficiently retrieve the person/entity who created the portal.
+                    event.setCancelled(true);
+                    return;
+                }
+            }
         }
     }
 }
