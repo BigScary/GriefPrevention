@@ -25,7 +25,6 @@ import java.util.stream.Stream;
 
 /**
  * A representation of a system for displaying rectangular {@link Boundary Boundaries} to {@link Player Players}.
- *
  * This is used to display claim areas, visualize affected area during nature restoration, and more.
  */
 public abstract class BoundaryVisualization
@@ -255,10 +254,20 @@ public abstract class BoundaryVisualization
         Bukkit.getPluginManager().callEvent(event);
 
         Player player = event.getPlayer();
-        BoundaryVisualization visualization = event.getProvider().create(player.getWorld(), event.getCenter(), event.getHeight());
-        event.getBoundaries().stream().filter(Objects::nonNull).forEach(visualization.elements::add);
-
         PlayerData playerData = GriefPrevention.instance.dataStore.getPlayerData(player.getUniqueId());
+        BoundaryVisualization currentVisualization = playerData.getVisibleBoundaries();
+
+        Collection<Boundary> boundaries = event.getBoundaries();
+        boundaries.removeIf(Objects::isNull);
+
+        if (currentVisualization != null && currentVisualization.elements.equals(boundaries))
+        {
+            // Ignore visualization with duplicate boundaries.
+            return;
+        }
+
+        BoundaryVisualization visualization = event.getProvider().create(player.getWorld(), event.getCenter(), event.getHeight());
+        visualization.elements.addAll(boundaries);
 
         // If they have a visualization active, clear it first.
         playerData.setVisibleBoundaries(null);
