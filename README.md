@@ -1,11 +1,13 @@
-<img alt="GriefPrevention" align="center" width=100% height=auto src=https://repository-images.githubusercontent.com/68339667/9b3f7c00-ce61-11ea-82d1-208eaa0606e8>
+<p align="center">
+<img alt="GriefPrevention" width=100% height=auto src="https://repository-images.githubusercontent.com/68339667/9b3f7c00-ce61-11ea-82d1-208eaa0606e8">
+</p>
 
 <h1 align="center">The self-service anti-griefing plugin for Minecraft servers since 2011</h1>
 
 <p align="center">
 <a href="https://github.com/TechFortress/GriefPrevention/releases/"><img alt="Downloads" src="https://img.shields.io/badge/Downloads-green" height="70px"></a>
 <a href="https://docs.griefprevention.com/"><img alt="Docs" src="https://img.shields.io/badge/Docs-gray?logo=readthedocs&logoColor=white" height="70px"></a>
-<a href="#Support"><img alt="Get Help" src="https://img.shields.io/badge/Get%20Help-yellow?logo=amazoncloudwatch&logoColor=white" height="70px"></a>
+<a href="#support"><img alt="Get Help" src="https://img.shields.io/badge/Get%20Help-yellow?logo=amazoncloudwatch&logoColor=white" height="70px"></a>
 
 </p>
   
