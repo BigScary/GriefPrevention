@@ -180,60 +180,82 @@ public class EntityEventHandler implements Listener
         }
 
         //sand cannon fix - when the falling block doesn't fall straight down, take additional anti-grief steps
-        else if (event.getEntityType() == EntityType.FALLING_BLOCK)
+        else if (event.getEntity() instanceof FallingBlock fallingBlock)
         {
-            FallingBlock entity = (FallingBlock) event.getEntity();
-            Block block = event.getBlock();
+            handleFallingBlockChangeBlock(event, fallingBlock);
+        }
+    }
 
-            //if changing a block TO air, this is when the falling block formed.  note its original location
-            if (event.getTo() == Material.AIR)
+    private void handleFallingBlockChangeBlock(EntityChangeBlockEvent event, FallingBlock fallingBlock)
+    {
+        Block block = event.getBlock();
+        Location blockLocation = block.getLocation();
+
+        //if changing a block TO air, this is when the falling block formed.  note its original location
+        if (event.getTo() == Material.AIR)
+        {
+            fallingBlock.setMetadata("GP_FALLINGBLOCK", new FixedMetadataValue(GriefPrevention.instance, blockLocation));
+            return;
+        }
+
+        // Otherwise, the falling block is forming a block.
+
+        ClaimsMode claimsMode = GriefPrevention.instance.config_claims_worldModes.get(block.getWorld());
+        // If claims are disabled, the block is always allowed to form.
+        if (claimsMode == ClaimsMode.Disabled) return;
+
+        List<MetadataValue> values = fallingBlock.getMetadata("GP_FALLINGBLOCK");
+        //if we're not sure where this entity came from (maybe another plugin didn't follow the standard?), allow the block to form
+        //Or if entity fell through an end portal, allow it to form, as the event is erroneously fired twice in this scenario.
+        if (values.isEmpty() || !(values.get(0).value() instanceof Location originalLocation)) return;
+
+        // If it fell straight down, allow.
+        if (originalLocation.getBlockX() == blockLocation.getBlockX() && originalLocation.getBlockZ() == blockLocation.getBlockZ())
+        {
+            return;
+        }
+
+        //in creative mode worlds, never form the block
+        if (claimsMode == ClaimsMode.Creative)
+        {
+            event.setCancelled(true);
+            fallingBlock.remove();
+            return;
+        }
+
+        //in other worlds, if landing in land claim, only allow if source was also in the land claim
+        Claim claim = this.dataStore.getClaimAt(blockLocation, false, null);
+
+        // If landing in a claim...
+        if (claim != null)
+        {
+            // If the claim contains the formation point, allow block to form.
+            if (claim.contains(originalLocation, false, false)) return;
+
+            // If the claim is an unrestricted subclaim and the block is from
+            // within the parent (but not another subclaim!) block may form.
+            if (claim.parent != null && !claim.getSubclaimRestrictions() && claim.parent.contains(originalLocation, false, true))
             {
-                entity.setMetadata("GP_FALLINGBLOCK", new FixedMetadataValue(GriefPrevention.instance, block.getLocation()));
-            }
-            //otherwise, the falling block is forming a block.  compare new location to original source
-            else
-            {
-                List<MetadataValue> values = entity.getMetadata("GP_FALLINGBLOCK");
-                //if we're not sure where this entity came from (maybe another plugin didn't follow the standard?), allow the block to form
-                //Or if entity fell through an end portal, allow it to form, as the event is erroneously fired twice in this scenario.
-                if (values.size() < 1) return;
-
-                Location originalLocation = (Location) (values.get(0).value());
-                Location newLocation = block.getLocation();
-
-                //if did not fall straight down
-                if (originalLocation.getBlockX() != newLocation.getBlockX() || originalLocation.getBlockZ() != newLocation.getBlockZ())
-                {
-                    //in creative mode worlds, never form the block
-                    if (GriefPrevention.instance.config_claims_worldModes.get(newLocation.getWorld()) == ClaimsMode.Creative)
-                    {
-                        event.setCancelled(true);
-                        entity.remove();
-                        return;
-                    }
-
-                    //in other worlds, if landing in land claim, only allow if source was also in the land claim
-                    Claim claim = this.dataStore.getClaimAt(newLocation, false, null);
-                    if (claim != null && !claim.contains(originalLocation, false, false))
-                    {
-                        //when not allowed, drop as item instead of forming a block
-                        event.setCancelled(true);
-
-                        // Just in case, skip already dead entities.
-                        if (entity.isDead())
-                        {
-                            return;
-                        }
-
-                        // Remove entity so it doesn't continuously spawn drops.
-                        entity.remove();
-
-                        ItemStack itemStack = new ItemStack(entity.getBlockData().getMaterial(), 1);
-                        block.getWorld().dropItemNaturally(entity.getLocation(), itemStack);
-                    }
-                }
+                return;
             }
         }
+        // If not landing in a claim and claims are not required, allow block to form.
+        else if (claimsMode == ClaimsMode.Survival) return;
+
+        //when not allowed, drop as item instead of forming a block
+        event.setCancelled(true);
+
+        // Just in case, skip already dead entities.
+        if (fallingBlock.isDead())
+        {
+            return;
+        }
+
+        // Remove entity so it doesn't continuously spawn drops.
+        fallingBlock.remove();
+
+        ItemStack itemStack = new ItemStack(fallingBlock.getBlockData().getMaterial(), 1);
+        block.getWorld().dropItemNaturally(fallingBlock.getLocation(), itemStack);
     }
 
     private void handleProjectileChangeBlock(EntityChangeBlockEvent event, Projectile projectile)
